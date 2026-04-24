@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Assessing Data Quality</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="assessing-data-quality">
+<h1 class="title">Assessing Data Quality</h1>
+<p><strong>Why</strong></p>
+<p>The first step after data processing is analysis of the diffraction
+data to assess quality and detect any pathologies that might make
+structure solution difficult. Data quality can be quantified in terms of
+resolution of diffraction, anomalous signal-to-noise, and consistency
+with prior knowledge about diffraction from crystals.</p>
+<p>Possible pathologies include twinning, translational non-crystallographic
+symmetry, anisotropy, and missed symmetry elements. For example, crystals
+are considered ‘twinned’ if two or more separate crystals (domains) are
+intergrown in such a way that they share some crystal lattice
+points in a symmetrical manner. And translational noncrystallographic
+symmetry (tNCS) occurs when two or more independent copies of a molecule
+or assembly have a similar orientation in the asymmetric unit of the crystal.</p>
+<p><strong>How</strong></p>
+<p>The <em>phenix.xtriage</em> program analyzes data to assess quality and
+detect possible problems. For most uses, the program only requires a
+reflection file containing the data set you wish to analyze. Running
+<em>phenix.xtriage</em> generates information about the data set, which is best
+viewed in the GUI as graphs and tables. The first section of the output
+provides an overall assessment of the data.</p>
+<p><strong>How to use the phenix.xtriage GUI:</strong> <a class="reference external" href="../reference/xtriage_gui.html">Click here</a></p>
+<p><a class="reference external" href="../reference/xtriage.html">Phenix reference manual for
+phenix.xtriage</a></p>
+<p><strong>Common issues</strong></p>
+<p><em>Interpretation of twinning results</em>: There are two parts to testing for
+twinning — determining whether the overall intensity statistics look
+normal, and testing for specific twinning operations. Both kinds of
+tests need to indicate twinning for the data set to be considered
+twinned. In some cases, the tests of specific twinning operations return
+a high twin fraction but the overall intensity statistics look normal;
+this should not be interpreted as twinning. More likely, a symmetry element
+is missing, and <em>phenix.xtriage</em> might suggest a higher symmetry.</p>
+<p><strong>Related programs and Documentation</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="../reference/plan_sad_experiment.html">phenix.plan_sad_experiment</a>:
+This tool allows you to plan your SAD data collection strategy by
+estimating the anomalous signal and the probability of solving your
+structure with SAD based on the anomalously-scattering atoms, wavelength, size
+of your molecule, and overall I/sigI for your dataset.</li>
+<li><a class="reference external" href="../reference/anomalous_signal.html">phenix.anomalous_signal</a>:
+This tool is like
+<a class="reference external" href="../reference/plan_sad_experiment.html">phenix.plan_sad_experiment</a>
+except that it uses your measured data to give much more accurate
+estimates. Specifically, it uses your scaled data, two half-dataset files
+of your scaled data, the name of the anomalously-scattering atom, and the
+number of sites in the substructure in order to estimate the anomalous
+signal in your data and the probability of solving your structure by SAD.
+You can create the necessary scaled half-datasets using
+<a class="reference external" href="../reference/scale_and_merge.html">phenix.scale_and_merge</a>.</li>
+<li><a class="reference external" href="http://cci.lbl.gov/docs/cctbx/doc_hklviewer/">HKLviewer</a>:
+This program visualizes reciprocal space data. This can be very useful for detecting
+systematic problems, such as incompleteness (e.g., missing cones or wedges),
+TNCS or twinning.</li>
+<li><a class="reference external" href="../reference/explore_metric_symmetry.html">phenix.explore_metric_symmetry</a>:
+This program tests whether your crystal lattice is
+consistent with other lattices/symmetries. It also can test whether
+two lattices are related. (Command line only).</li>
+<li><a class="reference external" href="../reference/unmerged_data.html">Using unmerged data in Phenix</a>:
+You can analyze unmerged data in Phenix to provide useful
+information, including the new CC1/2 and CC* statistics. The
+program <em>phenix.merging_statistics</em> calculates these and
+a number of other statistics. The program
+<a class="reference external" href="../reference/scale_and_merge.html">phenix.scale_and_merge</a>
+scales unmerged data for you.</li>
+</ul>
+</div>
+    
+  </body>
+</html>

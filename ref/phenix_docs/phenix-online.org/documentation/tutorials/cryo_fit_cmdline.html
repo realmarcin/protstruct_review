@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Tutorial: Fitting Biomolecules into Cryo-EM Maps using MD Simulation (command-line)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="tutorial-fitting-biomolecules-into-cryo-em-maps-using-md-simulation-command-line">
+<h1 class="title">Tutorial: Fitting Biomolecules into Cryo-EM Maps using MD Simulation (command-line)</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="cryo_fit_cmdline.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="cryo_fit_cmdline.html#overview" id="toc-entry-1">Overview</a></li>
+<li><a class="reference internal" href="cryo_fit_cmdline.html#input-files" id="toc-entry-2">Input files</a></li>
+<li><a class="reference internal" href="cryo_fit_cmdline.html#basic-command-line-syntax" id="toc-entry-3">Basic command-line syntax</a></li>
+<li><a class="reference internal" href="cryo_fit_cmdline.html#running-the-tutorial-with-provided-strucure-and-map" id="toc-entry-4">Running the tutorial with provided strucure and map</a></li>
+<li><a class="reference internal" href="cryo_fit_cmdline.html#output" id="toc-entry-5">Output</a></li>
+<li><a class="reference internal" href="cryo_fit_cmdline.html#example" id="toc-entry-6">Example</a></li>
+<li><a class="reference internal" href="cryo_fit_cmdline.html#limitation" id="toc-entry-7">Limitation</a></li>
+<li><a class="reference internal" href="cryo_fit_cmdline.html#how-to-generate-and-record-movie" id="toc-entry-8">How to generate and record movie?</a></li>
+<li><a class="reference internal" href="cryo_fit_cmdline.html#options" id="toc-entry-9">Options</a></li>
+<li><a class="reference internal" href="cryo_fit_cmdline.html#list-of-the-most-useful-options" id="toc-entry-10">List of the most useful options</a></li>
+<li><a class="reference internal" href="cryo_fit_cmdline.html#list-of-all-available-keywords" id="toc-entry-11">List of all available keywords</a></li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h1><a class="toc-backref" href="cryo_fit_cmdline.html#toc-entry-1">Overview</a></h1>
+<p>This tutorial will show you how to fit biomolecular structures
+into cryo-EM maps using molecular dynamics simulation with Cryo_fit
+under the PHENIX command-line environment.</p>
+<p>For GUI tutorial, please see the <a class="reference external" href="cryo_fit_gui.html">cryo_fit_gui_tutorial</a>.</p>
+<p>Theoretical explanation of Cryo_fit is <a class="reference external" href="../reference/cryo_fit.html">here</a>.</p>
+<p>For Cryo_fit installation, please see <a class="reference external" href="cryo_fit_install.html">installation notes for cryo_fit</a>.</p>
+</div>
+<div class="section" id="input-files">
+<h1><a class="toc-backref" href="cryo_fit_cmdline.html#toc-entry-2">Input files</a></h1>
+<p>&lt;initial_model&gt; and &lt;target_map&gt;</p>
+<dl class="docutils">
+<dt>Initial Model: .cif or .pdb</dt>
+<dd>The initial model is a guide or template structure (CIF/mmCIF/pdb) that is close to the model representing the target cryo EM map structurally.</dd>
+</dl>
+<p>Target Map: .ccp4, .map/.mrc (MRC style binary file), or .sit (Situs style text file)</p>
+</div>
+<div class="section" id="basic-command-line-syntax">
+<h1><a class="toc-backref" href="cryo_fit_cmdline.html#toc-entry-3">Basic command-line syntax</a></h1>
+<ul class="simple">
+<li>phenix.cryo_fit &lt;initial_model&gt; &lt;target_map&gt;</li>
+</ul>
+<blockquote>
+<ul class="simple">
+<li>For example, phenix.cryo_fit model.pdb map.ccp4</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="running-the-tutorial-with-provided-strucure-and-map">
+<h1><a class="toc-backref" href="cryo_fit_cmdline.html#toc-entry-4">Running the tutorial with provided strucure and map</a></h1>
+<ul class="simple">
+<li>Use the map and model files in $PHENIX/modules/cryo_fit/tutorial_input_files</li>
+</ul>
+<p>Command:</p>
+<pre class="literal-block">
+phenix.cryo_fit GTPase_activation_center_tutorial.pdb GTPase_activation_center_tutorial_gaussian_1p5.mrc
+</pre>
+</div>
+<div class="section" id="output">
+<h1><a class="toc-backref" href="cryo_fit_cmdline.html#toc-entry-5">Output</a></h1>
+<p>The &quot;Output&quot; folder has all the useful output files</p>
+<p>Cryo_fit saves 3 structures with the highest correlation coefficients (CC):</p>
+<blockquote>
+<ul class="simple">
+<li>cryo_fitted_chain_recovered_cleaned_for_real_space_refine_molprobity.pdb</li>
+<li>extracted_&lt;x&gt;_ps.pdb</li>
+<li>extracted_&lt;y&gt;_ps.pdb</li>
+</ul>
+</blockquote>
+<dl class="docutils">
+<dt>These are</dt>
+<dd><ul class="first simple">
+<li>The final cryo_fitted structure (The PDB file with the highest CC):</li>
+</ul>
+<blockquote>
+<ul class="simple">
+<li>cryo_fitted_chain_recovered_cleaned_for_real_space_refine_molprobity.pdb</li>
+</ul>
+</blockquote>
+<ul class="simple">
+<li>A &lt;x&gt;.gro file is for vmd visualization.</li>
+<li>A geometry extracted PDB file at certain (x) pico second during MD simualtion:</li>
+</ul>
+<blockquote class="last">
+<ul class="simple">
+<li>extracted_&lt;x&gt;_ps.pdb</li>
+</ul>
+</blockquote>
+</dd>
+</dl>
+<p>If Cryo_fit cannot find a structure with higher CC than that of the starting model, the input PDB file will exist in the output folder.</p>
+<p>Also, the history of the CCs between cryo_fitted structures and the cryo-EM map is stored in the &quot;cc_record&quot; file.</p>
+<ul class="simple">
+<li>In summary, the PDB file with the highest structure-map CC after a successful run is</li>
+</ul>
+<blockquote>
+<ul class="simple">
+<li>cryo_fitted_chain_recovered_cleaned_for_real_space_refine_molprobity.pdb</li>
+</ul>
+</blockquote>
+<ul class="simple">
+<li>For structure samples among those with top-ranked CCs, use</li>
+</ul>
+<blockquote>
+<ul class="simple">
+<li>extracted_&lt;x&gt;_ps.pdb</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="example">
+<h1><a class="toc-backref" href="cryo_fit_cmdline.html#toc-entry-6">Example</a></h1>
+<img alt="../images/cryo_fit_result.jpg" src="../images/cryo_fit_result.jpg" />
+</div>
+<div class="section" id="limitation">
+<h1><a class="toc-backref" href="cryo_fit_cmdline.html#toc-entry-7">Limitation</a></h1>
+<p>Gromacs4.5.5 does not handle water molecules in structure files. Cryo_fit will remove any water from the input coordinate before starting.</p>
+<p>Cryo_fit doesn't handle less commom monomers such as 7C4, BMA,
+GDP, ILX, NAG, SEP, TRX. It will simply exclude those monomers
+and report what are excluded.</p>
+</div>
+<div class="section" id="how-to-generate-and-record-movie">
+<h1><a class="toc-backref" href="cryo_fit_cmdline.html#toc-entry-8">How to generate and record movie?</a></h1>
+<p><a class="reference external" href="cryo_fit_movie.html">Generate_record_movie_by_cryo_fit1</a></p>
+</div>
+<div class="section" id="options">
+<h1><a class="toc-backref" href="cryo_fit_cmdline.html#toc-entry-9">Options</a></h1>
+<p>Default options will be used if unspecified. Expert users of Gromacs may want to
+customize some options if needed.</p>
+</div>
+<div class="section" id="list-of-the-most-useful-options">
+<h1><a class="toc-backref" href="cryo_fit_cmdline.html#toc-entry-10">List of the most useful options</a></h1>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="15%" />
+<col width="59%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>Option</td>
+<td>Default value</td>
+<td>Description of inputs
+and uses</td>
+</tr>
+<tr><td>emweight_multiply_by</td>
+<td>8</td>
+<td>Multiply by this number to the number of atoms for
+weight for cryo-EM map bias.
+For example, emweight = (number of atoms in gro file)
+x (emweight_multiply_by which is 8)
+The higher the weight, the stronger bias toward EM map
+rather than MD force field and stereochemistry
+preserving constraints. If user's map has a better
+resolution, higher value of emweight_multiply_by is
+recommended since map has much information.
+If user's map has have a worse resolution, lower value
+of emweight_multiply_by is recommended for more likely
+geometry.
+If CC (correlation coefficient) needs to be improved
+faster, higher number of emweight_multiply_by is
+recommended.</td>
+</tr>
+<tr><td>nproc</td>
+<td>max cores</td>
+<td>Specify number of cores for minimization and cryo_fit.
+If it is not specified, or max is chosen, the cryo_fit
+will try to use most cores automatically (up to 16)</td>
+</tr>
+<tr><td>number_of_steps_for_cr
+yo_fit</td>
+<td>None</td>
+<td>This is the initial number of steps for cryo_fit.
+Eventually, cryo_fit will increase it depending on
+molecule size and cc trend. For tutorial files, this
+will be 70,000</td>
+</tr>
+<tr><td>number_of_steps_for_mi
+nimization</td>
+<td>None</td>
+<td>Specify number of steps for minimization.
+If this is left blank, cryo_fit will estimate it
+depending on molecule size.number of steps for
+cryo_fit. Enough minimization will prevent &quot;blow-up&quot;
+during MD simulation later.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1><a class="toc-backref" href="cryo_fit_cmdline.html#toc-entry-11">List of all available keywords</a></h1>
+<p>{{phil:cryo_fit.command_line.run}}</p>
+</div>
+</div>
+    
+  </body>
+</html>

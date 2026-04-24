@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Map improvement (cryo-EM)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="map-improvement-cryo-em">
+<h1 class="title">Map improvement (cryo-EM)</h1>
+<p><strong>Why</strong></p>
+<p>Cryo-EM maps can be improved by methods such as sharpening/blurring and density
+modification.</p>
+<p>Sharpening can reveal the high-resolution details concealed in the cryo-EM map.
+Often, cryo-EM maps can appear smooth and can lack a high level of detail (contrast)
+because high-resolution amplitudes of corresponding Fourier map coefficients
+decay from causes such as radiation damage, sample movement, sample heterogeneity,
+and errors in the reconstruction procedure. We note that sharpening (and
+blurring) modify the amplitudes of Fourier coefficients and leave the phases
+unchanged.</p>
+<p>Density modification can be used to improve a cryo-EM map by adjusting the Fourier coefficients
+to better agree with both the original map and the expected features. This
+improvement relies on two ideas: (1) the Fourier coefficients representing the
+map are uncorrelated, and (2) some features in a map region are known in advance.</p>
+<p><strong>How</strong></p>
+<p>The program <em>phenix.map_sharpening</em> performs map sharpening by optimizing the detail and
+connectivity of a cryo-EM map. It tests several resolution-dependent functions
+and outputs the one with maximal clarity, based on adjusted surface area (default)
+or kurtosis. The program works best on maps with 4.5 Å or better resolution.
+At lower resolutions, it may be unable to distinguish variations in the quality of
+the map as the sharpening is varied. Typically, optimal sharpening is determined by
+examining a box cut out of the map, and then applying this to the entire map; however,
+other options are available.</p>
+<p>The program <em>phenix.resolve_cryo_em</em> performs density modification of a cryo-EM
+map using two unmasked half-maps, the FSC-based resolution, and a sequence file specifying the
+contents of the map. You can also supply a model, which will be randomized, refined, and
+used in model-based density modification. You normally access the program's functionality
+by running the ResolveCryoEM tool in the Phenix GUI.</p>
+<p><strong>How to use phenix.map_sharpening:</strong> <a class="reference external" href="../reference/map_sharpening.html">Click
+here</a></p>
+<p><strong>How to use phenix.resolve_cryo_em:</strong> <a class="reference external" href="../reference/resolve_cryo_em.html">Click
+here</a></p>
+<p><strong>Common issues</strong></p>
+<ul class="simple">
+<li><em>phenix.map_sharpening</em> doesn't work for <em>map_box</em>-produced maps: <em>map_sharpening</em> should
+not be used on maps produced with the exact-unique option of <em>map_box</em>. These maps are
+closely masked around the density of a single molecular, so much of the map is
+set to zero. Therefore, the map is missing noise information and <em>auto-sharpen</em>
+doesn't work properly.</li>
+<li><em>phenix.resolve_cryo_em</em> doesn't work well: Poor results could be due to using
+masked half-maps, having non-uniform solvent noise, or getting interference from
+having very prominent density away from the macromolecule. The program can also
+crash if you have limited memory and are using multiple processors. See
+<a class="reference external" href="../reference/resolve_cryo_em.html">phenix.resolve_cryo_em</a> for ways to
+address these issues.</li>
+</ul>
+<p><strong>Related programs</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="../reference/map_symmetry.html">phenix.map_symmetry</a>: This tool finds internal symmetries
+in a map, allowing the map to be reduced to the repeating unit.</li>
+<li><a class="reference external" href="../reference/map_box.html">phenix.map_box</a>: This tool cuts out a box from a
+larger map. It is used to extract the unique part of a map.</li>
+<li><a class="reference external" href="../reference/combine_focused_maps.html">phenix.combine_focused_maps</a>: This tool
+creates a weighted composition map from a set of locally focused maps and associated models,
+where each part of each map is weighted by its correlation with the corresponding model.
+The maps do not have to be superimposed or even have the same gridding or size.</li>
+</ul>
+</div>
+    
+  </body>
+</html>

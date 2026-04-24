@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>phenix.fem: compute Feature Enhanced Map (FEM)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="phenix-fem-compute-feature-enhanced-map-fem">
+<h1 class="title">phenix.fem: compute Feature Enhanced Map (FEM)</h1>
+<p><strong>Description</strong></p>
+<blockquote>
+<p>The program reads PDB model, reflection data (Fobs or Iobs), experimental
+uncertainties and R-free flags, if available. Then it computes
+{2mFobs-DFmodel, Phase_model} map that is subject to FEM procedure.</p>
+<dl class="docutils">
+<dt>Output is MTZ file with three sets of Fourier map coefficients:</dt>
+<dd><ul class="first last simple">
+<li>2mFoDFc,PHI2mFoDFc: usual {2mFobs-DFmodel, Phase_model} sigma-a weighted
+synthesis. No anisotropy correction or filling missing data.</li>
+<li>ResolveDM,PHIResolveDM: Resolve density modified map coefficients</li>
+<li>FEM,PHIFEM: Feature Enhanced Map</li>
+</ul>
+</dd>
+</dl>
+</blockquote>
+<p><strong>Command line usage examples</strong></p>
+<blockquote>
+<ol class="arabic">
+<li><p class="first">Running with all defaults:</p>
+<pre class="literal-block">
+% phenix.fem model.pdb data.mtz
+</pre>
+</li>
+<li><p class="first">Specify data label:</p>
+<pre class="literal-block">
+% phenix.fem data.mtz model.pdb label=Fobs
+</pre>
+</li>
+<li><p class="first">Specify scattering dictionary (X-ray, electron, neutron):</p>
+<pre class="literal-block">
+% phenix.fem model.pdb data.mtz scattering_label=neutron
+</pre>
+</li>
+<li><dl class="first docutils">
+<dt>Some other settings and their defaults:</dt>
+<dd><ul class="first last simple">
+<li>use_omit=True        : use OMIT map</li>
+<li>use_resolve=Auto     : use Resolve DM as extra filter</li>
+<li>use_max_map=True     : use 'maximal synthesis'</li>
+<li>file_name_prefix=fem : file prefix for output</li>
+<li>For more settings run phenix.fem without arguments in the command line.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</blockquote>
+<p><strong>GUI</strong></p>
+<blockquote>
+Graphical user interface is available</blockquote>
+<p><strong>Additional information</strong></p>
+<blockquote>
+<p>Latest presentation of FEM methodology:</p>
+<blockquote>
+<a class="reference external" href="https://phenix-online.org/presentations/fem_06MAY2014.pdf">http://phenix-online.org/presentations/fem_06MAY2014.pdf</a></blockquote>
+<p>Publication in Computational Crystallography Newsletter (front page):</p>
+<blockquote>
+<a class="reference external" href="http://www.phenix-online.org/newsletter/CCN_2013_07.pdf">http://www.phenix-online.org/newsletter/CCN_2013_07.pdf</a></blockquote>
+</blockquote>
+<div class="section" id="references">
+<h1>References</h1>
+<p><ul><li><b>FEM: feature-enhanced map.</b> P.V. Afonine, N.W. Moriarty, M. Mustyakimov, O.V. Sobolev, T.C. Terwilliger, D. Turk, A. Urzhumtsev, and P.D. Adams.  <i>Acta Cryst.</i> D<b>71</b>, 646-666 (2015).</li>
+</ul></p>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">random_seed</span><span class="phil-words"> = 2679941 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_omit</span><span class="phil-words"> = True </span><span class="phil-help">Use composite OMIT protocol</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sharp</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_unsharp_masking</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolution_factor</span><span class="phil-words"> = 1./4 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">signal_threshold</span><span class="phil-words"> = 0.5 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_resolve</span><span class="phil-words"> = Auto </span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_max_map</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ignore_zero_occupancy_atoms</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">sequence</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">scattering_table</span><span class="phil-words"> = wk1995 it1992 *n_gaussian neutron electron </span></li><li class="phil-param" data-expert="0"><span class="phil-name">wavelength</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">energy</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_experimental_phases</span><span class="phil-words"> = False </span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">xray_data</span><span class="phil-help">Scope of X-ray data and free-R flags</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">labels</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">high_resolution</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">low_resolution</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">twin_law</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">outliers_rejection</span><span class="phil-words"> = True </span><span class="phil-help">Remove basic wilson outliers , extreme wilson outliers , and beamstop shadow outliers</span></li><li class="phil-param" data-expert="0"><span class="phil-name">french_wilson_scale</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">sigma_fobs_rejection_criterion</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">sigma_iobs_rejection_criterion</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="1"><span class="phil-name">ignore_all_zeros</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="1"><span class="phil-name">force_anomalous_flag_to_be_equal_to</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="2"><span class="phil-name">convert_to_non_anomalous_if_ratio_pairs_lone_less_than_threshold</span><span class="phil-words"> = 0.5 </span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">french_wilson</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">max_bins</span><span class="phil-words"> = 60 </span><span class="phil-help">Maximum number of resolution bins</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_bin_size</span><span class="phil-words"> = 40 </span><span class="phil-help">Minimum number of reflections per bin</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">r_free_flags</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">This is normally the same as the file containing Fobs and is usually selected automatically.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">label</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">required</span><span class="phil-words"> = True </span><span class="phil-help">Specify if free-r flags are must be present (or else generated)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">test_flag_value</span><span class="phil-words"> = None </span><span class="phil-help">This value is usually selected automatically - do not change unless you really know what you're doing!</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ignore_r_free_flags</span><span class="phil-words"> = False </span><span class="phil-help">Use all reflections in refinement (work and test)</span></li><li class="phil-param" data-expert="2"><span class="phil-name">disable_suitability_test</span><span class="phil-words"> = False </span></li><li class="phil-param" data-expert="2"><span class="phil-name">ignore_pdb_hexdigest</span><span class="phil-words"> = False </span><span class="phil-help">If True, disables safety check based on MD5 hexdigests stored in PDB files produced by previous runs.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">generate</span><span class="phil-words"> = False </span><span class="phil-help">Generate R-free flags (if not available in input files)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fraction</span><span class="phil-words"> = 0.1 </span></li><li class="phil-param" data-expert="2"><span class="phil-name">max_free</span><span class="phil-words"> = 2000 </span></li><li class="phil-param" data-expert="2"><span class="phil-name">lattice_symmetry_max_delta</span><span class="phil-words"> = 5 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_lattice_symmetry</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_dataman_shells</span><span class="phil-words"> = False </span><span class="phil-help">Used to avoid biasing of the test set by certain types of non-crystallographic symmetry.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_shells</span><span class="phil-words"> = 20 </span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">pdb</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">Model file(s) name (PDB)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">monomers</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">Monomer file(s) name (CIF)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">maps</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">map_file_name</span><span class="phil-words"> = None </span><span class="phil-help">A CCP4-formatted map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">d_min</span><span class="phil-words"> = None </span><span class="phil-help">Resolution of map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coefficients_file_name</span><span class="phil-words"> = None </span><span class="phil-help">MTZ file containing map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coefficients_label</span><span class="phil-words"> = None </span><span class="phil-help">Data label for complex map coefficients in MTZ file</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name_prefix</span><span class="phil-words"> = fem </span></li><li class="phil-param" data-expert="0"><span class="phil-name">column_root_label</span><span class="phil-words"> = FEM </span></li><li class="phil-param" data-expert="0"><span class="phil-name">gui_output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

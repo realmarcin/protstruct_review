@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Auto-sharpen (deprecated, use MapSharpening)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="auto-sharpen-deprecated-use-mapsharpening">
+<h1 class="title">Auto-sharpen (deprecated, use MapSharpening)</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>auto_sharpen: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>The routine auto_sharpen will automatically identify optimal
+sharpening/blurring/map adjustment for the input map and will write
+out an optimized version of the map.</p>
+</div>
+<div class="section" id="video-tutorial">
+<h1>Video Tutorial</h1>
+<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/S56rYoZWxnM" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" ></iframe></div><p>The <a class="reference external" href="https://www.youtube.com/watch?v=S56rYoZWxnM">tutorial video</a> is available on the
+<a class="reference external" href="https://www.youtube.com/channel/UCcdI0hfHngWAZLJWynxPQWg">Phenix YouTube channel</a> and covers the
+following topics:</p>
+<ul class="simple">
+<li>basic overview</li>
+<li>how to run phenix.map_to_model via the GUI</li>
+</ul>
+</div>
+<div class="section" id="gui">
+<h1>GUI</h1>
+<p>A Graphical User Interface is available.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-auto-sharpen-works">
+<h1>How auto_sharpen works:</h1>
+<p>Auto-sharpen adjusts the resolution dependence of the map
+to maximize the clarity of the map.  You can choose to use
+map kurtosis or the adjusted surface area of the map which is the
+default for this purpose.</p>
+<p>The auto-sharpen tool works best at resolutions of about 4.5 A or
+better. At lower resolutions it may be unable to distinguish
+variations in the quality of the map as the sharpening is varied.</p>
+<p>Kurtosis is a standard statistical measure that reflects the peakiness of
+the map.</p>
+<p>The adjusted surface area is a combination of the surface area of
+contours in the map at a particular threshold
+and of the number of distinct regions enclosed by the top 30% (default) of
+those contours.  The threshold is chosen by default to be one where the
+volume enclosed by the contours is 20% of the non-solvent volume in the map.
+The weighting between the surface area (to be maximized) and number of regions
+enclosed (to be minimized) is chosen empirically (default region_weight=20).</p>
+<p>Several resolution-dependent functions are tested, and the one
+that gives the best adjusted surface area (or kurtosis) is chosen.
+In each case the map is transformed to obtain Fourier coefficients. The
+amplitudes of these coefficients are then adjusted, keeping the phases
+constant. The available functions for modifying the amplitudes are:</p>
+<pre class="literal-block">
+No sharpening (map is left as is)
+
+Sharpening b-factor applied over entire resolution range (b_sharpen
+applied to achieve an effective isotropic overall b-value of b_iso).
+
+Sharpening b-factor applied up to resolution specified with the
+resolution=xxx keyword, then blurred beyond this resolution (with
+transition specified by the keyword k_sharpen, b_iso_to_d_cut).  If
+the sharpening b_sharpen is negative (blurring the map),
+the blurring is applied over the entire resolution range.
+
+Resolution-dependent sharpening factor with three parameters.
+First the resolution-dependence of the map is removed by normalizing the
+amplitudes.  Then a scale factor S is to the data, where
+log10(S) is determined by coefficients b[0],b[1],b[2] and a resolution
+d_cut (typically d_cut is the nominal resolution of the map).
+The value of log10(S) varies smoothly from 0 at resolution=infinity, to b[0]
+at d_cut/2, to b[1] at d_cut, and to b[1]+b[2] at the highest resolution
+in the map.  The value of b[1] is limited to being no larger than b[0] and the
+value of b[1]+b[2] is limited to be no larger than b[1].
+</pre>
+<p>You can also choose to specify the sharpening/blurring parameters for your
+map and they will simply be applied to the map. For example you can apply
+a sharpening B-value (b_sharpen) to sharpen the map, or you can specify a
+target overall B-value (b_iso) to obtain after sharpening.</p>
+</div>
+<div class="section" id="box-of-density-in-sharpening">
+<h1><em>Box of density in sharpening</em></h1>
+<p>Normally phenix.auto_sharpen will determine the optimal sharpening by
+examining the density in a box cut out of your map, then apply this to
+the entire map.</p>
+</div>
+<div class="section" id="local-sharpening">
+<h1><em>Local sharpening</em></h1>
+<p>You can choose to apply autosharpening locally if you want.  In this case
+the auto-sharpening parameters are determined in many boxes cut out of
+the map, and corresponding sharpened maps are calculated.  The map that
+is produced is a weighted map where the density at a particular point
+comes most from the sharpened map based on a box near that point.</p>
+</div>
+<div class="section" id="half-map-based-sharpening">
+<h1><em>Half-map-based sharpening</em></h1>
+<p>You can identify the sharpening parameters using two half-maps if you
+want.  The resolution-dependent correlation of density in the two half-maps
+is used to identify the optimal resolution-dependent weighting of
+the map.  This approach requires a target resolution which is used
+to set the overall fall-off with resolution for an ideal map.  That
+fall-off for an ideal map is then multiplied by an estimated
+resolution-dependent correlation of density in the map with the true
+map (the estimation comes from the half-map correlations).</p>
+</div>
+<div class="section" id="model-based-sharpening">
+<h1><em>Model-based sharpening</em></h1>
+<p>You can identify instead the sharpening parameters using your map and a
+model.  This approach requires a guess of the RMSD between the model and
+the true model.  The resolution-dependent correlation of model and map
+density is used as in the half-map approach above to identify the
+weighting of Fourier coefficients.</p>
+</div>
+<div class="section" id="using-crystallographic-maps">
+<h1><em>Using crystallographic maps</em></h1>
+<p>You can use phenix.auto_sharpen with a crystallographic map (represented
+as map coefficients).</p>
+</div>
+<div class="section" id="shifting-the-map-to-the-origin">
+<h1><em>Shifting the map to the origin</em></h1>
+<p>Most crystallographic maps have the origin at the corner of the map (
+grid point [0,0,0]), while most cryo-EM maps have the orgin in the
+middle of the map.  An output map with the origin shifted to the
+corner of the map is optionally written out.</p>
+</div>
+<div class="section" id="output-files-from-auto-sharpen">
+<h1><em>Output files from auto_sharpen</em></h1>
+<p><strong>sharpened_map.ccp4</strong>: Sharpened map.</p>
+<p><strong>shifted_sharpened_map.ccp4</strong>: Sharpened map, shifted to place the origin on grid point (0,0,0) and sharpened</p>
+<p><strong>sharpened_map_coeffs.mtz</strong>: Sharpened map, shifted to place the origin on grid point (0,0,0) and sharpened, represented as map coefficients.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-auto-sharpen">
+<h1>Standard run of auto_sharpen:</h1>
+<p>Running auto_sharpen is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.auto_sharpen my_map.map resolution=2.6
+</pre>
+<p>where my_map.map is a CCP4, mrc or other related map format, and you
+specify the nominal resolution of the map.</p>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+<p>Maps produced with the extract-unique option of map_box should not be
+sharpened with auto-sharpen.  These maps are closely masked around the
+density of a single molecule and are set to zero in much of the map,
+so the information about noise in the map that normally is available
+is missing and auto-sharpen does not work properly.</p>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+<p><ul><li><b>Automated map sharpening by maximization of detail and connectivity.</b> T.C. Terwilliger, P.V. Afonine, Sobolev, OV, and P.D. Adams. <a href="https://doi.org/10.1107/S2059798318004655"><i>Acta Cryst.</i> D<b>74</b>, 545-559 (2018)</a>.</li>
+</ul></p>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">map_file</span><span class="phil-words"> = None </span><span class="phil-help">File with CCP4-style map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">half_map_file</span><span class="phil-words"> = None </span><span class="phil-help">Half map (two should be supplied) for FSC calculation. Must have grid identical to map_file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">external_map_file</span><span class="phil-words"> = None </span><span class="phil-help">External map to be used to scale map_file (power vs resolution will be matched)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_file</span><span class="phil-words"> = None </span><span class="phil-help">Optional file with map coefficients</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_labels</span><span class="phil-words"> = None </span><span class="phil-help">Optional label specifying which columns of of map coefficients to use</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_file</span><span class="phil-words"> = None </span><span class="phil-help">If a model is supplied, the map will be adjusted to maximize map-model correlation. This can be used to improve a map in regions where no model is yet built.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_file</span><span class="phil-words"> = None </span><span class="phil-help">File with NCS information (typically point-group NCS with the center specified). Typically in PDB format. Can also be a .ncs_spec file from phenix. Created automatically if symmetry is specified.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">seq_file</span><span class="phil-words"> = None </span><span class="phil-help">Sequence file (unique chains only, 1-letter code, chains separated by blank line or greater-than sign.) Can have chains that are DNA/RNA/protein and all can be present in one file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">input_weight_map_pickle_file</span><span class="phil-words"> = None </span><span class="phil-help">Weight map pickle file</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">shifted_map_file</span><span class="phil-words"> = shifted_map.ccp4 </span><span class="phil-help">Input map file shifted to new origin.</span></li><li class="phil-param" data-expert="1"><span class="phil-name">sharpened_map_file</span><span class="phil-words"> = None </span><span class="phil-help">Sharpened input map file. In the same location as input map.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">shifted_sharpened_map_file</span><span class="phil-words"> = None </span><span class="phil-help">Input map file shifted to place origin at 0,0,0 and sharpened.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sharpened_map_coeffs_file</span><span class="phil-words"> = None </span><span class="phil-help">Sharpened input map (shifted to new origin if original origin was not 0,0,0), written out as map coefficients</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_weight_map_pickle_file</span><span class="phil-words"> = weight_map_pickle_file.pkl </span><span class="phil-help">Output weight map pickle file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_directory</span><span class="phil-words"> = None </span><span class="phil-help">Directory where output files are to be written applied.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">is_crystal</span><span class="phil-words"> = None </span><span class="phil-help">Defines whether this is a crystal (or cryo-EM). Default is True if use_sg_symmetry=True and False otherwise.</span></li><li class="phil-param" data-expert="1"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">Optional nominal resolution of the map.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_content</span><span class="phil-words"> = None </span><span class="phil-help">Optional solvent fraction of the cell.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_content_iterations</span><span class="phil-words"> = 3 </span><span class="phil-help">Iterations of solvent fraction estimation. Used for ID of solvent content in boxed maps.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">molecular_mass</span><span class="phil-words"> = None </span><span class="phil-help">Molecular mass of molecule in Da. Used as alternative method of specifying solvent content.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_copies</span><span class="phil-words"> = None </span><span class="phil-help">You can specify ncs copies and seq file to define solvent content</span></li><li class="phil-param" data-expert="0"><span class="phil-name">wang_radius</span><span class="phil-words"> = None </span><span class="phil-help">Wang radius for solvent identification. Default is 1.5* resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">buffer_radius</span><span class="phil-words"> = None </span><span class="phil-help">Buffer radius for mask smoothing. Default is resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pseudo_likelihood</span><span class="phil-words"> = None </span><span class="phil-help">Use pseudo-likelihood method for half-map sharpening. (In development)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">map_modification</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">b_iso</span><span class="phil-words"> = None </span><span class="phil-help">Target B-value for map (sharpening will be applied to yield this value of b_iso). If sharpening method is not supplied, default is to use b_iso_to_d_cut sharpening.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_sharpen</span><span class="phil-words"> = None </span><span class="phil-help">Sharpen with this b-value. Contrast with b_iso that yields a targeted value of b_iso</span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_blur_hires</span><span class="phil-words"> = 200 </span><span class="phil-help">Blur high_resolution data (higher than d_cut) with this b-value. Contrast with b_sharpen applied to data up to d_cut. Note on defaults: If None and b_sharpen is positive (sharpening) then high-resolution data is left as is (not sharpened). If None and b_sharpen is negative (blurring) high-resolution data is also blurred.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolution_dependent_b</span><span class="phil-words"> = None </span><span class="phil-help">If set, apply resolution_dependent_b (b0 b1 b2). Log10(amplitudes) will start at 1, change to b0 at half of resolution specified, changing linearly, change to b1/2 at resolution specified, and change to b1/2+b2 at d_min_ratio*resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">normalize_amplitudes_in_resdep</span><span class="phil-words"> = False </span><span class="phil-help">Normalize amplitudes in resolution-dependent sharpening</span></li><li class="phil-param" data-expert="0"><span class="phil-name">d_min_ratio</span><span class="phil-words"> = 0.833 </span><span class="phil-help">Sharpening will be applied using d_min equal to d_min_ratio times resolution. Default is 0.833</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scale_max</span><span class="phil-words"> = 100000 </span><span class="phil-help">Scale amplitudes from inverse FFT to yield maximum of this value</span></li><li class="phil-param" data-expert="0"><span class="phil-name">input_d_cut</span><span class="phil-words"> = None </span><span class="phil-help">High-resolution limit for sharpening</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rmsd</span><span class="phil-words"> = None </span><span class="phil-help">RMSD of model to true model (if supplied). Used to estimate expected fall-of with resolution of correct part of model-based map. If None, assumed to be resolution times rmsd_resolution_factor.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rmsd_resolution_factor</span><span class="phil-words"> = 0.25 </span><span class="phil-help">default RMSD is resolution times resolution factor</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fraction_complete</span><span class="phil-words"> = None </span><span class="phil-help">Completness of model (if supplied). Used to estimate correct part of model-based map. If None, estimated from max(FSC).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">auto_sharpen</span><span class="phil-words"> = True </span><span class="phil-help">Automatically determine sharpening using kurtosis maximization or adjusted surface area. Default is True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">auto_sharpen_methods</span><span class="phil-words"> = no_sharpening b_iso *b_iso_to_d_cut resolution_dependent model_sharpening half_map_sharpening target_b_iso_to_d_cut external_map_sharpening None </span><span class="phil-help">Methods to use in sharpening. b_iso searches for b_iso to maximize sharpening target (kurtosis or adjusted_sa). b_iso_to_d_cut applies b_iso only up to resolution specified, with fall-over of k_sharpen. Resolution dependent adjusts 3 parameters to sharpen variably over resolution range. Default is b_iso_to_d_cut . target_b_iso_to_d_cut uses target_b_iso_ratio to set b_iso.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">box_in_auto_sharpen</span><span class="phil-words"> = False </span><span class="phil-help">Use a representative box of density for initial auto-sharpening instead of the entire map. Default is False.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_select_in_auto_sharpen</span><span class="phil-words"> = True </span><span class="phil-help">Choose representative box of density for initial auto-sharpening with density_select method (choose region where there is high density). Normally use False for X-ray data and True for cryo-EM.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_select_threshold_in_auto_sharpen</span><span class="phil-words"> = None </span><span class="phil-help">Threshold for density select choice of box. Default is 0.05. If your map has low overall contrast you might need to make this bigger such as 0.2.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">allow_box_if_b_iso_set</span><span class="phil-words"> = False </span><span class="phil-help">Allow box_in_auto_sharpen (if set to True) even if b_iso is set. Default is to set box_n_auto_sharpen=False if b_iso is set.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">soft_mask</span><span class="phil-words"> = True </span><span class="phil-help">Use soft mask (smooth change from inside to outside with radius based on resolution of map).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_weak_density</span><span class="phil-words"> = False </span><span class="phil-help">When choosing box of representative density, use poor density (to get optimized map for weaker density)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">discard_if_worse</span><span class="phil-words"> = None </span><span class="phil-help">Discard sharpening if worse</span></li><li class="phil-param" data-expert="0"><span class="phil-name">local_sharpening</span><span class="phil-words"> = None </span><span class="phil-help">Sharpen locally using overlapping regions. NOTE: Best to turn off local_aniso_in_local_sharpening if NCS is present. If local_aniso_in_local_sharpening is True and NCS is present this can distort the map for some NCS copies because an anisotropy correction is applied based on local density in one copy and is transferred without rotation to other copies.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">local_aniso_in_local_sharpening</span><span class="phil-words"> = None </span><span class="phil-help">Use local anisotropy in local sharpening. Default is True unless NCS is present.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">overall_before_local</span><span class="phil-words"> = True </span><span class="phil-help">Apply overall scaling before local scaling</span></li><li class="phil-param" data-expert="0"><span class="phil-name">select_sharpened_map</span><span class="phil-words"> = None </span><span class="phil-help">Select a single sharpened map to use</span></li><li class="phil-param" data-expert="0"><span class="phil-name">read_sharpened_maps</span><span class="phil-words"> = None </span><span class="phil-help">Read in previously-calculated sharpened maps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_sharpened_maps</span><span class="phil-words"> = None </span><span class="phil-help">Write out local sharpened maps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">smoothing_radius</span><span class="phil-words"> = None </span><span class="phil-help">Sharpen locally using smoothing_radius. Default is 2/3 of mean distance between centers for sharpening</span></li><li class="phil-param" data-expert="0"><span class="phil-name">box_center</span><span class="phil-words"> = None </span><span class="phil-help">You can specify the center of the box (A units)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">box_size</span><span class="phil-words"> = 30 30 30 </span><span class="phil-help">You can specify the size of the box (grid units)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_n_overlap</span><span class="phil-words"> = 10 </span><span class="phil-help">You can specify the targeted overlap of boxes in local sharpening</span></li><li class="phil-param" data-expert="0"><span class="phil-name">restrict_map_size</span><span class="phil-words"> = None </span><span class="phil-help">Restrict box map to be inside full map (required for cryo-EM data). Default is True if use_sg_symmetry=False and False if use_sg_symmetry=True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_aniso</span><span class="phil-words"> = True </span><span class="phil-help">You can remove anisotropy (overall and locally) during sharpening</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_box_fraction</span><span class="phil-words"> = 0.5 </span><span class="phil-help">If box is greater than this fraction of entire map, use entire map. Default is 0.5.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_select_max_box_fraction</span><span class="phil-words"> = 0.95 </span><span class="phil-help">If box is greater than this fraction of entire map, use entire map for density_select. Default is 0.95</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_cut</span><span class="phil-words"> = 0.2 </span><span class="phil-help">Estimate of minimum highly reliable CC in half-map FSC. Used to decide at what CC value to smooth the remaining CC values.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_cc_for_rescale</span><span class="phil-words"> = 0.2 </span><span class="phil-help">Used along with cc_cut and scale_using_last to correct for small errors in FSC estimation at high resolution. If the value of FSC near the high-resolution limit is above max_cc_for_rescale, assume these values are correct and do not correct them.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scale_using_last</span><span class="phil-words"> = 3 </span><span class="phil-help">If set, assume that the last scale_using_last bins in the FSC for half-map or model sharpening are about zero (corrects for errors int the half-map process).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mask_atoms</span><span class="phil-words"> = True </span><span class="phil-help">Mask atoms when using model sharpening</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mask_atoms_atom_radius</span><span class="phil-words"> = 3 </span><span class="phil-help">Mask for mask_atoms will have mask_atoms_atom_radius</span></li><li class="phil-param" data-expert="0"><span class="phil-name">value_outside_atoms</span><span class="phil-words"> = None </span><span class="phil-help">Value of map outside atoms (set to mean to have mean value inside and outside mask be equal)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">k_sharpen</span><span class="phil-words"> = 10 </span><span class="phil-help">Steepness of transition between sharpening (up to resolution ) and not sharpening (d &lt; resolution). Note: for blurring, all data are blurred (regardless of resolution), while for sharpening, only data with d about resolution or lower are sharpened. This prevents making very high-resolution data too strong. Note 2: if k_sharpen is zero or None, then no transition is applied and all data is sharpened or blurred.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">iterate</span><span class="phil-words"> = False </span><span class="phil-help">You can iterate auto-sharpening. This is useful in cases where you do not specify the solvent content and it is not accurately estimated until sharpening is optimized.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimize_b_blur_hires</span><span class="phil-words"> = False </span><span class="phil-help">Optimize value of b_blur_hires. Only applies for auto_sharpen_methods b_iso_to_d_cut and b_iso. This is normally carried out and helps prevent over-blurring at high resolution if the same map is sharpened more than once.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimize_d_cut</span><span class="phil-words"> = None </span><span class="phil-help">Optimize value of d_cut. Only applies for auto_sharpen_methods b_iso_to_d_cut and b_iso</span></li><li class="phil-param" data-expert="0"><span class="phil-name">adjust_region_weight</span><span class="phil-words"> = True </span><span class="phil-help">Adjust region_weight to make overall change in surface area equal to overall change in normalized regions over the range of search_b_min to search_b_max using b_iso_to_d_cut.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">region_weight_method</span><span class="phil-words"> = initial_ratio *delta_ratio b_iso </span><span class="phil-help">Method for choosing region_weights. Initial_ratio uses ratio of surface area to regions at low B value. Delta ratio uses change in this ratio from low to high B. B_iso uses resolution-dependent b_iso (not weights) with the formula b_iso=5.9*d_min**2</span></li><li class="phil-param" data-expert="0"><span class="phil-name">region_weight_factor</span><span class="phil-words"> = 1.0 </span><span class="phil-help">Multiplies region_weight after calculation with region_weight_method above</span></li><li class="phil-param" data-expert="0"><span class="phil-name">region_weight_buffer</span><span class="phil-words"> = 0.1 </span><span class="phil-help">Region_weight adjusted to be region_weight_buffer away from minimum or maximum values</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_b_iso_ratio</span><span class="phil-words"> = 5.9 </span><span class="phil-help">Target b_iso ratio : b_iso is estimated as target_b_iso_ratio * resolution**2</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_b_iso_model_scale</span><span class="phil-words"> = 0. </span><span class="phil-help">For model sharpening, the target_biso is scaled (normally zero).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">signal_min</span><span class="phil-words"> = 3.0 </span><span class="phil-help">Minimum signal in estimation of optimal b_iso. If not achieved, use any other method chosen.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_b_min</span><span class="phil-words"> = None </span><span class="phil-help">Low bound for b_iso search. Default is -100.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_b_max</span><span class="phil-words"> = None </span><span class="phil-help">High bound for b_iso search. Default is 300.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_b_n</span><span class="phil-words"> = None </span><span class="phil-help">Number of b_iso values to search. Default is 21.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">residual_target</span><span class="phil-words"> = None </span><span class="phil-help">Target for maximization steps in sharpening. Can be kurtosis or adjusted_sa (adjusted surface area). Default is adjusted_sa.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sharpening_target</span><span class="phil-words"> = None </span><span class="phil-help">Overall target for sharpening. Can be kurtosis or adjusted_sa (adjusted surface area). Used to decide which sharpening approach is used. Note that during optimization, residual_target is used (they can be the same.) Default is adjusted_sa.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">require_improvement</span><span class="phil-words"> = None </span><span class="phil-help">Require improvement in score for sharpening to be applied. Default is True.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">region_weight</span><span class="phil-words"> = None </span><span class="phil-help">Region weighting in adjusted surface area calculation. Score is surface area minus region_weight times number of regions. Default is set automatically. A smaller value will give more sharpening.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sa_percent</span><span class="phil-words"> = None </span><span class="phil-help">Percent of target regions used in calulation of adjusted surface area. Default is 30.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fraction_occupied</span><span class="phil-words"> = None </span><span class="phil-help">Fraction of molecular volume targeted to be inside contours. Used to set contour level. Default is 0.20</span></li><li class="phil-param" data-expert="1"><span class="phil-name">n_bins</span><span class="phil-words"> = None </span><span class="phil-help">Number of resolution bins for sharpening. Default is 20.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">regions_to_keep</span><span class="phil-words"> = None </span><span class="phil-help">You can specify a limit to the number of regions to keep when generating the asymmetric unit of density.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_regions_to_test</span><span class="phil-words"> = None </span><span class="phil-help">Number of regions to test for surface area in adjusted_sa scoring of sharpening. Default is 30</span></li><li class="phil-param" data-expert="0"><span class="phil-name">eps</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">k_sol</span><span class="phil-words"> = 0.35 </span><span class="phil-help">k_sol value for model map calculation. IGNORED (Not applied)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_sol</span><span class="phil-words"> = 50 </span><span class="phil-help">b_sol value for model map calculation. IGNORED (Not applied)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_size</span><span class="phil-words"> = None </span><span class="phil-help">Size of resolve to use. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ignore_map_limitations</span><span class="phil-words"> = None </span><span class="phil-help">Ignore limitations such as map cannot be sharpened</span></li><li class="phil-param" data-expert="0"><span class="phil-name">multiprocessing</span><span class="phil-words"> = *multiprocessing sge lsf pbs condor pbspro slurm </span><span class="phil-help">Choices are multiprocessing (single machine) or queuing systems</span></li><li class="phil-param" data-expert="0"><span class="phil-name">queue_run_command</span><span class="phil-words"> = None </span><span class="phil-help">run command for queue jobs. For example qsub.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of processors to use</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

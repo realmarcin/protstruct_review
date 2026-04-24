@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>ReadySet!</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="readyset">
+<h1 class="title"><em>ReadySet!</em></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="ready_set.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="ready_set.html#author" id="toc-entry-1">Author</a></li>
+<li><a class="reference internal" href="ready_set.html#purpose" id="toc-entry-2">Purpose</a></li>
+<li><a class="reference internal" href="ready_set.html#general-procedure" id="toc-entry-3">General Procedure</a></li>
+<li><a class="reference internal" href="ready_set.html#ligand-hydrogen-addition" id="toc-entry-4">Ligand hydrogen addition</a></li>
+<li><a class="reference internal" href="ready_set.html#metal-coordination" id="toc-entry-5">Metal coordination</a></li>
+<li><a class="reference internal" href="ready_set.html#neutron-exchange-addition" id="toc-entry-6">Neutron exchange addition</a></li>
+<li><a class="reference internal" href="ready_set.html#list-of-all-available-keywords" id="toc-entry-7">List of all available keywords</a></li>
+</ul>
+</div>
+<div class="section" id="author">
+<h1><a class="toc-backref" href="ready_set.html#toc-entry-1">Author</a></h1>
+<p>Nigel W. Moriarty</p>
+</div>
+<div class="section" id="purpose">
+<h1><a class="toc-backref" href="ready_set.html#toc-entry-2">Purpose</a></h1>
+<p><em>ReadySet!</em> is a program designed to prepare a PDB file for refinement
+as in <em>ReadySet! Refine!!!</em>. It will add hydrogens to the protein model
+using phenix.reduce and to the ligands using eLBOW. The appropriate
+restraints are also written to disk. Hydrogens can also be added to
+water molecules. Deuterium atoms can be added to facilitate dual
+xray-neutron refinement. Metal coordination files are also generated.</p>
+</div>
+<div class="section" id="general-procedure">
+<h1><a class="toc-backref" href="ready_set.html#toc-entry-3">General Procedure</a></h1>
+</div>
+<div class="section" id="ligand-hydrogen-addition">
+<h1><a class="toc-backref" href="ready_set.html#toc-entry-4">Ligand hydrogen addition</a></h1>
+<p>Including hydrogens in a refinement leads to better models. <em>ReadySet!</em>
+will add hydrogens to the ligands using eLBOW and PDB Chemical
+Components. The input PDB file is divided into 'standard' residues
+including the standard aminoacids and RNA/DNA bases. The other residues
+(usually ligands) are tested using the three-letter and atomic names
+against the PHENIX monomer library and the PDB Chemical Components
+database.</p>
+<p>If the ligand is determined to be in the PHENIX monomer library then the
+hydrogens are added with the atom naming from the library. This is done
+using a SMILES string taken from the PDB Chemical Components database
+and the atom names from the monomer library. In this case, the hydrogens
+are added to the output PDB file but there is no restraints written
+because phenix.refine will use the library restraints.</p>
+<p>If the ligand is determined to be in the PDB Chemical Components
+database, the SMILES string and the atom names are used to generate a
+molecule that represents the ligand. The atomic naming is determined
+using either the version 2 or version 3 PDB names. The restraints are
+written to disk.</p>
+<p>If no match is found in the PHENIX monomer library or PDB Chemical
+Components database, the residue atoms are used to generate the ligand.
+The restraints are written to disk.</p>
+<p>Once there is a ligand representation including hydrogens, the ligand
+must be included in the output. For each copy of the ligand in the model
+the presentation is pruned to match the number of non-hydrogen atoms and
+overlayed onto the ligand orientation. Hydrogens are added in an
+optimised geometry for each copy of the ligand.</p>
+<p>Covalently bound ligands are handled and two files, the CIF link
+restraints file and the atom selection file, are output.</p>
+</div>
+<div class="section" id="metal-coordination">
+<h1><a class="toc-backref" href="ready_set.html#toc-entry-5">Metal coordination</a></h1>
+<p>Any metals in the model are coordinated and the results output in an
+&quot;edits&quot; for phenix.refine. The distances and angles in the PDB file are
+used in the output.</p>
+</div>
+<div class="section" id="neutron-exchange-addition">
+<h1><a class="toc-backref" href="ready_set.html#toc-entry-6">Neutron exchange addition</a></h1>
+<p>Deuteriums are added to aminoacids that exhibit exchangeable sites. The
+hydrogens are placed in alternative location &quot;A&quot; and the corresponding
+deuteriums are placed in &quot;B&quot;.</p>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1><a class="toc-backref" href="ready_set.html#toc-entry-7">List of all available keywords</a></h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">ready_set</span><ul><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb_file_name</span><span class="phil-words"> = None </span><span class="phil-help">PDB filename containing protein model, ligands, metal centres and water molecules</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cif_file_name</span><span class="phil-words"> = None </span><span class="phil-help">CIF restraints file to provide chemical information for ligands</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cif_dir_name</span><span class="phil-words"> = None </span><span class="phil-help">directory containing CIF restraints file to provide chemical information for ligands</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_cache_directory</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_file_name</span><span class="phil-words"> = None </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">actions</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">hydrogens</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">histidine_nitrogen_protonation</span><span class="phil-words"> = False </span></li><li class="phil-param" data-expert="0"><span class="phil-name">neutron_option</span><span class="phil-words"> = *all_h all_d hd_and_h hd_and_d all_hd </span></li><li class="phil-param" data-expert="2"><span class="phil-name">add_h_to_water</span><span class="phil-words"> = False </span></li><li class="phil-param" data-expert="2"><span class="phil-name">add_d_to_water</span><span class="phil-words"> = False </span></li><li class="phil-param" data-expert="0"><span class="phil-name">neutron_exchange_hydrogens</span><span class="phil-words"> = False </span><span class="phil-help">Add deuteriums in exchangeable sites</span></li><li class="phil-param" data-expert="0"><span class="phil-name">perdeuterate</span><span class="phil-words"> = False </span><span class="phil-help">Add deuteriums in all possible sites</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligands</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimise_ligand_geometry</span><span class="phil-words"> = False </span><span class="phil-help">Perform an AM1 geometry optimisation on each ligand</span></li><li class="phil-param" data-expert="0"><span class="phil-name">trust_residue_code_is_chemical_components_code</span><span class="phil-words"> = False </span></li><li class="phil-param" data-expert="0"><span class="phil-name">metals</span><span class="phil-words"> = False </span><span class="phil-help">Generate edits file for metal coordination</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_waters</span><span class="phil-words"> = False </span><span class="phil-help">Remove waters from model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">link_to_edits</span><span class="phil-words"> = False </span><span class="phil-help">Output edits determined by LINK records</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimise_final_geometry_of_hydrogens</span><span class="phil-words"> = True </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">metal_coordination</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use_default_bondlengths</span><span class="phil-words"> = True </span><span class="phil-help">Use standard defaults for ideal bondlengths. If false use the input geometry values.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">bond_cutoff</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_angles</span><span class="phil-words"> = False </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">run_options</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">random_seed</span><span class="phil-words"> = 03056941001 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">run_within_refine</span><span class="phil-words"> = False </span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

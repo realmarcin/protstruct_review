@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Docking a model into a map</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="docking-a-model-into-a-map">
+<h1 class="title">Docking a model into a map</h1>
+<p><strong>Why</strong></p>
+<p>Obtaining the structure of a macromolecule generally requires building
+an atomic model that fits the cryo-EM map. A docking procedure is used
+to do this fitting if the model, or a part of the model, is known but has
+not been placed into the map.</p>
+<p>For example, your cryo-EM map might show a molecular complex assembled from
+components available from other experiments, such as X-ray crystallography.
+Then, you can dock these components' models into your cryo-EM map to obtain
+a model for the entire complex.</p>
+<p><strong>How</strong></p>
+<p>The program <em>phenix.dock_in_map</em> automatically docks one or several models into a map,
+using a convolution-based shape search to find a part of the map that is similar
+to the model. Initially, it performs a low-resolution search that focuses on
+the overall shape of the molecule, which is performed without rotation to
+optimize runtime. Alternatively, you can perform an initial fast search by
+matching the moments of inertia of the model and map, but this option requires
+an accurate map that looks a lot like the model. Next, if the placement is
+satisfactory, a full search can be run on multiple processors using real-space
+rigid-body refinement with the full resolution of the map.</p>
+<p>In a standard run of <em>phenix.dock_in_map</em>, you input the model (PDB file) that you
+want to place, a map (CCP4, MRC, or other map format file), the nominal resolution
+of the map, and the number of processors to use.The program outputs a search
+PDB file transformed to superpose on the target map file</p>
+<p><strong>Getting help from the Phenix chatbot</strong></p>
+<p>You can use the free Phenix
+<a class="reference external" href="../reference/chatbot.html">chatbot</a>
+to get help on any Phenix program.  Just ask it any question about using Phenix.</p>
+<p><strong>How to use phenix.dock_in_map:</strong> <a class="reference external" href="../reference/dock_in_map.html">Click
+here</a></p>
+<p><strong>Common issues</strong></p>
+<ul class="simple">
+<li>None</li>
+</ul>
+<p><strong>Related programs</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="../reference/cryo_fit.html">cryo_fit</a>: This tool performs flexible fitting
+of a model into a cryo-EM map.</li>
+</ul>
+</div>
+    
+  </body>
+</html>

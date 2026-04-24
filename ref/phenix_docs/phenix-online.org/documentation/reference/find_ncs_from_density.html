@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Finding NCS from density in a map with find_ncs_from_density</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="finding-ncs-from-density-in-a-map-with-find-ncs-from-density">
+<h1 class="title">Finding NCS from density in a map with find_ncs_from_density</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>find_ncs_from_density: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>find_ncs_from_density is a tool to identify NCS relationships
+directly from an electron density map specified with a map coefficients
+file. It writes out the NCS operators in a format that can be read by
+find_ncs and by the PHENIX wizards. Usually find_ncs_from_density is
+used through find_ncs (phenix.find_ncs contains
+find_ncs_from_density).</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-find-ncs-from-density-works">
+<h1>How find_ncs_from_density works:</h1>
+<ul class="simple">
+<li>The find_ncs_from_density algorithm first identifies potential
+locations of centers of macromolecules in the density map by finding
+maxima of the local RMS density using
+phenix.guess_molecular_centers.</li>
+<li>Then it cuts out a sphere of density centered at a trial center and
+carries out an FFT-based rotation-translation search to find all
+occurrences of similar density in the asymmetric unit of your map.</li>
+<li>The region over which NCS-related correlation is high is identified
+and the operators are written out as a &quot;find_ncs.ncs_spec&quot; file
+that can be read by the phenix wizards and a
+&quot;find_ncs.phenix_refine&quot; file that can be read by phenix.refine.</li>
+<li>You can run the algorithm as a whole or you can run each part
+separately with phenix.guess_molecular_centers and
+phenix.find_ncs_from_density.</li>
+</ul>
+</div>
+<div class="section" id="output-files-from-find-ncs-from-density">
+<h1><em>Output files from find_ncs_from_density</em></h1>
+<p><strong>find_ncs_from_density.ncs_spec</strong>: A formatted file that can be
+read by phenix.find_ncs and the PHENIX wizards that specifies the NCS
+operators. <strong>temp_dir/ncs_avg_map_coeffs.mtz</strong>: This is an mtz file
+with just one averaged NCS region written out in space group P1.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-find-ncs-from-density">
+<h1>Standard run of find_ncs_from_density:</h1>
+<p>Running find_ncs_from_density is easy. From the command-line you can
+type:</p>
+<pre class="literal-block">
+phenix.find_ncs_from_density  map_coeffs.mtz
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+<p>If your molecule is large, you may wish to increase the radius used for
+NCS identification (density_radius) and the peak separation
+(peak_separation). If your molecule has pseudo-symmetry you may also
+want to increase these parameters.</p>
+<p>If you know how many NCS copies are present, you may wish to specifying
+that with ncs_copies_max.</p>
+<p>If you want to have the program look much harder for NCS, try the keyword
+n_center_use=20  (or some other number larger than 1).  It will then take
+the top 20 positions found with guess_molecular_centers and try each one
+as a center for a molecule (instead of trying just the top 1 position).</p>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+<p><ul><li><b>Finding non-crystallographic symmetry in density maps of macromolecular structures.</b> T.C. Terwilliger. <a href="https://doi.org/10.1007/s10969-013-9157-7"><i>J Struct Funct Genomics</i> <b>14</b>, 91-5 (2013)</a>.</li>
+</ul></p>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">find_ncs_from_density</span><ul><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">mtz_in</span><span class="phil-words"> = None </span><span class="phil-help">MTZ file with coefficients for a map </span></li><li class="phil-param" data-expert="0"><span class="phil-name">labin</span><span class="phil-words"> = "" </span><span class="phil-help"> Labin line for MTZ file with map coefficients.
+                 This is optional if find_ncs_from_density
+                 can guess the correct coefficients
+                 for FP PHI and FOM.  Otherwise specify:
+                 LABIN FP=myFP PHIB=myPHI FOM=myFOM
+                 where myFP is your column label for FP </span></li><li class="phil-param" data-expert="0"><span class="phil-name">center_pdb_in</span><span class="phil-words"> = None </span><span class="phil-help">Optional PDB file with list of centers of density to be  used as search model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_mtz_in</span><span class="phil-words"> = None </span><span class="phil-help">MTZ file with coefficients for density around center    defined by first atom in center_pdb_in (required)   NOTE: Must be in space group p1 with identical cell to mtz_in</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_labin</span><span class="phil-words"> = "" </span><span class="phil-help"> Labin line for MTZ file density_mtz_in.
+                 This is optional if find_ncs_from_density
+                 can guess the correct coefficients
+                 for FP PHI and FOM.  Otherwise specify:
+                 LABIN FP=myFP PHIB=myPHI FOM=myFOM
+                 where myFP is your column label for FP </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">centers_pdb_out</span><span class="phil-words"> = guess_molecular_centers.pdb </span><span class="phil-help">Output PDB file with coords of centers</span></li><li class="phil-param" data-expert="0"><span class="phil-name">log</span><span class="phil-words"> = find_ncs_from_density.log </span><span class="phil-help">Output log file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_spec_file</span><span class="phil-words"> = 'find_ncs_from_density.ncs_spec' </span><span class="phil-help">NCS specification file with all NCS information</span></li><li class="phil-param" data-expert="0"><span class="phil-name">params_out</span><span class="phil-words"> = find_ncs_from_density_params.eff </span><span class="phil-help">Parameters file to rerun find_ncs_from_density</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_mask_file</span><span class="phil-words"> = None </span><span class="phil-help">If defined, map coefficients will be written to this file that show the asymmetric unit of NCS.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">directories</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = "temp_dir" </span><span class="phil-help">Temporary work directory</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = "" </span><span class="phil-help">Output directory where files are to be written</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">density_search</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">density_radius</span><span class="phil-words"> = 10. </span><span class="phil-help">Radius for density to be cut out and compared</span></li><li class="phil-param" data-expert="0"><span class="phil-name">peak_separation</span><span class="phil-words"> = 15 </span><span class="phil-help">Minimum distance between centers. Use about 1.5*density_radius</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_peaks</span><span class="phil-words"> = 20 </span><span class="phil-help">Number of NCS-related peaks of density to output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">delta_phi</span><span class="phil-words"> = 20 </span><span class="phil-help">Angular spacing of search </span></li><li class="phil-param" data-expert="0"><span class="phil-name">rotz_only</span><span class="phil-words"> = False </span><span class="phil-help">Rotate around Z only</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_copies_max</span><span class="phil-words"> = None </span><span class="phil-help">Maximum number of NCS copies to look for</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_ratio_to_top_cc</span><span class="phil-words"> = 0.75 </span><span class="phil-help">Peaks will be kept up to ncs_copies_max, or   min_ratio_to_top_cc * best cc, whichever comes first</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_ncs_cc_from_density</span><span class="phil-words"> = 0.30 </span><span class="phil-help">Overall NCS CC at full resolution must be at least this high</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fraction_ncs_min_from_density</span><span class="phil-words"> = 0.05 </span><span class="phil-help">Minimum fraction of the asymmetric unit covered by NCS. NCS ignored if less than this.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dump_ncs_density</span><span class="phil-words"> = False </span><span class="phil-help"> You can dump 1 mtz file for each possible NCS copy   so that you can see if the NCS is real  Each file has the local map transformed to the orientation  and position of copy 1 so they should all superimpose  The files are written to the temp_dir (e.g.,   temp_dir/ncs_1_map_coeffs_001.mtz )</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_operators_inside_unit_cell</span><span class="phil-words"> = False </span><span class="phil-help">If set then put the operators inside the unit cell. This removes the use of space-group symmetry for SG P1 and is used normally for non-crystal data.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">find_centers</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">smoothing_radius</span><span class="phil-words"> = None </span><span class="phil-help">Radius for smoothing squared density to find centers Choose a smaller value to get more center guesses. Default is same value as density_radius.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_center_find</span><span class="phil-words"> = None </span><span class="phil-help">Target number of centers to find Smoothing radius will be varied from 2 to 2*smoothing_radius and the value giving the number of peaks  closest to n_center_find will be used. Normally leave this set to None</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_center_use</span><span class="phil-words"> = 20 </span><span class="phil-help">Number of locations to consider as molecular centers   in density search. Try increasing this number to  look harder for NCS.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">try_all_centers</span><span class="phil-words"> = False </span><span class="phil-help">If set, try all n_center_use centers. Normally stop if a  good solution is found.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ok_ncs_cc</span><span class="phil-words"> = 0.6 </span><span class="phil-help">NCS correlation good enough to terminate search</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="1"><span class="phil-name">resolution</span><span class="phil-words"> = 4. </span><span class="phil-help">High-resolution limit for map calculation It is useful to cut the resolution at 3-5 A If you use higher resolution, use a finer delta_phi</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_fraction</span><span class="phil-words"> = 0.5 </span><span class="phil-help">solvent fraction</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = True </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">debug</span><span class="phil-words"> = False </span><span class="phil-help">Debugging output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">raise_sorry</span><span class="phil-words"> = False </span><span class="phil-help">Raise sorry if problems</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dry_run</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and check parameter names</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_command_list</span><span class="phil-words"> = None </span><span class="phil-help">You can supply any resolve command here NOTE: for command-line usage you need to enclose the whole set of commands in double quotes (&amp;quot;) and each individual command in single quotes (') like this:  resolve_command_list=&amp;quot;'no_build' 'b_overall 23' &amp;quot; </span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

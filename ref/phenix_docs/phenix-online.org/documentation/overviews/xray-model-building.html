@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Model Building</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="model-building">
+<h1 class="title">Model Building</h1>
+<p><strong>Why</strong></p>
+<p>Determining the structure of a macromolecule typically requires
+building an atomic model by fitting to maps obtained from
+<a class="reference external" href="xray-experimental-phasing.html">experimental phasing</a> or
+<a class="reference external" href="xray-molecular-replacement.html">molecular replacement</a>.
+For many cases, automated methods can be used to build models for
+both proteins and nucleic acids.</p>
+<p>The accuracy and completeness of the model
+building is a function of the quality of the starting electron density
+map, and less critically the resolution of the data. At low resolution
+(3.0 Å or worse), partial models are usually built, which require manual
+completion.</p>
+<p><strong>How</strong></p>
+<p>In Phenix, several programs aid in automated model building; the main one
+is <em>phenix.autobuild</em>. The model building process integrates phase improvement
+using density modification methods with automated map interpretation in order
+to build and refine models. This minimally requires an experimental density map,
+experimental diffraction data, and the sequence of the molecule(s) in the crystal.
+The program outputs a model file with the automatically built model and the map
+coefficients for the best electron density map created during the
+model building process.</p>
+<p><strong>How to use the phenix.autobuild GUI:</strong> <a class="reference external" href="../reference/autobuild_gui.html">Click
+here</a></p>
+<p><a class="reference external" href="../reference/autobuild.html">Phenix reference manual for
+phenix.autobuild</a></p>
+<p><strong>Common issues</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="../faqs/model_building.html">Frequently asked questions about model
+building</a></li>
+</ul>
+<p><strong>Related programs</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="../reference/find_helices_strands.html">phenix.find_helices_strands</a>: This
+program very rapidly locates protein secondary structure elements in an electron
+density map. This is extremely useful for quickly confirming that a map contains
+macromolecular features, or for interpreting low-resolution (4 Å or worse) maps.
+Optionally, you can provide the amino acid sequence and the program will fit residues
+where density permits.</li>
+<li><a class="reference external" href="../reference/fit_loops.html">phenix.fit_loops</a>: This program docks missing
+loops into protein structures given the current incomplete model, the
+sequence, and an electron density map. Model building procedures are
+sometimes unable to fit models to poor density in loop regions,
+especially in the initial stages of map interpretation. As the model
+becomes more complete and maps improve, <em>phenix.fit_loops</em> can perform
+simple real-space refinement to clean up the structure.</li>
+<li><a class="reference external" href="../reference/map_to_model.html">phenix.map_to_model</a>: This program is
+designed for lower-resolution model building. It is suitable for
+both crystallographic maps and cryo-EM maps.  Taking into account
+symmetry used to create a map, it builds only the unique
+part of the model and expands to the remaining NCS-related copies.</li>
+</ul>
+</div>
+    
+  </body>
+</html>

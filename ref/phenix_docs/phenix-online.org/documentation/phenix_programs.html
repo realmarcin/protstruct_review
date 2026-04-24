@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Overview of Phenix Programs</title>
+    
+    <link rel="stylesheet" type="text/css" href="css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="index.html">
+        <img src="icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="overview-of-phenix-programs">
+<h1 class="title">Overview of Phenix Programs</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="phenix_programs.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="phenix_programs.html#general" id="toc-entry-1">General</a></li>
+<li><a class="reference internal" href="phenix_programs.html#assessing-data-quality" id="toc-entry-2">Assessing data quality</a></li>
+<li><a class="reference internal" href="phenix_programs.html#experimental-phasing" id="toc-entry-3">Experimental Phasing</a></li>
+<li><a class="reference internal" href="phenix_programs.html#molecular-replacement" id="toc-entry-4">Molecular Replacement</a></li>
+<li><a class="reference internal" href="phenix_programs.html#alphafold-and-other-predicted-models" id="toc-entry-5">AlphaFold and other predicted models</a></li>
+<li><a class="reference internal" href="phenix_programs.html#model-building" id="toc-entry-6">Model Building</a></li>
+<li><a class="reference internal" href="phenix_programs.html#structure-refinement" id="toc-entry-7">Structure Refinement</a></li>
+<li><a class="reference internal" href="phenix_programs.html#validation" id="toc-entry-8">Validation</a></li>
+<li><a class="reference internal" href="phenix_programs.html#ligands" id="toc-entry-9">Ligands</a></li>
+<li><a class="reference internal" href="phenix_programs.html#deposition" id="toc-entry-10">Deposition</a></li>
+<li><a class="reference internal" href="phenix_programs.html#reflection-data-tools" id="toc-entry-11">Reflection data tools</a></li>
+<li><a class="reference internal" href="phenix_programs.html#map-tools" id="toc-entry-12">Map tools</a></li>
+<li><a class="reference internal" href="phenix_programs.html#model-tools" id="toc-entry-13">Model tools</a></li>
+<li><a class="reference internal" href="phenix_programs.html#miscellaneous" id="toc-entry-14">Miscellaneous</a></li>
+</ul>
+</div>
+<div class="section" id="general">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-1">General</a></h1>
+<ul class="simple">
+<li>phenix: Run Phenix graphical user interface</li>
+<li>phenix.about: Summarize contributors, packages, and info for phenix</li>
+<li>phenix.acknowledgments: Summarize third-party components of Phenix</li>
+<li>phenix.commands: List command line Phenix methods</li>
+<li>phenix.doc: Phenix documentation</li>
+<li>phenix.help: Load Phenix documentation (same as phenix.doc)</li>
+<li>phenix.version: Print version of Phenix</li>
+<li>phenix.find_program: Find a program or regression test</li>
+<li>phenix.list: Print list of Phenix commands</li>
+<li>phenix_regression.list: Print list of Phenix regression commands</li>
+</ul>
+</div>
+<div class="section" id="assessing-data-quality">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-2">Assessing data quality</a></h1>
+<ul class="simple">
+<li>phenix.cc_star: Calculate cc_star values for correlation of data vs resolution</li>
+<li>phenix.compare_datasets: Similar to phenix.data_viewer, as side-by-side view</li>
+<li>phenix.data_viewer: View pseudo-precession planes through a dataset</li>
+<li>phenix.emma: Compare heavy-atom solutions</li>
+<li>phenix.explore_metric_symmetry: Compare unit cells</li>
+<li>phenix.merging_statistics: Calculate statistics on unmerged data</li>
+<li>phenix.xtriage: Analyze data files for quality and unusual conditions</li>
+</ul>
+</div>
+<div class="section" id="experimental-phasing">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-3">Experimental Phasing</a></h1>
+<ul class="simple">
+<li>phenix.autosol: Automated structure solution by MR/MAD/SAD</li>
+<li>phenix.find_ncs: Find NCS in a model, map or heavy-atom sites</li>
+<li>phenix.hyss: Identify heavy-atom sites from anomalous dataset</li>
+<li>phenix.density_modification: Density modification</li>
+<li>phenix.multi_crystal_average: Multi-crystal averaging</li>
+<li>phenix.ncs_and_number_of_ha: Guess solvent content and number of heavy-atom sites</li>
+<li>phenix.ncs_average: NCS average (no density modification) and write map file</li>
+<li>phenix.phase_and_build: Rapid density modification and model-building</li>
+</ul>
+</div>
+<div class="section" id="molecular-replacement">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-4">Molecular Replacement</a></h1>
+<ul class="simple">
+<li>phenix.automr: Automated MR and model-building</li>
+<li>phenix.cut_out_density: Create MTZ coeffs with density cut out from a map</li>
+<li>phenix.find_alt_orig_sym_mate: Superimpose structures allowing origin shifts (see also map_to_object)</li>
+<li>phenix.morph_model: Morph a model to match a map</li>
+<li>phenix.mr_model_preparation: Download and edit PDB files for MR</li>
+<li>phenix.mr_rescoring: Model scoring for mr_rosetta</li>
+<li>phenix.mr_rosetta: MR and model improvement with phaser/autobuild/Rosetta</li>
+<li>phenix.mr_rosetta_rebuild: Rebuild model with Rosetta</li>
+<li>phenix.phaser: Run PHASER</li>
+<li>phenix.sculptor: Improve molecular replacment models using sequence alignment and structural infomation</li>
+<li>phenix.ensembler: Superpose PDB files to create ensemble for MR</li>
+<li>phenix.sculpt_ensemble: Combined sculptor and ensembler</li>
+</ul>
+</div>
+<div class="section" id="alphafold-and-other-predicted-models">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-5">AlphaFold and other predicted models</a></h1>
+<ul class="simple">
+<li>phenix.predict_and_build: Solve X-ray structure or interpret cryo-EM map with iterative prediction and rebuilding</li>
+<li>phenix.process_predicted_model: Process AlphaFold2 and other predicted models</li>
+<li>phenix.dock_predicted_model: Dock processed AlphaFold2 models into cryo-EM map</li>
+<li>phenix.dock_and_rebuild: Process, dock and rebuild AlphaFold2 model into cryo-EM map</li>
+</ul>
+</div>
+<div class="section" id="model-building">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-6">Model Building</a></h1>
+<ul class="simple">
+<li>phenix.assign_sequence: Assign sequence to a chain using a map and seq file</li>
+<li>phenix.autobuild: Iterative model-building density modification and refinement</li>
+<li>phenix.build_one_model: Build one model using a map and data file</li>
+<li>phenix.build_rna_helices: Build RNA helices into a map</li>
+<li>phenix.combine_models: Take best parts of two models</li>
+<li>phenix.dock_and_rebuild: Process, dock and rebuild AlphaFold2 model into cryo-EM map</li>
+<li>phenix.dock_predicted_model: Dock processed AlphaFold2 models into cryo-EM map</li>
+<li>phenix.find_helices_strands: Build helices and strands into a map</li>
+<li>phenix.fit_loops: Fit missing loops in a model</li>
+<li>phenix.map_to_model: Build a model using a low-resolution map or cryo-EM map</li>
+<li>phenix.trace_and_build: Build a model by chain tracing using a cryo-EM map</li>
+<li>phenix.douse: Build water into cryo-EM map</li>
+</ul>
+</div>
+<div class="section" id="structure-refinement">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-7">Structure Refinement</a></h1>
+<ul class="simple">
+<li>phenix.den_refine: Carry out DEN refinement of a model</li>
+<li>phenix.ensemble_refinement: run ensemble refinement</li>
+<li>phenix.find_tls_groups: Automatic identification of appropriate TLS groups in model</li>
+<li>phenix.ready_set: Set up files for refinement, including addition of hydrogens, generation of ligand restraints, and metal coordination restraints</li>
+<li>phenix.real_space_refine: Extensive real-space refinement</li>
+<li>phenix.refine: Carry out refinement of a model</li>
+<li>phenix.secondary_structure_restraints: generate pseudo H-bond restraints for alpha helices, beta sheets, and nucleic acid base pairs</li>
+</ul>
+</div>
+<div class="section" id="validation">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-8">Validation</a></h1>
+<ul class="simple">
+<li>phenix.b_factor_statistics: Display summary of atomic displacement parameters for a model (or atom selection)</li>
+<li>phenix.cablam_training: C-alpha-based protein secondary structure exploration</li>
+<li>phenix.cablam_validate: C-alpha-based protein secondary structure exploration</li>
+<li>phenix.cbetadev: Validate protein sidechain C-beta geometry</li>
+<li>phenix.clashscore: Evaluate model based on all-atom contacts</li>
+<li>phenix.kinemage: Generates a multi-criterion validation kinemage file, for viewing in KiNG</li>
+<li>phenix.king: Run KiNG molecular graphics</li>
+<li>phenix.map_correlations: Compare maps or map and model, optionally allowing translational offsets</li>
+<li>phenix.model_vs_data: Evaluate model using experimental data</li>
+<li>phenix.molprobity: Run molprobity</li>
+<li>phenix.probe: Run PROBE, for analysis of all-atom contacts</li>
+<li>phenix.r_factor_statistics: Distribution of Rfree, Rwork and Rfree-Rwork for PDB models at similar resolution</li>
+<li>phenix.ramalyze: Validate protein backbone Ramachandran dihedral angles</li>
+<li>phenix.reduce: Run REDUCE, software for addition or trimming of hydrogens</li>
+<li>phenix.rna_validate: Validate RNA sugar puckers, backbone bond and angle geometry, and backbone suite conformations</li>
+<li>phenix.rotalyze: Validate protein sidechain rotamers</li>
+<li>phenix.holton_geometry_validation : Assess overall geometry</li>
+</ul>
+</div>
+<div class="section" id="ligands">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-9">Ligands</a></h1>
+<ul class="simple">
+<li>phenix.elbow: Ligand builder (CIF from PDB, SMILES etc)</li>
+<li>phenix.find_all_ligands: Find ligands from a list in a map</li>
+<li>phenix.ligand_identification: Identify ligands from a map</li>
+<li>phenix.ligand_pipeline: Automated molecular replacement, refinement, and ligand fitting for high-throughput crystallography</li>
+<li>phenix.ligandfit: Fit ligands into a map</li>
+<li>phenix.metal_coordination: Generate metal coordination bond and angle restraints</li>
+<li>phenix.reel: Graphical ligand restraints editor</li>
+</ul>
+</div>
+<div class="section" id="deposition">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-10">Deposition</a></h1>
+<ul class="simple">
+<li>mmtbx.prepare_pdb_deposition: produce mmCIF files for deposition</li>
+<li>phenix.get_pdb_validation_report: get validation report from RCSB via OneDep API</li>
+</ul>
+</div>
+<div class="section" id="reflection-data-tools">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-11">Reflection data tools</a></h1>
+<ul class="simple">
+<li>phenix.cif_as_mtz: Convert CIF to MTZ</li>
+<li>phenix.cif_as_pdb: Convert CIF to PDB format</li>
+<li>phenix.cns_as_mtz: Convert CNS to MTZ</li>
+<li>phenix.csv_as_mtz: Convert csv reflection files to MTZ</li>
+<li>phenix.fmodel: Calculate structure factors from model</li>
+<li>phenix.import_and_add_free: Import a data file and add Free R set</li>
+<li>phenix.mtz.dump: Dump MTZ file contents</li>
+<li>phenix.mtz_as_cif: Convert mtz to CIF format</li>
+<li>phenix.reciprocal_space_arrays: Create MTZ file with Fmodel,Fcalc,Fbulk,Fmask,FOM,HL, resolution and more</li>
+<li>phenix.reflection_file_converter: Basic conversion between reflection file formats (command-line)</li>
+<li>phenix.reflection_statistics: Evaluation and comparison of reflection data (e.g. anomalous difference correlations)</li>
+<li>phenix.reindex: Reindex an MTZ file</li>
+<li>phenix.remove_aniso: Remove anisotropy from columns of an MTZ dataset</li>
+<li>phenix.xmanip: Experimental tool for manipulation of reflection data</li>
+</ul>
+</div>
+<div class="section" id="map-tools">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-12">Map tools</a></h1>
+<ul class="simple">
+<li>phenix.average_map_coeffs: Average a set of map coefficients from several files</li>
+<li>phenix.composite_omit_map: Generate composite omit map, with our without refinement and simulated annealing</li>
+<li>phenix.density_outside_model: Remove density near a model from a map</li>
+<li>phenix.cut_out_density: Create MTZ coeffs with density cut out from a map</li>
+<li>phenix.segment_and_split_map: Split a map into regions of density</li>
+<li>phenix.map_sharpening: Optimize a map by sharpening</li>
+<li>phenix.local_resolution: Calculate a local resolution map</li>
+<li>phenix.dock_in_map: Dock a model into a map</li>
+<li>phenix.map_symmetry: Identify symmetry in a map</li>
+<li>phenix.resolve_cryo_em: Density modify a cryo-EM map</li>
+<li>phenix.map_model_correlations: Map and map-model correlation allowing translations</li>
+<li>phenix.guess_molecular_centers: Guess molecular centers from local RMS density</li>
+<li>phenix.map_box: Simple cut out map around a PDB file</li>
+<li>phenix.map_to_model_histogram: Compute averaged radial density distribution</li>
+<li>phenix.map_to_object: Superimpose using SG symmetry only (see also find_alt_orig_sym_mate)</li>
+<li>phenix.map_to_structure_factors: Calculate structure factors and HL coefficients from ccp4 map file and save in MTZ</li>
+<li>phenix.map_value_at_point: Get map value at given coordinates</li>
+<li>phenix.maps: Create maps from PDB and MTZ files</li>
+<li>phenix.maximum_entropy_map: Compute maximum entropy map from map coefficients</li>
+<li>phenix.polder: Compute omit map which excludes the bulk solvent around the omitted region</li>
+<li>phenix.remove_free_from_map: Set all map coeffs of free reflections to zero</li>
+<li>phenix.resolve_cryo_em: Density modify a cryo-EM map</li>
+<li>phenix.superpose_maps: Superimpose PDB files and transform map to match</li>
+<li>phenix.mtriage: Tool to analyse cryo-EM map (resolution, etc)</li>
+</ul>
+</div>
+<div class="section" id="model-tools">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-13">Model tools</a></h1>
+<ul class="simple">
+<li>phenix.apply_ncs: Apply NCS (.ncs_spec file) to a chain to create molecule</li>
+<li>phenix.dynamics: Shake up structure with simple molecular dynamics</li>
+<li>phenix.form_factor_query: f' and f'' table lookup given element and wavelength</li>
+<li>phenix.fragment_search: Find fragments in PDB matching a target fragment</li>
+<li>phenix.ksdssp: Identify secondary structure in a model</li>
+<li>phenix.model_model_distances: Distance between two PDB files: per atom, residue, chain, model and overall</li>
+<li>phenix.muscle: sequence alignment tool</li>
+<li>phenix.pdb.hierarchy: Quick summary of PDB file content</li>
+<li>phenix.pdb_as_cif: Convert PDB format to CIF</li>
+<li>phenix.pdb_atom_selection: Extract selected atoms from PDB file (useful for experimenting with atom selections)</li>
+<li>phenix.pdb_editor: Edit PDB files graphically</li>
+<li>phenix.pdb_interpretation: Read PDB file and build restraints for refinement (useful for trouble-shooting)</li>
+<li>phenix.pdbtools: Manipulate PDB files</li>
+<li>phenix.perigee: Interaction finder</li>
+<li>phenix.print_sequence: Print sequence from PDB file</li>
+<li>phenix.process_predicted_model: Process AlphaFold2 and other predicted models</li>
+<li>phenix.pulchra: PULCHRA conversion from CA to full chain</li>
+<li>phenix.replace_with_fragments_from_pdb: Replace model with fragments from the PDB</li>
+<li>phenix.search_and_morph: Find Structures in PDB using SSM matching and morphing</li>
+<li>phenix.simple_ncs_from_pdb: NCS from a PDB file (use instead phenix.find_ncs)</li>
+<li>phenix.structure_search: Find Similar Structures in PDB using phi-psi angles and sequence</li>
+<li>phenix.superpose_ligands: Superimpose two ligands</li>
+<li>phenix.superpose_models: Superimpose models using aligned sequences or SSM</li>
+<li>phenix.trim_overlapping: Remove residues in a PDB file overlapping another</li>
+<li>phenix.trim_pdb: Remove hydrogen atoms from a PDB file</li>
+</ul>
+</div>
+<div class="section" id="miscellaneous">
+<h1><a class="toc-backref" href="phenix_programs.html#toc-entry-14">Miscellaneous</a></h1>
+<ul class="simple">
+<li>phenix.default_gui_settings: Print out base PHENIX GUI configuration (mostly useful for site admins)</li>
+<li>phenix.get_latest_version: Download most recent installer replacing current installation</li>
+<li>phenix.grow_density: Density modification to enhance chain ends</li>
+<li>phenix.pymol: Pymol</li>
+<li>phenix.python: Run phenix-cognizant version of python</li>
+<li>phenix.resolve: Run resolve</li>
+<li>phenix.resolve_pattern: run resolve_pattern</li>
+<li>phenix.run_example: Run an example from the phenix_examples directory</li>
+<li>phenix.show_build_path: Show path to Phenix build directory</li>
+<li>phenix.show_dist_paths: Show paths to all components of Phenix</li>
+<li>phenix.solve: Run SOLVE</li>
+<li>phenix.start_coot: Coot molecular graphics</li>
+<li>phenix.where_mon_lib_list_cif: Show location of monomer library used by Phenix</li>
+</ul>
+</div>
+</div>
+    
+  </body>
+</html>

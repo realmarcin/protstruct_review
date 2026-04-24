@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Build water into cryo-EM map using phenix.douse</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="build-water-into-cryo-em-map-using-phenix-douse">
+<h1 class="title">Build water into cryo-EM map using phenix.douse</h1>
+<p><cite>phenix.douse</cite> is a tool to build water into cryo-EM maps.</p>
+<div class="section" id="facts-about-the-procedure">
+<h1>Facts about the procedure</h1>
+<p>1) The water is built into density map also ensuring each water is linked to the
+protein via H-bond, directly or indirectly (via another water).</p>
+<p>2) Atomic model of the macro-molecule is assumed to be as complete and accurate
+as possible (for example, B factors are refined individually).</p>
+<p>3) Water is looked for in a band of 6A width extending out from the protein
+surface. This allows to build about two solvation layers around protein. Any
+unmodeled density in this region is treated as potential water.</p>
+<p>4) Minimal (dist_min) and maximal (dist_max) distances between any water and
+protein or other water are 2 and 3.2A, correspondingly.</p>
+<p>5) Not all protein atoms are used to assess contacts with prospective water
+molecules but only those that can participate in H-bonds. These atoms are
+additionally filtered to leave a subset of atoms that are confidently placed in
+the map. The confidence is quantified by CCmask
+(cc_mask_threshold_interacting_atoms) - the correlation between model-calculated
+and experimental maps for the atom in question. The default is set to 0.5.
+The CCmask is calculated in a sphere of 2A radius (atom_radius) around the atom
+in question.</p>
+<p>6) Only strong enough density peaks are considered as potential water-candidates.
+&quot;Strong enough&quot; is defined as the average of map density values interpolated at
+atomic centers of protein atoms times the attenuation scale factor
+map_threshold_scale which is set to 0.25 by default.</p>
+<p>7) The remaining peaks are filtered by two additional
+criteria.</p>
+<p>One is CCmask (cc_mask_filter) with the cutoff value of 0.5
+(cc_mask_filter_threshold). The CCmask is calculated similarly to &quot;5)&quot;. Since
+CCmask strongly depends on atomic B factors and B factors of newly placed
+water-candidates are not known, unrestrained isotropic B factor refinement is
+performed for newly placed water prior to CCmask calculation.</p>
+<p>Another selection criterion is peak sphericity (scc). The peak sphericity is
+evaluated as minimal correlation between any combination of two sets of map
+values interpolated along vectors going out from the peak center and having
+length of 1A. For a perfectly spherical peak the correlation between any
+&quot;pair of vectors&quot; (any pair of sets of map values along these vectors) must be 1.
+The water is rejected if scc is less than 0.5.</p>
+</div>
+<div class="section" id="comments">
+<h1>Comments</h1>
+<p>1) Geometric (water-protein or water-water distance) and chemical (types of
+interacting atoms) criteria are rather strong and rigid criteria and do not allow
+much room for variation. The set default values are taken from standard literature.</p>
+<p>2) Map-based criteria, such as various correlations, are more heuristics and
+rule-of-thumb based. For correlations, 1 means perfect similarity, 0 is no
+similarity and -1 is anti-similarity. So a choice like 0.5 means some similarity,
+half-way between none and perfect. Choosing a larger value will mean choosing
+more confident waters.</p>
+<p>3) Map sphericity reflects the observation that water density appears to be
+approximately spherical most of the time. This observation breaks down in a
+number of special cases that need a special treatment and that can be a subject
+of future improvement of the tool. For example, at high resolution water with
+high directional mobility typically yield elliptical peak shapes. Water
+coordinated by heavier ions may not even resolved as individual peak or even if
+resolved as individual peak its spehricity can be largely perturbed.</p>
+<p>4) Peak height threshold for selecting peak candidates is another rather ad-hoc
+criterion. It uses peak heights of confidently placed protein atoms as a guide.
+However, since water molecules are more mobile and often partially occupied,
+their peaks are expected to be weaker than peaks of better resolved protein atoms.
+By how much weaker? That is unknown. Thus some arbitrary attenuation scale is used.</p>
+<p>5) Building 'single-atom' entities, such as water or ions, is a much more
+difficult task to do compared to building more feature-rich molecules such as
+proteins or multi-atom ligands. This is because it is much easier to confuse a
+true peak with a noise peak, while a constellation of many peaks (corresponding
+to protein chain, for example) contains very important information about shape
+and connectivity, making interpretation such peaks in terms of atomic model easier.
+Therefore, water building procedure is unlikely to be ever fully automated.</p>
+</div>
+<div class="section" id="availability">
+<h1>Availability</h1>
+<p>Command line, GUI.</p>
+</div>
+<div class="section" id="required-inputs">
+<h1>Required inputs</h1>
+<p>Atomic model (PDB or mmCIF format) and map (MRC format).</p>
+<p><cite>resolution</cite> is required if <cite>cc_mask_filter</cite> is set to True.</p>
+</div>
+<div class="section" id="optional-inputs">
+<h1>Optional inputs</h1>
+<p><cite>mode = whole</cite> or <cite>per_chain</cite>: work on the whole model or per chain. Working on
+the whole model may require a lot of memory.</p>
+<p><cite>sphericity_filter = True</cite>: use peak sphericity criteria. Disable to add more water.</p>
+<p><cite>scc = 0.5</cite>: map peak sphericity characteristic. Decrease to add more water.</p>
+<p><cite>keep_input_water = False</cite>: keep or remove existing water.</p>
+<p><cite>dist_min = 2.0</cite>: minimal peak-peak or peak-atom distance. Decrease to add more water.</p>
+<p><cite>dist_max = 3.2</cite>: maximal peak-peak or peak-atom distance. Increase to add more water.</p>
+<p><cite>step = 0.3</cite>: map re-sampling step.</p>
+<p><cite>map_threshold_scale = 0.5</cite>: map threshold for peak selection = (mean map value
+at atom centers) * map_threshold_scale
+Decrease to add more water.</p>
+<p><cite>cc_mask_filter = True</cite>: reject water with CC_mask &lt; cc_mask_filter_threshold.</p>
+<p><cite>cc_mask_filter_threshold = 0.5</cite>: CC_mask threshold for rejecting water.</p>
+<p><cite>resolution</cite>: map resolution. Required if cc_mask_filter=True</p>
+</div>
+<div class="section" id="limitations">
+<h1>Limitations</h1>
+<p>P1 symmetry is the only supported symmetry.</p>
+</div>
+<div class="section" id="assumptions">
+<h1>Assumptions</h1>
+<p>Macromolecular part of the atomic model is as compltete as possible (no missing
+chains or other unmodelled parts present). The model is fully refined including
+individual B-factors.</p>
+<p>Map resolution is sufficently high to expect water oxygens be visible in the map.</p>
+</div>
+<div class="section" id="example">
+<h1>Example</h1>
+<blockquote>
+phenix.douse model.pdb map.mrc resolution=2.5</blockquote>
+<p><cite>resolution</cite> is required if <cite>cc_mask_filter</cite> is set to True.</p>
+</div>
+<div class="section" id="more-information">
+<h1>More information</h1>
+<p><a class="reference external" href="https://phenix-online.org/phenixwebsite_static/mainsite/files/presentations/water.pdf">https://phenix-online.org/phenixwebsite_static/mainsite/files/presentations/water.pdf</a></p>
+<p>This document reflects the procedure at the time of making the document. The
+procedure in most current version of Phenix can be (slightly) different.</p>
+</div>
+<div class="section" id="author">
+<h1>Author</h1>
+<p>Pavel Afonine (<a class="reference external" href="https://phenix-online.org/cdn-cgi/l/email-protection#f4a4b5929b9a9d9a91d2d7c2c0cf989698da939b82">PAfonine&#64;lbl.gov</a>)</p>
+</div>
+</div>
+    
+  <script data-cfasync="false" src="https://phenix-online.org/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

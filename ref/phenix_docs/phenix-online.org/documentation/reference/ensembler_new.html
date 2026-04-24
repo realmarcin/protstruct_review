@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Ensemble creation with Ensembler</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="ensemble-creation-with-ensembler">
+<h1 class="title">Ensemble creation with Ensembler</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="ensembler_new.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="ensembler_new.html#purpose" id="toc-entry-1">Purpose</a></li>
+<li><a class="reference internal" href="ensembler_new.html#usage" id="toc-entry-2">Usage</a></li>
+<li><a class="reference internal" href="ensembler_new.html#input-files" id="toc-entry-3">Input files</a></li>
+<li><a class="reference internal" href="ensembler_new.html#output-files" id="toc-entry-4">Output files</a></li>
+<li><a class="reference internal" href="ensembler_new.html#description" id="toc-entry-5">Description</a><ul>
+<li><a class="reference internal" href="ensembler_new.html#model-input" id="toc-entry-6">Model input</a><ul>
+<li><a class="reference internal" href="ensembler_new.html#single-chain-structures" id="toc-entry-7">Single-chain structures</a></li>
+<li><a class="reference internal" href="ensembler_new.html#multimeric-assemblies" id="toc-entry-8">Multimeric assemblies</a></li>
+<li><a class="reference internal" href="ensembler_new.html#input-summary" id="toc-entry-9">Input summary</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="ensembler_new.html#residue-mapping" id="toc-entry-10">Residue mapping</a></li>
+<li><a class="reference internal" href="ensembler_new.html#atom-mapping" id="toc-entry-11">Atom mapping</a></li>
+<li><a class="reference internal" href="ensembler_new.html#superposition" id="toc-entry-12">Superposition</a></li>
+<li><a class="reference internal" href="ensembler_new.html#weighting" id="toc-entry-13">Weighting</a></li>
+<li><a class="reference internal" href="ensembler_new.html#cluster-analysis" id="toc-entry-14">Cluster analysis</a></li>
+<li><a class="reference internal" href="ensembler_new.html#chain-trimming" id="toc-entry-15">Chain trimming</a></li>
+<li><a class="reference internal" href="ensembler_new.html#sorting" id="toc-entry-16">Sorting</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="ensembler_new.html#command-line" id="toc-entry-17">Command line</a><ul>
+<li><a class="reference internal" href="ensembler_new.html#command-line-switches" id="toc-entry-18">Command-line switches</a></li>
+<li><a class="reference internal" href="ensembler_new.html#phil-arguments" id="toc-entry-19">PHIL arguments</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="ensembler_new.html#specific-limitations-and-possible-problems" id="toc-entry-20">Specific limitations and possible problems</a><ul>
+<li><a class="reference internal" href="ensembler_new.html#processing-features" id="toc-entry-21">Processing features</a></li>
+<li><a class="reference internal" href="ensembler_new.html#warning-and-error-messages" id="toc-entry-22">Warning and error messages</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="ensembler_new.html#references" id="toc-entry-23">References</a></li>
+<li><a class="reference internal" href="ensembler_new.html#additional-information" id="toc-entry-24">Additional information</a><ul>
+<li><a class="reference internal" href="ensembler_new.html#list-of-all-available-keywords" id="toc-entry-25">List of all available keywords</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1><a class="toc-backref" href="ensembler_new.html#toc-entry-1">Purpose</a></h1>
+<p>Ensembling is a superposition of multiple homologous structures, which often
+gives superior performance when used as search model for molecular replacement.</p>
+</div>
+<div class="section" id="usage">
+<h1><a class="toc-backref" href="ensembler_new.html#toc-entry-2">Usage</a></h1>
+<p>There is a standalone <tt class="docutils literal">ensembler_new</tt> program available from the command
+line. The unified model preparation program <tt class="docutils literal">sculpt_ensemble</tt> is available
+from the command line and also from the PHENIX GUI.</p>
+</div>
+<div class="section" id="input-files">
+<h1><a class="toc-backref" href="ensembler_new.html#toc-entry-3">Input files</a></h1>
+<ul class="simple">
+<li><strong>Structures</strong> <em>(compulsory)</em>. The chains that are to be superposed.
+Protein/DNA/RNA chains are automatically identified, other chains are
+not used in the superposition step. These non-recognized chains are either
+discarded, or if these are associated with a chain that is used for
+superposition (this is governed by whether these chains have the same
+chainID), these can also be transformed by the appropriate transformation
+matrix. In case the structure contains multiple chains, these are either
+superposed as independent entities (default), or as an assembly (e.g. a
+tetramer) - this is governed by the <tt class="docutils literal">assembly</tt> keyword (defines a group of
+chains that should be superposed as a group - this can be used multiple
+times) or the <tt class="docutils literal">read_single__assembly_from_file</tt> keyword (to treat the
+contents of the file as a single assembly).
+Accepted formats: PDB. Recognized extensions: <tt class="docutils literal">.pdb</tt>, <tt class="docutils literal">.ent</tt>.</li>
+<li><strong>Alignment</strong> <em>(optional)</em>. In case a user-supplied residue mapping
+is requested, this keywords allows the input for alignment files. In case
+assemblies are also defined, the user-supplied residue mapping option (and
+the corresponding alignment file) can be configured on an assembly-member
+basis, and this can be achieved by listing the mapping option/corresponding
+alignment in the same order as the assembly members.
+The program recognizes alignment files from their extensions [<tt class="docutils literal">.aln</tt>
+(CLUSTAL format), <tt class="docutils literal">.pir</tt> (PIR-format) and <tt class="docutils literal">.ali</tt> (relaxed PIR-like
+format) are accepted], but in case multiple alignment input is required,
+it has to be used with a full assignment syntax, e.g.
+<tt class="docutils literal"><span class="pre">alignment=&quot;my1.aln</span> my2.aln&quot;</tt>.</li>
+</ul>
+</div>
+<div class="section" id="output-files">
+<h1><a class="toc-backref" href="ensembler_new.html#toc-entry-4">Output files</a></h1>
+<p>The superposed chains can be written out either as a quasi multiple
+model PDB file that is readable by phaser directly (output style
+<tt class="docutils literal">merged</tt>, output file name <tt class="docutils literal">root_merged.pdb</tt>) or as a series of
+files containing each chain separately (output style <tt class="docutils literal">separate</tt>, file
+name <tt class="docutils literal">root_pdb_chain.pdb</tt>, where pdb is the name of the PDB file the
+chain was read from, and chain is the chain identifier). The file name
+<tt class="docutils literal">root</tt> can be changed via the <tt class="docutils literal">root</tt> parameter of the <tt class="docutils literal">output</tt>
+(default: <tt class="docutils literal">ensemble</tt>).</p>
+</div>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="ensembler_new.html#toc-entry-5">Description</a></h1>
+<p>The workflow consists of several stages that can be independently
+configured. These are listed in order of execution.
+For a summary of all parameters with the corresponding defaults, see the
+<a class="reference internal" href="ensembler_new.html#additional-information">Additional information</a> section.</p>
+<div class="section" id="model-input">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-6">Model input</a></h2>
+<p>The syntax allows the definition of structural assemblies in a flexible manner,
+and is also backwards-compatible with the previous version, i.e. existing
+command lines do not have to be changed.</p>
+<div class="section" id="single-chain-structures">
+<h3><a class="toc-backref" href="ensembler_new.html#toc-entry-7">Single-chain structures</a></h3>
+<p>These only require the input of files that contain the structures to be
+superposed. In case multiple chains are present in a file, these are superposed
+independently, but it is also possible to restrict participating chains to a
+selection (using the <tt class="docutils literal">selection</tt> keyword).</p>
+<p>For example, to superpose all chains in a.pdb with all chains in b.pdb, the
+following PHIL is needed (these can also be specified as command-line
+arguments):</p>
+<pre class="literal-block">
+input.model.file_name=a.pdb
+input.model.file_name = b.pdb
+</pre>
+<p>To superpose only chains A and B from a.pdb with chains A and C from b.pdb, the
+<tt class="docutils literal">selection</tt> keyword can be used (please note that this can now longer be
+achieved from the command line):</p>
+<pre class="literal-block">
+input {
+  model {
+    file_name = a.pdb
+    selection = chain A or chain B
+    }
+
+  model {
+    file_name = b.pdb
+    selection = chain A or chain C
+    }
+  }
+</pre>
+</div>
+<div class="section" id="multimeric-assemblies">
+<h3><a class="toc-backref" href="ensembler_new.html#toc-entry-8">Multimeric assemblies</a></h3>
+<p>In this case the individual assemblies need to be specified using either the
+<tt class="docutils literal">assembly</tt> keyword or the <tt class="docutils literal">read_single_assembly_from_file</tt> keyword if the
+respective structure file contains a single assembly only.</p>
+<p>In case the input PDB file contains multiple MODEL sections, these are
+automatically treated as separate assemblies and no further action is required.
+However, it is still possible to omit chains from the assembly by listing only
+the chainIDs on the <tt class="docutils literal">assembly</tt> keyword. On the other hand, the
+<tt class="docutils literal">read_single_assembly_from_file</tt> is not applicable to such a PDB file, and
+will result in an error message.</p>
+<p>For example, the structure <a class="reference external" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=4qtr">4QTR</a> contains two copies of a protein-DNA complex:
+protein chains A and B interact with DNA chains E and F, while protein
+chains C and D interact with DNA chains G and H.</p>
+<p>To superpose these two assemblies, the following input is required:</p>
+<pre class="literal-block">
+input {
+  model {
+    file_name = 4qtr.pdb
+    assembly = A B E F
+    assembly = C D G H
+    }
+  }
+</pre>
+<p>To superpose a subset of the assemblies, it is sufficient to specify the subset
+to be superposed. Additional chains are automatically discarded. For example,
+to superpose a partial assembly from the previous example, one can use the
+following command file:</p>
+<pre class="literal-block">
+input {
+  model {
+    file_name = 4qtr.pdb
+    assembly = A E F
+    assembly = C G H
+    }
+  }
+</pre>
+<p>If the assemblies to be superposed are present in separate files, one can use
+a more convenient syntax:</p>
+<pre class="literal-block">
+input {
+  model {
+    file_name = 4qtr_1.pdb
+    read_single_assembly_from_file = True
+    }
+  model {
+    file_name = 4qtr_2.pdb
+    read_single_assembly_from_file = True
+    }
+  }
+</pre>
+</div>
+<div class="section" id="input-summary">
+<h3><a class="toc-backref" href="ensembler_new.html#toc-entry-9">Input summary</a></h3>
+<p>The program list the chains that were read from input files, and also displays
+the identified macromolecule type. It also does a consistency check to ensure
+that all assemblies have the same number of chains and these are of identical
+types.</p>
+</div>
+</div>
+<div class="section" id="residue-mapping">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-10">Residue mapping</a></h2>
+<p>Establishes the equivalence of residues among the input chains. There
+are several options available:</p>
+<ul class="simple">
+<li><tt class="docutils literal">ssm</tt> - Do structure-based pairwise SSM alignment, using the first chain
+as reference (default).</li>
+<li><tt class="docutils literal">ssm_multiple_alignment</tt> - Do structure-based multiple SSM alignment.</li>
+<li><tt class="docutils literal">muscle</tt> - Generate a sequence alignment with MUSCLE and use that
+to align the residues.</li>
+<li><tt class="docutils literal">multiple_alignment</tt> - A user supplied multiple alignment is used.
+An error message will be raised if this is not present or does not
+cover all present chains.</li>
+<li><tt class="docutils literal">resid</tt> - Residue sequence number with insertion code will be used.</li>
+</ul>
+<p>Residue mapping can be requested on an assembly-member basis, by specifying the
+requested options in the same order as the chains of the assembly. This is not
+compulsory, and if no options are specified, a default dependent on the
+macromolecule type will be used (for <tt class="docutils literal">protein</tt>, the default is <tt class="docutils literal">ssm</tt>, for
+nucleic acids it is <tt class="docutils literal">muscle</tt>). It is also possible to request specific
+mapping algorithms for a subset of all chains of the assembly, but in this case
+these have to come first in the list.</p>
+<p>For example, to request non-default mapping options for the <a class="reference external" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=4qtr">4QTR</a> example, the
+following options are needed (<tt class="docutils literal">input</tt> section repeated for convenience):</p>
+<pre class="literal-block">
+input {
+  model {
+    file_name = 4qtr.pdb
+    assembly = A B E F
+    assembly = C D G H
+    }
+  }
+
+configuration {
+  mapping = ssm muscle muscle resid
+  }
+</pre>
+<p>This will use the <tt class="docutils literal">ssm</tt> option for chains A and B, <tt class="docutils literal">muscle</tt> for chains B
+and D, <tt class="docutils literal">muscle</tt> for chains E and G and <tt class="docutils literal">resid</tt> for chains F and H. Note
+that these coincide with the defaults for chains A and B (assembly position 1,
+protein chain) as well as for chains E and G (assembly position 3, DNA chains).
+To request non-default options only, one has to rearrange the assembly so that
+positions 2 and 4 in the current setup become positions 1 and 2:</p>
+<pre class="literal-block">
+input {
+  model {
+    file_name = 4qtr.pdb
+    assembly = B F A E
+    assembly = D H C G
+    }
+  }
+
+configuration {
+  mapping = muscle resid
+  }
+</pre>
+<p>In this case, since no specific mapping is requested for assembly positions 3
+and 4, the default options will be used.</p>
+</div>
+<div class="section" id="atom-mapping">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-11">Atom mapping</a></h2>
+<p>Maps selected atoms within equivalent residues to each other. The
+mapping is done by name hence the order of atoms in the residue does not
+matter. If atoms are missing from certain residues (or if certain
+residues contain extra atoms), a gap will be filled where necessary.</p>
+<p>Atom selection is controlled by the <tt class="docutils literal">atoms</tt> parameter of the
+<tt class="docutils literal">configuration</tt> scope. If multiple atom names are requested, these need to be
+separated by a comma (<tt class="docutils literal">,</tt>). If no selection is requested, a type dependent on
+the macromolecule will be used (<tt class="docutils literal">CA</tt> for <tt class="docutils literal">protein</tt> and <tt class="docutils literal">P</tt> for nucleic
+acids). There are also type-dependent shorthands available (<tt class="docutils literal">backbone</tt> and
+<tt class="docutils literal">all</tt>).</p>
+<p>For assembly structures, it is possible to request atom selection on an
+assembly-member basis, with the same limitation that was explained in the
+previous section. As an example, here is a selection for the <a class="reference external" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=4qtr">4QTR</a> structure:</p>
+<pre class="literal-block">
+input {
+  model {
+    file_name = 4qtr.pdb
+    assembly = A B E F
+    assembly = C D G H
+    }
+  }
+
+configuration {
+  atoms = C,CA,N,O backbone all backbone
+  }
+</pre>
+<p>This instructs the program to use atoms C, CA, N, O for assembly position 1
+(chains A and C), backbone atoms for assembly position 2 (chains B and D; since
+these are protein chains, the shorthand <tt class="docutils literal">backbone</tt> stands for atoms C, CA, N
+and O), all atoms for assembly position 3 (chains E and G ) and backbone atoms
+for assembly position 4 (chains F and H; since these are DNA chains, backbone
+selection includes all atoms from the phosphate and the deoxy-ribose).</p>
+</div>
+<div class="section" id="superposition">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-12">Superposition</a></h2>
+<p>Equivalent positions are superposed iteratively to find a globally
+optimal solution. There are two superposition algorithms implemented,
+which primarily differ in how they handle gaps in equivalent positions.</p>
+<ul class="simple">
+<li><tt class="docutils literal">gapless</tt>. This algorithm discards all positions where gaps are
+present, For further details, see <a class="reference internal" href="ensembler_new.html#diamond1992">Diamond (1992)</a>.</li>
+</ul>
+<ul class="simple">
+<li><tt class="docutils literal">gapped</tt>. This algorithm can use all positions as long as there are
+two sites presents (i.e. not gaps), and may give better results for
+chains with distant sequence identity. For the exact algorithm, see
+<a class="reference internal" href="ensembler_new.html#wangsnoeyink2008">Wang &amp; Snoeyink (2008)</a>.</li>
+</ul>
+<p>Both algorithms use Diamond's formulation to solve the pairwise
+rotational superposition problem (<a class="reference internal" href="ensembler_new.html#diamond1988">Diamond, 1988</a>).</p>
+<p>An exception is raised if there are less than 3 sites present for
+superposition.</p>
+<p>Multiple superposition is an iterative process and consists of a series
+of pairwise superpositions. The convergence criterion is controlled by
+the <tt class="docutils literal">convergence</tt> parameter (in the <tt class="docutils literal">superposition</tt> scope), which is
+the r.m.s. difference change between two consecutive iterations.</p>
+</div>
+<div class="section" id="weighting">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-13">Weighting</a></h2>
+<p>Automatic weighting can be used to improve superposition, either to
+amplify highly homologous regions or to decrease the effect of incorrect
+site-equivalence (typically arises because of a wrong alignment).
+Implemented weighting schemes are as follows:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal">unit</tt> - Unit weights (equivalent to no weighting).</p>
+</li>
+<li><p class="first"><tt class="docutils literal">robust_resistant</tt> - Robust-resistant weighting scheme (default).
+This tends to converge fast and give reliable results. The exact
+formula for weighting is as follows:</p>
+<pre class="literal-block">
+w = 1 - ( delta2 / tolerance2 )2 if delta &lt; tolerance
+w = 0 (otherwise)
+</pre>
+<p>where <tt class="docutils literal">delta</tt> is the deviation from the average. Tolerance is an
+empirical value, and its optimal value is close to (unweighted r.m.s.d.) <sup>2</sup>
+and can be controlled by the <tt class="docutils literal">critical</tt> parameter of the <tt class="docutils literal">robust_resistant</tt>
+scope.</p>
+</li>
+</ul>
+<p>Weighting is iterated with superposition until weights converge, which
+can be controlled by the <tt class="docutils literal">convergence</tt> parameter of the <tt class="docutils literal">weighting</tt>
+scope.</p>
+<p>In case of highly dissimilar structures (or incorrect residue mapping),
+weight determination may temporarily need to be damped to avoid
+divergence. This is done automatically (in steps controlled by the
+<tt class="docutils literal">incremental_damping_factor</tt> parameter of the <tt class="docutils literal">weighting</tt> scope),
+until a preset value (controlled by the <tt class="docutils literal">max_damping_factor</tt> parameter
+of the <tt class="docutils literal">weighting</tt> scope) is reached, at which point an exception is
+raised.</p>
+</div>
+<div class="section" id="cluster-analysis">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-14">Cluster analysis</a></h2>
+<p>Hierarchical cluster analysis is performed using the pairwise r.m.s.
+differences as a distance measure. The <tt class="docutils literal">clustering</tt> parameter of the
+<tt class="docutils literal">configuration</tt> score can be used to adjust cluster boundaries. Clustering
+information can be requested for multiple thresholds. Default: no clustering
+performed.</p>
+</div>
+<div class="section" id="chain-trimming">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-15">Chain trimming</a></h2>
+<p>This option trims residues from the final superposed model where the
+unweighted r.m.s.d. is above a certain threshold (<tt class="docutils literal">threshold</tt>
+parameter of the <tt class="docutils literal">trimming</tt> scope). Useful in removing flexible loops,
+etc. Default: no trimming.</p>
+</div>
+<div class="section" id="sorting">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-16">Sorting</a></h2>
+<p>After superposition is complete, the chains can be sorted by sequence
+identity (<tt class="docutils literal">identity</tt>), fraction of common sites wrt all aligned atom
+positions (<tt class="docutils literal">overlap</tt>), weighted r.m.s.d. (<tt class="docutils literal">wrmsd</tt>) or unweighted
+r.m.s.d. (<tt class="docutils literal">unwrmsd</tt>). This is controlled by the <tt class="docutils literal">sort</tt> parameter of
+the <tt class="docutils literal">output</tt> scope. Default: input order (<tt class="docutils literal">input</tt>).</p>
+</div>
+</div>
+<div class="section" id="command-line">
+<h1><a class="toc-backref" href="ensembler_new.html#toc-entry-17">Command line</a></h1>
+<pre class="literal-block">
+phenix.ensembler \
+    [ command-line switches ] \
+    [ PHIL-format parameter files ] \
+    [ PHIL command-line assignments ] \
+    [ PDB-files ] \
+    [ alignment files ]
+</pre>
+<div class="section" id="command-line-switches">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-18">Command-line switches</a></h2>
+<pre class="literal-block">
+-h, --help            show this help message and exit
+--show-defaults       print PHIL and exit
+-i, --stdin           read PHIL from stdin as well
+-v, --verbosity       set verbosity level (info,debug,verbose)
+--version             show program's version number and exit
+--text-logfile FILE   Verbatim copy of log stream
+--html-logfile FILE   Verbatim copy of log stream in HTML
+</pre>
+</div>
+<div class="section" id="phil-arguments">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-19">PHIL arguments</a></h2>
+<p>Everything not starting with a dash('-') is interpreted as a PHIL
+argument. This can be a PHIL-format file containing parameters,
+command-line assignment or a file whose type is automatically recognized
+(based on file extension; structure files and alignment files are
+recognized automatically).</p>
+</div>
+</div>
+<div class="section" id="specific-limitations-and-possible-problems">
+<h1><a class="toc-backref" href="ensembler_new.html#toc-entry-20">Specific limitations and possible problems</a></h1>
+<div class="section" id="processing-features">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-21">Processing features</a></h2>
+<ul class="simple">
+<li>When an alignment-based residue mapping protocol is requested, very short
+residue segments (shorter than 3 consecutive residues) cannot be reliably
+aligned to the sequence, and these will be discarded from the superposition.</li>
+</ul>
+</div>
+<div class="section" id="warning-and-error-messages">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-22">Warning and error messages</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal">No input pdb files</tt>: no PDB files were given.</li>
+<li><tt class="docutils literal">Cannot treat multiple MODELs as a single assembly</tt>: the
+<tt class="docutils literal">read_single_assembly_from_file</tt> keyword was used in connection with a PDB
+file that contains multiple MODEL records.</li>
+<li><tt class="docutils literal">No chains read from input PDB files</tt>: no superposable chain was found in
+input files. Superposable chains are protein, DNA and RNA.</li>
+<li><tt class="docutils literal">No chain with allowed type found</tt>: no superposable chains found in
+structure file. Superposable chains are protein, DNA and RNA.</li>
+<li><tt class="docutils literal">No chain <span class="pre">'..'</span> found</tt>: chain '..' (requested as part of an
+assembly) is not present.</li>
+<li><tt class="docutils literal">Inconsistency between assembly 1 and assembly ..: different number of
+chains</tt>: assembly 1 and assembly .. do not have the same number of chains.</li>
+<li><tt class="docutils literal">Inconsistency between assembly 1 and assembly ..: different chain types</tt>:
+an assembly position in assembly 1 and assembly .. do not have the same
+macromolecule type. The information on chains types in the assembly is given
+prior to this error message.</li>
+<li><tt class="docutils literal">Mapping .. is not applicable to chain type ..</tt>: the mapping method .. is
+not applicable to a chain with macromolecule type .. (e.g. SSM superposition
+can only be used with protein chains).</li>
+<li><tt class="docutils literal">No alignment specified</tt>: no alignment file was specified and a
+user-supplied alignment based mapping method was requested.</li>
+<li><tt class="docutils literal">No matching alignment found</tt>: no alignment sequence matches
+from the ser-supplied alignment matches the chain sequence.</li>
+<li><tt class="docutils literal">SSM <span class="pre">error:...</span></tt>: an error occurred during SSM superposition.</li>
+<li><tt class="docutils literal">No sites selected</tt>: the requested atom selection results in no sites
+selected for superposition.</li>
+<li><tt class="docutils literal">Less than 2 chains for superposition</tt>: superposition cannot
+proceed because there are less than 2 chains found.</li>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal">Insufficient overlap among structures</tt>: superposition cannot proceed</dt>
+<dd>because there are less than 3 sites available (this is checked after
+discarding gaps). If this error occurs, discarding the chain with the
+lowest overlap (printed just before the error is raised) may allow
+one to proceed.</dd>
+</dl>
+</li>
+<li><tt class="docutils literal">Excessive weight shift, damping weight change</tt>: this warning is
+emitted if weights need to be damped, because all weights are zero.</li>
+<li><tt class="docutils literal">Weight damping recovery exhausted</tt>: this error is raised if even
+after successive rounds of re-weighting, all weights are still zero.
+This either indicates incorrect alignment of the chains or too tight
+expected error.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="references">
+<h1><a class="toc-backref" href="ensembler_new.html#toc-entry-23">References</a></h1>
+<table class="docutils citation" frame="void" id="diamond1988" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[Diamond1988]</td><td><strong>A note on the rotational superposition problem</strong>
+R. Diamond <em>Acta Cryst.</em> <strong>A44</strong>, 211-216 (1988)</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="diamond1992" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[Diamond1992]</td><td><strong>On the multiple simultaneous superposition of molecular structures by rigid body transformations</strong>
+R. Diamond <em>Protein Science</em> <strong>1</strong>, 1279-1287 (1992)</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="wangsnoeyink2008" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[WangSnoeyink2008]</td><td><strong>Defining and computing optimum RMSD for gapped and weighted multiple-structure alignment</strong>
+X. Wang and J. Snoeyink
+<em>EEE/ACM Transactions on Computational Biology and Bioinformatics</em> <strong>5</strong>, 525-533 (2008)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="additional-information">
+<h1><a class="toc-backref" href="ensembler_new.html#toc-entry-24">Additional information</a></h1>
+<div class="section" id="list-of-all-available-keywords">
+<h2><a class="toc-backref" href="ensembler_new.html#toc-entry-25">List of all available keywords</a></h2>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input</span><span class="phil-help">Input files</span><ul><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">model</span><span class="phil-help">Input model file</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">Input file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">selection</span><span class="phil-words"> = None </span><span class="phil-help">Selection string</span></li><li class="phil-param" data-expert="0"><span class="phil-name">assembly</span><span class="phil-words"> = None </span><span class="phil-help">Assembly information</span></li><li class="phil-param" data-expert="0"><span class="phil-name">read_single_assembly_from_file</span><span class="phil-words"> = False </span><span class="phil-help">Consider contents of the file as a single assembly</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><span class="phil-help">Output file(s)</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">location</span><span class="phil-words"> = "" </span></li><li class="phil-param" data-expert="0"><span class="phil-name">gui_output_dir</span><span class="phil-words"> = None </span><span class="phil-help">Sets base output directory for Phenix GUI - not used when run from the command line.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">root</span><span class="phil-words"> = ensemble </span><span class="phil-help">Output file root</span></li><li class="phil-param" data-expert="0"><span class="phil-name">style</span><span class="phil-words"> = *merged separate </span><span class="phil-help">Output options for ensemble</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sort</span><span class="phil-words"> = *input wrmsd unwrmsd overlap cluster </span><span class="phil-help">Sort ensemble components</span></li><li class="phil-param" data-expert="0"><span class="phil-name">error_file_root</span><span class="phil-words"> = None </span><span class="phil-help">Output file root for superposition error files</span></li><li class="phil-param" data-expert="0"><span class="phil-name">retain_associated_chains</span><span class="phil-words"> = False </span><span class="phil-help">Keep (and transform) chains that are not assembly members</span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">configuration</span><span class="phil-help">General parameters for ensemble generation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">mapping</span><span class="phil-words"> = None </span><span class="phil-help">Residue mapping methods. Valid choices: resid, ssm, ssm_multiple_alignment, muscle, multiple_alignment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">alignment</span><span class="phil-words"> = None </span><span class="phil-help">Alignment file (only necessary for 'alignments' modes)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">atoms</span><span class="phil-words"> = None </span><span class="phil-help">Atom to include in superposition</span></li><li class="phil-param" data-expert="0"><span class="phil-name">clustering</span><span class="phil-words"> = None </span><span class="phil-help">Cutoff distance for cluster analysis</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">superposition</span><span class="phil-help">Superposition setup</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">method</span><span class="phil-words"> = *gapless gapped </span><span class="phil-help">Superposition algorithm</span></li><li class="phil-param" data-expert="0"><span class="phil-name">convergence</span><span class="phil-words"> = 1.0E-4 </span><span class="phil-help">Convergence criterion for superposition</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">weighting</span><span class="phil-help">Parameters for weighting scheme</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">scheme</span><span class="phil-words"> = unit *robust_resistant </span><span class="phil-help">Weighting scheme</span></li><li class="phil-param" data-expert="0"><span class="phil-name">convergence</span><span class="phil-words"> = 1.0E-3 </span><span class="phil-help">Convergence criterion for weight iteration</span></li><li class="phil-param" data-expert="0"><span class="phil-name">incremental_damping_factor</span><span class="phil-words"> = 1.5 </span><span class="phil-help">Damping factor in recovery cycle</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_damping_factor</span><span class="phil-words"> = 3.34 </span><span class="phil-help">Quit recovery if cumulative damping factor is above</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">robust_resistant</span><span class="phil-help">Setting for robust-resistance scheme</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">critical</span><span class="phil-words"> = 3 </span><span class="phil-help">tolerance</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">trimming</span><span class="phil-help">Trimming parameters</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">trim</span><span class="phil-words"> = False </span><span class="phil-help">Trim differing loops</span></li><li class="phil-param" data-expert="0"><span class="phil-name">threshold</span><span class="phil-words"> = 3.0 </span><span class="phil-help">Max position RMSD for inclusion</span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+</div>
+    
+  </body>
+</html>

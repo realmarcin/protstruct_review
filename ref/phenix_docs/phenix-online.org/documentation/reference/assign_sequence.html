@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Sequence assignment and linkage of neighboring segments with assign_sequence</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="sequence-assignment-and-linkage-of-neighboring-segments-with-assign-sequence">
+<h1 class="title">Sequence assignment and linkage of neighboring segments with assign_sequence</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>assign_sequence: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>You can now carry out an improved sequence assignment of a model that
+you have already built with phenix.assign_sequence. Further, once the
+sequence has been assigned, this method will use the sequence and
+proximity to identify chains that should be connected, and it will
+connect those that have the appropriate relationships using the new loop
+libraries available in phenix.fit_loops. The result is that you may be
+able to obtain a more complete model with more chains assigned to
+sequence than previously.</p>
+<p>assign_sequence is a command line tool for reanalyzing resolve sequence
+assignment for a model and a map including the non-crystallographic
+symmetry, exclusion of sequence by previously-assigned regions, and
+requirement for plausible distances and geometries between ends of
+fragments with assigned sequences. Additionally assign_sequence will
+use the fit_loops loop library to connect segments that are separated
+by a short loop.</p>
+<p>Note: assign_sequence is designed to be used after resolve
+model-building in which residues that are not assigned to sequence are
+given residue numbers higher than any residue in the input sequence
+file. If you input a model not built by resolve or in phenix, or if you
+would like to completely redo the sequence assignment for your model, be
+sure to set &quot;allow_fixed_segments=False&quot;.</p>
+<p>NOTE: assign_sequence is normally called from phenix.phase_and_build
+but you can run it interactively if you want.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-assign-sequence-works">
+<h1>How assign_sequence works:</h1>
+<p>The starting point for assign_sequence is a set of segments of
+structure read in from the input model. assign_sequence then uses
+resolve to calculate the compatibility of each possible side chain with
+each residue in each segment. Then assign_sequence tests out possible
+combinations of alignments of all the segments in the input model and
+chooses the set of alignments that is most compatible with the density
+map, the number of NCS copies, and with the geometries and distances
+between ends of the segments.</p>
+<p>Sequence probabilities:</p>
+<p>assign_sequence uses the side-chain to map compatibility matrix
+calculated by resolve to assess the relative probabilities of each
+possible side chain at each position in the input model. Segments that
+are positively assigned to a sequence by resolve are (by default)
+maintained and used as anchors for further sequence assignment. All
+other segments have a relative probability associated with each possible
+alignment of the segment to the input sequence. The score for each
+alignment is the logarithm of this probability (essentially a
+log-likelihood LL score).</p>
+<p>Connection scores:</p>
+<p>Any pair of segments with some assignment of sequence to each segment
+has an additional score corresponding to the plausibility of a
+connection of the expected length existing between the segments. If the
+distance between ends is greater than can be bridged by the number of
+residues separating them, then the connection is not possible. If the
+connection is possible, it is scored based on the best density fit (CC)
+of a loop from the fit_loops loop library. This additional score is
+normally 10*CC.</p>
+<p>Generating sequence alignments and connectivities</p>
+<p>assign_sequence starts with the segments with the most convincing
+assignments of sequence. Often these are those with sequence positively
+assigned by resolve; otherwise they are those with the
+highest-probability assignments. This yields a starting arrangement
+(sequence assignment for a set of segments). Then each possible sequence
+assignment of each unassigned segment is tested for compatibility with
+the existing arrangement and the one that is most compatible (based on
+the connections that would result, duplication of sequence, and
+sequence-map matching) is added to the arrangement. Optionally many
+arrangements can be built up in parallel, but often a very good one can
+be found simply by taking the top one at each step. This process is
+repeated until no additional segments can be added to the arrangement to
+yield an increase in log-likelihood score of (by default) 2 or greater.</p>
+<p>NCS copies:</p>
+<p>assign_sequence builds up a set of possible sequence assignments and
+connectivities that depends on the expected number of copies in the
+asymmetric unit of the crystal. If there is only one copy of the
+molecule in the crystal, then no residues in the sequence can be used
+more than once in sequence assignment. If there are N copies, then a
+residue can be used up to N times. If there are multiple copies, then
+each molecule must be self-consistent, with plausible distances and
+geometries relating each segment to the next.</p>
+<p>Connecting segments:</p>
+<p>Once a final arrangement is found, including NCS if applicable, all
+segments that are separated by short loops (typically 0-3 residues) are
+connected using loops from the fit_loops loop library. This yields
+longer segments of structure with sequences fully assigned. The
+resulting model then has side chains added to match the newly-assigned
+sequence and is written out.</p>
+</div>
+<div class="section" id="output-files-from-assign-sequence">
+<h1><em>Output files from assign_sequence</em></h1>
+<p><strong>assign_sequence.pdb</strong>: A PDB file with your input model assigned to
+sequence (to the extent possible). Residues not assigned to sequence
+will be given a chain ID higher than those assigned, and they will be
+given residue numbers higher than any residue number in the sequence
+file.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-assign-sequence">
+<h1>Standard run of assign_sequence:</h1>
+<p>Running assign_sequence is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.assign_sequence map_coeffs.mtz coords.pdb sequence.dat
+</pre>
+<p>If you want (or need) to specify the column names from your mtz file,
+you will need to tell assign_sequence what FP and PHIB (and optionally
+FOM) are, in this format:</p>
+<pre class="literal-block">
+phenix.assign_sequence map_coeffs.mtz coords.pdb \
+labin=&quot;FP=2FOFCWT PHIB=PH2FOFCWT&quot; sequence.dat
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">seq_file</span><span class="phil-words"> = None </span><span class="phil-help">File with 1-letter code sequence of molecule.
+              Chains separated by blank line or greater-than sign</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_in</span><span class="phil-words"> = None </span><span class="phil-help">Optional starting PDB file (ends will be extended if present)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mtz_in</span><span class="phil-words"> = None </span><span class="phil-help">MTZ file with coefficients for a map </span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeff_labels</span><span class="phil-words"> = None </span><span class="phil-help">If map coefficients cannot be identified automatically from your MTZ file, you can specify the label or labels  for them. (Please separate labels with blank space,  MTZ columns grouped together separated by commas with no blanks.) You can specify: map_coeff_labels (e.g., FWT,PHIFWT) amplitudes and phases (e.g., FP,SIGFP PHIB) or amplitudes, phases, weights (e.g., FP,SIGFP PHIB FOM)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">labin</span><span class="phil-words"> = "" </span><span class="phil-help"> For backward compatibility only.
+                 Use instead map_coeff_labels.
+                 Labin line for MTZ file with map coefficients.
+                 This is optional if assign_sequence
+                 can guess the correct coefficients
+                 for FP PHIB .  Otherwise specify:
+                 LABIN FP=myFP PHIB=myPHI
+                 where myFP is your column label for FP.
+                 NOTE: myFP and myPHI must be adjacent in the mtz file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_in</span><span class="phil-words"> = None </span><span class="phil-help">CCP4 or MRC-style map file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">prob_file</span><span class="phil-words"> = None </span><span class="phil-help">File with sequence probability information from resolve</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ec_hist_file</span><span class="phil-words"> = /home/vsts/work/1/modules/solve_resolve/ext_ref_files/ec_hist.pkl </span><span class="phil-help">File with EC histograms</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ec_dict_file</span><span class="phil-words"> = None </span><span class="phil-help">Input file with pre-calculated EC scores</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ss_pred_file</span><span class="phil-words"> = None </span><span class="phil-help">File with secondary structure probability information in the format of raptorX (http://raptorx.uchicago.edu/StructurePropertyPred/predict/)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">linkage_file</span><span class="phil-words"> = None </span><span class="phil-help">File with linkage information from combine_models
+                 Must have been run with the same input pdb file
+                 and the same value of min_segment_length</span></li><li class="phil-param" data-expert="0"><span class="phil-name">loop_dict_file</span><span class="phil-words"> = None </span><span class="phil-help">File with loop information from previous run as pickle file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pair_object_dict_file</span><span class="phil-words"> = None </span><span class="phil-help">pair object dict as pickle file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">checked_connections_file</span><span class="phil-words"> = None </span><span class="phil-help">checked connections dict as pickle file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_removed_mtz_in</span><span class="phil-words"> = None </span><span class="phil-help">MTZ file with density_removed coefficients for a map </span></li><li class="phil-param" data-expert="0"><span class="phil-name">comparison_model</span><span class="phil-words"> = None </span><span class="phil-help">Comparison model (normally just for testing)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ec_file</span><span class="phil-words"> = None </span><span class="phil-help">EC file (format is residue i residue j EC value)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">target_output_format</span><span class="phil-words"> = *None pdb mmcif </span><span class="phil-help">Desired output format (if possible). Choices are None ( try to use input format), pdb, mmcif. If output model does not fit in pdb format, mmcif will be used. Default is pdb.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_out</span><span class="phil-words"> = assign_sequence.pdb </span><span class="phil-help">Output PDB file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">log</span><span class="phil-words"> = None </span><span class="phil-help">Output log file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">params_out</span><span class="phil-words"> = assign_sequence_params.eff </span><span class="phil-help">Parameters file to rerun assign_sequence</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_loop_dict_file</span><span class="phil-words"> = None </span><span class="phil-help">loop dict as pickle file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_pair_object_dict_file</span><span class="phil-words"> = None </span><span class="phil-help">pair object dict as pickle file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_checked_connections_file</span><span class="phil-words"> = None </span><span class="phil-help">checked connections dict as pickle file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_ec_dict_file</span><span class="phil-words"> = None </span><span class="phil-help">ec dict as pickle file</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">assignment</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">map_all_connections</span><span class="phil-words"> = False </span><span class="phil-help">Map all connecting parts, even those that are not linked</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ec_scale</span><span class="phil-words"> = None </span><span class="phil-help">Scale on EC scores (compared to density analysis). If None, adjust to match SD of EC scores to SD of scores from density.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fraction_ec_inter_chain</span><span class="phil-words"> = 0.1 </span><span class="phil-help">Fraction of inter-chain EC values to save</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_resolution</span><span class="phil-words"> = None </span><span class="phil-help">Resolution for NCS identification</span></li><li class="phil-param" data-expert="0"><span class="phil-name">find_ncs</span><span class="phil-words"> = False </span><span class="phil-help">Try to find NCS in chains after sequence assignment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">range_to_keep</span><span class="phil-words"> = 4.0 </span><span class="phil-help">Keep solutions with score within range_to_keep of the maximum</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_keep</span><span class="phil-words"> = 10 </span><span class="phil-help">Number of possibilities to keep in optimization</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_write</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of possibilities to write out at end</span></li><li class="phil-param" data-expert="0"><span class="phil-name">linkage_score</span><span class="phil-words"> = 10. </span><span class="phil-help">Score for creating a link between segments</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_linkage_score</span><span class="phil-words"> = 12. </span><span class="phil-help">Maximum linkage score attainable</span></li><li class="phil-param" data-expert="0"><span class="phil-name">loop_score</span><span class="phil-words"> = 10. </span><span class="phil-help">Score for a loop is loop_score*(1.+loop_cc)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_overlap_rmsd</span><span class="phil-words"> = 2. </span><span class="phil-help">Maximum rmsd for 3 residues on each end of loop-lib fit</span></li><li class="phil-param" data-expert="0"><span class="phil-name">allowed_overlap</span><span class="phil-words"> = 4 </span><span class="phil-help">Allowed overlap of segments allowed. At the end if there are overlaps they will be trimmed off.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">length_mismatch_penalty</span><span class="phil-words"> = 0 </span><span class="phil-help">Decrease in linkage score if linkage is not correct length</span></li><li class="phil-param" data-expert="0"><span class="phil-name">depth_to_keep</span><span class="phil-words"> = 8.0 </span><span class="phil-help">In full optimization solutions will be kept with score  depth_to_keep + max_linkage_score below the best</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_length_mismatch</span><span class="phil-words"> = 3 </span><span class="phil-help">Maximum length mismatch in linkages</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_confidence</span><span class="phil-words"> = 0.9999 </span><span class="phil-help">Sets required confidence level in a placement
+            of a segment to keep the best one. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">convincing_score</span><span class="phil-words"> = 2. </span><span class="phil-help">Score gain required to keep a sequence assignment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">starting_convincing_score</span><span class="phil-words"> = 10. </span><span class="phil-help">Score gain required to keep an initial sequence assignment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_ec</span><span class="phil-words"> = None </span><span class="phil-help">Use EC values in assigning sequence. Requires ec_file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_density</span><span class="phil-words"> = True </span><span class="phil-help">Use density in assigning sequence. Requires map coefficients</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_inter_residue_difference</span><span class="phil-words"> = None </span><span class="phil-help">Ignore EC values for residue differences shorter than this</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_inter_residue_difference</span><span class="phil-words"> = None </span><span class="phil-help">Ignore EC values for residue differences longer than this</span></li><li class="phil-param" data-expert="0"><span class="phil-name">subtract_expected_value</span><span class="phil-words"> = True </span><span class="phil-help">Subtract ec values for distances associated with intra-residue differences. Alternative is subtract ec values for all distances corresponding to residue differences.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">match_ec_to_pdb</span><span class="phil-words"> = None </span><span class="phil-help">Align ec to pdb sequence and adjust ec residue numbers. Alternatives are no matching or match_c_to_seq</span></li><li class="phil-param" data-expert="0"><span class="phil-name">match_ec_to_seq</span><span class="phil-words"> = None </span><span class="phil-help">Align ec to input sequence and adjust ec residue numbers. Alternatives are no matching or match_c_to_pdb. NOTE: sequence file must have only one chain and start at residue 1 unless start_res is specified.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_ec_length</span><span class="phil-words"> = 5 </span><span class="phil-help">Minimum length of match between PDB and EC file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_random_score</span><span class="phil-words"> = 20 </span><span class="phil-help">Number of random distances to average for random scoring</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_separation_for_bins</span><span class="phil-words"> = 20 </span><span class="phil-help">Maximum distance (in residues) between residues to consider   in binning EC values</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_ec_seq_mismatch</span><span class="phil-words"> = 2 </span><span class="phil-help">Maximum mismatches of sequence in EC database compared to PDB file or sequence file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_cb_for_ec</span><span class="phil-words"> = True </span><span class="phil-help">use C-beta positions for EC calculations</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_ec</span><span class="phil-words"> = -1000 </span><span class="phil-help">Minimum EC to consider</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_length</span><span class="phil-words"> = 4 </span><span class="phil-help">Minimum length of a segment to place</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_segment_length</span><span class="phil-words"> = 5 </span><span class="phil-help">Segments shorter than this will be ignored on read-in.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_levels</span><span class="phil-words"> = None </span><span class="phil-help">Number of segments to consider in building a  complete sequence assignment (quick default = 6, otherwise 20)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_indiv_tries_per_level</span><span class="phil-words"> = None </span><span class="phil-help">Number of sequence assignments to consider for each  segment (quick default = 1, otherwise 3)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_total_tries_per_level</span><span class="phil-words"> = None </span><span class="phil-help">Number of sequence arrangements to consider for all  additional segments (quick default = 1, otherwise 6)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_placements</span><span class="phil-words"> = 100 </span><span class="phil-help">Number of placements of any segment to consider</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_final_placements</span><span class="phil-words"> = 20 </span><span class="phil-help">Number of final arrangements to consider</span></li><li class="phil-param" data-expert="0"><span class="phil-name">check_ncs_with_offset</span><span class="phil-words"> = True </span><span class="phil-help">Check to verify that segments that seem to show NCS are
+            actually different if offset by 1 residue. If protein is just helices
+            then you might need to try check=False</span></li><li class="phil-param" data-expert="0"><span class="phil-name">list_only_complete</span><span class="phil-words"> = False </span><span class="phil-help">Only include complete arrangements; ignore those that
+            have arrangements of some segments that are subsequently
+            removed as incompatible</span></li><li class="phil-param" data-expert="0"><span class="phil-name">allow_fixed_segments</span><span class="phil-words"> = True </span><span class="phil-help">If True, then input segments with sequences assigned
+           are kept fixed.
+            If fix_known=False, then assigned segments are identified by
+            sequence numbers less than or equal to the longest
+            segment in the sequence file.
+           </span></li><li class="phil-param" data-expert="0"><span class="phil-name">all_are_fixed</span><span class="phil-words"> = False </span><span class="phil-help">Fix all segments. Note: will fail if multiple chains</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fix_known</span><span class="phil-words"> = False </span><span class="phil-help">If True, then all input segments with except those marked
+            as segid=UNK will be considered fixed. (Instead of identifying
+            them based on sequence number in input file).
+            Forces allow_fixed_segments to be True.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_connectivity</span><span class="phil-words"> = False </span><span class="phil-help">This is very useful if you expect your model to have the same
+            connectivity as your template. If True, then input segments
+            are kept in the order found in the
+            input PDB and kept assigned to the original chains, but
+            their assignments may change otherwise (allowing
+            insertions/deletions). NOTE: If True, then allow_fixed_segments=False
+            unless fix_known=True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">include_chain_u_in_keep_connectivity</span><span class="phil-words"> = False </span><span class="phil-help">If True, chains with chainID of 'U' are included in analysis with keep_connectivity=True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimize_arrangements</span><span class="phil-words"> = None </span><span class="phil-help">Try to optimize arrangements at the end, including removal
+                of uncertain segments</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_connectivity_in_optimize</span><span class="phil-words"> = True </span><span class="phil-help">If True and keep_connectivity is True and optimize_arrangements is True , then connectivity will be used in chain optimization</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_uncertain_segments</span><span class="phil-words"> = True </span><span class="phil-help">If True, then remove uncertain segments. NOTE: at very end of  iteration, if any, then the removal of uncertain segments is  determined by iteration.remove_uncertain_at_end.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimize_sequence_alignment</span><span class="phil-words"> = False </span><span class="phil-help">If True, then try to align fragments to template sequence Only appropriate if fully assigned model is input  (not likely)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimize_alignment_changes</span><span class="phil-words"> = False </span><span class="phil-help">If True, then try to keep sequence numbers matched to
+            original as much as possible.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">allow_longer_connections</span><span class="phil-words"> = True </span><span class="phil-help">If a connection segment is available, try with lower
+                scoring also n+1,n+2,n+3 connections. This may be a
+                good idea because loops are often built short by one or a few
+                residues.
+                </span></li><li class="phil-param" data-expert="0"><span class="phil-name">replace_side_chains</span><span class="phil-words"> = True </span><span class="phil-help">At the end of sequence assignment identify side-chain
+            rotamers and replace existing side-chains</span></li><li class="phil-param" data-expert="0"><span class="phil-name">replace_direct_joins</span><span class="phil-words"> = False </span><span class="phil-help">Use fit-loops to rebuild all junctions that are joined flush</span></li><li class="phil-param" data-expert="0"><span class="phil-name">short_segment_length</span><span class="phil-words"> = 12 </span><span class="phil-help">Definition of a short segment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_loop_length</span><span class="phil-words"> = 8 </span><span class="phil-help">Maximum length of loop to try to fit</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_random_loop</span><span class="phil-words"> = 500 </span><span class="phil-help">Number of loop versions to build</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_unassigned_short_segments</span><span class="phil-words"> = 20 </span><span class="phil-help">Maximum number of segments short_segment_length or fewer  residues that are  not assigned to sequence to consider in connections.  Keeping  too many can make the analysis take a very long time.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">compare_only</span><span class="phil-words"> = False </span><span class="phil-help">Just compare input model to comparison model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">reset_sequence</span><span class="phil-words"> = False </span><span class="phil-help">Adjust sequence numbering and sequence of segments in  pdb_in based  on sequence numbers of matching positions in comparison_model. Cannot be used with compare_only.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">make_unique</span><span class="phil-words"> = None </span><span class="phil-help">Make segments of input model unique (no overlapping) residues. Normally keep this at None. Used in iteration of assign_sequence.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">start_res</span><span class="phil-words"> = None </span><span class="phil-help">Starting residue number of sequence file. Used only for  compare_only with ec weighting</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ignore_ter_or_break</span><span class="phil-words"> = None </span><span class="phil-help">Ignore TER/BREAK records in PDB file. Use only residue numbers and chain ID to identify breaks in seq_prob steps</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">iteration</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">iterative_assignment</span><span class="phil-words"> = False </span><span class="phil-help">You can iteratively assign sequence and fit loops This can improve the assignment, but will take longer</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cycles</span><span class="phil-words"> = 3 </span><span class="phil-help">Cycles of iteration</span></li><li class="phil-param" data-expert="0"><span class="phil-name">start_step</span><span class="phil-words"> = *assign_sequence fit_loops insert_loops get_connections </span><span class="phil-help">You can decide where to start in the cycle</span></li><li class="phil-param" data-expert="0"><span class="phil-name">end_step</span><span class="phil-words"> = *None assign_sequence fit_loops insert_loops get_connections </span><span class="phil-help">You can specify last step to carry out in iteration</span></li><li class="phil-param" data-expert="0"><span class="phil-name">skip_step</span><span class="phil-words"> = None </span><span class="phil-help">You can specify steps to skip in iteration</span></li><li class="phil-param" data-expert="0"><span class="phil-name">assign_sequence_file</span><span class="phil-words"> = None </span><span class="phil-help">File partially assigned to sequence (output of assign_sequence)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">loops_file</span><span class="phil-words"> = None </span><span class="phil-help">File with loops to insert</span></li><li class="phil-param" data-expert="0"><span class="phil-name">assign_sequence_insertion_file</span><span class="phil-words"> = None </span><span class="phil-help">File partially assigned to sequence with insertions</span></li><li class="phil-param" data-expert="0"><span class="phil-name">connections_file_list</span><span class="phil-words"> = None </span><span class="phil-help">list of files with possible connections to consider</span></li><li class="phil-param" data-expert="0"><span class="phil-name">only_assign_sequence_on_last_cycle</span><span class="phil-words"> = True </span><span class="phil-help">Just run assign_sequence step on last iteration cycle</span></li><li class="phil-param" data-expert="0"><span class="phil-name">build_outside_model</span><span class="phil-words"> = True </span><span class="phil-help">Build outside model in get_connections</span></li><li class="phil-param" data-expert="0"><span class="phil-name">build_outside_model_once</span><span class="phil-words"> = True </span><span class="phil-help">Run build outside model a maximum of one time (Run once if build_outside_model=True, never if  build_outside_model=False)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_uncertain_at_end</span><span class="phil-words"> = False </span><span class="phil-help">If True, then remove uncertain segments at very end of iteration (in addition to removing them along the way if  remove_uncertain_segments=True )</span></li><li class="phil-param" data-expert="0"><span class="phil-name">connect_all_segments</span><span class="phil-words"> = True </span><span class="phil-help">Connect all segments sequentially in get_connections</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fill_in_gaps</span><span class="phil-words"> = True </span><span class="phil-help">After optimize and keep_connectivity, try to fill in gaps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">standard_gap_score</span><span class="phil-words"> = 0. </span><span class="phil-help">Score for filling default gap</span></li><li class="phil-param" data-expert="0"><span class="phil-name">decrease_tries_with_levels</span><span class="phil-words"> = False </span><span class="phil-help">Reduce number of tries each level of search</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">directories</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = "temp_dir" </span><span class="phil-help">Optional temporary work directory </span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = "" </span><span class="phil-help">Optional output directory</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = 0. </span><span class="phil-help">high-resolution limit for map calculation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_fraction</span><span class="phil-words"> = 0.5 </span><span class="phil-help">solvent fraction</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_type</span><span class="phil-words"> = *PROTEIN DNA RNA </span><span class="phil-help">Chain type (for identifying main-chain and side-chain atoms)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_copies</span><span class="phil-words"> = 1 </span><span class="phil-help">NCS copies</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">model_building</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">dist_max</span><span class="phil-words"> = 20. </span><span class="phil-help">Maximum distance ends can be apart to consider for linking</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_loop_lib_gap</span><span class="phil-words"> = 3 </span><span class="phil-help">Maximum number of residues in working loop library (This must match loop libraries that are available)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">quick</span><span class="phil-words"> = True </span><span class="phil-help">Run quickly</span></li><li class="phil-param" data-expert="0"><span class="phil-name">raise_sorry</span><span class="phil-words"> = False </span><span class="phil-help">Raise sorry if problems</span></li><li class="phil-param" data-expert="0"><span class="phil-name">debug</span><span class="phil-words"> = False </span><span class="phil-help">Debugging output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dry_run</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and check parameter names</span></li><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">   You can specify the number of processors to use </span></li><li class="phil-param" data-expert="0"><span class="phil-name">check_wait_time</span><span class="phil-words"> = 1.0 </span><span class="phil-help">   You can specify the length of time (seconds) to wait  between checking for subprocesses to end</span></li><li class="phil-param" data-expert="0"><span class="phil-name">wait_between_submit_time</span><span class="phil-words"> = 1.0 </span><span class="phil-help">   You can specify the length of time (seconds) to wait  between each job that is submitted when running sub-processes. This can be helpful on NFS-mounted systems when running  with multiple processors to avoid file conflicts. The symptom of too short a wait_between_submit_time is File exists:....</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_command_list</span><span class="phil-words"> = None </span><span class="phil-help">You can supply any resolve command here NOTE: for command-line usage you need to enclose the whole set of commands in double quotes (&amp;quot;) and each individual command in single quotes (') like this:  resolve_command_list=&amp;quot;'no_build' 'b_overall 23' &amp;quot; </span></li><li class="phil-param" data-expert="0"><span class="phil-name">background</span><span class="phil-words"> = None </span><span class="phil-help">run jobs in background or not (if nproc is greater than 1) Usually set automatically. If run_command is sh or csh, True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">run_command</span><span class="phil-words"> = "sh " </span><span class="phil-help"> Command for running jobs (e.g., sh or qsub )</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_size</span><span class="phil-words"> = 24 </span><span class="phil-help">Size of resolve to use. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">em_side_density</span><span class="phil-words"> = False </span><span class="phil-help">Use EM side chain density</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">non_user_params</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">print_citations</span><span class="phil-words"> = True </span><span class="phil-help">Print citation information at end of run</span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

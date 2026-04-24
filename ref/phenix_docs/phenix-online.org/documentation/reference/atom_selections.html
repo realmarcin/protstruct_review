@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>The Phenix atom selection syntax</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="the-phenix-atom-selection-syntax">
+<h1 class="title">The Phenix atom selection syntax</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="atom_selections.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="atom_selections.html#introduction" id="toc-entry-1">Introduction</a></li>
+<li><a class="reference internal" href="atom_selections.html#video-tutorial" id="toc-entry-2">Video Tutorial</a></li>
+<li><a class="reference internal" href="atom_selections.html#examples-for-selection-expressions" id="toc-entry-3">Examples for selection expressions</a></li>
+<li><a class="reference internal" href="atom_selections.html#graphical-selection" id="toc-entry-4">Graphical selection</a></li>
+<li><a class="reference internal" href="atom_selections.html#smart-selections" id="toc-entry-5">&quot;Smart&quot; selections</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h1><a class="toc-backref" href="atom_selections.html#toc-entry-1">Introduction</a></h1>
+<p>Many of the programs in Phenix, and <a class="reference external" href="refine_gui.html">phenix.refine</a> in
+particular, allow (or require) you to specify selections
+of atoms in a model.  Common examples include:</p>
+<blockquote>
+<ul class="simple">
+<li>TLS (constrained anisotropic displacement) and rigid-body refinement groups</li>
+<li>Selections for isotropic versus anisotropic B-factor refinement</li>
+<li>Atoms to leave out for omit map calculation</li>
+<li>Subset of atoms to modify properties for (in <a class="reference external" href="pdbtools.html">PDBTools</a>)</li>
+<li>Harmonically restrain atoms during refinement</li>
+</ul>
+</blockquote>
+<p>All of these parameters are defined using a common syntax similar to what is
+used in <a class="reference external" href="http://cns-online.org">CNS</a> or <a class="reference external" href="http://pymol.org">PyMOL</a>.
+The syntax allows for selection of atomic properties such as atom name,
+residue number, chain ID, or B-factor, which can be combined by the use of
+simple boolean statements (<tt class="docutils literal">and</tt>, <tt class="docutils literal">or</tt>, or <tt class="docutils literal">not</tt>).</p>
+</div>
+<div class="section" id="video-tutorial">
+<h1><a class="toc-backref" href="atom_selections.html#toc-entry-2">Video Tutorial</a></h1>
+<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/K28q378F39s" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" ></iframe></div><p>The <a class="reference external" href="https://youtu.be/K28q378F39s">tutorial video</a> is available on the
+<a class="reference external" href="https://www.youtube.com/c/phenixtutorials">Phenix YouTube channel</a> and covers the
+following topics:</p>
+<ul class="simple">
+<li>Basic overview</li>
+<li>Examples for selection syntax</li>
+<li>Examples for combined expressions</li>
+<li>How to test if an expression works (phenix.pdb_atom_selection)</li>
+</ul>
+</div>
+<div class="section" id="examples-for-selection-expressions">
+<h1><a class="toc-backref" href="atom_selections.html#toc-entry-3">Examples for selection expressions</a></h1>
+<p><strong>All atoms</strong></p>
+<pre class="literal-block">
+all
+</pre>
+<p><strong>All C-alpha atoms (not case sensitive)</strong></p>
+<pre class="literal-block">
+name ca
+</pre>
+<p><strong>All atoms with H in the name (* is a wildcard character)</strong></p>
+<pre class="literal-block">
+name *H*
+</pre>
+<p><strong>Atoms names with * (backslash disables wildcard function)</strong></p>
+<pre class="literal-block">
+name o2\*
+</pre>
+<p><strong>All atoms in 'A' conformation</strong></p>
+<pre class="literal-block">
+altloc A
+</pre>
+<p><strong>Atom names with spaces</strong></p>
+<pre class="literal-block">
+name 'O 1'
+</pre>
+<p><strong>Atom names with primes don't necessarily have to be quoted</strong></p>
+<pre class="literal-block">
+name o2'
+</pre>
+<p><strong>Boolean &quot;and&quot;, &quot;or&quot;, and &quot;not&quot;</strong></p>
+<pre class="literal-block">
+resname ALA and (name ca or name c or name n or name o)
+chain a and not altid b
+resid 120 and icode c and model 2
+segid a and element c and charge 2+ and anisou
+</pre>
+<p>Note that the <tt class="docutils literal">and</tt>, <tt class="docutils literal">or</tt>, and <tt class="docutils literal">not</tt> operators have equal priority, so
+parentheses may be required to indicate which clauses go together.
+The first example above selects for all atoms with the specified names in
+alanine residues, but if the parentheses are omitted:</p>
+<pre class="literal-block">
+resname ALA and name ca or name c or name n or name o
+</pre>
+<p>it will instead select C-alpha atoms in ALA, plus all atoms named C, N, or O
+regardless of residue name.</p>
+<p>Also note that the outcome of boolean expression can be somewhat different from
+what one may expect comparing it with natural language. For example, if one
+wants to select ALA and GLY residues in the molecule, the selection should be</p>
+<pre class="literal-block">
+resname ALA or resname GLY
+</pre>
+<p>because suitable residues have residue name ALA or GLY. On the contrary,
+selection</p>
+<pre class="literal-block">
+resname ALA and resname GLY
+</pre>
+<p>will result in empty selection because there is no residue that can satisfy
+both conditions simultaneously.</p>
+<p><strong>A single residue by number</strong></p>
+<pre class="literal-block">
+resseq 188
+</pre>
+<p>Note that if there are several chains containing residue number 188, all of
+them will be selected. To be more specific and select residue 188 in particular
+chain:</p>
+<pre class="literal-block">
+chain A and resid 188
+</pre>
+<p>this will select residue 188 only in chain A.</p>
+<p><strong>A range of residues</strong></p>
+<pre class="literal-block">
+resseq 2:10
+</pre>
+<p>This selects all residue numbers falling within this range, independent of
+their order in the PDB file.  The numbering must be ascending; <tt class="docutils literal">resseq 10:2</tt>
+will not work.</p>
+<p><strong>Insertion codes</strong></p>
+<p><tt class="docutils literal">resid</tt> combines the residue number (<tt class="docutils literal">resseq</tt>) with the insertion code (icode); thus the following selections are identical:</p>
+<pre class="literal-block">
+resid 188
+resseq 188 and icode ' '
+</pre>
+<p>as are these:</p>
+<pre class="literal-block">
+resid 27C
+resseq 27 and icode 'C'
+</pre>
+<p><strong>Specifying ordered ranges of residues</strong></p>
+<p>For some purposes, such as specifying TLS groups, it may be impractical to
+specify a numerical range of <tt class="docutils literal">resseq</tt> attributes.  This is especially the
+case when the residue numbering is not continuous and ascending, which is
+found in some PDB entries, or when the insertion code is non-blank.  An
+alternative is to define a series of residues by their combined number and
+insertion code, using the <tt class="docutils literal">through</tt> keyword:</p>
+<pre class="literal-block">
+chain A and resid 1000 through 17J
+</pre>
+<p>In this case, the residues will be examined in the order that they appear in
+the PDB file, and every atom falling between 1000 and 17J in chain A will
+be included.  This is the only situation where the ordering of atoms is
+important in atom selections.</p>
+<p><strong>B-factors and occupancies</strong></p>
+<p>You may also select atoms based on their numerical properties:</p>
+<pre class="literal-block">
+bfactor &gt; 80
+bfactor = 0
+occupancy &lt; 1
+occupancy = 0
+</pre>
+<p><strong>Other</strong></p>
+<p>A few additional keywords are supported:</p>
+<pre class="literal-block">
+element H
+water
+pepnames
+hetero
+</pre>
+<p>These examples specify hydrogen atoms, water molecules (detected by residue
+name), common amino acid residues, and atoms labeled as HETATM, respectively.</p>
+<p><strong>Selecting no atoms</strong></p>
+<pre class="literal-block">
+(not all)
+</pre>
+<p>The default value of most selections is <tt class="docutils literal">None</tt> (which in the GUI will appear
+as a blank field), but the treatment of this differs depending on how the
+atom selection will be used.  For omit selections, <tt class="docutils literal">None</tt> is equivalent to
+<tt class="docutils literal">(not all)</tt>; for rigid-body selections, phenix.refine will default to
+treating the entire model as a single rigid body.  For B-factor refinement,
+leaving the selections set to <tt class="docutils literal">None</tt> will result in their parameterization
+being determined based on the input model and atom type (hydrogens are
+treated specially).</p>
+</div>
+<div class="section" id="graphical-selection">
+<h1><a class="toc-backref" href="atom_selections.html#toc-entry-4">Graphical selection</a></h1>
+<p>In the phenix.refine GUI, any valid
+atom selection can be visualized if you have a suitable graphics card
+and have already loaded a PDB file with valid symmetry information.  The
+graphics window can be opened by clicking the &quot;View/pick&quot; button next
+to any atom selection field.  Depending on the size of your structure, it
+may take several seconds for PHENIX to determine the atomic connectivity.
+The current selection, if any, will be highlighted:</p>
+<img alt="../images/gui_atom_selection.png" src="../images/gui_atom_selection.png" />
+<p>The <em>View/pick</em> button opens a window that allows you to type in
+selections and immediately visualize the results, including the number of
+atoms selected.  On mice with at least two buttons, clicking on an atom
+with the right button will open a menu for selecting residue ranges or
+chains.  However, we
+recommend that you learn the selection syntax, as it is much more flexible
+than mouse controls.  Selections made in the graphics window will be sent
+automatically to the appropriate control.</p>
+<p>Once this window is open, it does not need to be closed; clicking a different
+&quot;View/pick&quot; button will transfer control of the display.  (On Linux, you
+will first need to open the <em>Actions</em> menu and click <em>Restore parent window</em>
+to transfer mouse and keyboard controls back to the configuration dialog.)</p>
+</div>
+<div class="section" id="smart-selections">
+<h1><a class="toc-backref" href="atom_selections.html#toc-entry-5">&quot;Smart&quot; selections</a></h1>
+<p>In some contexts (primarily in <a class="reference external" href="refine_gui.html">phenix.refine</a> and
+<a class="reference external" href="pdbtools.html">PDBTools</a>), the geometry restraints information is used
+to extend the allowed keywords:</p>
+<pre class="literal-block">
+resname ALA and backbone
+resname ALA and sidechain
+peptide backbone
+rna backbone or dna backbone
+water or nucleotide
+dna and not (phosphate or ribose)
+within(5, (nucleotide or peptide) backbone)
+</pre>
+<p>Note however that these options cannot be visually selected in the Phenix
+GUI at present, and they may not be recognized by all programs.</p>
+</div>
+</div>
+    
+  </body>
+</html>

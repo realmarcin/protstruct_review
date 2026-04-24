@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Model searching and morphing using secondary structure matching (SSM)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="model-searching-and-morphing-using-secondary-structure-matching-ssm">
+<h1 class="title">Model searching and morphing using secondary structure matching (SSM)</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>search_and_morph: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>Search for structures in the PDB similar to a supplied model using SSM
+matching, superimpose the matching structures, then optionally morph
+them to be similar to the target model and trim back to the parts that match.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-search-and-morph-works">
+<h1>How search_and_morph works:</h1>
+<p>search_and_morph uses SSM-based (secondary structure matching) to find
+structures in the PDB that are similar to a supplied model. The SSM
+matching is the same as in phenix.superpose_and_morph.  The SSM
+matching starts with identifying secondary structure in the supplied model,
+indexing all pairs of secondary structure elements.  These pairs of
+secondary structure elements are compared with indexed pairs from all
+structures in a curated subset of the PDB, leading to sets of
+matching pairs in the target and structures in the PDB.</p>
+<p>The curated subset of the PDB consist of non-redundant (&lt;90% identity),
+high-resolution structures (&lt; 2 A) that have very good geometry. The main-chain
+coordinates of these structures are supplied in a database as part of Phenix.</p>
+<p>Normally the basic unit of a match is a set of three pairs
+of secondary structure elements (they can be overlapping) with the same
+spatial arrangement in the two structures.  Such a match is called a triple
+in search_and_morph.</p>
+<p>A matching triples yields a unique orientation of the moving model.  Matching
+triples are grouped into sets in which all the triples yield nearly the same
+orientation. The PDB entries representing the largest groups are then tested
+for match to the target structure.</p>
+<p>Optionally (if database is set to &quot;pdb100&quot;), sequence neighbors of these
+PDB entries are identified and added
+to the structures tested for matching the target structure</p>
+<p>The structures to be examined are either loaded from the Phenix database or
+downloaded from the PDB. They are then superimposed on the target structure
+and (optionally) morphed and trimmed to match the target structure in the
+same way as in phenix.superimpose_and_morph. In this procedure the
+best-fitting superimposed structures are morphed by
+calculation of a real-space distortion field that changes over a typical
+distance of about 10 A (set by the parameter distortion_field_length).</p>
+<p>Finally (optionally) the moving models are trimmed to remove
+segments that are very different from the fixed model.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-search-and-morph">
+<h1>Standard run of search_and_morph:</h1>
+<p>Running search_and_morph is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.search_and_morph model.pdb nproc=8
+</pre>
+<p>This will find structures in the PDB similar to model.pdb, superimpose them,
+morph them to match, and trim back to the matching region.</p>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">model</span><span class="phil-words"> = None </span><span class="phil-help">Input PDB file to try and match</span></li><li class="phil-param" data-expert="0"><span class="phil-name">selection</span><span class="phil-words"> = None </span><span class="phil-help">If specified, only include selected part of model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">local_pdb_dir</span><span class="phil-words"> = None </span><span class="phil-help">Local PDB mirror (something like /User/files/pdb_mirror/)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">superposed_model_prefix</span><span class="phil-words"> = None </span><span class="phil-help">Output files with superposed models will begin with this prefix</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">search_and_morph</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">morph</span><span class="phil-words"> = True </span><span class="phil-help">Morph moving model after superposition</span></li><li class="phil-param" data-expert="0"><span class="phil-name">trim</span><span class="phil-words"> = True </span><span class="phil-help">Trim moving model after morphing</span></li><li class="phil-param" data-expert="0"><span class="phil-name">replace_structure_elements</span><span class="phil-words"> = True </span><span class="phil-help">Replace each secondary structure element (helices/strands) with idealized version before finding matching segments in PDB. Includes replacing individual strands with helices if spacing from other secondary structure is suitable and density is compatible with a helix.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">database</span><span class="phil-words"> = *pdb100 pdb2018_90 </span><span class="phil-help">Database to search. pdb100 is unique set of PDB. pdb2018_90 is quality-filtered PDB at 90% identity</span></li><li class="phil-param" data-expert="0"><span class="phil-name">number_of_sequence_neighbors</span><span class="phil-words"> = None </span><span class="phil-help">Number of sequence neighbors to search if using pdb100. Default is 10 for quick, 100 otherwise</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_models</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of models to return</span></li><li class="phil-param" data-expert="0"><span class="phil-name">allow_reverse_connectivity</span><span class="phil-words"> = False </span><span class="phil-help">Allow match to reversed model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_include_list</span><span class="phil-words"> = None </span><span class="phil-help">List of PDB ID or pdb ID and chain_id to include ( e.g., 2DY1 or 2DY1_A)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_exclude_list</span><span class="phil-words"> = None </span><span class="phil-help">List of PDB ID or pdb ID and chain_id to exclude (2DY1 or 2DY1_A)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">exclude_similar_to_this_pdb_id</span><span class="phil-words"> = None </span><span class="phil-help">Exclude all PDB chains with sequence identity &gt; maximum_percent_identity_to_this_pdb_id to exclude_similar_to_this_pdb_id</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_percent_identity_to_this_pdb_id</span><span class="phil-words"> = 30 </span><span class="phil-help">Maximum percent identity to supplied PDB chain to include. Exclude all PDB chains with sequence identity &gt; maximum_percent_identity_to_this_pdb_id to exclude_similar_to_this_pdb_id</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_models_to_fetch</span><span class="phil-words"> = None </span><span class="phil-help">Maximum number of models to fetch from PDB. Default is 10 for quick and 100 otherwise</span></li><li class="phil-param" data-expert="0"><span class="phil-name">starting_distance_cutoff</span><span class="phil-words"> = 2.5 </span><span class="phil-help">Starting distance cutoff. Try to keep atoms within this distance, but increase if too few are found.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">shift_field_distance</span><span class="phil-words"> = None </span><span class="phil-help">Shift field distance. Distance over which morphing leaves model mostly the same. Over longer distances morphing changes model. Default is 10 A.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of processors to use. If None, uses all available</span></li><li class="phil-param" data-expert="0"><span class="phil-name">quick</span><span class="phil-words"> = False </span><span class="phil-help">Run quickly</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

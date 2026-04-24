@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Correlation of map and model (deprecated, use MapCorrelations)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="correlation-of-map-and-model-deprecated-use-mapcorrelations">
+<h1 class="title">Correlation of map and model (deprecated, use MapCorrelations)</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>get_cc_mtz_pdb: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>get_cc_mtz_pdb is a command line tool for adjusting the origin of a
+PDB file using space-group symmetry so that the PDB file superimposes on
+a map, obtaining the correlation of model and map, and analyzing the
+correlation for each residue.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-get-cc-mtz-pdb-works">
+<h1>How get_cc_mtz_pdb works:</h1>
+<p>get_cc_mtz_pdb calculates a model map based on the supplied PDB file,
+then uses RESOLVE to find the origin shift (using space-group symmetry)
+that maximizes the correlation of this model map with a map calculated
+with the supplied map coefficients in an mtz file. This shift is applied
+to the atoms in the PDB file to create <strong>offset.pdb</strong> and then the
+correlation, residue-by-residue of <strong>offset.pdb</strong> with the map is
+analyzed. Atoms and residues that are out of density or are in weak
+density are flagged.</p>
+<p>You can set several parameters to define how the correlations are
+calculated.</p>
+<p>By default model density is calculated using the atom types, occupancies
+and isotropic thermal factors (B-values) supplied in the PDB file. If
+you specify</p>
+<pre class="literal-block">
+scale=True
+</pre>
+<p>then an overall B as well as an increment in B-values for each atom
+beyond CB (for proteins) will be added to the values in the PDB file,
+after adjusting these parameters to maximize the map correlation.</p>
+<p>If you specify</p>
+<pre class="literal-block">
+use_only_refl_present_in_mtz=True
+</pre>
+<p>then the model-based map will be calculated using the same set of
+reflections as the map calculated from your input mtz file. This reduces
+the contribution of missing reflections on the calculation (but the
+correlation is no longer the actual map-model correlation).</p>
+<p>In the calculation of the map correlation in the region of the model,
+the region where the model is located is defined as all points within a
+distance rad_max of an atom in the model. The value of rad_max is
+adjusted in each case to maximize this correlation. Its value is
+typically similar to the high-resolution limit of the map.</p>
+</div>
+<div class="section" id="output-files-from-get-cc-mtz-pdb">
+<h1><em>Output files from get_cc_mtz_pdb</em></h1>
+<p><strong>offset.pdb</strong>: A PDB file offset to match the origin in the mtz file.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-get-cc-mtz-pdb">
+<h1>Standard run of get_cc_mtz_pdb:</h1>
+<p>Running the get_cc_mtz_pdb is easy. From the command-line you can
+type:</p>
+<pre class="literal-block">
+phenix.get_cc_mtz_pdb map_coeffs.mtz coords.pdb
+</pre>
+<p>If you want (or need) to specify the column names from your mtz file,
+you will need to tell get_cc_mtz_pdb what FP and PHIB (and optionally
+FOM) are, in this format:</p>
+<pre class="literal-block">
+phenix.get_cc_mtz_pdb map_coeffs.mtz coords.pdb \
+labin=&quot;FP=2FOFCWT PHIB=PH2FOFCWT&quot;
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+<p>The option to use atom selections in get_cc_mtz_pdb can cause some
+confusion, because the CC values obtained can depend on the atom
+selections. The way this works is that the PDB file (after atom
+selections) is used to calculate model density. This model density is
+compared to the map from your input map coefficients in the region
+surrounding the atoms selected. This model density can depend on the
+presence of nearby atoms (where the density extends a ways away from
+those atoms).</p>
+<p>In versions of PHENIX up to 1.3-final, defaults were set to maximize the
+correlation coefficient rather than to give the correlation using the
+existing thermal parameters and including only the reflections present
+in the mtz file. These previous defaults were equivalent to using the
+values:</p>
+<pre class="literal-block">
+scale=True
+use_only_refl_present_in_mtz=True
+</pre>
+<p>These defaults were changed so that the correlation values obtained by
+default in a case where no origin shifts are needed would correspond to
+those obtained by simply calculating (1) a map using the input map
+coefficients and (2) a map from the PBB file and then determining the
+correlation between these maps.</p>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">get_cc_mtz_pdb</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb_in</span><span class="phil-words"> = None </span><span class="phil-help">PDB file with coordinates to evaluate</span></li><li class="phil-param" data-expert="0"><span class="phil-name">atom_selection</span><span class="phil-words"> = None </span><span class="phil-help">Any selection specified with atom_selection is applied to  input model (pdb_in) before using the model. NOTE: this option can result in confusing output because  the model density near an atom and therefore the local CC value depends not just on the atoms being considered but also nearby atoms.  Therefore if you remove some atoms next  to a residue with atom_selection then the CC for that residue may change.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mtz_in</span><span class="phil-words"> = None </span><span class="phil-help">MTZ file with coefficients for a map </span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_in</span><span class="phil-words"> = None </span><span class="phil-help">CCP4 or MRC-style map file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">labin</span><span class="phil-words"> = "" </span><span class="phil-help"> Labin line for MTZ file with map coefficients.
+                 This is optional if get_cc_mtz_pdb
+                 can guess the correct coefficients
+                 for FP PHI and FOM.  Otherwise specify:
+                 LABIN FP=myFP PHIB=myPHI FOM=myFOM
+                 where myFP is your column label for FP </span></li><li class="phil-param" data-expert="0"><span class="phil-name">offset_pdb_suffix</span><span class="phil-words"> = offset </span><span class="phil-help">Suffix for output version of pdb file, (offset to maximize  correlation with mtz file if fix_xyz is not set)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">high-resolution limit for map calculation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_only_refl_present_in_mtz</span><span class="phil-words"> = False </span><span class="phil-help"> You can specify that only reflections present in
+          your mtz file are used in the comparison.
+          </span></li><li class="phil-param" data-expert="0"><span class="phil-name">scale</span><span class="phil-words"> = False </span><span class="phil-help">If you set scale=True then get_cc_mtz_pdb applies
+           an overall B factor and a delta_b for each atom beyond CB.
+           </span></li><li class="phil-param" data-expert="0"><span class="phil-name">split_conformers</span><span class="phil-words"> = False </span><span class="phil-help">If you want to have A and B conformers analyzed separately
+               you can say split_conformers=True. Note that this requires that
+               the entire A conformer for a residue must be before (or after)
+               the entire B conformer for that residue.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_cc_mask</span><span class="phil-words"> = None </span><span class="phil-help">Use cc_mask calculation to match validation methods Default is True for map_in and False for mtz_in</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fix_xyz</span><span class="phil-words"> = False </span><span class="phil-help">If you want your PDB file compared to the map from
+               your mtz file with no offsets at all (fixed position)
+               then specify fix_xyz=True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fix_rad_max</span><span class="phil-words"> = False </span><span class="phil-help">If you want to use a fixed radius around all atoms  for calculation of the correlation use fix_rad=True. To set the value, use rad_max=xxx, otherwise it is set automatically.  If rad_max is set, fix_rad_max is set to True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rad_max</span><span class="phil-words"> = None </span><span class="phil-help">If you want to use a fixed radius around all atoms  for calculation of the correlation use fix_rad=True. To set the value, use rad_max=2.5, otherwise it is set automatically</span></li><li class="phil-param" data-expert="0"><span class="phil-name">any_offset</span><span class="phil-words"> = False </span><span class="phil-help">You can search for a match with any offset even
+          though this is not allowed by space-group symmetry</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_type</span><span class="phil-words"> = *PROTEIN DNA RNA </span><span class="phil-help">Chain type (for identifying main-chain and side-chain atoms)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = "temp_dir" </span><span class="phil-help">Temporary work directory</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = "" </span><span class="phil-help">Output directory where files are to be written</span></li><li class="phil-param" data-expert="0"><span class="phil-name">gui_output_dir</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = True </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">quick</span><span class="phil-words"> = False </span><span class="phil-help">Skip the residue-by=residue correlations for a quick run</span></li><li class="phil-param" data-expert="0"><span class="phil-name">raise_sorry</span><span class="phil-words"> = False </span><span class="phil-help">Raise sorry if problems</span></li><li class="phil-param" data-expert="0"><span class="phil-name">debug</span><span class="phil-words"> = False </span><span class="phil-help">Debugging output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dry_run</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and check parameter names</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_command_list</span><span class="phil-words"> = None </span><span class="phil-help">You can supply any resolve command here NOTE: for command-line usage you need to enclose the whole set of commands in double quotes (&amp;quot;) and each individual command in single quotes (') like this:  resolve_command_list=&amp;quot;'no_build' 'b_overall 23' &amp;quot; </span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">target_output_format</span><span class="phil-words"> = *None pdb mmcif </span><span class="phil-help">Desired output format (if possible). Choices are None ( try to use input format), pdb, mmcif. If output model does not fit in pdb format, mmcif will be used. Default is pdb.</span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

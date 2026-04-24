@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Calculating Fragment Antigen-Binding (Fab) elbow angle</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="calculating-fragment-antigen-binding-fab-elbow-angle">
+<h1 class="title">Calculating Fragment Antigen-Binding (Fab) elbow angle</h1>
+<div class="section" id="overview">
+<h1>Overview</h1>
+<p>Each FAB is made of two chains, Heavy (H) and Light (L), and two domains,
+Variable (V) and Constant (C or C1, The heavy domain has three parts).
+The angle between the variable and constant domains is the FAB elbow angle.
+It is the angle between rotation axes, the pseudo-dyad axes,
+defined by aligning the light portion of each domain, on-to the heavy one.</p>
+<div class="section" id="command-line-options">
+<h2>Command line options:</h2>
+<ul class="simple">
+<li><strong>light</strong>: chain ID of light domain, by default set to L</li>
+<li><strong>heavy</strong>: chain ID of heavy domain, by default set to H</li>
+<li><strong>limit_l</strong>: the number of the residue separating between variable
+and constant domains in the light chain, by default 107</li>
+<li><strong>limit_H</strong>: the number of the residue separating between variable
+and constant domains in the heavy chain, by default 113</li>
+<li><strong>h</strong>: help</li>
+</ul>
+</div>
+</div>
+<div class="section" id="usage">
+<h1>Usage:</h1>
+<p>&gt;&gt;&gt;phenix.fab_elbow_angle fab_name.pdb [light=L] [heavy=H] [limit_l=107] [limit_h=113]</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples:</h1>
+<p>&gt;&gt;&gt;phenix.fab_elbow_angle 7fab.pdb light=L heavy=H limit_l=104 limit_h=117</p>
+<p>123.00</p>
+<p>&gt;&gt;&gt;phenix.fab_elbow_angle 1bbd.pdb</p>
+<p>126.34</p>
+</div>
+</div>
+    
+  </body>
+</html>

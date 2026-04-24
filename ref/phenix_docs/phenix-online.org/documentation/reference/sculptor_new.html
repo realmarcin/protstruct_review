@@ -1,0 +1,650 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Model editing with Sculptor</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="model-editing-with-sculptor">
+<h1 class="title">Model editing with Sculptor</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="sculptor_new.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="sculptor_new.html#purpose" id="toc-entry-1">Purpose</a></li>
+<li><a class="reference internal" href="sculptor_new.html#conventions" id="toc-entry-2">Conventions</a></li>
+<li><a class="reference internal" href="sculptor_new.html#usage" id="toc-entry-3">Usage</a><ul>
+<li><a class="reference internal" href="sculptor_new.html#input-files" id="toc-entry-4">Input files</a></li>
+<li><a class="reference internal" href="sculptor_new.html#output-files" id="toc-entry-5">Output files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="sculptor_new.html#outline-of-the-procedure" id="toc-entry-6">Outline of the procedure</a><ul>
+<li><a class="reference internal" href="sculptor_new.html#preprocessing" id="toc-entry-7">Preprocessing</a></li>
+<li><a class="reference internal" href="sculptor_new.html#chain-to-alignment-matching" id="toc-entry-8">Chain-to-alignment matching</a></li>
+<li><a class="reference internal" href="sculptor_new.html#error-estimates" id="toc-entry-9">Error estimates</a></li>
+<li><a class="reference internal" href="sculptor_new.html#chain-processing" id="toc-entry-10">Chain processing</a><ul>
+<li><a class="reference internal" href="sculptor_new.html#protein-chains" id="toc-entry-11">Protein chains</a><ul>
+<li><a class="reference internal" href="sculptor_new.html#deletion" id="toc-entry-12">Deletion</a></li>
+<li><a class="reference internal" href="sculptor_new.html#polishing" id="toc-entry-13">Polishing</a></li>
+<li><a class="reference internal" href="sculptor_new.html#atom-mapping" id="toc-entry-14">Atom mapping</a></li>
+<li><a class="reference internal" href="sculptor_new.html#pruning" id="toc-entry-15">Pruning</a></li>
+<li><a class="reference internal" href="sculptor_new.html#b-factor-prediction" id="toc-entry-16">B-factor prediction</a></li>
+<li><a class="reference internal" href="sculptor_new.html#renumber" id="toc-entry-17">Renumber</a></li>
+<li><a class="reference internal" href="sculptor_new.html#rename" id="toc-entry-18">Rename</a></li>
+<li><a class="reference internal" href="sculptor_new.html#completion" id="toc-entry-19">Completion</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="sculptor_new.html#dna-rna-chains" id="toc-entry-20">DNA/RNA chains</a><ul>
+<li><a class="reference internal" href="sculptor_new.html#deletion-1" id="toc-entry-21">Deletion</a></li>
+<li><a class="reference internal" href="sculptor_new.html#polishing-1" id="toc-entry-22">Polishing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="sculptor_new.html#monosaccharide-chains" id="toc-entry-23">Monosaccharide chains</a></li>
+<li><a class="reference internal" href="sculptor_new.html#hetero-chains" id="toc-entry-24">Hetero chains</a></li>
+<li><a class="reference internal" href="sculptor_new.html#other-chains" id="toc-entry-25">Other chains</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="sculptor_new.html#sequence-similarity-calculation" id="toc-entry-26">Sequence similarity calculation</a></li>
+<li><a class="reference internal" href="sculptor_new.html#missing-value-substitution" id="toc-entry-27">Missing value substitution</a></li>
+<li><a class="reference internal" href="sculptor_new.html#command-line" id="toc-entry-28">Command line</a><ul>
+<li><a class="reference internal" href="sculptor_new.html#command-line-switches" id="toc-entry-29">Command-line switches</a></li>
+<li><a class="reference internal" href="sculptor_new.html#phil-arguments" id="toc-entry-30">PHIL arguments</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="sculptor_new.html#specific-limitations-and-possible-problems" id="toc-entry-31">Specific limitations and possible problems</a><ul>
+<li><a class="reference internal" href="sculptor_new.html#processing-features" id="toc-entry-32">Processing features</a></li>
+<li><a class="reference internal" href="sculptor_new.html#error-messages" id="toc-entry-33">Error messages</a></li>
+<li><a class="reference internal" href="sculptor_new.html#warning-messages" id="toc-entry-34">Warning messages</a><ul>
+<li><a class="reference internal" href="sculptor_new.html#alignment" id="toc-entry-35">Alignment</a></li>
+<li><a class="reference internal" href="sculptor_new.html#sequence-files" id="toc-entry-36">Sequence files</a></li>
+<li><a class="reference internal" href="sculptor_new.html#error-files" id="toc-entry-37">Error files</a></li>
+<li><a class="reference internal" href="sculptor_new.html#error-estimation" id="toc-entry-38">Error estimation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="sculptor_new.html#references" id="toc-entry-39">References</a></li>
+<li><a class="reference internal" href="sculptor_new.html#citation" id="toc-entry-40">Citation</a></li>
+<li><a class="reference internal" href="sculptor_new.html#additional-information" id="toc-entry-41">Additional information</a><ul>
+<li><a class="reference internal" href="sculptor_new.html#list-of-all-available-keywords" id="toc-entry-42">List of all available keywords</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1><a class="toc-backref" href="sculptor_new.html#toc-entry-1">Purpose</a></h1>
+<p>Sculptor can be used to improve a molecular replacement model using
+additional information available from an alignment and/or structure. It is
+based on an algorithm outlined in <a class="reference internal" href="sculptor_new.html#schwarzenbacher2004">Schwarzenbacher et al. (2004)</a>.</p>
+</div>
+<div class="section" id="conventions">
+<h1><a class="toc-backref" href="sculptor_new.html#toc-entry-2">Conventions</a></h1>
+<p>The following terms are used with the special meaning:</p>
+<ul class="simple">
+<li><strong>target:</strong> the structure to be solved</li>
+<li><strong>model:</strong> the structure used as a model for the target</li>
+</ul>
+</div>
+<div class="section" id="usage">
+<h1><a class="toc-backref" href="sculptor_new.html#toc-entry-3">Usage</a></h1>
+<p>There is a standalone <tt class="docutils literal">sculptor_new</tt> program available from the command line.
+The unified model preparation program <tt class="docutils literal">sculpt_ensemble</tt> is available from the
+command line and also from the PHENIX GUI.</p>
+<div class="section" id="input-files">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-4">Input files</a></h2>
+<ul class="simple">
+<li><strong>Structure</strong> <em>(compulsory)</em>: the structure to be modified. Specific
+parts can be selected using CNS-style atom selection syntax. Chains
+are divided into <em>protein</em>, <em>DNA</em>, <em>RNA</em>, <em>hetero</em>, <em>monosaccharide</em> and
+<em>other</em> chain categories, and processed according to instructions given for
+the appropriate chain type. Accepted formats: PDB. Recognized extensions:
+<tt class="docutils literal">.pdb</tt>, <tt class="docutils literal">.ent</tt>.</li>
+<li><strong>Alignments</strong>: sequence alignment with the target sequence. The alignment
+contains information that can be exploited in model improvement (this is
+currently only implemented for protein chains). The chains are
+automatically associated with the corresponding alignment based on a
+sequence comparison. The target sequence is also automatically identified if
+it is provided through the <tt class="docutils literal">target_sequence</tt> keyword, otherwise the first
+sequence in the alignment is used as target. Alignment input is optional, in
+case it is not provided, an alignment will be made up using the chain
+sequence with itself.
+Accepted extensions (with the corresponding format) are <tt class="docutils literal">.aln</tt> (CLUSTAL
+format), <tt class="docutils literal">.pir</tt> (PIR-format) and <tt class="docutils literal">.ali</tt> (relaxed PIR-like format).</li>
+<li><strong>Homology search files</strong>: hits from a homology search. These work very
+similarly to a set of <em>alignment files</em>. It is assumed that the first
+sequence in each alignment is the target sequence (the sequence used for
+searching homologues).
+Accepted extensions (with the corresponding format) are <tt class="docutils literal">.xml</tt>
+(BLAST-family XML output) and <tt class="docutils literal">.hhr</tt> (HHPRED output).</li>
+<li><strong>Sequence files</strong>: target sequence. In case no alignment is available,
+Sculptor can be instructed to prepare an alignment using the sequences
+of model chains assigned on the <tt class="docutils literal">chain_ids</tt> parameter (please note that
+in this case this alignment will be used for the specified chains, and any
+user-supplied alignments will be ignored). Multiple sequence files can be
+provided when target sequences for distinct protein chains differ.
+Accepted extensions are <tt class="docutils literal">.fasta</tt>, <tt class="docutils literal">.faa</tt> or <tt class="docutils literal">.fa</tt> for FASTA
+format, <tt class="docutils literal">.pir</tt> for PIR-format and <tt class="docutils literal">.seq</tt> or <tt class="docutils literal">.dat</tt> for a
+relaxed PIR/FASTA-like format.</li>
+<li><strong>Error files</strong> and <strong>Superposition error</strong> files: error estimates coming
+either from a model quality assessment program (MQAP) or from a
+superposition. Errors from MQAPs can be used in mainchain processing and also
+in B-factor weighting, while those from a superposition can only be used for
+mainchain processing. The inputs are kept separate, and hence it is possible
+to use two different error estimates for each macromolecule chain.</li>
+</ul>
+</div>
+<div class="section" id="output-files">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-5">Output files</a></h2>
+<p>The fully processed structure is output. The file is named according to the
+following convention: <tt class="docutils literal">root_pdb.pdb</tt>, where <tt class="docutils literal">root</tt> is a user-defined
+parameter (accessible from the <tt class="docutils literal">output</tt> scope), and <tt class="docutils literal">pdb</tt> is the basename
+of the input PDB file.</p>
+</div>
+</div>
+<div class="section" id="outline-of-the-procedure">
+<h1><a class="toc-backref" href="sculptor_new.html#toc-entry-6">Outline of the procedure</a></h1>
+<p>The workflow consists of several stages that can be independently
+configured. These are listed in order of execution. For a summary of all
+keywords with the corresponding defaults, see the <a class="reference internal" href="sculptor_new.html#additional-information">Additional information</a>
+section.</p>
+<div class="section" id="preprocessing">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-7">Preprocessing</a></h2>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt><tt class="docutils literal">selection</tt>: selects a subset of the input PDB file, using</dt>
+<dd>CNS-style atom selection syntax. Default: <tt class="docutils literal">all</tt>.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal">remove_alternate_conformations</tt>: selects the first alternate</dt>
+<dd>conformation for disordered entities, and discards the rest. Also
+involes <tt class="docutils literal">sanitize_occupancies</tt>.</dd>
+</dl>
+</li>
+<li><tt class="docutils literal">sanitize_occupancies</tt>: resets all occupancies to 1.0.</li>
+<li><tt class="docutils literal">keep_crystal_symmetry</tt>: retain the CRYST record of the model structure.</li>
+</ul>
+<p>In addition, chains will be analysed, hetero, sugar and solvent atoms will be
+separated from protein/DNA/RNA chains if they are not separated by <tt class="docutils literal">TER</tt>
+cards.</p>
+</div>
+<div class="section" id="chain-to-alignment-matching">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-8">Chain-to-alignment matching</a></h2>
+<p>Parameters in the <tt class="docutils literal">chain_to_alignment_matching</tt> scope control how a sequence
+from an alignment is matched to the sequence of a macromolecule chain, and what
+constitutes an acceptable match. The sequence from the alignment is considered
+strictly consecutive, while gaps are allowed in the sequence derived from the
+protein chain (this is governed by the <tt class="docutils literal">consecutivity</tt> parameter;
+<tt class="docutils literal">geometry</tt> means that a chain segment is strictly consecutive if there is a
+bond to the neighbouring residue, and <tt class="docutils literal">numbering</tt> means that residue
+numbering should be used to decide whether a residue is connected to
+neighbouring ones). The <tt class="docutils literal">min_sequence__identity</tt> parameter is used as a
+threshold to accept a possible match between the two sequences.</p>
+</div>
+<div class="section" id="error-estimates">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-9">Error estimates</a></h2>
+<p>These parameters control how error estimates input are matched to
+macromolecule chains. In addition, if no external errors are available, the
+modelling program * <a class="reference external" href="https://www.rosettacommons.org">Rosetta</a> * is installed and configured to be used with
+PHENIX, and there is network connectivity, Sculptor can be instructed to
+calculate an error estimate (<tt class="docutils literal">calculate_if not_provided</tt> parameter and
+<tt class="docutils literal">homology_modelling</tt> scope) by first making a homology model using
+* <a class="reference external" href="https://www.rosettacommons.org">Rosetta</a> * and then submitting this to the <a class="reference external" href="http://duffman.it.liu.se/ProQ2/index.php">ProQ2</a> server. Raw results
+* obtained will be written out if the <tt class="docutils literal">output_prefix</tt> parameter is set.
+Please note that this only works for protein chains. For more information, see
+the the <a class="reference external" href="simple_homology_model.html#description">simple_homology_model documentation</a>.</p>
+<p>Please note that the input/obtained error estimates are only used if a suitable
+processing method is selected. Such methods are available in the <a class="reference internal" href="sculptor_new.html#protein-deletion">Deletion</a>
+and <a class="reference internal" href="sculptor_new.html#b-factor-prediction">B-factor prediction</a> sections.</p>
+</div>
+<div class="section" id="chain-processing">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-10">Chain processing</a></h2>
+<div class="section" id="protein-chains">
+<h3><a class="toc-backref" href="sculptor_new.html#toc-entry-11">Protein chains</a></h3>
+<div class="section" id="deletion">
+<span id="protein-deletion"></span><h4><a class="toc-backref" href="sculptor_new.html#toc-entry-12">Deletion</a></h4>
+<p>Discards residues from a model chain that are unlikely to improve signal
+in molecular replacement. This information is calculated either from the
+alignment or from estimated errors.</p>
+<p>There are multiple algorithms available:</p>
+<ul class="simple">
+<li><tt class="docutils literal">gap</tt>: Deletes residues that are not present in the target (model
+residue is aligned with a gap). For this algorithm, the supplied
+alignment is used as a pairwise alignment.</li>
+<li><tt class="docutils literal">threshold_based_similarity</tt>: Deletes residues for which the
+sequence similarity is below a certain threshold. All sequences in a
+multiple alignment contribute to the score. Details of the sequence
+similarity calculation are given in the section
+<a class="reference internal" href="sculptor_new.html#sequence-similarity-calculation">Sequence similarity calculation</a>.</li>
+<li><tt class="docutils literal">completeness_based_similarity</tt>: Deletes the same number of
+residues (modified by a fractional offset) as the <tt class="docutils literal">gap</tt> algorithm
+would but residues that get removed are the ones with the lowest
+sequence similarity. This way the default values are valid over a
+much larger sequence similarity range than those in
+<tt class="docutils literal">threshold_based_similarity</tt>. All sequences in a multiple alignment
+contribute to the score. Details of the sequence similarity
+calculation are given in the section <a class="reference internal" href="sculptor_new.html#sequence-similarity-calculation">Sequence similarity calculation</a>.</li>
+<li><tt class="docutils literal">remove_long</tt>: Deletes residues from the model if these are aligned with
+gaps and at least <tt class="docutils literal">minimum_length</tt> long.</li>
+<li><tt class="docutils literal">rms</tt>: Deletes residues whose estimated error is over a certain threshold.
+Missing values are filled in using parameters in the
+<tt class="docutils literal">missing_value_substitution</tt> scope (see <a class="reference internal" href="sculptor_new.html#missing-value-substitution">Missing value substitution</a>).</li>
+<li><tt class="docutils literal">superposition</tt>: Deletes residues whose superposition error is over a
+certain threshold. Missing values are filled in using parameters in the
+<tt class="docutils literal">missing_value_substitution</tt> scope (see <a class="reference internal" href="sculptor_new.html#missing-value-substitution">Missing value substitution</a>).</li>
+</ul>
+<p>These algorithms can also be used together in any combination. In this
+case, a residue will be deleted if assigned for deletion by any active
+algorithms.</p>
+</div>
+<div class="section" id="polishing">
+<h4><a class="toc-backref" href="sculptor_new.html#toc-entry-13">Polishing</a></h4>
+<p>Makes small adjustments to the mainchain of a chain (taking results from
+deletion into account) to make it obey basic macromolecular features.</p>
+<ul class="simple">
+<li><tt class="docutils literal">remove_short</tt>. Deletes additional residue segments from the
+molecule so that no continuous segment is shorter than a preset limit
+(determined by the <tt class="docutils literal">minimum_length</tt> parameter of the
+<tt class="docutils literal">remove_short</tt> scope). Segment boundaries are determined from
+spatial connectivity of residues. This algorithm is primarily
+intended to remove &quot;floating&quot; residues that are the result of
+extensive loop truncation.</li>
+<li><tt class="docutils literal">undo_short</tt>. Reinstate short segment that are assigned for deletion. The
+maximum length is controlled by the <tt class="docutils literal">maximum_length</tt> parameter.</li>
+<li><tt class="docutils literal">keep_regular</tt>. Reinstate deleted residues if they are in regular
+secondary structure and the segment marked for deletion is shorter
+than the <tt class="docutils literal">maximum_length</tt> parameter of the <tt class="docutils literal">keep_regular</tt> scope.</li>
+</ul>
+<p>These algorithms can also be used together in combination. In this case,
+the chain will be processed sequentially by both algorithms.</p>
+</div>
+<div class="section" id="atom-mapping">
+<h4><a class="toc-backref" href="sculptor_new.html#toc-entry-14">Atom mapping</a></h4>
+<p>This governs how the sidechain of an amino acid residue in the model is morphed
+into the target type.</p>
+<ul class="simple">
+<li><tt class="docutils literal">connectivity</tt>. This uses atom-connectivity-based similarity to match one
+sidechain to another. The matching can take into account whether the chemical
+element of the model and target type agree (<tt class="docutils literal">match_chemical_elements</tt>
+keyword).</li>
+<li><tt class="docutils literal">geometry</tt>. This uses the actual observed geometry of the sidechain in the
+model structure and tries to map it onto all known rotamers of the target
+amino acid, and selects the rotamer that results in the highest number of
+atoms mapped. Geometric matching is done via matching distances, and the
+tolerance is controlled by the <tt class="docutils literal">tolerance</tt> keyword. The algorithm can also
+take into account the chemical elements explicitly, but this is probably not
+as useful, since implicitly these are always taken into account through
+bond lengths and angles. Rotamer information is obtained through the monomer
+library, and hence this algorithm only works well if the monomer library
+contains this information. With this algorithm, matching a particular
+sidechain with the same type can result in a partial match if the observed
+sidechain conformation is not rotameric. The keyword <tt class="docutils literal">match_if_identical</tt>
+controls whether matching should be performed in this case or just an
+identity atom map should be used.</li>
+</ul>
+</div>
+<div class="section" id="pruning">
+<h4><a class="toc-backref" href="sculptor_new.html#toc-entry-15">Pruning</a></h4>
+<p>This phase determines the level distance from the C<sub>alpha</sub> atom
+up to which a residue sidechain in the model is potentially similar to
+its counterpart in the target.</p>
+<ul class="simple">
+<li><tt class="docutils literal">null</tt>. No pruning is applied (unmatched atoms will still be discarded).</li>
+<li><tt class="docutils literal">schwarzenbacher</tt>. Implements the algorithm published by
+Schwarzenbacher <em>et al.</em> (2004), who propose that for optimal
+molecular replacement results a residue sidechain should be truncated
+if aligned with a non-identical residue, and not truncated otherwise.
+The level of truncation is controlled by the <tt class="docutils literal">pruning_level</tt>
+parameter, and defaults to 3 (which corresponds to C<sub>gamma</sub>)
+and can be controlled by the <tt class="docutils literal">pruning_level</tt> parameter of the
+<tt class="docutils literal">schwarzenbacher</tt> scope.</li>
+<li><tt class="docutils literal">Similarity</tt>. Uses sequence similarity values for deciding the
+level of truncation. Residues above <tt class="docutils literal">full_truncation_limit</tt> are not
+truncated at all, those below the <tt class="docutils literal">full_truncation_limit</tt> are
+truncated to C<sub>beta</sub>, and those in between are truncated
+according to the <tt class="docutils literal">pruning_level</tt> parameter (all available from the
+<tt class="docutils literal">similarity</tt> scopei). Results tend to be similar to those given by
+the Schwarzenbacher algorithm; however, it is possible to get high
+similarity values (and full sidechain preservation) for certain
+substitutions (i.e. TYR to PHE), and low-sequence similarity zones
+can end up being truncated to C<sub>beta</sub>. Details of the sequence
+similarity calculation are given in the section
+<a class="reference internal" href="sculptor_new.html#sequence-similarity-calculation">Sequence similarity calculation</a>.</li>
+</ul>
+<p>These algorithms can also be used together in any combination, in which
+case the sidechain will be truncated to the shortest value suggested.</p>
+</div>
+<div class="section" id="b-factor-prediction">
+<h4><a class="toc-backref" href="sculptor_new.html#toc-entry-16">B-factor prediction</a></h4>
+<p>B-factor prediction tries to increase B-factors for atoms that are
+likely to be more flexible or more in error. The calculation takes
+simple physical properties into account, and these are linearly
+transformed to B-factors (controlled by the <tt class="docutils literal">factor</tt> parameter of the
+corresponding scope). If this value is lower than the <tt class="docutils literal">minimum</tt> (from
+the <tt class="docutils literal">bfactor</tt>scope) parameter, a constant is added to all B-factors
+so that the lowest of those equals to <tt class="docutils literal">minimum</tt> (this is primarily
+intended to avoid negative B-factors).</p>
+<ul class="simple">
+<li><tt class="docutils literal">original</tt>. This uses the original B-factor of atoms. This is
+primarily intended as a contributor to a combination, but can also be
+used to manipulate current B-factors, e.g. set them to a constant
+value.</li>
+<li><tt class="docutils literal">asa</tt>. This calculates accessible surface area for an isolated
+chain and transforms the raw values to B-factors. A high ASA-value
+indicates a potential for flexibility. The calculation can be
+configured by the <tt class="docutils literal">precision</tt> and <tt class="docutils literal">probe_radius</tt> parameters of
+the <tt class="docutils literal">asa</tt> scope.</li>
+<li><tt class="docutils literal">similarity</tt>. Low sequence similarity regions tend to be more
+dissimilar. Details of the sequence similarity calculation are given
+in the section <a class="reference internal" href="sculptor_new.html#sequence-similarity-calculation">Sequence similarity calculation</a>.</li>
+<li><tt class="docutils literal">rms</tt>. Use error estimates (either input or those calculated within the
+program) to weight atoms. The theoretical scale factor of 8/3 * pi^2 is
+already built into the calculation, but this can be adjusted if necessary.
+Missing values are filled in using parameters in the
+<tt class="docutils literal">missing_value_substitution</tt> scope (see <a class="reference internal" href="sculptor_new.html#missing-value-substitution">Missing value substitution</a>).</li>
+</ul>
+<p>Algorithms can be used in combination, in which case the sum of the
+predicted B-factors is used. This mode can also be used to map sequence
+similarity or accessible surface area to residues/atoms for display
+purposes.</p>
+</div>
+<div class="section" id="renumber">
+<h4><a class="toc-backref" href="sculptor_new.html#toc-entry-17">Renumber</a></h4>
+<p>Renumbers residues according to the <tt class="docutils literal">target</tt> or <tt class="docutils literal">model</tt> sequence. It
+is also possible to turn renumbering off (option <tt class="docutils literal">original</tt>).</p>
+</div>
+<div class="section" id="rename">
+<h4><a class="toc-backref" href="sculptor_new.html#toc-entry-18">Rename</a></h4>
+<p>Renames residues according their counterpart in the target sequence. Please
+note that this is only a name change. Sidechain atoms are always mapped onto
+their target counterparts, and deleted if not present in the target. On the
+other hand, the addition of atoms that are present in the target and not in the
+model does not take place if renaming is not performed.</p>
+</div>
+<div class="section" id="completion">
+<h4><a class="toc-backref" href="sculptor_new.html#toc-entry-19">Completion</a></h4>
+<p>Controls the addition of missing atoms.</p>
+<ul class="simple">
+<li><tt class="docutils literal">cbeta</tt>. Adds C<sub>beta</sub> atom if the residue is not glycine,
+and C, N and C<sub>alpha</sub> atoms are all present. A common C<sub>beta</sub>
+position is used for all non-proline residues, and a slightly differing ones
+for prolines.</li>
+<li><tt class="docutils literal">cbeta_and_pro</tt>. Fills in C<sub>beta</sub> where possible for non-proline
+residues, and the whole sidechain for prolines.</li>
+<li><tt class="docutils literal">sidechain</tt>. Fills in missing atoms for all sidechains. The algorithm tries
+to get as close as possible to the atoms present in the structure, but in the
+general case, all sidechain atoms within the residue may move slightly.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="dna-rna-chains">
+<h3><a class="toc-backref" href="sculptor_new.html#toc-entry-20">DNA/RNA chains</a></h3>
+<div class="section" id="deletion-1">
+<h4><a class="toc-backref" href="sculptor_new.html#toc-entry-21">Deletion</a></h4>
+<p>Discards residues from a model chain that are unlikely to improve signal
+in molecular replacement.</p>
+<p>There are two algorithms available:</p>
+<ul class="simple">
+<li><tt class="docutils literal">all</tt>: Deletes all residues.</li>
+<li><tt class="docutils literal">superposition</tt>: Deletes residues whose superposition error is over a
+certain threshold. Missing values are filled in using parameters in the
+<tt class="docutils literal">missing_value_substitution</tt> scope (see <a class="reference internal" href="sculptor_new.html#missing-value-substitution">Missing value substitution</a>).</li>
+</ul>
+<p>These algorithms can also be used together in any combination. In this
+case, a residue will be deleted if assigned for deletion by any active
+algorithms.</p>
+</div>
+<div class="section" id="polishing-1">
+<h4><a class="toc-backref" href="sculptor_new.html#toc-entry-22">Polishing</a></h4>
+<p>Makes small adjustments to the mainchain of a chain (taking results from
+deletion into account) to make it obey basic macromolecular features.</p>
+<ul class="simple">
+<li><tt class="docutils literal">remove_short</tt>. Deletes additional residue segments from the
+molecule so that no continuous segment is shorter than a preset limit
+(determined by the <tt class="docutils literal">minimum_length</tt> parameter of the
+<tt class="docutils literal">remove_short</tt> scope). Segment boundaries are determined from
+spatial connectivity of residues. This algorithm is primarily
+intended to remove &quot;floating&quot; residues that are the result of
+extensive loop truncation.</li>
+</ul>
+<p>These algorithms can also be used together in combination. In this case,
+the chain will be processed sequentially by both algorithms.</p>
+</div>
+</div>
+<div class="section" id="monosaccharide-chains">
+<h3><a class="toc-backref" href="sculptor_new.html#toc-entry-23">Monosaccharide chains</a></h3>
+<p>This can be used to trim existing glucosyl chains based on the distance from
+the residue to which they are attached. Connectivity of glycosyl chains is
+worked out from distance tests, and the <tt class="docutils literal">maximum_bond_length</tt> parameter can
+be used to adjust this slightly. Branched glycosyl chains are also handled.</p>
+</div>
+<div class="section" id="hetero-chains">
+<h3><a class="toc-backref" href="sculptor_new.html#toc-entry-24">Hetero chains</a></h3>
+<p>Residues in these chains are normally deleted, unless an exception is
+made by specifying the residue codes that are to be retained. This is
+primarily intended to keep a known ligands of protein classes (e.g.
+HEM).</p>
+</div>
+<div class="section" id="other-chains">
+<h3><a class="toc-backref" href="sculptor_new.html#toc-entry-25">Other chains</a></h3>
+<p>These are removed from the model.</p>
+</div>
+</div>
+</div>
+<div class="section" id="sequence-similarity-calculation">
+<h1><a class="toc-backref" href="sculptor_new.html#toc-entry-26">Sequence similarity calculation</a></h1>
+<p>Sequence similarity is calculated from the full alignment supplied
+(taking all present sequences into account), using a scoring matrix
+(currently <tt class="docutils literal">blosum50</tt>, <tt class="docutils literal">blosum62</tt>, <tt class="docutils literal">dayhoff</tt> and <tt class="docutils literal">identity</tt> are
+available). Raw scores are then smoothed using one of two alogrithms:</p>
+<ul class="simple">
+<li><tt class="docutils literal">linear</tt>: averaging is done over a <tt class="docutils literal">window</tt> of residues (this is measured
+from the residue in question, i.e. 2*window + 1 residues scores are used),
+and is weighted using either <tt class="docutils literal">uniform</tt> or <tt class="docutils literal">triangular</tt> weights. The
+resulting scores are &quot;normalized&quot; so that 1.0 would indicate a perfect
+alignment, 0.0 would be a random match, and -1.0 a (locally) fully gapped
+alignment (on average). Note, it is possible to obtain values outside this
+range. This helps to ensure that defaults are sensible irrespective of the
+choice for the scoring matrix.</li>
+<li><tt class="docutils literal">spatial</tt>: averaging is done over a sphere with radius <tt class="docutils literal">maximum_distance</tt>
+using all residue scores that are within this limit. Residues that are not
+present in the model and hence no spatial coordinate can be associated with
+them affect the raw scores of neighbouring residues (using a convolution with
+a triangular weight function).</li>
+</ul>
+<p>Sequence similarity calculation is configured individually for the steps
+that are using it.</p>
+</div>
+<div class="section" id="missing-value-substitution">
+<h1><a class="toc-backref" href="sculptor_new.html#toc-entry-27">Missing value substitution</a></h1>
+<p>Governs how missing error values are substituted.</p>
+<ul class="simple">
+<li><tt class="docutils literal">maximum_value</tt>: uses the maximum value encountered for the particular
+chain.</li>
+<li><tt class="docutils literal">scaled_interpolated_value</tt>: interpolates within a chain or extrapolates at
+the termini. Extrapolation is done by increasing the B-factor of the closest
+residue with a factor that is calculated as the nth power of a constant value
+(<tt class="docutils literal">extrapolation_step_scale</tt> parameter), where n is the distance from the
+closest residue. Interpolation is done in two steps. First linear
+interpolation is performed between the two bridge residues, and then these
+are multiplied with a factor that is calculated as the nth power of a
+constant value (<tt class="docutils literal">interpolation_step_scale</tt>), where n is the distance from
+the nearest bridge residue.</li>
+</ul>
+<p>Missing value substitution is configured individually for the steps that are
+using it.</p>
+</div>
+<div class="section" id="command-line">
+<h1><a class="toc-backref" href="sculptor_new.html#toc-entry-28">Command line</a></h1>
+<pre class="literal-block">
+phenix.sculptor \
+    [ command-line switches ] \
+    [ PHIL-format parameter files ] \
+    [ PHIL command-line assignments ] \
+    [ PDB-files ] \
+    [ alignment files ]
+</pre>
+<div class="section" id="command-line-switches">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-29">Command-line switches</a></h2>
+<pre class="literal-block">
+-h, --help            show this help message and exit
+--show-defaults       print PHIL and exit
+-i, --stdin           read PHIL from stdin as well
+-v, --verbosity       set verbosity level (info,debug,verbose)
+--version             show program's version number and exit
+--text-logfile FILE   Verbatim copy of log stream
+--html-logfile FILE   Verbatim copy of log stream in HTML
+</pre>
+</div>
+<div class="section" id="phil-arguments">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-30">PHIL arguments</a></h2>
+<p>Everything not starting with a dash ('-') is interpreted as a PHIL
+argument. This can be a PHIL-format file containing parameters,
+command-line assignment or a file whose type is automatically recognized
+(based on file extension). Note that sequence files are not accepted on
+the command line, since associated chains could not easily be guessed
+and require a fully specified parameter scope.</p>
+</div>
+</div>
+<div class="section" id="specific-limitations-and-possible-problems">
+<h1><a class="toc-backref" href="sculptor_new.html#toc-entry-31">Specific limitations and possible problems</a></h1>
+<div class="section" id="processing-features">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-32">Processing features</a></h2>
+<ul class="simple">
+<li>Very short residue segments (shorter in <tt class="docutils literal">min_hss_length</tt> consecutive
+residues than <tt class="docutils literal">min_hss_length</tt> parameter in the
+<tt class="docutils literal">chain_to_alignment_matching</tt> scope) cannot be reliably aligned to the
+sequence, and these may be discarded from the model.</li>
+<li>The <tt class="docutils literal">similarity</tt> algorithm from the <tt class="docutils literal">deletion</tt> scope may result
+in residues that are aligned with a gap being included in the model.
+Although this possibly indicates an error in the alignment and is
+potentially beneficial for molecular replacement, this causes a
+problem at the <tt class="docutils literal">rename</tt> stage, as there is no 3-letter residue name
+for a &quot;-&quot;; these residues are named according to the <tt class="docutils literal">gapname</tt> parameter
+(default: <tt class="docutils literal">ALA</tt>).</li>
+<li>Residue numbers for gap residues are built up using the residue
+number of the previous non-gap residue and an insertion code (A-Z,
+depending on the number of gap residues after the previous non-gap
+residue).</li>
+</ul>
+</div>
+<div class="section" id="error-messages">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-33">Error messages</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal">No pdb files specified</tt>: there are no PDB files to process.</li>
+<li><tt class="docutils literal">Applicable chain_ids not specified for ..</tt>: the input file requires the
+specification chainIDs (sequence file, error files and superposition error
+files).</li>
+<li><tt class="docutils literal">No atoms left after atom selection</tt>: the atom selection provided
+results in an empty structure.</li>
+<li><tt class="docutils literal">Error while reading alignment: ..</tt>: some error occurred while trying to
+read an alignment file:<ul>
+<li><tt class="docutils literal">..: input alignment is empty</tt>: no alignment sequences were found in
+alignment file ..</li>
+<li><tt class="docutils literal">..: no alignment sequences match</tt>: the target sequence specified for
+alignment file .. does not match any alignment sequences.</li>
+</ul>
+</li>
+<li><tt class="docutils literal">Cannot open file</tt>: a file cannot be opened for reading (possibly does not
+exist).</li>
+<li><tt class="docutils literal">No hit with index .. in ..</tt>: the requested homology search hit from
+homology search file .. does not exist.</li>
+</ul>
+</div>
+<div class="section" id="warning-messages">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-34">Warning messages</a></h2>
+<div class="section" id="alignment">
+<h3><a class="toc-backref" href="sculptor_new.html#toc-entry-35">Alignment</a></h3>
+<ul class="simple">
+<li><tt class="docutils literal">Aligner: no aligned candidates</tt>: no alignment sequence match the observed
+chain sequence. In this case a dummy alignment will be used.</li>
+<li><tt class="docutils literal">No sequences read from file</tt>: the sequence file given as the target
+sequence does not contain any sequences.</li>
+<li><tt class="docutils literal">Multiple sequences found, using first</tt>: the sequence file given as the
+target sequence contains multiple sequences.</li>
+</ul>
+</div>
+<div class="section" id="sequence-files">
+<h3><a class="toc-backref" href="sculptor_new.html#toc-entry-36">Sequence files</a></h3>
+<ul class="simple">
+<li><tt class="docutils literal">File contains multiple sequences, only the first will be used</tt>: the
+sequence file given as the target sequence contains multiple sequences.</li>
+</ul>
+</div>
+<div class="section" id="error-files">
+<h3><a class="toc-backref" href="sculptor_new.html#toc-entry-37">Error files</a></h3>
+<ul class="simple">
+<li><tt class="docutils literal">Duplicate resid: <span class="pre">'..'</span></tt>: resid .. occurs multiple times.</li>
+<li><tt class="docutils literal">Cannot convert <span class="pre">'..'</span> to <span class="pre">floating-point</span> number</tt>: the error value is
+non-numeric.</li>
+<li><tt class="docutils literal">Error file specified for chain fail criteria</tt>: the error values that are
+specified for a particular chain are rejected, because they fail the set
+criteria.</li>
+</ul>
+</div>
+<div class="section" id="error-estimation">
+<h3><a class="toc-backref" href="sculptor_new.html#toc-entry-38">Error estimation</a></h3>
+<ul class="simple">
+<li><tt class="docutils literal">Homology modelling failed</tt>: no homology model can be created.</li>
+<li><tt class="docutils literal">ProQ2 error estimation failed</tt>: no error values could be obtained from the
+ProQ2 server.</li>
+<li><tt class="docutils literal">ProQ2 structure contains multiple chains</tt>: although a single chain was
+submitted to ProQ2, the results returned contain multiple chains.</li>
+<li><tt class="docutils literal">Chain <span class="pre">'..'</span> is not <span class="pre">'..'</span></tt>: chain .. is not recognised as a macromolecular
+chain.</li>
+<li><tt class="docutils literal">PDB could not be matched to sequence</tt>: sequence-to-structure matching fail
+for the returned results.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="references">
+<h1><a class="toc-backref" href="sculptor_new.html#toc-entry-39">References</a></h1>
+<table class="docutils citation" frame="void" id="schwarzenbacher2004" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[Schwarzenbacher2004]</td><td><strong>The importance of alignment accuracy for molecular replacement.</strong>
+R. Schwarzenbacher, A. Godzik, S. K. Grzechnik and L. Jaroszewski
+<em>Acta Cryst.</em> <strong>D60</strong>, 1229-1236 (2004)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="citation">
+<h1><a class="toc-backref" href="sculptor_new.html#toc-entry-40">Citation</a></h1>
+<p><strong>Improvement of molecular-replacement models with Sculptor.</strong> G.
+Bunkoczi and R. J. Read <em>Acta Cryst.</em> <strong>D67</strong>, 303-312 (2011)</p>
+</div>
+<div class="section" id="additional-information">
+<h1><a class="toc-backref" href="sculptor_new.html#toc-entry-41">Additional information</a></h1>
+<div class="section" id="list-of-all-available-keywords">
+<h2><a class="toc-backref" href="sculptor_new.html#toc-entry-42">List of all available keywords</a></h2>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input</span><span class="phil-help">Input files</span><ul><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">model</span><span class="phil-help">Input pdb file</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">PDB file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">selection</span><span class="phil-words"> = all </span><span class="phil-help">Selection string</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_alternate_conformations</span><span class="phil-words"> = False </span><span class="phil-help">Remove alternate conformations</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sanitize_occupancies</span><span class="phil-words"> = False </span><span class="phil-help">Sets occupancies &gt; 1.0 to 1.0</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_crystal_symmetry</span><span class="phil-words"> = False </span><span class="phil-help">Keeps the crystal symmetry of the model</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">alignment</span><span class="phil-help">Input alignment file</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">Alignment file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_sequence</span><span class="phil-words"> = None </span><span class="phil-help">Target sequence file name (to locate target sequence in alignment)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">homology_search</span><span class="phil-help">Alignment from homology search file</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">Homology search file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = None </span><span class="phil-help">Which alignments to use</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">sequence</span><span class="phil-help">Input sequence file</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">Sequence file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_ids</span><span class="phil-words"> = None </span><span class="phil-help">Which chain IDs the target sequence applies</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">errors</span><span class="phil-help">Estimated errors for chain</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">Error file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_ids</span><span class="phil-words"> = None </span><span class="phil-help">Which chain IDs the error file corresponds to</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">superposition_errors</span><span class="phil-help">Superposition errors for chain</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">Error file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_ids</span><span class="phil-words"> = None </span><span class="phil-help">Which chain IDs the error file corresponds to</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><span class="phil-help">Output options</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param" data-expert="0"><span class="phil-name">folder</span><span class="phil-words"> = . </span><span class="phil-help">Output file folder</span></li><li class="phil-param" data-expert="0"><span class="phil-name">root</span><span class="phil-words"> = sculpt </span><span class="phil-help">Output file root</span></li><li class="phil-param" data-expert="0"><span class="phil-name">format</span><span class="phil-words"> = *pdb </span><span class="phil-help">Output file format</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">chain_to_alignment_matching</span><span class="phil-help">Chain-to-alignment matching options</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">consecutivity</span><span class="phil-words"> = *geometry numbering </span><span class="phil-help">Consecutivity criterion to detect chain breaks</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_hss_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Minimum length of a sequence fragment to be included in chain alignment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_seed_hss_count</span><span class="phil-words"> = 12 </span><span class="phil-help">Number of HSS to use in extensive search</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_completion_hss_count</span><span class="phil-words"> = 6 </span><span class="phil-help">Number of HSS to use in gap filling</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_sequence_overlap</span><span class="phil-words"> = 10 </span><span class="phil-help">Minimum overlap between sequences to perform full alignment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_sequence_identity</span><span class="phil-words"> = 0.80 </span><span class="phil-help">Minimum sequence identity of accepted chain alignment</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">error_search</span><span class="phil-help">Parameters for matching error files and/or estimating errors</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">min_sequence_identity</span><span class="phil-words"> = 0.8 </span><span class="phil-help">Minimum sequence identity to accept error file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_sequence_overlap</span><span class="phil-words"> = 0.8 </span><span class="phil-help">Minimum sequence overlap to accept error file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">calculate_if_not_provided</span><span class="phil-words"> = False </span><span class="phil-help">Use Rosetta and the ProQ2 server to get error estimates</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_prefix</span><span class="phil-words"> = None </span><span class="phil-help">File name for results of intermediate steps</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">homology_modelling</span><span class="phil-help">Parameters for homology modelling</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">min_residue_margin</span><span class="phil-words"> = 2 </span><span class="phil-help">Minimum number of residues to cut back on both sides of loops</span></li><li class="phil-param" data-expert="0"><span class="phil-name">residue_distance</span><span class="phil-words"> = 2.5 </span><span class="phil-help">Distance covered by a single residue (in A)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_edge_segment_length</span><span class="phil-words"> = 5 </span><span class="phil-help">Discard edge segments if shorter (after considering gap margins)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_internal_segment_length</span><span class="phil-words"> = 2 </span><span class="phil-help">Discard internal segments if shorter (after considering gap margins)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_loop_length</span><span class="phil-words"> = 60 </span><span class="phil-help">Maximum loop length</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rosetta_max_build_attempts</span><span class="phil-words"> = 1000 </span><span class="phil-help">Maximum build attempts to close loop</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rosetta_bump_overlap_factor</span><span class="phil-words"> = 0.1 </span><span class="phil-help">Allows some atomic overlap in initial loop closures</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rosetta_loop_closure</span><span class="phil-words"> = kic *ngk </span><span class="phil-help">Algorithm for Rosetta loop closure</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rosetta_loop_refinement</span><span class="phil-words"> = *no default quick fast test </span><span class="phil-help">Algorithm for Rosetta loop refinement</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">sculpt</span><span class="phil-help">Parameters for sculpting</span><ul><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">protein</span><span class="phil-help">Options to process protein chains</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">completion</span><span class="phil-words"> = cbeta cbeta_and_pro sidechain </span><span class="phil-help">Method to build missing sidechain atoms</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">mainchain</span><span class="phil-help">Options for main chain processing</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">remove_unaligned</span><span class="phil-words"> = True </span><span class="phil-help">Delete residues that could not be matched to an alignment</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">deletion</span><span class="phil-help">Mainchain deletion algorithms</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *gap threshold_based_similarity completeness_based_similarity residue_count_based_similarity remove_long rms superposition </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gap</span><span class="phil-help">Delete residue if aligned with gap</span><ul /></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">threshold_based_similarity</span><span class="phil-help">Delete residue if sequence similarity is low</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">threshold</span><span class="phil-words"> = -0.20 </span><span class="phil-help">Threshold to accept a residue</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">similarity_calculation</span><span class="phil-help">Configure sequence similarity calculation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">matrix</span><span class="phil-words"> = identity dayhoff blosum50 *blosum62 </span><span class="phil-help">Similarity matrix</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">smoothing</span><span class="phil-help">Configure raw similarity smoothing</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *linear spatial </span><span class="phil-help">Method to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">linear</span><span class="phil-help">Parameters for linear averaging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">window</span><span class="phil-words"> = 5 </span><span class="phil-help">Averaging window width</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weighting</span><span class="phil-words"> = uniform *triangular </span><span class="phil-help">Weighting scheme</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">spatial</span><span class="phil-help">Parameters for spatial averaging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">gap_bleed_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Alignment positions affected by gaps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_distance</span><span class="phil-words"> = 10 </span><span class="phil-help">Spatial distance for averaging</span></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">completeness_based_similarity</span><span class="phil-help">Delete residues based on sequence similarity to get same number of gaps           as the Schwarzenbacher algorithm</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">offset</span><span class="phil-words"> = 0.0 </span><span class="phil-help">Completeness in fraction of model length         (0.0 = completeness from Schwarzenbacher algorithm, useful range: +/-0.05)</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">similarity_calculation</span><span class="phil-help">Configure sequence similarity calculation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">matrix</span><span class="phil-words"> = identity dayhoff blosum50 *blosum62 </span><span class="phil-help">Similarity matrix</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">smoothing</span><span class="phil-help">Configure raw similarity smoothing</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *linear spatial </span><span class="phil-help">Method to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">linear</span><span class="phil-help">Parameters for linear averaging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">window</span><span class="phil-words"> = 5 </span><span class="phil-help">Averaging window width</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weighting</span><span class="phil-words"> = uniform *triangular </span><span class="phil-help">Weighting scheme</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">spatial</span><span class="phil-help">Parameters for spatial averaging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">gap_bleed_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Alignment positions affected by gaps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_distance</span><span class="phil-words"> = 10 </span><span class="phil-help">Spatial distance for averaging</span></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">residue_count_based_similarity</span><span class="phil-help">Delete residues based on sequence similarity to delete the same number           of residues as the Schwarzenbacher algorithm</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">offset</span><span class="phil-words"> = 0.0 </span><span class="phil-help">Completeness in fraction of model length         (0.0 = completeness from Schwarzenbacher algorithm, useful range: +/-0.05)</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">similarity_calculation</span><span class="phil-help">Configure sequence similarity calculation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">matrix</span><span class="phil-words"> = identity dayhoff blosum50 *blosum62 </span><span class="phil-help">Similarity matrix</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">smoothing</span><span class="phil-help">Configure raw similarity smoothing</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *linear spatial </span><span class="phil-help">Method to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">linear</span><span class="phil-help">Parameters for linear averaging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">window</span><span class="phil-words"> = 5 </span><span class="phil-help">Averaging window width</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weighting</span><span class="phil-words"> = uniform *triangular </span><span class="phil-help">Weighting scheme</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">spatial</span><span class="phil-help">Parameters for spatial averaging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">gap_bleed_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Alignment positions affected by gaps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_distance</span><span class="phil-words"> = 10 </span><span class="phil-help">Spatial distance for averaging</span></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">remove_long</span><span class="phil-help">Delete gap segments if longer than a threshold</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">minimum_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Minimum length for mainchain segment to remove</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">rms</span><span class="phil-help">Delete residues if estimated error is larger than a threshold</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">threshold</span><span class="phil-words"> = 5.0 </span><span class="phil-help">Maximum allowed error for a residue</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">missing_value_substitution</span><span class="phil-help">Policy to fill in missing values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *maximum_value scaled_interpolated_value </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">maximum_value</span><span class="phil-help">Substitute maximum from the sequence</span><ul /></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">scaled_interpolated_value</span><span class="phil-help">Substitute interpolated value scaled with the distance</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">extrapolation_step_scale</span><span class="phil-words"> = 1.20 </span><span class="phil-help">Stepwise scale factor for extrapolation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">interpolation_step_scale</span><span class="phil-words"> = 1.10 </span><span class="phil-help">Stepwise scale factor for extrapolation</span></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">superposition</span><span class="phil-help">Delete residues if estimated error is larger than a threshold</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">threshold</span><span class="phil-words"> = 2.0 </span><span class="phil-help">Maximum allowed error for a residue</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">missing_value_substitution</span><span class="phil-help">Policy to fill in missing values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *maximum_value scaled_interpolated_value </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">maximum_value</span><span class="phil-help">Substitute maximum from the sequence</span><ul /></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">scaled_interpolated_value</span><span class="phil-help">Substitute interpolated value scaled with the distance</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">extrapolation_step_scale</span><span class="phil-words"> = 1.20 </span><span class="phil-help">Stepwise scale factor for extrapolation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">interpolation_step_scale</span><span class="phil-words"> = 1.10 </span><span class="phil-help">Stepwise scale factor for extrapolation</span></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">polishing</span><span class="phil-help">Mainchain polishing algorithms</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = remove_short undo_short keep_regular </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">remove_short</span><span class="phil-help">Delete short unconnected segments</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">minimum_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Minimum length</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">undo_short</span><span class="phil-help">Delete short gaps</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">maximum_length</span><span class="phil-words"> = 2 </span><span class="phil-help">Maximum length</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">keep_regular</span><span class="phil-help">Keep residues in secondary structure</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">maximum_length</span><span class="phil-words"> = 1 </span><span class="phil-help">Maximum length</span></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">bfactor</span><span class="phil-help">Configure B-factor modification</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *original asa similarity rms </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_b</span><span class="phil-words"> = 10.00 </span><span class="phil-help">Minimum B-factor</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">original</span><span class="phil-help">Use original bfactors to predict new B-values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">factor</span><span class="phil-words"> = 1.00 </span><span class="phil-help">Scale factor</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">asa</span><span class="phil-help">Use accessible surface area to predict new B-values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">precision</span><span class="phil-words"> = 960 </span><span class="phil-help">Number of points per atom</span></li><li class="phil-param" data-expert="0"><span class="phil-name">probe_radius</span><span class="phil-words"> = 1.40 </span><span class="phil-help">Radius for probing surface accessibility</span></li><li class="phil-param" data-expert="0"><span class="phil-name">factor</span><span class="phil-words"> = 2.00 </span><span class="phil-help">Scale factor</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">similarity</span><span class="phil-help">Use sequence similarity to predict new B-values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">factor</span><span class="phil-words"> = -100.00 </span><span class="phil-help">Scale factor</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">similarity_calculation</span><span class="phil-help">Configure sequence similarity calculation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">matrix</span><span class="phil-words"> = identity dayhoff blosum50 *blosum62 </span><span class="phil-help">Similarity matrix</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">smoothing</span><span class="phil-help">Configure raw similarity smoothing</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *linear spatial </span><span class="phil-help">Method to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">linear</span><span class="phil-help">Parameters for linear averaging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">window</span><span class="phil-words"> = 5 </span><span class="phil-help">Averaging window width</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weighting</span><span class="phil-words"> = uniform *triangular </span><span class="phil-help">Weighting scheme</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">spatial</span><span class="phil-help">Parameters for spatial averaging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">gap_bleed_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Alignment positions affected by gaps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_distance</span><span class="phil-words"> = 10 </span><span class="phil-help">Spatial distance for averaging</span></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">rms</span><span class="phil-help">Use external RMS error estimates to calculate B-values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">factor</span><span class="phil-words"> = 1.00 </span><span class="phil-help">Scale factor</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">missing_value_substitution</span><span class="phil-help">Policy to fill in missing values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *maximum_value scaled_interpolated_value </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">maximum_value</span><span class="phil-help">Substitute maximum from the sequence</span><ul /></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">scaled_interpolated_value</span><span class="phil-help">Substitute interpolated value scaled with the distance</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">extrapolation_step_scale</span><span class="phil-words"> = 1.20 </span><span class="phil-help">Stepwise scale factor for extrapolation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">interpolation_step_scale</span><span class="phil-words"> = 1.10 </span><span class="phil-help">Stepwise scale factor for extrapolation</span></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">renumber</span><span class="phil-help">Residue renumbering</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *target model original </span><span class="phil-help">Method to use</span></li><li class="phil-param" data-expert="0"><span class="phil-name">start</span><span class="phil-words"> = 1 </span><span class="phil-help">Start residue number</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">pruning</span><span class="phil-help">Options for sidechain pruning</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = null *schwarzenbacher similarity </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pruning_level_unaligned</span><span class="phil-words"> = 2 </span><span class="phil-help">Pruning level for residues that could not be matched to an alignment</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">null</span><span class="phil-help">Do not impose bond distance threshold</span><ul /></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">schwarzenbacher</span><span class="phil-help">Truncate atoms if target residue != source residue</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pruning_level</span><span class="phil-words"> = 2 </span><span class="phil-help">Level of truncation</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">similarity</span><span class="phil-help">Truncate atoms based on sequence similarity</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pruning_level</span><span class="phil-words"> = 2 </span><span class="phil-help">Level of intermediate truncation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">full_length_limit</span><span class="phil-words"> = 0.2 </span><span class="phil-help">Limit of no truncation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">full_truncation_limit</span><span class="phil-words"> = -0.2 </span><span class="phil-help">Limit for full truncation</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">similarity_calculation</span><span class="phil-help">Configure sequence similarity calculation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">matrix</span><span class="phil-words"> = identity dayhoff blosum50 *blosum62 </span><span class="phil-help">Similarity matrix</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">smoothing</span><span class="phil-help">Configure raw similarity smoothing</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *linear spatial </span><span class="phil-help">Method to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">linear</span><span class="phil-help">Parameters for linear averaging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">window</span><span class="phil-words"> = 1 </span><span class="phil-help">Averaging window width</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weighting</span><span class="phil-words"> = uniform *triangular </span><span class="phil-help">Weighting scheme</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">spatial</span><span class="phil-help">Parameters for spatial averaging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">gap_bleed_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Alignment positions affected by gaps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_distance</span><span class="phil-words"> = 10 </span><span class="phil-help">Spatial distance for averaging</span></li></ul></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">rename</span><span class="phil-help">Residue renaming</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = original *target </span><span class="phil-help">Method to use</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_ptm</span><span class="phil-words"> = False </span><span class="phil-help">Preserve post-translational modification of model residue if base residue types agree</span></li><li class="phil-param" data-expert="0"><span class="phil-name">gapname</span><span class="phil-words"> = ALA </span><span class="phil-help">Name residues corresponding to alignment gaps</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">mapping</span><span class="phil-help">Options for sidechain mapping</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *connectivity geometry </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_if_identical</span><span class="phil-words"> = True </span><span class="phil-help">Do mapping procedure for identical residues types</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">connectivity</span><span class="phil-help">Match atoms by connectivity</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">match_chemical_elements</span><span class="phil-words"> = True </span><span class="phil-help">Take chemical element into account</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">geometry</span><span class="phil-help">Match atoms by geometry considering all rotamers</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">match_chemical_elements</span><span class="phil-words"> = False </span><span class="phil-help">Take chemical element into account</span></li><li class="phil-param" data-expert="0"><span class="phil-name">tolerance</span><span class="phil-words"> = 0.1 </span><span class="phil-help">Distance tolerance</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fine_sampling</span><span class="phil-words"> = False </span><span class="phil-help">Use fine sampling for rotamers</span></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">dna</span><span class="phil-help">Options to process DNA chains</span><ul><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">mainchain</span><span class="phil-help">Options for main chain processing</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">remove_unaligned</span><span class="phil-words"> = True </span><span class="phil-help">Delete residues that could not be matched to an alignment</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">deletion</span><span class="phil-help">Mainchain deletion algorithms</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *all superposition </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">all</span><span class="phil-help">Delete all residues</span><ul /></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">superposition</span><span class="phil-help">Delete residues if estimated error is larger than a threshold</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">threshold</span><span class="phil-words"> = 2.0 </span><span class="phil-help">Maximum allowed error for a residue</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">missing_value_substitution</span><span class="phil-help">Policy to fill in missing values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *maximum_value scaled_interpolated_value </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">maximum_value</span><span class="phil-help">Substitute maximum from the sequence</span><ul /></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">scaled_interpolated_value</span><span class="phil-help">Substitute interpolated value scaled with the distance</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">extrapolation_step_scale</span><span class="phil-words"> = 1.20 </span><span class="phil-help">Stepwise scale factor for extrapolation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">interpolation_step_scale</span><span class="phil-words"> = 1.10 </span><span class="phil-help">Stepwise scale factor for extrapolation</span></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">polishing</span><span class="phil-help">Mainchain polishing algorithms</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = remove_short </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">remove_short</span><span class="phil-help">Delete short unconnected segments</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">minimum_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Minimum length</span></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">rna</span><span class="phil-help">Options to process RNA chains</span><ul><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">mainchain</span><span class="phil-help">Options for main chain processing</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">remove_unaligned</span><span class="phil-words"> = True </span><span class="phil-help">Delete residues that could not be matched to an alignment</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">deletion</span><span class="phil-help">Mainchain deletion algorithms</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *all superposition </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">all</span><span class="phil-help">Delete all residues</span><ul /></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">superposition</span><span class="phil-help">Delete residues if estimated error is larger than a threshold</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">threshold</span><span class="phil-words"> = 2.0 </span><span class="phil-help">Maximum allowed error for a residue</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">missing_value_substitution</span><span class="phil-help">Policy to fill in missing values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *maximum_value scaled_interpolated_value </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">maximum_value</span><span class="phil-help">Substitute maximum from the sequence</span><ul /></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">scaled_interpolated_value</span><span class="phil-help">Substitute interpolated value scaled with the distance</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">extrapolation_step_scale</span><span class="phil-words"> = 1.20 </span><span class="phil-help">Stepwise scale factor for extrapolation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">interpolation_step_scale</span><span class="phil-words"> = 1.10 </span><span class="phil-help">Stepwise scale factor for extrapolation</span></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">polishing</span><span class="phil-help">Mainchain polishing algorithms</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = remove_short </span><span class="phil-help">Algorithm to use</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">remove_short</span><span class="phil-help">Delete short unconnected segments</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">minimum_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Minimum length</span></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">hetero</span><span class="phil-help">Options to process hetero chains</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">keep</span><span class="phil-words"> = None </span><span class="phil-help">Keep named hetero residues</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">monosaccharide</span><span class="phil-help">Options to process glycosyl chains</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">maximum_depth</span><span class="phil-words"> = 0 </span><span class="phil-help">Keep chain up to maximum depth (None to keep all)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_bond_length</span><span class="phil-words"> = 1.5 </span><span class="phil-help">Maximum bond length for glycosidic bond</span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+</div>
+    
+  </body>
+</html>

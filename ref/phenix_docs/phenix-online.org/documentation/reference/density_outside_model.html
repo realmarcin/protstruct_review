@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Merging two models with density_outside_model</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="merging-two-models-with-density-outside-model">
+<h1 class="title">Merging two models with density_outside_model</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>density_outside_model: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>This routine takes a model and map coefficients and returns new map
+coefficients with density set to zero near the atoms in the model</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+<p>The main uses of phenix.density_outside_model are:</p>
+<ul class="simple">
+<li>Creating a map where all the parts of the map that have been
+explained by a model are removed.</li>
+</ul>
+</div>
+<div class="section" id="how-density-outside-model-works">
+<h1>How density_outside_model works:</h1>
+<p>Density_outside_model calculates a map from the map coefficients. Then
+all map values at points near an atom in the model are set to zero. Then
+a new set of map coefficients is calulated and written out.</p>
+<p>Optionally the model can be trimmed so that that the last n_trim
+residues in each segment of the model are not included.</p>
+</div>
+<div class="section" id="output-files-from-density-outside-model">
+<h1><em>Output files from density_outside_model</em></h1>
+<p><strong>density_removed.mtz</strong>: An MTZ file with your new map coefficients.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-density-outside-model">
+<h1>Standard run of density_outside_model:</h1>
+<p>Running density_outside_model is easy. From the command-line you can
+type:</p>
+<pre class="literal-block">
+phenix.density_outside_model pdb_in=mask_pdb.pdb \
+   map_coeffs.mtz
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">density_outside_model</span><ul><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb_in</span><span class="phil-words"> = None </span><span class="phil-help">Input PDB file marking region to remove from map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mtz_in</span><span class="phil-words"> = None </span><span class="phil-help">Input MTZ file with map coefficients</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeff_labels</span><span class="phil-words"> = None </span><span class="phil-help">If map coefficients cannot be identified automatically from your MTZ file, you can specify the label or labels  for them. (Please separate labels with blank space,  MTZ columns grouped together separated by commas with no blanks.) You can specify: map_coeff_labels (e.g., FWT,PHIFWT) amplitudes and phases (e.g., FP,SIGFP PHIB) or amplitudes, phases, weights (e.g., FP,SIGFP PHIB FOM)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">mtz_out</span><span class="phil-words"> = density_removed.mtz </span><span class="phil-help">Output MTZ file in sg p1 with density_removed of density</span></li><li class="phil-param" data-expert="0"><span class="phil-name">log</span><span class="phil-words"> = density_removed.log </span><span class="phil-help">Output log file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">params_out</span><span class="phil-words"> = density_removed_params.eff </span><span class="phil-help">Parameters file to rerun density_removed</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">directories</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = "temp_dir" </span><span class="phil-help">Optional temporary work directory </span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = "" </span><span class="phil-help">Output directory where files are to be written</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">density_removed_region</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">density_removed_model_radius</span><span class="phil-words"> = 2.5 </span><span class="phil-help">If density_removed_type is model, then flat density will replace actual density inside of region within  density_removed_model_radius of an atom in pdb_in (after  application of any  selections specified with atom_selection.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">include_hetatm</span><span class="phil-words"> = True </span><span class="phil-help">If True, then include HETATM atoms in input PDB file in defining region to be included </span></li><li class="phil-param" data-expert="0"><span class="phil-name">atom_selection</span><span class="phil-words"> = None </span><span class="phil-help">Any selection specified with atom_selection is applied to  input model before using the model.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_trim</span><span class="phil-words"> = 0 </span><span class="phil-help">Trim all ends of segments by n_trim residues before  calculating density</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_removed_as_map</span><span class="phil-words"> = False </span><span class="phil-help">Return modified density as map (alternative is map coeffs).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_type</span><span class="phil-words"> = PROTEIN </span><span class="phil-help">chain type (PROTEIN RNA DNA)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">raise_sorry</span><span class="phil-words"> = False </span><span class="phil-help">Raise sorry if problems</span></li><li class="phil-param" data-expert="0"><span class="phil-name">debug</span><span class="phil-words"> = False </span><span class="phil-help">Debugging output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dry_run</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and check parameter names</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_command_list</span><span class="phil-words"> = None </span><span class="phil-help">You can supply any resolve command here NOTE: for command-line usage you need to enclose the whole set of commands in double quotes (&amp;quot;) and each individual command in single quotes (') like this:  resolve_command_list=&amp;quot;'no_build' 'b_overall 23' &amp;quot; </span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

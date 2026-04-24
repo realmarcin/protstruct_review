@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Model superposition with optional morphing and trimming</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="model-superposition-with-optional-morphing-and-trimming">
+<h1 class="title">Model superposition with optional morphing and trimming</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt>superpose_models: Peter Zwart, Pavel Afonine, Ralf W. Grosse-Kunstleve,</dt>
+<dd>Tom Terwilliger</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>Superpose moving model on fixed model. Optionally morph the moving
+model to be similar to the fixed model and trim it back to the parts that
+match.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-superpose-models-works">
+<h1>How superpose_models works:</h1>
+<p>The superpose_models tool can use either sequence-based alignment with
+least-squares fitting or SSM-based (secondary-structure-matching)
+superposition.</p>
+</div>
+<div class="section" id="lsq-fitting-sequence-based-alignment-and-least-squares-fitting">
+<h1>LSQ fitting (sequence-based alignment and least-squares fitting)</h1>
+<p>The LSQ fitting method consists of least-squares superposition of two selected
+parts from two pdb files. If no selections is provided for fixed and
+moving models the whole content of both input PDB files is used for
+superposition. If the number of atoms in fixed and moving models is
+different and the models contain amino-acid residues then the sequence
+alignment is performed and the matching residues (CA atoms by default,
+can be changed by the user) are used for superposition. Note that
+selected (and/or matching) atoms are the atoms used to find the
+superposition operators while these operators are applied to the whole
+moving structure.</p>
+</div>
+<div class="section" id="ssm-matching">
+<h1>SSM matching</h1>
+<p>SSM matching in phenix.superpose_models consists
+of identifying secondary structure in the two models, indexing all pairs of
+secondary structure elements, and finding sets of matching pairs in the
+two structures.  Normally the basic unit of a match is a set of three pairs
+of secondary structure elements (they can be overlapping) with the same
+spatial arrangement in the two structures.  Such a match is called a triple
+in superpose_models.</p>
+<p>A matching triples yields a unique orientation of the moving model.  Matching
+triples are grouped into sets in which all the triples yield nearly the same
+orientation. Then the transformations suggested by the largest groups are
+each tested by using them to superimpose the moving model on the fixed model
+and noting the number of residues that superimpose.</p>
+</div>
+<div class="section" id="options">
+<h1>Options</h1>
+<blockquote>
+<p>LSQ fitting.  This is the default superposition method.</p>
+<p>SSM matching. This is an alternative to LSQ fitting.  It can be useful if
+your models do not have similar sequences</p>
+<p>Morphing.  The best-fitting superimposed moving models can be morphed by
+calculation of a real-space distortion field that changes over a typical
+distance of about 10 A (set by the parameter distortion_field_length).
+This is a way to superpose one model on another and then make them as
+similar as possible by applying a smooth distortion to the moving model</p>
+<p>Trimming.  The superposed (and optionally morphed) moving model can
+be trimmed to remove segments that are very different from the fixed model.</p>
+<p>SSM match to map.  You can supply a map and specify ssm_match_to_map=True.
+The tool will search for helices and strands in the map and generate a
+target helices_strands model.  Then a brute force SSM matching of your
+moving model to the helices_strands model is carried out and matches are
+scored with map-model correlation. This option can also be carried out
+with the dock_in_map tool.
+Note this option does not support trimming or morphing.</p>
+<p>Brute force SSM.  You can supply a target model that has helices and strands.
+Helices and strands in your moving model will be matched to those in the
+target model to superpose it.  You can also supply a map_file and specify
+score_superpose_brute_force_with_cc if you wish.
+Note this option does not support trimming or morphing.</p>
+</blockquote>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-superpose-models">
+<h1>Standard run of superpose_models:</h1>
+<p>Running superpose_models is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.superpose_models fixed_model=fixed_model.pdb \
+   moving_model=moving_model.pdb morph=true trim=true
+</pre>
+<p>This will superimpose moving_model.pdb on fixed_model.pdb, morph it (gradual
+adjustment of atomic positions with location along the chain and in space),
+and trim moving_model back to the region where they are similar.</p>
+<p>To superpose a model on a map you can say:</p>
+<pre class="literal-block">
+phenix.superpose_models map_file=map.ccp4 moving_model=moving_model.pdb
+</pre>
+<p>This will find helices and strands in map.ccp4 and superpose moving_model.pdb
+on those secondary structure elements.</p>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+<ul class="simple">
+<li>When using LSQ fitting a different number of atoms in selection_fixed
+and selection_moving can lead to failure if sequence alignment  is not
+successful.</li>
+<li>More than one model in one PDB file (separated with MODEL-ENDMDL) is not
+supported.</li>
+</ul>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">fixed_model</span><span class="phil-words"> = None </span><span class="phil-help">Input fixed PDB file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fixed_selection</span><span class="phil-words"> = None </span><span class="phil-help">If specified, only include selected part of fixed model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">moving_model</span><span class="phil-words"> = None </span><span class="phil-help">Input moving PDB file. Model to superpose on fixed_model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">moving_selection</span><span class="phil-words"> = None </span><span class="phil-help">If specified, only include selected part of moving model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">other_model_to_move</span><span class="phil-words"> = None </span><span class="phil-help">If specified, transform this model with the same parameters as the moving_model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_file</span><span class="phil-words"> = None </span><span class="phil-help">File with CCP4-style map for brute_force superposition only</span></li><li class="phil-param" data-expert="0"><span class="phil-name">only_include_first_chain</span><span class="phil-words"> = False </span><span class="phil-help">Only use first chain in each input model</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">helices_strands_model</span><span class="phil-words"> = 'helices_strands.pdb' </span><span class="phil-help">Helices-strands model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">superposed_model</span><span class="phil-words"> = None </span><span class="phil-help">Output file with superposed moving model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">transformed_other_model</span><span class="phil-words"> = None </span><span class="phil-help">Output file with moved other_model</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">Resolution. Will be truncated to minimum_working_resolution if finer than that</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_working_resolution</span><span class="phil-words"> = 3 </span><span class="phil-help">Working High-resolution limit. Resolution will be truncated to this value</span></li><li class="phil-param" data-expert="0"><span class="phil-name">wrapping</span><span class="phil-words"> = False </span><span class="phil-help">Map_file is a crystal</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">superpose_models</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">superpose</span><span class="phil-words"> = True </span><span class="phil-help">Superpose moving model on fixed model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">morph</span><span class="phil-words"> = True </span><span class="phil-help">Morph moving model after superposition</span></li><li class="phil-param" data-expert="0"><span class="phil-name">trim</span><span class="phil-words"> = True </span><span class="phil-help">Trim moving model after morphing</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ssm_match_to_map</span><span class="phil-words"> = False </span><span class="phil-help">SSM match to helices/strands from map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">superpose_brute_force</span><span class="phil-words"> = False </span><span class="phil-help">Use brute force method to superpose</span></li><li class="phil-param" data-expert="0"><span class="phil-name">score_superpose_brute_force_with_cc</span><span class="phil-words"> = None </span><span class="phil-help">Use cc scoring in brute force method (requires map file)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ok_brute_force_cc</span><span class="phil-words"> = 0.25 </span><span class="phil-help">OK value for brute force cc (stop looking if achieved)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">shift_field_distance</span><span class="phil-words"> = None </span><span class="phil-help">Shift field distance. Distance over which morphing leaves model mostly the same. Over longer distances morphing changes model. Default is 10 A.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">good_enough_fraction</span><span class="phil-words"> = 0.9 </span><span class="phil-help">Good enough fraction. If this much of model is found with sequence-based search skip ssm</span></li><li class="phil-param" data-expert="0"><span class="phil-name">starting_distance_cutoff</span><span class="phil-words"> = 2.5 </span><span class="phil-help">Starting distance cutoff. Try to keep atoms within this distance, but increase if too few are found.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">include_ssm</span><span class="phil-words"> = True </span><span class="phil-help">Include SSM matching (superpose based on secondary structure)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">include_lsq</span><span class="phil-words"> = True </span><span class="phil-help">Include least-squares matching (minimizing RMSD)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">try_lsq_first</span><span class="phil-words"> = True </span><span class="phil-help">Try lsq matching first if lsq and ssm are both included</span></li><li class="phil-param" data-expert="0"><span class="phil-name">try_with_fragments_if_poor_fit</span><span class="phil-words"> = True </span><span class="phil-help">Try lsq matching with fragments if no fit obtained</span></li><li class="phil-param" data-expert="0"><span class="phil-name">include_swapped_match</span><span class="phil-words"> = None </span><span class="phil-help">Try matching fixed to moving if initial match fails</span></li><li class="phil-param" data-expert="0"><span class="phil-name">allow_reverse_connectivity</span><span class="phil-words"> = None </span><span class="phil-help">Allow match to reversed model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">direct_morph</span><span class="phil-words"> = False </span><span class="phil-help">Directly morph moving model onto fixed model. Requires chain ID and residue numbering to be identical, but fixed_model can have missing residues. Does not allow trimming.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">direct_morph_method</span><span class="phil-words"> = along_chain </span><span class="phil-help">Choice of method for direct morph: along_chain or in_space</span></li><li class="phil-param" data-expert="0"><span class="phil-name">direct_morph_smoothing_window</span><span class="phil-words"> = 11 </span><span class="phil-help">Smoothing window for direct morph</span></li><li class="phil-param" data-expert="0"><span class="phil-name">identify_register_shifts</span><span class="phil-words"> = False </span><span class="phil-help">Identify positions in chains where the register between fixed and moving models changes</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">alignment</span><span class="phil-help">Set of parameters for sequence alignment. Defaults are good for most of cases</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">alignment_style</span><span class="phil-words"> = local *global </span></li><li class="phil-param" data-expert="0"><span class="phil-name">gap_opening_penalty</span><span class="phil-words"> = 1 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">gap_extension_penalty</span><span class="phil-words"> = 1 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">similarity_matrix</span><span class="phil-words"> = blosum50 dayhoff *identity </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of processors to use. If None, uses all available</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Docking a model into a cryo-EM map with dock_in_map</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="docking-a-model-into-a-cryo-em-map-with-dock-in-map">
+<h1 class="title">Docking a model into a cryo-EM map with dock_in_map</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>dock_in_map: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>The routine dock_in_map will automatically dock a model or models into a map.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-dock-in-map-works">
+<h1>How dock_in_map works:</h1>
+<p>Dock-in-map uses both SSM and  convolution-based shape searches to find a
+part of a map that is similar to a model.  The key elements of the search are:</p>
+<pre class="literal-block">
+An SSM search is carried out first (protein only).  This search is
+identical to the ssm_match_to_map option in superpose_models. Helices
+and strands are found in the map to create a target model, then a brute
+force superposition of helices and strands in the search model to those in
+the target model is carried out. Potential superpositions are evaluated
+by map-model correlation.
+
+If the SSM search fails to find a satisfactory superposition,
+an initial search at lower resolution that focuses on overall shape of the
+molecule is carried out.  This allows a quick search but is less
+effective if the map contains more than one molecule. If this fails, the
+next methods are tried.
+
+Initial search without rotation.  This allows a fast search that can place
+a molecule that is just shifted by a translation
+
+Optional initial search based on matching moments of inertia of model and map.
+This is also a fast search but requires an accurate map that looks a lot
+like the model and does not have extra density.
+
+Full search at the full resolution of the map.  This search can be run on
+multiple processors to speed it up.
+</pre>
+</div>
+<div class="section" id="uses">
+<h1>Uses</h1>
+<p>You can use dock_in_map to place any number of copies of any number of unique
+molecules.  You specify the molecules one by one:</p>
+<pre class="literal-block">
+search_model=model1.pdb
+search_model=model2.pdb
+search_model=model3.pdb
+</pre>
+<p>and the number of copies all at once with:</p>
+<pre class="literal-block">
+search_model_copies=&quot;3 1 2&quot;
+</pre>
+<p>to look for 3 copies of model1.pdb, one of model2.pdb and two of model3.pdb.</p>
+<p>You can also use dock_in_map to superimpose density from one map on another
+map. You just specify the second map with the density:</p>
+<pre class="literal-block">
+search_map_file=map_file.ccp4
+</pre>
+<p>and dock_in_map will find the density in this map, convert it to a pseudo-model
+that corresponds to this density, and then search for the pseudo-model just as
+any other model.  When dock_in_map is done finding the pseudo-model, it applies
+the transformation that it found to the original density in your search_map_file
+to create a new map that superimposes on the target map.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-dock-in-map">
+<h1>Standard run of dock_in_map:</h1>
+<p>Running dock_in_map is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.dock_in_map 1ss8_A.pdb emd_8750.map resolution=4 nproc=4 \
+   pdb_out=placed_model_from_emd_8750.pdb
+</pre>
+<p>where 1ss8_A.pdb is the model you would like to place,
+emd_8750.map is a CCP4, mrc or other related map format, and you
+specify the nominal resolution of the map and the number of processors to use.</p>
+<p>For docking density into a map:</p>
+<blockquote>
+<dl class="docutils">
+<dt>phenix.dock_in_map emd_8750.map density.ccp4 resolution=4 </dt>
+<dd>superposed_map_file=density_superposed.ccp4</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+<p>If your map is inverted (left-handed), docking and model-building will not
+work properly. You can often tell if your map is inverted because any
+helices will be left-handed.  If you are unsure, you can run MapBox with
+invert_hand=True to invert the map and then see if docking works.  Note that
+if your map is inverted, you will want to invert all your maps and start
+everything from the beginning.</p>
+<p>If your map has pseudo-symmetry (like a proteasome) you might need to box
+one subunit or try ssm_search=False to use a more thorough search in docking.</p>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">map_file</span><span class="phil-words"> = None </span><span class="phil-help">File with CCP4-style map. May have origin in any location.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">seq_file</span><span class="phil-words"> = None </span><span class="phil-help">Optional sequence file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_model</span><span class="phil-words"> = None </span><span class="phil-help">Input PDB file(s) to be placed in the map.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_map_file</span><span class="phil-words"> = None </span><span class="phil-help">Search map file with CCP4-style map to be superimposed on the reference map. Map will be converted to a pseudo-model that corresponds to density in map. At completion of dock_in_map the search map file will be transformed to match the target map and written out.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_model_copies</span><span class="phil-words"> = None </span><span class="phil-help">You can specify how many copies for each search model by supplying one value of search_model_copies for each of your search models. Put them in all at once as in search_model_copies="1,3,2".</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_map_copies</span><span class="phil-words"> = None </span><span class="phil-help">You can specify how many copies for each search map by supplying one value of search_map_copies for each of your search models. Put them all in at once as in search_map_copies="3,4,5"</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fixed_model</span><span class="phil-words"> = None </span><span class="phil-help">Fixed model marking region not to be considered. Fixed model will be added to placed search model to create new fixed model if append_to_fixed_model is set and multiple searches are done.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_model</span><span class="phil-words"> = None </span><span class="phil-help">Model (typically helices-strands model) already docked into map and used as a marker.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">symmetry_file</span><span class="phil-words"> = None </span><span class="phil-help">Symmetry file (.ncs_spec format or MATRX records) with reconstruction symmetry. Used in identification of unique part of map. Required if allow_symmetry is set and more than one copy is requested. NOTE: symmetry file applies to map file in original position</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb_out</span><span class="phil-words"> = placed_model.pdb </span><span class="phil-help">Search PDB file, transformed to superpose on the target map file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">superposed_map_file</span><span class="phil-words"> = superposed_map.ccp4 </span><span class="phil-help">Search map file (if just one), transformed to superpose on the target map file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">skip_fixed_model_in_pdb_out</span><span class="phil-words"> = True </span><span class="phil-help">Skip fixed model in output PDB file. Just write the new part.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">temp_dir</span><span class="phil-words"> = None </span><span class="phil-help">Temporary directory.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">High-resolution limit for main search. This can be lower resolution than the data. The search is quicker at lower resolution. If your model is poor, try 2-3 A lower resolution than your data (i.e, if your data is 2.5 A, try 5 A).</span></li><li class="phil-param" data-expert="3"><span class="phil-name">scattering_table</span><span class="phil-words"> = n_gaussian wk1995 it1992 *electron neutron </span><span class="phil-help">Choice of scattering table for structure factor calculations. Standard for X-ray is n_gaussian, for cryoEM is electron.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">sequence</span><span class="phil-words"> = None </span><span class="phil-help">Sequence as text string. Normally supply a sequence file instead</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_type</span><span class="phil-words"> = *PROTEIN DNA RNA </span><span class="phil-help">Chain type</span></li><li class="phil-param" data-expert="0"><span class="phil-name">wrapping</span><span class="phil-words"> = None </span><span class="phil-help">You can specify whether the map is wrapped (can map values outside bounds to inside with cell translations).</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">search</span><ul><li class="phil-param" data-expert="2"><span class="phil-name">dock_chains_individually</span><span class="phil-words"> = False </span><span class="phil-help">Dock each chain (identified by chain_id field) individually. This is useful if the chains might have different orientations in the map compared to the search model, such as in a search model that is a predicted model. Normally used along with create_unique_chain_at_end=True for predicted models to put the model back together.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">create_unique_chain_at_end</span><span class="phil-words"> = None </span><span class="phil-help">Take all docked chains and try to create one chain that has no duplicate residue numbers and that has distances between ends of fragments consistent with the number of residues between them. If symmetry has been applied, create N copies representing that symmetry. Default is True if dock_chains_individually = True and False otherwise.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">minimum_cc_to_keep_domain</span><span class="phil-words"> = 0.2 </span><span class="phil-help">Do not keep domains in create_unique_chain_at_end if cc is less than minimum_cc_to_keep_domain.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_sequential_fragments_by_distance</span><span class="phil-words"> = None </span><span class="phil-help">Try to dock a chain in a way that minimizes the distance between its first residue and the previously-docked residue with the highest residue number less than this, and similarly for the last residue and the next available placed residue. Default is True if create_unique_chain_at_end is set. Normally use only if you have a model with a single chain and you are docking pieces of that chain.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">choose_better_of_individual_and_group_docking</span><span class="phil-words"> = None </span><span class="phil-help">Dock entire search model (normally one only) and also by chain...pick better-fitting of the two for each chain</span></li><li class="phil-param" data-expert="2"><span class="phil-name">low_res_search</span><span class="phil-words"> = True </span><span class="phil-help">Try to fit by searching at low resolution first</span></li><li class="phil-param" data-expert="2"><span class="phil-name">dock_with_mr</span><span class="phil-words"> = True </span><span class="phil-help">Try using MR to dock first</span></li><li class="phil-param" data-expert="2"><span class="phil-name">ssm_search</span><span class="phil-words"> = None </span><span class="phil-help">Try to fit by searching for secondary structure. Default is False for dock_in_map and True for dock_and_rebuild if dock_with_mr is not used.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">refine_cycles</span><span class="phil-words"> = 3 </span><span class="phil-help">rigid-body refinement cycles</span></li><li class="phil-param" data-expert="2"><span class="phil-name">ssm_search_min_cc</span><span class="phil-words"> = 0.30 </span><span class="phil-help">Stop ssm search if this cc achieved</span></li><li class="phil-param" data-expert="2"><span class="phil-name">backup_resolution_cutoff_searches</span><span class="phil-words"> = 2 </span><span class="phil-help">If initial fitting does not work, try up to this many times increasing resolution by backup_resolution_ratio each time</span></li><li class="phil-param" data-expert="2"><span class="phil-name">backup_resolution_ratio</span><span class="phil-words"> = 1.67 </span><span class="phil-help">If initial fitting does not work, try up to backup_resolution_cutoff_searches times increasing the resolution by backup_resolution_ratio each time</span></li><li class="phil-param" data-expert="2"><span class="phil-name">resolution_radius_scale</span><span class="phil-words"> = 0.5 </span><span class="phil-help">Resolution for low-res search will be resolution_radius_scale times the radius of gyration of the search model.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">align_moments</span><span class="phil-words"> = False </span><span class="phil-help">Try to fit by aligning moments of inertia if size of density region and molecule are similar</span></li><li class="phil-param" data-expert="2"><span class="phil-name">max_radius_ratio</span><span class="phil-words"> = 2. </span><span class="phil-help">Radius of gyration of molecule and density must be within max_radius_ratio of each other</span></li><li class="phil-param" data-expert="2"><span class="phil-name">radius_scale</span><span class="phil-words"> = 1.5 </span><span class="phil-help">Mask for density and atoms will be radius_scale times the radius of gyration of model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_symmetry</span><span class="phil-words"> = True </span><span class="phil-help">If search_model_copies or search_map_copies are the same for each model and greater than one and allow_symmetry is set, use symmetry in the map to place all copies after the first one.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">skip_if_low_cc</span><span class="phil-words"> = True </span><span class="phil-help">Skip solution before rigid-body refinement if map-model CC is less than half of min_cc.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">rigid_body_refinement</span><span class="phil-words"> = True </span><span class="phil-help">Run rigid-body refinement on final model</span></li><li class="phil-param" data-expert="1"><span class="phil-name">rigid_body_refinement_single_unit</span><span class="phil-words"> = True </span><span class="phil-help">Run rigid-body refinement with just one unit (do not break up into chains)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rigid_body_refinement_split_method</span><span class="phil-words"> = *chain_id segid </span><span class="phil-help">When splitting up molecule for rigid-body refinement (if rigid_body_refinement_single_unit=False), use either chain_id or segid to split up molecule</span></li><li class="phil-param" data-expert="3"><span class="phil-name">rigid_body_refinement_resolution</span><span class="phil-words"> = None </span><span class="phil-help">Run rigid-body refinement at this resolution if specified</span></li><li class="phil-param" data-expert="2"><span class="phil-name">append_to_fixed_model</span><span class="phil-words"> = True </span><span class="phil-help">Append placed search model to fixed model (if any) after search</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_cc</span><span class="phil-words"> = 0.4 </span><span class="phil-help">If quick run, stop if minimum CC is achieved in local search. Also always skip if starting CC_mask is less than 1/4 min_cc.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">run_in_boxes</span><span class="phil-words"> = True </span><span class="phil-help">Run on sub-boxes and combine at the end</span></li><li class="phil-param" data-expert="3"><span class="phil-name">target_box_size</span><span class="phil-words"> = 60 </span><span class="phil-help">Try to get boxes about this big on a side (grid units)</span></li><li class="phil-param" data-expert="3"><span class="phil-name">target_boxes</span><span class="phil-words"> = None </span><span class="phil-help">Try to get this many boxes. Default is nproc unless this makes box size much smaller than target_box_size</span></li><li class="phil-param" data-expert="3"><span class="phil-name">box_to_run</span><span class="phil-words"> = None </span><span class="phil-help">Run only this box</span></li><li class="phil-param" data-expert="0"><span class="phil-name">box_overlap_scale</span><span class="phil-words"> = 1 </span><span class="phil-help">box overlap (overlap of boxes) will be box_overlap_scale times the density radius</span></li><li class="phil-param" data-expert="3"><span class="phil-name">edge_ratio</span><span class="phil-words"> = 10 </span><span class="phil-help">box edge box_overlap times edge_ratio</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_radius</span><span class="phil-words"> = None </span><span class="phil-help">Radius for density to be cut out and compared. Default is 6 times the resolution.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model_radius</span><span class="phil-words"> = 3 </span><span class="phil-help">Radius for removing density near fixed_model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">zero_value</span><span class="phil-words"> = 0 </span><span class="phil-help">Value to set map in regions overlapping fixed model</span></li><li class="phil-param" data-expert="2"><span class="phil-name">density_peaks</span><span class="phil-words"> = 20 </span><span class="phil-help">Number of NCS-related peaks of density to check</span></li><li class="phil-param" data-expert="2"><span class="phil-name">delta_phi</span><span class="phil-words"> = 20 </span><span class="phil-help">Angular spacing of search </span></li><li class="phil-param" data-expert="3"><span class="phil-name">max_rot</span><span class="phil-words"> = None </span><span class="phil-help">Maximum rotations to try</span></li><li class="phil-param" data-expert="3"><span class="phil-name">rotz_only</span><span class="phil-words"> = None </span><span class="phil-help">Rotate only around Z</span></li><li class="phil-param" data-expert="2"><span class="phil-name">single_positions_to_try</span><span class="phil-words"> = 10 </span><span class="phil-help">Number of offset positions to try in optimizing orientation. Positions along the chain are selected as centers and a local fit near each position is carried out. The resulting offsets relative to the original placement are used to optimize the overall orientation and position.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_position_shift_frac</span><span class="phil-words"> = 0.05 </span><span class="phil-help">Maximum fractional positional shift in single_positions run</span></li><li class="phil-param" data-expert="3"><span class="phil-name">min_relative_cc</span><span class="phil-words"> = 0.67 </span><span class="phil-help">Minimum local CC relative to original CC to keep a local search. This is a way to reject local searches that are completely wrong.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">sieve_fit</span><span class="phil-words"> = None </span><span class="phil-help">Use sieve_fit fraction of single positions in fitting. If None, use all</span></li><li class="phil-param" data-expert="3"><span class="phil-name">ncs_copies_max</span><span class="phil-words"> = None </span><span class="phil-help">Maximum number of matching models to write. If more than one they will be written as MODEL records in the output PDB file. You can get them individually afterwards with phenix.pdbtools placed_model.pdb keep="model 1" etc.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">start_rot</span><span class="phil-words"> = None </span><span class="phil-help">Three numbers rotx, rotz, rotx defining the starting rotation of the search model. Normally used along with delta_phi=1000 or max_rot=1 to generate exactly one defined rotation.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">search_center</span><span class="phil-words"> = None </span><span class="phil-help">Optional coordinates in search model for centering search. Note this is different from target_search_center which is the location xyz in the map to look.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">search_center_selection</span><span class="phil-words"> = None </span><span class="phil-help">Optional selection defining coordinates in search model for centering search.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">target_search_center</span><span class="phil-words"> = None </span><span class="phil-help">Optional coordinates in reference map where search_center should be approximately located after superimposing maps. Used to eliminate possible superpositions that place the search center elsewhere. Overlap scores decreased based on distance to target_search_center/density_radius.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">model_search_position</span><span class="phil-words"> = None </span><span class="phil-help">Optional coordinates (usually part of search model) for matching to target_search_position after transformation. These can be specified in addition to target_search_center. Can have multiple model_search_position and target_search_position pairs by specifying each multiple times in order. NOTE: Not compatible with map search</span></li><li class="phil-param" data-expert="2"><span class="phil-name">target_search_position</span><span class="phil-words"> = None </span><span class="phil-help">Target positions for model_search_position after transformation.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_position_radius</span><span class="phil-words"> = None </span><span class="phil-help">Radius for comparison of target_search_position and transformed search_position values. Default is density_radius. If specified, must be a single value or the same number of values as entries in model_search_position and target_search_position</span></li><li class="phil-param" data-expert="3"><span class="phil-name">rot_id_n</span><span class="phil-words"> = None </span><span class="phil-help">Number of rotation groups. Along with rot_id_group, allows defining groups of rotations to be carried out in one run. .short_caption = Number of rotation groups</span></li><li class="phil-param" data-expert="3"><span class="phil-name">rot_id_group</span><span class="phil-words"> = None </span><span class="phil-help">rotation group to include. See rot_id_n.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">map_box</span><span class="phil-words"> = True </span><span class="phil-help">Run map_box to extract useful part of map before search</span></li><li class="phil-param" data-expert="3"><span class="phil-name">fix_search_position</span><span class="phil-words"> = False </span><span class="phil-help">You can choose to not move your model center of mass to the origin by fixing the search position</span></li><li class="phil-param" data-expert="3"><span class="phil-name">search_box_size</span><span class="phil-words"> = None </span><span class="phil-help">You can choose the size of the search box for local searches. Normally set by default corresponding to 3 times density_radius</span></li><li class="phil-param" data-expert="3"><span class="phil-name">lower_bounds</span><span class="phil-words"> = None </span><span class="phil-help">You can select a part of your map for analysis with lower_bounds and upper_bounds.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">upper_bounds</span><span class="phil-words"> = None </span><span class="phil-help">You can select a part of your map for analysis with lower_bounds and upper_bounds.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">keep_search_order</span><span class="phil-words"> = None </span><span class="phil-help">Keep search order as input</span></li><li class="phil-param" data-expert="1"><span class="phil-name">remove_water</span><span class="phil-words"> = False </span><span class="phil-help">Remove waters and other hetero atoms from input files</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of processors to use</span></li><li class="phil-param" data-expert="3"><span class="phil-name">random_seed</span><span class="phil-words"> = 171731 </span><span class="phil-help">Random seed</span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">quick</span><span class="phil-words"> = True </span><span class="phil-help">Try translation search first and stop if CC is at least min_cc</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

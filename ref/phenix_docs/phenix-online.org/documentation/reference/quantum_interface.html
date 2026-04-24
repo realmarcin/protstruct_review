@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Quantum Interface (QI)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="quantum-interface-qi">
+<h1 class="title">Quantum Interface (QI)</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="quantum_interface.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="quantum_interface.html#authors" id="toc-entry-1">Authors</a></li>
+<li><a class="reference internal" href="quantum_interface.html#introduction" id="toc-entry-2">Introduction</a></li>
+<li><a class="reference internal" href="quantum_interface.html#various-uses" id="toc-entry-3">Various uses</a></li>
+<li><a class="reference internal" href="quantum_interface.html#tips-and-tricks" id="toc-entry-4">Tips and Tricks</a><ul>
+<li><a class="reference internal" href="quantum_interface.html#model-completeness" id="toc-entry-5">Model completeness</a></li>
+<li><a class="reference internal" href="quantum_interface.html#timings" id="toc-entry-6">Timings</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="quantum_interface.html#literature" id="toc-entry-7">Literature</a></li>
+</ul>
+</div>
+<div class="section" id="authors">
+<h1><a class="toc-backref" href="quantum_interface.html#toc-entry-1">Authors</a></h1>
+<p>Nigel W. Moriarty, Dorothee Liebschner</p>
+</div>
+<div class="section" id="introduction">
+<h1><a class="toc-backref" href="quantum_interface.html#toc-entry-2">Introduction</a></h1>
+<p>Quantum Mechanics (QM) has been shown to provide accurate geometries and
+energies for a wide range of chemical entities. Using QM for restraints
+generation is not new, however, using QM <em>in situ</em> restraints generation
+directly in <em>phenix.refine</em> without additional (and possibibly costly licensed)
+software is new. The inclusion of <a class="reference external" href="http://openmopac.net">MOPAC</a> in the python3
+installations of Phenix has made this possible. The Quantum Interface (QI) is
+a new module that allows the use of MOPAC or a 3rd party QM package – <a class="reference external" href="https://www.orcasoftware.de/tutorials_orca/">Orca</a> –
+for a number of procedures.</p>
+</div>
+<div class="section" id="various-uses">
+<h1><a class="toc-backref" href="quantum_interface.html#toc-entry-3">Various uses</a></h1>
+<p>Calculate ligand restraints <em>in situ</em> using <a class="reference external" href="quantum_mechanical_restraints.html">Quantum Mechanical Restraints
+(QMR)</a></p>
+<p>Calculate ligand strain energies using <a class="reference external" href="qi_energies.html">Quantum Mechanical Energies (QME)</a></p>
+<p>Determination of best Histidine tautamer <a class="reference external" href="qi_histidine.html">Quantum Mechanical Flipping (QMF)</a></p>
+</div>
+<div class="section" id="tips-and-tricks">
+<h1><a class="toc-backref" href="quantum_interface.html#toc-entry-4">Tips and Tricks</a></h1>
+<div class="section" id="model-completeness">
+<h2><a class="toc-backref" href="quantum_interface.html#toc-entry-5">Model completeness</a></h2>
+<p>One of the most important points about Quantum Chemistry is that it is an
+<a class="reference external" href="https://en.wikipedia.org/wiki/Electronic_structure">all-electron</a> method. This means that <strong>all</strong> atoms (and electrons) need to
+be specified in order to perform the correct calculation. This is a case where
+<a class="reference external" href="https://en.wikipedia.org/wiki/Garbage_in,_garbage_out">GIGO</a> will really bite you. In standard refinement, missing atoms are not
+critical but in QM missing atoms are catastrophic.</p>
+<p>The QI module
+calculates the charge based on the atoms in the input model (and the
+selection) but care must be taken to ensure that the input model is correct
+down to the protonation. Besides calculating the incorrect result, the QM
+calculation can have difficulty converging thus resulting in excessive run
+times.</p>
+</div>
+<div class="section" id="timings">
+<h2><a class="toc-backref" href="quantum_interface.html#toc-entry-6">Timings</a></h2>
+<p>QM calculations scale as a power of the number of atoms. This means that
+increasing the buffer can greatly affect the timings.</p>
+<p>Using the parallel features in MOPAC and Orca are generally not linear so
+the QI module has a feature to prefer simple parallelism on based on jobs
+that can be useful for some situations.</p>
+</div>
+</div>
+<div class="section" id="literature">
+<h1><a class="toc-backref" href="quantum_interface.html#toc-entry-7">Literature</a></h1>
+<p><ul><li><b>In situ ligand restraints from quantum-mechanical methods.</b> D. Liebschner, N.W. Moriarty, B.K. Poon, and P.D. Adams. <a href="https://doi.org/10.1107/S2059798323000025"><i>Acta Cryst.</i> D<b>79</b>, 100-110 (2023)</a>.</li>
+</ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Cryo-EM Validation tools in Phenix</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="cryo-em-validation-tools-in-phenix">
+<h1 class="title">Cryo-EM Validation tools in Phenix</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="validation_cryo_em.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="validation_cryo_em.html#overview" id="toc-entry-1">Overview</a></li>
+<li><a class="reference internal" href="validation_cryo_em.html#model" id="toc-entry-2">Model</a></li>
+<li><a class="reference internal" href="validation_cryo_em.html#model-and-data-fit" id="toc-entry-3">Model and Data Fit</a></li>
+<li><a class="reference internal" href="validation_cryo_em.html#data" id="toc-entry-4">Data</a></li>
+<li><a class="reference internal" href="validation_cryo_em.html#references" id="toc-entry-5">References</a></li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h1><a class="toc-backref" href="validation_cryo_em.html#toc-entry-1">Overview</a></h1>
+<p>Phenix has multiple tools for validating cryo-EM maps and models. They are
+combined into a single tool called <tt class="docutils literal">phenix.validation_cryoem</tt>. This can be run
+in the GUI by selecting &quot;Comprehensive Validation (cryo-EM)&quot; either from the
+&quot;Validation&quot; section or the &quot;Cryo-EM&quot; section.</p>
+<img alt="../images/validation_cryoem_main.png" src="../images/validation_cryoem_main.png" />
+<p>Opening the program will show a window for supplying your input files and basic
+settings.</p>
+<img alt="../images/validation_cryoem_input.png" src="../images/validation_cryoem_input.png" />
+<p>You will need at least a model and one map. If you provide half maps, be sure to
+indicate which map is the full map and which maps are the half maps. To do so,
+after adding the files, you can right-click on the row of a map file and select
+either &quot;Full map&quot; or &quot;Half map.&quot;</p>
+<img alt="../images/validation_cryoem_map_input.png" src="../images/validation_cryoem_map_input.png" />
+<p>Lastly, before running the program, enter the resolution of the map.</p>
+<p><strong>Important note:</strong> The default scattering table for cryo-EM tools is &quot;electron.&quot;
+A consequence of this setting is that Phenix does not have electron scattering
+factors for ions. You may get error messages if your cryo-EM structures have ions.</p>
+<p>Once the program finishes the analysis, you will get a page that summarizes all
+the results, as well as additional pages for more detailed information about each
+section.</p>
+<img alt="../images/validation_cryoem_summary.png" src="../images/validation_cryoem_summary.png" />
+<p>Similar to the &quot;Comprehensive Validation (X-ray/Neutron)&quot; GUI, the model and map
+can be viewed in Coot and the pages with more detail information will allow you
+to zoom into the more problematic areas of your structure.</p>
+<p>There is also a button, &quot;Export Table 1,&quot; for exporting the summary statistics
+into plain text, comma separated text, or rich-text format.</p>
+</div>
+<div class="section" id="model">
+<h1><a class="toc-backref" href="validation_cryo_em.html#toc-entry-2">Model</a></h1>
+<p>This page contains the model-related metrics with additional pages for each
+major metric.</p>
+<p>Generally, clicking on a row of a table or clicking a point in the graph</p>
+<img alt="../images/validation_cryoem_ile.png" src="../images/validation_cryoem_ile.png" />
+<p>will zoom in on that particular atom/residue in Coot.</p>
+<img alt="../images/validation_cryoem_ile_coot.png" src="../images/validation_cryoem_ile_coot.png" />
+<p>The results are subdivided into several categories listed below.</p>
+<blockquote>
+<ul class="simple">
+<li><strong>Clashes:</strong> this shows areas of the structure where atoms may be too close to
+each other. In Coot, this is shown by red dots.</li>
+<li><strong>CaBLAM:</strong> this is the output from <a class="reference external" href="cablam_validation.html">phenix.cablam</a>,
+which looks at several measures based on the geometry of the C-α atoms.</li>
+<li><strong>C</strong>β: this looks for any deviations in the C-β atoms.</li>
+<li><strong>Cis/Twisted:</strong> Cis peptides are generally rare (~5% of prolines and ~0.03%
+of other residues), so make sure that a cis conformation is really supported
+by the map. Twisted peptides are almost always incorrect.</li>
+<li><strong>Rotamers:</strong> this checks that the sidechains are in the expected regions
+according to compiled distributions of the Χ-angles in the Top8000
+database.</li>
+<li><strong>Ramachandran:</strong> this checks that the dihedral angles of the protein residues
+are in the expected regions according to the Top8000 database.</li>
+<li><strong>Geometry restraints:</strong> this checks that the bond lengths, bond angles,
+dihedral angles, and other geometric restraints do not deviate too much from
+the mean value.</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="model-and-data-fit">
+<h1><a class="toc-backref" href="validation_cryo_em.html#toc-entry-3">Model and Data Fit</a></h1>
+<p>This page shows how well the model fits into the map by calculating different
+correlation coefficients. Please check the <a class="reference external" href="https://doi.org/10.1107/S2059798318009324">first reference</a> for a more detailed
+description of each correlation coefficient (CC). Table 3 from the reference is
+reproduced below.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="58%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Metric</th>
+<th class="head">Region of the map used in the calculation</th>
+<th class="head">Purpose</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>CC<sub>box</sub></td>
+<td>Whole map</td>
+<td>Similarity of maps</td>
+</tr>
+<tr><td>CC<sub>mask</sub></td>
+<td>Jiang &amp; Brunger mask with a fixed radius</td>
+<td>Fit of the atomic centers</td>
+</tr>
+<tr><td>CC<sub>volume</sub></td>
+<td>Mask of points with the highest values in the model map</td>
+<td>Fit of the molecular envelope defined by the model map</td>
+</tr>
+<tr><td>CC<sub>peaks</sub></td>
+<td>Mask of points with the highest values in the model and in the target maps</td>
+<td>Fit of the strongest peaks in the model and target maps</td>
+</tr>
+<tr><td>CC<sub>vr_mask</sub></td>
+<td>Same as CC<sub>mask</sub> but atomic radii are variable and function of resolution, atom type and ADP</td>
+<td>Fit of the atomic images in the given map</td>
+</tr>
+</tbody>
+</table>
+<p>Correlation coefficients per chain and per residue are also shown in plots.</p>
+<img alt="../images/validation_cryoem_mvd.png" src="../images/validation_cryoem_mvd.png" />
+<p>The per residue plot is shown for a single chain. To change the chain, you can
+click on the per chain plot or use the drop down menu. Clicking on the per
+residue plot will center on the residue in Coot.</p>
+</div>
+<div class="section" id="data">
+<h1><a class="toc-backref" href="validation_cryo_em.html#toc-entry-4">Data</a></h1>
+<p>This page shows the output from <tt class="docutils literal">phenix.mtriage</tt>. The output is the same as if
+you were to run <tt class="docutils literal">phenix.mtriage</tt> separately. More details can be found in the
+<a class="reference external" href="mtriage.html">Mtriage documemtation</a></p>
+<img alt="../images/validation_cryoem_fsc.png" src="../images/validation_cryoem_fsc.png" />
+<p>The results are subdivided into several categories listed below.</p>
+<blockquote>
+<ul class="simple">
+<li><strong>Summary:</strong> this shows basic statistics about the maps and summarizes the
+resolution estimates</li>
+<li><strong>FSC (Half-maps):</strong> this shows a graph plotting the Fourier shell
+coefficient curve based on the half-maps (if available) with and without
+masking. The intersections of the curves with FSC=0.143 are shown.</li>
+<li><strong>FSC (Model-map):</strong> this shows a graph plotting the Fourier shell
+coefficent curve based on the model map with and without masking. The
+intersections of the curves with FSC=0.5 are shown.</li>
+</ul>
+</blockquote>
+<p>In the pages with graphs, you can save the graph and export the data used to
+generate the graphs into a text file.</p>
+</div>
+<div class="section" id="references">
+<h1><a class="toc-backref" href="validation_cryo_em.html#toc-entry-5">References</a></h1>
+<p><ul><li><b>New tools for the analysis and validation of cryo-EM maps and atomic models.</b> P.V. Afonine, B.P. Klaholz, N.W. Moriarty, B.K. Poon, O.V. Sobolev, T.C. Terwilliger, P.D. Adams, and A. Urzhumtsev. <a href="https://doi.org/10.1107/S2059798318009324"><i>Acta Cryst.</i> D<b>74</b>, 814-840 (2018)</a>.</li>
+</ul></p>
+<p><ul><li><b>MolProbity: More and better reference data for improved all-atom structure validation.</b> C.J. Williams, B.J. Hintze, J.J. Headd, N.W. Moriarty, V.B. Chen, S. Jain, S.M. Prisant MG Lewis, L.L. Videau, D.A. Keedy, L.N. Deis, I.I.I. Arendall WB, V. Verma, J.S. Snoeyink, P.D. Adams, S.C. Lovell, J.S. Richardson, and D.C. Richardson. <a href="https://doi.org/10.1002/pro.3330"><i>Protein Science</i> <b>27</b>, 293-315 (2018)</a>.</li>
+</ul></p>
+<!-- This data file has been placed in the public domain. -->
+<!-- Derived from the Unicode character mappings available from
+<http://www.w3.org/2003/entities/xml/>.
+Processed by unicode2rstsubs.py, part of Docutils:
+<https://docutils.sourceforge.io>. -->
+</div>
+</div>
+    
+  </body>
+</html>

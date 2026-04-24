@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Scaling unmerged anomalous data or multiple datasets with scale_and_merge</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="scaling-unmerged-anomalous-data-or-multiple-datasets-with-scale-and-merge">
+<h1 class="title">Scaling unmerged anomalous data or multiple datasets with scale_and_merge</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>scale_and_merge: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>scale_and_merge is a tool for scaling unmerged anomalous data or multiple
+data files and creating a scaled dataset and two scaled half-datasets.
+This tool normally is used in combination with anomalous_signal to
+create a scaled dataset and analyze anomalous signal in a SAD dataset. It
+can also be used to scale any other group of datasets.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-scale-and-merge-works">
+<h1>How scale_and_merge works:</h1>
+<ul class="simple">
+<li>You supply scale_and_merge with a directory containing datafiles or
+the name of a single unmerged datafile.</li>
+<li>You can optionally also specify a pair of labels that identifies datasets
+that are to be kept together. For example if you collected your data
+as pairs of datafiles with inverse beam geometry, you might have called
+the members of a pair data_1_0_w1.HKL and data_1_0_w2.HKL, related by
+w1 and w2.</li>
+<li>scale_and_merge will first check the cell dimensions of all the datasets.
+Normally it will choose the largest set of similar crystals (you can
+have it keep all datasets with only_similar_datasets=False). It will also
+check the anisotropy in all the datafiles and calculate the average
+anisotropy (to be applied by default to all datafiles before scaling).</li>
+<li>scale_and_merge will then scale all the data together.  It will
+split your datafiles into smaller files if your datafiles contain duplicate
+measurements of the same indices.  The intensities in each datafile will
+be adjusted for anisotropy to match the average anisotropy of
+all the datafiles. In this way all the datafiles are matched but the overall
+character of the data is not changed.</li>
+<li>scale_and_merge will then scale each individual file with local scaling,
+producing files in the temporary directory with names ending in _scale.mtz.
+and then merge them all together.</li>
+<li>Merging of the individual datasets is done twice, and then optionally
+two additional times to optimize anomalous differences.</li>
+<li>In the first merging the individual datasets are simply averaged with weights
+based on the sigmas for each reflection. Then the individual datasets are
+compared with the overall mean dataset and dataset variances (estimates
+of systematic differences between datasets and the mean) are calculated
+based on the rms differences from the mean and the individual sigmas. In
+essence the dataset variance plus the individual variances are then to be
+used as estimates of the total variance for each reflection.  The second
+merging uses these total variances in weighting rather than the
+original sigmas. The correlations of each individual dataset with the
+merged dataset are calculated.</li>
+<li>If anomalous differences are optimized
+(default with optimize_anomalous=True), merging is carried
+out another time in order to optimize the weighting of anomalous differences
+in the merging step.  For each unique reflection in the asymmetric unit of
+each dataset, the mean I+ and mean I- are used to calculate anomalous
+differences.  The anomalous differences from each individual dataset are
+then compared with the anomalous differences from the merged dataset to
+estimate individual dataset anomalous difference variances.  Then
+the anomalous differences from each individual dataset
+are averaged, with weights based on the original sigmas and the
+dataset variances.  These merged anomalous differences are then used to
+replace the anomalous differences in the merged dataset above (for
+example, a reflection in the merged dataset above that has I+,sigI+,I-,sigI-
+would get new values of I+ and I- that have a difference equal to the
+appropriate merged anomalous difference, but the same mean as before.)
+The correlation of the anomalous differences in the original merged
+dataset and after optimization is printed (this should be high, for
+example 0.80).</li>
+<li>The original datasets are then split into two parts for creation of
+two half-datasets.  These half-datasets are useful for estimating the
+quality of the data and are used in anomalous_signal for this purpose.</li>
+<li>The splitting into half-datasets is done in one of three ways, and
+the method is chosen based on the number of anomalous differences available
+for comparison using each method.  With each method the data in each
+half-dataset are scaled just as the entire dataset was scaled.
+The preferred method is to split by files.  Half of the datafiles are
+used to create each half-dataset.  The next preferred method is to split
+with the first half of each dataset in one half-dataset and the second half
+in the other.  The third preferred method is splitting alternate reflections
+with each unique index (after mapping to the asymmetric unit) into the
+two half-datasets.  The last method is to randomly assign reflections to
+the two half-datasets.  The reason for this hierarchical approach is that
+reflections measured close in time, within the same dataset are better
+matched than those measured further in time or within different datasets.
+These approaches for splitting the datafiles attempt to pair anomalous
+differences measured close in time and in the same dataset.</li>
+<li>After half-datasets are obtained, the correlation of anomalous differences
+between half-datasets is estimated.</li>
+</ul>
+</div>
+<div class="section" id="output-from-scale-and-merge">
+<h1><em>Output from scale_and_merge</em></h1>
+<p>scale_and_merge provides a summary half-dataset correlations in your
+dataset.
+Here is an example with very weak anomalous signal (but present):</p>
+<pre class="literal-block">
+Scale and merge...analysis of multi-dataset SAD data
+input\_files {
+  data = &quot;dd&quot;
+  data\_labels = None
+  paired\_group\_ids = None
+}
+output\_files {
+  output\_file = &quot;scaled\_data.mtz&quot;
+  output\_half\_dataset\_a = &quot;half\_dataset\_a.mtz&quot;
+  output\_half\_dataset\_b = &quot;half\_dataset\_b.mtz&quot;
+  output\_file\_format = *mtz sca
+}
+crystal\_info {
+  resolution = None
+  low\_resolution = None
+  space\_group = None
+  unit\_cell = None
+}
+data\_selection {
+  minimum\_datafile\_fraction = 0.3
+  require\_fpfm = True
+  only\_similar\_datasets = True
+  relative\_length\_tolerance = None
+  absolute\_angle\_tolerance = None
+  choose\_optimal\_datasets = False
+  sort\_datasets\_by\_anomalous\_cc = True
+}
+scaling {
+  make\_anisotropy\_uniform = True
+  overallscale = False
+  skip\_scaling = False
+  lowest\_resolution\_range = 6
+}
+merging {
+  optimize\_anomalous = True
+  use\_best\_group\_as\_target = False
+  rescale\_sigmas = False
+}
+half\_dataset\_cc {
+  get\_half\_dataset\_cc = True
+  half\_dataset\_cc\_by\_files = True
+  split\_as\_first\_second\_half = True
+  split\_alternately = True
+  split\_randomly = True
+}
+directories {
+  temp\_dir = None
+  output\_dir = &quot;&quot;
+  gui\_output\_dir = None
+}
+control {
+  verbose = False
+  random\_seed = 714215
+  comparison\_file = None
+  clean\_up = True
+}
+Comparing crystal symmetries and noting anisotropy in data
+Relative length tolerance:  0.010  Angle tolerance: 1.000 degrees
+Taking initial symmetry from /Users/terwill/unix/misc/scale\_and\_merge/dd/WNV\_NS1\_205\_w2\_2.9\_90.HKL
+with 3 similar files
+
+
+            File             SG         A       B       C      Alpha   Beta   Gamma
+
+Symmetry group 1
+WNV\_NS1\_202\_w1\_2.9\_90.HKL    P 3 2 1  166.997 166.997  94.156  90.000  90.000 120.000
+WNV\_NS1\_202\_w2\_2.9\_90.HKL    P 3 2 1  166.704 166.704  94.113  90.000  90.000 120.000
+WNV\_NS1\_205\_w1\_2.9\_90.HKL    P 3 2 1  167.578 167.578  93.934  90.000  90.000 120.000
+WNV\_NS1\_205\_w2\_2.9\_90.HKL    P 3 2 1  167.639 167.639  93.859  90.000  90.000 120.000
+
+Scaling 4 datasets
+
+Scaling data files with local scaling
+
+Files to scale:
+/Users/terwill/unix/misc/scale\_and\_merge/dd/WNV\_NS1\_202\_w1\_2.9\_90.HKL
+/Users/terwill/unix/misc/scale\_and\_merge/dd/WNV\_NS1\_202\_w2\_2.9\_90.HKL
+/Users/terwill/unix/misc/scale\_and\_merge/dd/WNV\_NS1\_205\_w1\_2.9\_90.HKL
+/Users/terwill/unix/misc/scale\_and\_merge/dd/WNV\_NS1\_205\_w2\_2.9\_90.HKL
+
+Selecting just reflections that have both F+ and F- in the same
+dataset or are centric
+
+Splitting datafiles into sub-files with one copy of each unique hkl
+
+              File                    Refl       (rejected)   B1      B2     B3        B-avg
+
+TEMP0/WNV\_NS1\_202\_w1\_2.9\_90\_1.sca:   138180     (    6378)    63.9    63.9   55.00      60.9
+TEMP0/WNV\_NS1\_202\_w1\_2.9\_90\_2.sca:      229     (       0)    63.9    63.9   55.00      60.9
+TEMP0/WNV\_NS1\_202\_w2\_2.9\_90\_1.sca:   136254     (    6096)    59.4    59.4   49.78      56.2
+TEMP0/WNV\_NS1\_202\_w2\_2.9\_90\_2.sca:      206     (       0)    59.4    59.4   49.78      56.2
+TEMP0/WNV\_NS1\_205\_w1\_2.9\_90\_1.sca:   148714     (    4464)    73.7    73.7   63.92      70.4
+TEMP0/WNV\_NS1\_205\_w1\_2.9\_90\_2.sca:      239     (       0)    73.7    73.7   63.92      70.4
+TEMP0/WNV\_NS1\_205\_w2\_2.9\_90\_1.sca:   147256     (    4560)    70.3    70.3   60.50      67.0
+TEMP0/WNV\_NS1\_205\_w2\_2.9\_90\_2.sca:      241     (       0)    70.3    70.3   60.50      67.0
+
+Notes:
+Splitting /Users/terwill/unix/misc/scale\_and\_merge/dd/WNV\_NS1\_202\_w1\_2.9\_90.HKL into 2 files:
+Splitting /Users/terwill/unix/misc/scale\_and\_merge/dd/WNV\_NS1\_202\_w2\_2.9\_90.HKL into 2 files:
+Splitting /Users/terwill/unix/misc/scale\_and\_merge/dd/WNV\_NS1\_205\_w1\_2.9\_90.HKL into 2 files:
+Splitting /Users/terwill/unix/misc/scale\_and\_merge/dd/WNV\_NS1\_205\_w2\_2.9\_90.HKL into 2 files:
+Keeping split datafiles with at least 44614 reflections
+
+High-resolution limit:    2.89
+
+Scaling data in batches from individual data files
+
+List of scaled data files:
+TEMP0/WNV\_NS1\_205\_w1\_2.9\_90\_1\_scale.mtz (30844 refl)
+TEMP0/WNV\_NS1\_205\_w2\_2.9\_90\_1\_scale.mtz (30828 refl)
+TEMP0/WNV\_NS1\_202\_w1\_2.9\_90\_1\_scale.mtz (29641 refl)
+TEMP0/WNV\_NS1\_202\_w2\_2.9\_90\_1\_scale.mtz (29527 refl)
+
+
+Scaling and merging data files with overall scale factor
+
+Files to scale:
+TEMP0/WNV\_NS1\_205\_w1\_2.9\_90\_1\_scale.mtz
+TEMP0/WNV\_NS1\_205\_w2\_2.9\_90\_1\_scale.mtz
+TEMP0/WNV\_NS1\_202\_w1\_2.9\_90\_1\_scale.mtz
+TEMP0/WNV\_NS1\_202\_w2\_2.9\_90\_1\_scale.mtz
+
+ ****** Putting all data on common scale ******
+
+Standard dataset: 1  I/sigma:    8.30  Nrefl: 59133
+
+
+Total of 4 datasets to be used
+
+Scale factors for data groups:
+ ID    Scale   file\_name
+  1  1.000  TEMP0/WNV\_NS1\_205\_w1\_2.9\_90\_1\_scale.mtz
+  2  0.683  TEMP0/WNV\_NS1\_205\_w2\_2.9\_90\_1\_scale.mtz
+  3  1.198  TEMP0/WNV\_NS1\_202\_w1\_2.9\_90\_1\_scale.mtz
+  4  1.366  TEMP0/WNV\_NS1\_202\_w2\_2.9\_90\_1\_scale.mtz
+
+Mean I of scaled unmerged datasets:
+1:   9940.78 (N=59133)
+2:   9926.98 (N=59085)
+3:  10203.75 (N=56663)
+4:  10305.51 (N=56463)
+
+
+Getting overall merged dataset using original sigmas
+
+
+Datasets to be merged in estimation of variances:  1 2 3 4
+Datasets to be merged in final merging step:  1 2 3 4
+
+Getting scale factors, dataset variances and scaled intensities
+
+Merged mean I:  8966.65 (N=64581)
+
+
+Dataset variances
+(RMS difference from target dataset after accounting for sigmas)
+                          Dataset
+   Resolution        1        2        3        4
+ 48.40 -  4.94   2923.90  2353.89  6175.92  8461.67
+  4.94 -  3.92   1348.27  1407.39  1191.09  1267.29
+  3.92 -  3.43      0.00     0.00     0.00     0.00
+  3.43 -  3.11      0.00     0.00     0.00     0.00
+  3.11 -  2.89      0.00     0.00     0.00     0.00
+
+  ALL            2515.66  1935.84  3450.29  5499.59
+
+Getting merged dataset including dataset variances
+
+Dataset correlations with merged dataset
+                          Dataset
+   Resolution        1        2        3        4
+ 48.40 -  4.94      1.00     1.00     1.00     0.99
+  4.94 -  3.92      1.00     1.00     1.00     0.99
+  3.92 -  3.43      0.99     0.99     0.98     0.97
+  3.43 -  3.11      0.93     0.92     0.87     0.85
+  3.11 -  2.89      0.84     0.94     0.69     0.55
+
+  ALL               1.00     1.00     1.00     0.99
+
+New merged mean I:  9035.38 (N=64581) and I/sigma:   10.89
+
+NOTE: I/sigma cannot be directly compared to original due to including
+estimates of dataset variances and changes in number of reflections.
+
+
+Optimizing anomalous differences
+
+Merged mean anomalous difference:    -3.48 (N=31009)
+
+
+Dataset variances (anomalous differences)
+(RMS difference from target dataset after accounting for sigmas)
+                          Dataset
+   Resolution        1        2        3        4
+ 47.38 -  4.94      0.00  1652.13   993.28     0.00
+  4.94 -  3.92    732.44     0.00   503.86     0.00
+  3.92 -  3.43    690.71     0.00     0.00     0.00
+  3.43 -  3.11    272.68     0.00     0.00     0.00
+  3.11 -  2.89      0.00     0.00     0.00     0.00
+
+  ALL             468.90     0.00   435.50     0.00
+
+Getting merged dataset including dataset variances
+
+Dataset correlations with merged dataset (anomalous differences)
+                          Dataset
+   Resolution        1        2        3        4
+ 47.38 -  4.94      0.77     0.79     0.69     0.72
+  4.94 -  3.92      0.65     0.73     0.64     0.67
+  3.92 -  3.43      0.70     0.70     0.63     0.66
+  3.43 -  3.11      0.72     0.71     0.70     0.66
+  3.11 -  2.89      0.73     0.81     0.71     0.78
+
+  ALL               0.73     0.75     0.67     0.70
+Anom correlation on I of std merged and anom scaled:     0.83 (N=31009)
+Merged scaled data optimized for anomalous differences: scaled\_data.mtz
+
+
+==============================================================================
+
+Splitting data into groups for half-dataset CC
+
+Keeping datafiles intact within each half-dataset
+
+Half-dataset groups:
+
+Group A
+ TEMP0/WNV\_NS1\_205\_w1\_2.9\_90\_1\_scale.mtz
+TEMP0/WNV\_NS1\_202\_w1\_2.9\_90\_1\_scale.mtz
+
+Group B
+ TEMP0/WNV\n_NS1\_205\_w2\_2.9\_90\_1\_scale.mtz
+TEMP0/WNV\_NS1\_202\_w2\_2.9\_90\_1\_scale.mtz
+
+---- Calculating anomalous CC between half-datasets A,B----
+
+Half-dataset A: half\_dataset\_a.mtz
+Half-dataset B: half\_dataset\_b.mtz
+Unique reflections:
+half\_dataset\_a.mtz: 30242
+half\_dataset\_b.mtz: 30222
+Reflections in common:    29455
+Overall resolution:    2.90 A  Nrefl: 29455
+Overall anomalous correlation:   -0.018
+
+Anomalous correlation with varying high-resolution
+limits
+
+  d\_min     ---- CC ------       ----  N -----
+           Shell   Cumulative   Shell  Cumulative
+   6.00     0.080    0.080      3392      3392
+   5.50    -0.060    0.043      1052      4444
+   5.00    -0.115   -0.006      1519      5963
+   4.50    -0.040   -0.018      2256      8219
+   4.00    -0.065   -0.036      3540     11759
+   3.50    -0.016   -0.026      5862     17621
+   3.00    -0.009   -0.018      9997     27618
+   2.90    -0.022   -0.018      1837     29455
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">data</span><span class="phil-words"> = None </span><span class="phil-help">Anomalous data (I+ and I- or F+ and F-). Any standard format is fine. You can have any number of input files. If you have multiple files, specify the directory that contains them and nothing else.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">data_labels</span><span class="phil-words"> = None </span><span class="phil-help">Optional label specifying which columns of anomalous data to use. Not necessary if your input files have only one set of anomalous data. If you have multiple input files they need to have the same labels.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">assume_shelx_observation_type_is</span><span class="phil-words"> = *amplitudes intensities </span><span class="phil-help">For shelx files you need to specify if they are amplitudes or intensities</span></li><li class="phil-param" data-expert="0"><span class="phil-name">paired_group_ids</span><span class="phil-words"> = None </span><span class="phil-help">Optional pair of identifiers that specify datasets that should be grouped together. The paired group ids must be the only characters that differ between datasets that should be grouped together, and the characters must uniquely define what datasets to group. For example paired_group_ids='w1 w2' would be the pair for the two datasets se_w1.sca and se_w2.sca. In this example you could also use paired_group_ids='w1.sca w2.sca' and that would have the same effect. Use this option when some of your datafiles are related to others by inverse-beam data collection for example. This matching of datasets can be very helpful.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">check_file_type</span><span class="phil-words"> = False </span><span class="phil-help">You can request that the data type of input files be checked if a data directory is supplied. Default is to read everything in the data directory.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">reference_data</span><span class="phil-words"> = None </span><span class="phil-help">Reference data for use in scaling. All datasets will be scaled to this reference dataset. Useful if you have very accurate native data.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">reference_data_labels</span><span class="phil-words"> = None </span><span class="phil-help">Optional label specifying which columns of reference data to use.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_file</span><span class="phil-words"> = scaled_data.mtz </span><span class="phil-help">Output data file name for merged scaled data</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_half_dataset_a</span><span class="phil-words"> = half_dataset_a.mtz </span><span class="phil-help">Output data file name for half dataset A. Only written if get_half_datset_cc=True. This is the scaled merged data from half of the input data.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_half_dataset_b</span><span class="phil-words"> = half_dataset_b.mtz </span><span class="phil-help">Output data file name for half dataset B. Only written if get_half_datset_cc=True. This is the scaled merged data from the other half of the input data.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_file_format</span><span class="phil-words"> = *mtz sca </span><span class="phil-help">Output format for scaled data. Choices are MTZ and unmerged scalepack formats. Note: unmerged scalepack format not normally used because indices may be changed from original values and that data from within one input file may be merged, so that this unmerged data is partially merged and not the same as the original data.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">high-resolution limit </span></li><li class="phil-param" data-expert="0"><span class="phil-name">low_resolution</span><span class="phil-words"> = None </span><span class="phil-help">Low-resolution limit </span></li><li class="phil-param" data-expert="0"><span class="phil-name">space_group</span><span class="phil-words"> = None </span><span class="phil-help">Space group (normally read from the data file)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">unit_cell</span><span class="phil-words"> = None </span><span class="phil-help">Unit Cell (normally read from the data file)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">data_selection</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">anomalous</span><span class="phil-words"> = True </span><span class="phil-help">Consider data as anomalous (otherwise average Bijvoet mates).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_datafile_fraction</span><span class="phil-words"> = 0.3 </span><span class="phil-help">You can reject any datasets (after splitting) that have less than this fraction of the maximum number of reflections found in any datafile</span></li><li class="phil-param" data-expert="0"><span class="phil-name">require_fpfm</span><span class="phil-words"> = True </span><span class="phil-help">If set, then when files are split into unique sets of indices only centric reflections and reflections with both F+ and F- present are written out. Note that in most space groups there may be more than one F+ or F- symmetry mate present. If any one is present for F+ and any one for F- the reflection is written out.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">only_similar_datasets</span><span class="phil-words"> = True </span><span class="phil-help">Group data by lattice similarity and take biggest group only. If space_group and unit_cell are set, then take those only that match this space_group and unit_cell. Use relative_length_tolerance and absolute_angle_tolerance to decide if two datasets are similar.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">relative_length_tolerance</span><span class="phil-words"> = None </span><span class="phil-help">Tolerance for considering two cells similar (fractional) You can allow anything with only_similar_datasets=False</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolution_length_tolerance</span><span class="phil-words"> = None </span><span class="phil-help">Tolerance for considering two cells similar (fraction of resolution. For example normalized_length_tolerance=0.25 means the unit cells must match within 1/4 of the resolution. You can allow anything with only_similar_datasets=False</span></li><li class="phil-param" data-expert="0"><span class="phil-name">absolute_length_tolerance</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">absolute_angle_tolerance</span><span class="phil-words"> = None </span><span class="phil-help">Tolerance for considering two cell angles similar (degrees) You can allow anything with only_similar_datasets=False</span></li><li class="phil-param" data-expert="0"><span class="phil-name">choose_optimal_datasets</span><span class="phil-words"> = False </span><span class="phil-help">After initial merging, sort datasets by correlation to merged dataset, remove datasets until overall I/sigI is maximized, including dataset systematic errors in I/sigI.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sort_datasets_by_anomalous_cc</span><span class="phil-words"> = True </span><span class="phil-help">For choosing optimal datasets, sort the datsets by anomalous CC. Alternative is sorting by non-anomalous CC.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">scaling</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">make_anisotropy_uniform</span><span class="phil-words"> = True </span><span class="phil-help">Calculate anisotropy for all datasets and adjust all of them to the average anisotropy. This is designed to improve scaling without changing the overall character of the data (i.e., not sharpening the data or removing anisotropy).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">overallscale</span><span class="phil-words"> = False </span><span class="phil-help">If set, only use overall scale and B (no local scaling)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">skip_scaling</span><span class="phil-words"> = False </span><span class="phil-help">You can skip the scaling step and just get half-dataset CC for a pair of existing files that you have put in a directory by themselves.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">lowest_resolution_range</span><span class="phil-words"> = 6. </span><span class="phil-help">Lowest value of the high-resolution cutoff for CC as a function of high-resolution cutoff with constant low-resolution cutoff</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_common_refl</span><span class="phil-words"> = 200 </span><span class="phil-help">Minimum number of reflections in common to scale datasets</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sort_on_batch_number</span><span class="phil-words"> = True </span><span class="phil-help">You can sort XDS and MTZ reflections by frame number. Otherwise scale and merge assumes reflections are collected in the order in the data file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scale_reference_data</span><span class="phil-words"> = True </span><span class="phil-help">Scale reference data to maximum of 99999 if writing intermediate scalepack data files</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">merging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">include_dataset_variance</span><span class="phil-words"> = True </span><span class="phil-help">Scale datasets together including inter-dataset variance in in weighting. This takes into account the systematic differences among datasets and allows automatic down-weighting of datasets that are different than all the others.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimize_anomalous</span><span class="phil-words"> = True </span><span class="phil-help">Scale datasets together including inter-dataset variance in anomalous differences in weighting. Involves separation of mean intensity of each reflection from anomalous differences and recombination after scaling to recreate I+ and I-. Alternative is to include inter-dataset variance in intensities.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_best_group_as_target</span><span class="phil-words"> = False </span><span class="phil-help">Estimate inter-dataset variance by using the best dataset (highest I/sigma) as target for all datasets. This amounts to using all the other datasets to optimally estimate the data for this one crystal.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rescale_sigmas</span><span class="phil-words"> = False </span><span class="phil-help">Rescale sigmas assuming that at high resolution, there are no anomalous differences. This can sometimes be useful if the sigmas are all too high or low and the data are collected to sufficiently high resolution that there really are essentially no anomalous differences (only noise) at high resolution.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">half_dataset_cc</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">get_half_dataset_cc</span><span class="phil-words"> = True </span><span class="phil-help">Split datasets and get half-dataset CC if data are available</span></li><li class="phil-param" data-expert="0"><span class="phil-name">half_dataset_cc_by_files</span><span class="phil-words"> = True </span><span class="phil-help">Split datasets into groups based on keeping all data in a file together (only applies if multiple data files are supplied.)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">half_dataset_cc_match_inverses</span><span class="phil-words"> = False </span><span class="phil-help">Split datasets into groups keeping (hkl, -h-k-l) together. Applies if only one file or half_dataset_cc_by_files=False. Does not apply if less than half of the reflections have (-h-k-l) pairs and other methods below have more matches.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">split_as_first_second_half</span><span class="phil-words"> = True </span><span class="phil-help">split datasets into groups based on using the first or second half of each dataset in each half-dataset. Applies if half_dataset_cc_by_files=False or only one dataset is supplied and half_dataset_cc_match_inverses=False. Also applies if half_dataset_cc_by_files and half_dataset_cc_match_inverses have failed to yield sufficient anomalous differences.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">split_alternately</span><span class="phil-words"> = True </span><span class="phil-help">split datasets into groups based on sending observations of equivalent reflections alternately to the first or second half-dataset. Applies if split_as_first_second_half=False and half_dataset_cc_by_files=False and only one dataset is supplied. Also applies if other methods have failed to yield sufficient anomalous differences</span></li><li class="phil-param" data-expert="0"><span class="phil-name">split_randomly</span><span class="phil-words"> = True </span><span class="phil-help">split datasets into groups based on sending observations of equivalent reflections randomly to the first or second half-dataset. Applies if split_as_first_second_half=False and half_dataset_cc_by_files=False and split_alternately is False and only one dataset is supplied. Also applies if other methods have failed to yield sufficient anomalous differences</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">directories</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = None </span><span class="phil-help">Optional temporary work directory. If specified, it will be used for temporary files. If clean_up=True and it did not exist before, it will be removed at the end of the run. If it did exist, it will be left.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = "" </span><span class="phil-help">Output directory where files are to be written</span></li><li class="phil-param" data-expert="0"><span class="phil-name">gui_output_dir</span><span class="phil-words"> = None </span><span class="phil-help">GUI use only - does not apply to command line version</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">random_seed</span><span class="phil-words"> = 714215 </span><span class="phil-help">random seed</span></li><li class="phil-param" data-expert="0"><span class="phil-name">comparison_file</span><span class="phil-words"> = None </span><span class="phil-help">Data file with comparison anomalous differences</span></li><li class="phil-param" data-expert="0"><span class="phil-name">multiprocessing</span><span class="phil-words"> = *multiprocessing sge lsf pbs condor pbspro slurm </span><span class="phil-help">Choices are multiprocessing (single machine) or queuing systems</span></li><li class="phil-param" data-expert="0"><span class="phil-name">queue_run_command</span><span class="phil-words"> = None </span><span class="phil-help">run command for queue jobs. For example qsub.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of processors to use in scaling</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solve_size</span><span class="phil-words"> = None </span><span class="phil-help">You can set the size of Solve. Normally done automatically.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">clean_up</span><span class="phil-words"> = True </span><span class="phil-help">Clean up and remove temp directory after finishing</span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

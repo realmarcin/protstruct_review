@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Planning a SAD experiment with plan_sad_experiment</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="planning-a-sad-experiment-with-plan-sad-experiment">
+<h1 class="title">Planning a SAD experiment with plan_sad_experiment</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>plan_sad_experiment: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>plan_sad_experiment is a tool for estimating the anomalous signal that
+you might get from your SAD experiment and for predicting whether this
+signal would be sufficient to solve the structure. plan_sad_experiment
+is normally used along with scale_and_merge and anomalous_signal to
+plan a SAD experiment, scale the data, and analyze the anomalous signal
+before solving the structure.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-plan-sad-experiment-works">
+<h1>How plan_sad_experiment works:</h1>
+<ul class="simple">
+<li>You supply plan_sad_experiment with a sequence file, the
+anomalously-scattering atom you plan to use for the experiment,
+and the wavelength for data collection.</li>
+<li>plan_sad_experiment will estimate the necessary I/sigI of your
+dataset to provide enough anomalous signal to solve the structure.</li>
+<li>plan_sad_experiment will try various values of I/sigI for your
+dataset at each of several resolutions. For each I/sigI it will estimate
+the half-dataset anomalous correlation that would result along with the
+likely true correlation between your anomalous differences and those that
+would be calculated from a final model of your structure (cc*_ano).
+From this anomalous correlation (cc*_ano), plan_sad_experiment will
+estimate the anomalous signal (related to cc*_ano by the square root
+of the number of reflections divided by the square root of the number of
+sites).  Then plan_sad_experiment will choose a value of I/sigI that gives
+an anomalous signal of about 30 (if achievable with the maximum I/sigI
+you specify).</li>
+<li>The way that plan_sad_experiment and anomalous_signal estimate the
+probability that you can solve your dataset is to compare the anomalous
+signal in this dataset with the anomalous signal in other datasets at the
+same resolution. Then the fraction of similar datasets that can be solved
+by HySS is used as the probability that the anomalous substructure for
+your dataset will also be found.</li>
+<li>Similarly, the mean figure of merit for datasets with an estimated
+anomalous correlation (cc*_ano) similar to that for your data is used as
+an estimate of the figure of merit that you would obtain if the substructure
+is found for your crystal.</li>
+</ul>
+</div>
+<div class="section" id="output-from-plan-sad-experiment">
+<h1><em>Output from plan_sad_experiment</em></h1>
+<p>plan_sad_experiment provides a summary of the scattering expected from
+your crystal and a summary of the anomalous signal expected if you are able
+to measure your data with the suggested overall I/sigI.  You can set the
+maximum I/sigI to look for. Here is an example setting max_i_over_sigma=30:</p>
+<pre class="literal-block">
+   ----------Dataset overall I/sigma required to solve a structure----------
+
+
+Dataset characteristics:
+  Target anomalous signal:    30.0
+  Residues: 325
+  Chain-type: PROTEIN
+  Solvent\_fraction:    0.50
+  Atoms: 2642
+  Anomalously-scattering atom: se
+  Wavelength:  0.9792 A
+  Sites: 7
+  f-double-prime:    3.84
+
+Target anomalous scatterer:
+  Atom: se  f&quot;: 3.84  n:    7   rmsF:   10.2
+
+Other anomalous scatterers in the structure:
+  Atom:  C  f&quot;: 0.00  n: 1674   rmsF:    0.1
+  Atom:  N  f&quot;: 0.01  n:  445   rmsF:    0.1
+  Atom:  O  f&quot;: 0.01  n:  514   rmsF:    0.3
+  Atom:  S  f&quot;: 0.23  n:   10   rmsF:    0.7
+
+Normalized anomalous scattering:
+  From target anomalous atoms rms(x**2)/rms(F**2):     2.97
+  From other anomalous atoms rms(e**2)/rms(F**2):      0.24
+  Correlation of useful to total anomalous scattering: 1.00
+
+
+  ----------Dataset &lt;I&gt;/&lt;sigI&gt; needed for anomalous signal of 15-30----------
+
+
+-------Targets for entire dataset-------  ----------Likely outcome-----------
+
+                              Anomalous    Useful    Useful
+                            Half-dataset  Anom CC   Anomalous
+ Dmin   N     I/sigI sigF/F     CC       (cc*\_anom)  Signal   P(Substr)   FOM
+                      (%)                                        (%)
+
+ 6.00    852    29    3.0      0.58        0.64        7         51       0.22
+ 5.00   1473    29    3.0      0.62        0.66        9         79       0.15
+ 3.00   6821    29    3.0      0.64        0.66       19         89       0.22
+ 2.50  11787    29    3.0      0.70        0.68       25         96       0.19
+ 2.00  23021    28    3.2      0.62        0.66       29         97       0.17
+ 1.50  54569    13    6.7      0.18        0.42       29         97       0.15
+
+Note: Target anomalous signal not achievable with tested I/sigma (up to 30 )
+for resolutions of  2.50 A and lower. I/sigma shown is value
+of max\_i\_over\_sigma.
+
+
+This table says that if you collect your data to a resolution of   2.0 A with
+an overall &lt;I&gt;/&lt;sigma&gt; of about  28 then the half-dataset anomalous
+correlation should be about  0.62 (typically within a factor of 2).  This
+should lead to a correlation of your anomalous data to true anomalous
+differences (CC*\_ano) of about  0.66, and a useful anomalous signal around
+ 29 (again within a factor of about two). With this value of estimated
+anomalous signal the probability of finding the anomalous substructure is
+about  96% (based on estimated anomalous signal and actual outcomes for
+real structures.), and the estimated figure of merit of phasing is 0.17.
+
+The value of sigF/F (actually rms(sigF)/rms(F)) is approximately the inverse
+of I/sigma. The calculations are based on rms(sigF)/rms(F).
+
+Note that these values assume data measured with little radiation damage or at
+least with anomalous pairs measured close in time. The values also assume that
+the anomalously-scattering atoms are nearly as well-ordered as other atoms.
+If your crystal does not fit these assumptions it may be necessary to collect
+data with even higher I/sigma than indicated here.
+
+Note also that anomalous signal is roughly proportional to the anomalous
+structure factors at a given resolution. That means that if you have 50%
+occupancy of your anomalous atoms, the signal will be 50% of what it otherwise
+would be.  Also it means that if your anomalously scattering atoms only
+contribute to 5 A, you should only consider data to 5 A in this analysis.
+
+What to do next:
+
+1. Collect your data, trying to obtain a value of I/sigma for the whole
+   dataset at least as high as your target.
+2. Scale and analyze your unmerged data with phenix.scale\_and\_merge to get
+   accurate scaled and merged data as well as two half-dataset data files
+   that can be used to estimate the quality of your data.
+3. Analyze your anomalous data (the scaled merged data and the two
+   half-dataset data files) with phenix.anomalous\_signal to estimate
+   the anomalous signal in your data. This tool will again guess the
+   fraction of the substructure that can be obtained with your data,
+   this time with knowledge of the actual anomalous signal.  It will also
+   estimate the figure of merit of phasing that you can obtain once you
+   solve the substruture.
+4. Compare the anomalous signal in your measured data with the
+   estimated values in the table above. If they are lower than expected
+   you may need to collect more data to obtain the target anomalous signal.
+</pre>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param" data-expert="0"><span class="phil-name">i_over_sigma</span><span class="phil-words"> = None </span><span class="phil-help">Optional I/sigI. If supplied, the expected values of half-dataset correlation and cc*_ano based on this I/sigI be calculated.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_i_over_sigma</span><span class="phil-words"> = 100 </span><span class="phil-help">Limit search of necessary I/sigI to less than this value. You might increase this if you plan to do a very careful or very high-multiplicity experiment.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">i_over_sigma_range_low</span><span class="phil-words"> = None </span><span class="phil-help">If you set i_over_sigma_range_low and i_over_sigma_range_high then the value of i_over_sigma will be varied between these limits</span></li><li class="phil-param" data-expert="0"><span class="phil-name">i_over_sigma_range_high</span><span class="phil-words"> = None </span><span class="phil-help">If you set i_over_sigma_range_low and i_over_sigma_range_high then the value of i_over_sigma will be varied between these limits</span></li><li class="phil-param" data-expert="0"><span class="phil-name">steps</span><span class="phil-words"> = 20 </span><span class="phil-help">Number of steps for sampling ranges (i.e., i_over_sigma_low to i_over_sigma_high)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_in_bin</span><span class="phil-words"> = 50 </span><span class="phil-help">Minimum data points per bin in Bayesian estimation. Higher values smooth the predictor.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_signal</span><span class="phil-words"> = 30. </span><span class="phil-help">The anomalous signal that you would like to obtain. The value of I/sigma will be adjusted to obtain this signal. Typically you will need a signal of 15-30 so solve the substructure.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_cc_ano</span><span class="phil-words"> = 0.15 </span><span class="phil-help">You can set the target minimum (true) anomalous correlation (CC*_ano). This value affects the phasing accuracy after the substructure is determined.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ideal_cc_anom</span><span class="phil-words"> = 0.75 </span><span class="phil-help">The ideal_cc_anom is the expected anomalous correlation between an accurate model with isotropic anomalous scatterers and perfectly-measured data. The ideal_cc_anom is determined empirically. It is typically not unity because anomalous scatterers may have multiple locations with low occupancy or may be non-isotropic. A value of about 0.75 is a reasonable guess.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">include_weak_anomalous_scattering</span><span class="phil-words"> = Auto </span><span class="phil-help">At longer wavelengths the scattering of C, N, and O become significant relative to S. Default is to consider the scattering from C, N, O as noise. Additionally, (see intrinsic_scatterers_as_noise) if intrinsic anomalous scatterers (P and S) are weak, they will be counted as noise. This weak anomalous scattering is effectively noise and has the same effect as the ideal_cc_anom but it can be calculated from the composition. Its effects are added to those modeled by the ideal_cc_anom parameter. Default is to include weak anomalous scattering if a sequence file or the number of sulfurs is provided</span></li><li class="phil-param" data-expert="0"><span class="phil-name">intrinsic_scatterers_as_noise</span><span class="phil-words"> = None </span><span class="phil-help">Applies if include_weak_anomalous_scattering=True. You can choose to treat any intrinsic scatterers (S for protein, P for nucleic acid) as noise, just like any contributions from C, N, or O atoms. This is default if anomalous scattering (f-double-prime) from these atoms is less than half that of your specified anomalous scatterer. Alternatively these atoms are excluded from the noise calculation and are assumed to be included in the number of sites you specify.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">bayesian_updates</span><span class="phil-words"> = False </span><span class="phil-help">Use Bayesian updates of half-dataset CC and signal. First predict these values using standard approach, then use empirical half-dataset CC and signal for a training set of datasets to re-estimate these values. This helps correct for typical errors in measurement and typical resolution-dependent effects. Note that if you use bayesian_updates=True then the predictions may not vary smoothly with resolution or changes in parameters.</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">data</span><span class="phil-words"> = None </span><span class="phil-help">Data file (I or I+ and I- or F or F+ and F-). Any standard format is fine.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">data_labels</span><span class="phil-words"> = None </span><span class="phil-help">Optional label specifying which columns of anomalous data to use. Not necessary if your input file has only one set of anomalous data.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">High-resolution limit. Either a high-resolution limit or a (Wilson) b_value or both is required</span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_value</span><span class="phil-words"> = None </span><span class="phil-help">Estimated Wilson B-value for the dataset. Either a high-resolution limit or a (Wilson) b_value or both is required</span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_value_anomalous</span><span class="phil-words"> = None </span><span class="phil-help">Estimated Wilson B-value for the anomalously-scattering atoms. Normally leave as None and it will be estimated from b_value.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">seq_file</span><span class="phil-words"> = None </span><span class="phil-help">Optional sequence file (1-letter code). Separate chains with a blank line or line starting with &amp;gt;.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_type</span><span class="phil-words"> = *PROTEIN RNA DNA </span><span class="phil-help">Chain type (PROTEIN RNA DNA). This is used to estimate the number of atoms from the number of residues</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_copies</span><span class="phil-words"> = None </span><span class="phil-help">Optional estimate of NCS copies in your crystals (only used if a data file is supplied).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_fraction</span><span class="phil-words"> = None </span><span class="phil-help">Optional estimate of solvent fraction in your crystals (0 to 1)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">residues</span><span class="phil-words"> = None </span><span class="phil-help">The number of residues in the molecule or asymmetric unit. Note that it is the ratio of residues to anomalously-scattering atoms that matters.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">atom_type</span><span class="phil-words"> = None </span><span class="phil-help">Optional name of anomalously-scattering atom. If supplied, you also need to supply the wavelength for X-ray data collection. If not supplied, then you need to supply a value for f_double_prime.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">number_of_s</span><span class="phil-words"> = None </span><span class="phil-help">You can specify the number of S atoms in the asymmetric unit. Only used if include_weak_anomalous_scattering=True. If not set, the number is guessed from the sequence file if present.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">f_double_prime</span><span class="phil-words"> = None </span><span class="phil-help">F-double-prime value for the anomalously-scattering atom. Alternatively you can specify the atom type and wavelength.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">wavelength</span><span class="phil-words"> = None </span><span class="phil-help">Wavelength for X-ray data collection. If supplied, also specify the atom_type. Alternatively you can specify the value of f_double_prime</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sites</span><span class="phil-words"> = None </span><span class="phil-help">The number of anomalously-scattering atoms in the molecule or asymmetric unit. Note that it is the ratio of residues to anomalously-scattering atoms that matters.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sites_min</span><span class="phil-words"> = None </span><span class="phil-help">If you set sites_min and sites_max and not sites the sites will be varied from sites_min to sites_max</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sites_max</span><span class="phil-words"> = None </span><span class="phil-help">If you set sites_min and sites_max and not sites the sites will be varied from sites_min to sites_max</span></li><li class="phil-param" data-expert="0"><span class="phil-name">occupancy</span><span class="phil-words"> = 1 </span><span class="phil-help">Estimate of occupancy of anomalously-scattering atoms</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">fixed_resolution</span><span class="phil-words"> = False </span><span class="phil-help">Only run calculation at high_resolution limit</span></li><li class="phil-param" data-expert="0"><span class="phil-name">show_summary</span><span class="phil-words"> = False </span><span class="phil-help">Show summary only</span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

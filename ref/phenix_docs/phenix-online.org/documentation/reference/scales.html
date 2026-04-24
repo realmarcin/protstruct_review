@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Simplified Carbohydrate Line-Entry System (SCaLES)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="simplified-carbohydrate-line-entry-system-scales">
+<h1 class="title">Simplified Carbohydrate Line-Entry System (SCaLES)</h1>
+<p>There are many formats for specifying a polysaccharides as seen in this diagram
+from Herget et al. 2008.</p>
+<img alt="../images/glyco_formats.png" src="../images/glyco_formats.png" style="width: 600px;" />
+<p>The article introduces a format known as GlycoCT.</p>
+<p>A common and compact molecule specification format is known as SMILES
+(ref) which stands for. It relies on the specification of the elements
+and the bonds (both implicit and explicit) of a molecule. Branches and
+rings can also be specified.</p>
+<div class="section" id="section-1">
+<h1></h1>
+<p>Because protein crystallographers are conversant with the concept of
+residues and polysaccharides are polymers of various carbohydrate
+units, the step to equating an element to a sugar residue and a
+chemical bond to a glycosidic link is easy. Polysaccharides are
+simpler because there are no polymeric rings (only rings within the
+residue unit).  However, the linking is more complicated. Firstly,
+there are more types of links compared to the basic three in molecules
+(single, double, triple).  Secondly, the type of the link relies on
+the attaching carbohydrate (α, β).</p>
+</div>
+<div class="section" id="section-2">
+<h1></h1>
+<p>Conceptually, it is easiest to think of one sugar unit linking to the
+rest of the polysaccharide. For instance, this is the portion that
+attached to the protein. So, the most common polysaccharide attached
+to a protein is an N-linked chain that has three units in a linear
+chain linked to an ASN. The three-letter code for each of the units in
+order is NAG, NAG, MAN <a class="footnote-reference" href="scales.html#footnote-1" id="footnote-reference-1">[1]</a>. It is not a leap to imagine that
+this could be represented using:</p>
+<blockquote>
+<a class="reference external" href="../images/scales_carbo1.png">NAG-NAG-MAN</a> <a class="footnote-reference" href="scales.html#footnote-2" id="footnote-reference-2">[2]</a></blockquote>
+<p>As with SMILES, there is a default link. In SMILES, it's a single
+bound while in SCaLES the default is β(1-4). This linkage means
+that the attaching unit is connecting its anomeric carbon (C1) to the
+forth carbon (C4) on the other unit.  It also specifies that the
+attaching unit is a β-isomer. In the example, MAN is a mannose
+saccharide but it is the α-isomer so it should:</p>
+<blockquote>
+<a class="reference external" href="../images/scales_carbo2.png">NAG-NAG-BMA</a></blockquote>
+<p>However, the SCaLES parser automatically detects that the final residue is the
+incorrect isomer and changes the code from MAN to BMA: The linkage takes
+precedence. The specify an alternative to the default linkage, it can be
+indicated thus:</p>
+<blockquote>
+<a class="reference external" href="../images/scales_carbo3.png">NAG-NAG-a-(1-4)-MAN</a></blockquote>
+<p>The hand of the linkage can be specified with &quot;a&quot; or &quot;alpha&quot; and the carbon
+atoms being linked can be specified using &quot;(1-4)&quot; or &quot;(1,4)&quot;.</p>
+</div>
+<div class="section" id="section-3">
+<h1></h1>
+<p>Branching is specified using square brackets (compared to parenthesises in
+SMILES) thus:</p>
+<blockquote>
+<a class="reference external" href="../images/scales_carbo4.png">NAG-[a-(1-6)-FUC]-NAG-BMA</a></blockquote>
+<p>The branching can contain more than one saccharide:</p>
+<blockquote>
+<a class="reference external" href="../images/scales_carbo5.png">NAG-NAG-BMA-[a-(1-3)-MAN-a-(1-2)-MAN-a-(1-2)-MAN]-a-(1-6)-MAN-[a-(1-3)-MAN-a-(1-2)-MAN]-a-(1-6)-MAN-a-(1-2)-MAN</a></blockquote>
+<table class="docutils footnote" frame="void" id="footnote-1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="scales.html#footnote-reference-1">[1]</a></td><td>This is not exactly true so read on for pedagogical purposes.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="scales.html#footnote-reference-2">[2]</a></td><td>This links to an image of the polysaccharide generated in
+<a class="reference external" href="https://phenix-online.org/documentation/reference/carbo_builder.html">Carbohydrate Builder</a> in REEL.  For more details on the builder
+and the image see <a class="reference external" href="https://phenix-online.org/documentation/reference/carbo_builder.html">here</a>.</td></tr>
+</tbody>
+</table>
+<div class="section" id="references">
+<h2>References</h2>
+<p>Weininger, David (February 1988). &quot;SMILES, a chemical language and
+information system. 1. Introduction to methodology and encoding
+rules&quot;. Journal of Chemical Information and Modeling 28 (1):
+31–6. doi:10.1021/ci00057a005.</p>
+</div>
+</div>
+</div>
+    
+  </body>
+</html>

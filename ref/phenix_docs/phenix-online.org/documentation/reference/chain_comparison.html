@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Comparison of CA positions in two models allowing any order of fragments</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="comparison-of-ca-positions-in-two-models-allowing-any-order-of-fragments">
+<h1 class="title">Comparison of CA positions in two models allowing any order of fragments</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>chain_comparison: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>Identify how many of the CA atoms in one model match CA atoms in another
+model. Separately identify how many of these go in the same direction and
+how many of the residue names match.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-chain-comparison-works">
+<h1>How chain_comparison works:</h1>
+<p>chain_comparison runs normally selects the unique part of the target model
+(the first model specified), then it takes the entire query model and counts
+how many residues in the target model are matched by a residue in the
+query model.  If NCS is supplied, the unique part of the query is selected,
+NCS is applied and then the same analysis is carried out.</p>
+<p>If desired, you can have chain_comparison write out all the residues in
+the query model that are matching residues in the target model.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-chain-comparison">
+<h1>Standard run of chain_comparison:</h1>
+<p>Running chain_comparison is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.chain_comparison target.pdb query.pdb
+</pre>
+<p>If you want to compare P positions for RNA/DNA instead, you can say:</p>
+<pre class="literal-block">
+phenix.chain_comparison target.pdb query.pdb chain_type=RNA
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb_in</span><span class="phil-words"> = None </span><span class="phil-help">Input PDB file (enter target first and then query) query_dir is set)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">unique_query_only</span><span class="phil-words"> = False </span><span class="phil-help">Use only unique chains in query. Normally use unique_query_only=False and unique_part_of_target_only=True.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">unique_target_pdb_in</span><span class="phil-words"> = None </span><span class="phil-help">Target model identifying which element is selected with unique_query_only. NOTE: must be specified by keyword.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">unique_part_of_target_only</span><span class="phil-words"> = None </span><span class="phil-help">Use only unique chains in target (see also unique_query_only). .short_caption = Unique target only</span></li><li class="phil-param" data-expert="0"><span class="phil-name">test_unique_part_of_target_only</span><span class="phil-words"> = True </span><span class="phil-help">Try both unique_part_of_target_only as True and False and report result for whichever gives higher value of fraction matching. Cannot be used with match_pdb_file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">allow_extensions</span><span class="phil-words"> = False </span><span class="phil-help">If True, ignore parts of chains that do not overlap. Normally use False: identity is identity of overlapping part times fraction of chain that overlaps.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_file</span><span class="phil-words"> = None </span><span class="phil-help">NCS file. If unique_query_only is False (typically) apply NCS to it to generate full query. Normally used with test_unique_part_of_target_only=True. NOTE: if your structure has very high symmetry, including an NCS file can result in extremely long run times. It may be better in such cases to supply target and query files that have NCS applied (or matching structures without NCS) and not to supply an NCS file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">query_dir</span><span class="phil-words"> = None </span><span class="phil-help">directory containing query PDB files (any number)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">match_pdb_file</span><span class="phil-words"> = None </span><span class="phil-help">Output file containing segments with specified match percentage</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">chain_type</span><span class="phil-words"> = *PROTEIN RNA DNA </span><span class="phil-help">Chain type. All residues of other chain types ignored.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_crystal_symmetry</span><span class="phil-words"> = None </span><span class="phil-help">Default is True if space group is not P1. If set, use crystal symmetry to map atoms to closest positions</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">comparison</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">max_dist</span><span class="phil-words"> = 3. </span><span class="phil-help">Maximum distance between atoms to be considered close</span></li><li class="phil-param" data-expert="0"><span class="phil-name">distance_per_site</span><span class="phil-words"> = None </span><span class="phil-help">Maximum distance spanned by a pair of residues. Set by default as 3.8 A for protein and 8 A for RNA</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_similarity</span><span class="phil-words"> = 0.99 </span><span class="phil-help">When choosing unique chains, use min_similarity cutoff. This applies to both chain length and the sequence itself.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_length_from_matching_chains</span><span class="phil-words"> = False </span><span class="phil-help">Use length of chains in target that are matched to define full target length (as opposed to all unique chains in target).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_percent_match_to_select</span><span class="phil-words"> = 1 </span><span class="phil-help">You can specify minimum_percent_match_to_select and maximum_percent_match_to_select and match_pdb_file in which case all segments in the query model that have a percentage match (within max_dist of atom in target) in this range will be written out to match_pdb_file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_percent_match_to_select</span><span class="phil-words"> = 100 </span><span class="phil-help">You can specify minimum_percent_match_to_select and maximum_percent_match_to_select and match_pdb_file in which case all segments in the query model that have a percentage match (within max_dist of atom in target) in this range will be written out to match_pdb_file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_alt_conf</span><span class="phil-words"> = True </span><span class="phil-help">Remove alternate conformers before analysis. This is normally required to align correctly.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">residue_groups</span><span class="phil-words"> = "VGASCTI P LDNEQM KR FHY W" </span><span class="phil-help">Optional groups of residues to score together</span></li><li class="phil-param" data-expert="3"><span class="phil-name">score_by_residue_groups</span><span class="phil-words"> = False </span><span class="phil-help">Use residue groups in sequence alignment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">only_keep_best_chain</span><span class="phil-words"> = False </span><span class="phil-help">Use keep the best-matching chain in match_pdb</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">quiet</span><span class="phil-words"> = False </span><span class="phil-help">No printed output</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

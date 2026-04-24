@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Tutorial: solving a structure with Phaser-MR</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="tutorial-solving-a-structure-with-phaser-mr">
+<h1 class="title">Tutorial: solving a structure with Phaser-MR</h1>
+<div class="section" id="overview">
+<h1>Overview</h1>
+<p>This tutorial shows how to use the <a class="reference external" href="../reference/phaser_mr.html">Phaser-MR GUIs</a> to solve
+structures by molecular replacement, using example data included with the
+Phenix distribution.  We recommend reading the
+<a class="reference external" href="../reference/mr_overview.html">MR overview</a> before running these tutorials (and for
+adventurous users, the primary Phaser reference as well).</p>
+<p>A brief word about terminology: the search models used in Phaser are
+customarily named &quot;ensembles&quot;, and in fact Phaser will often work best in
+difficult cases when a set of superposed models (generated using <a class="reference external" href="../reference/ensembler.html">Ensembler</a> or similar tools) is used.  However, this is not required
+and for easily solved structures, such as the tutorial datasets used here,
+a single PDB file will be sufficient.  Furthermore, while Phaser can search
+for multiple alternative ensembles and output only the best solution, here we
+will use just one candidate per component.  Also note that the search models
+used here are single proteins, but this is not a requirement if the relative
+orientation of multiple chains are known (such as physiological dimers,
+multi-subunit complexes, or DNA helices).</p>
+<p>An essential feature of Phaser is that it scores possible solutions based on
+the expected asymmetric unit cell (ASU) contents (that is, the scattering mass).  Therefore,
+for the examples shown here, we will be supplying sequence files for the
+crystallized proteins.  We could, however, specify the molecular weight or
+number of residues instead.  Importantly, the manner in which the ASU contents
+is specified is completely decoupled from the &quot;ensemble&quot; (search model) input;
+where multiple proteins have been crystallized, we could supply separate
+sequence files (as is done here for the beta-blip example) or a single file
+with multiple sequences, and the result will be identical.  While it is
+technically possible to run Phaser with just a search model and extrapolate
+the molecular weight based on the desired number of copies, this is not
+recommended.</p>
+</div>
+<div class="section" id="full-automation-phaser-mrage">
+<h1>Full automation: phaser.MRage</h1>
+<p>The separate <a class="reference external" href="../reference/MRage.html">MRage</a> program (which uses Phaser as its core) can
+automatically discover and prepare search models, and search in parallel on a
+multi-core workstation or cluster.  A <a class="reference external" href="http://www.phaser.cimr.cam.ac.uk/index.php/Molecular_replacement_with_MRage">separate tutorial</a>
+is available on the Phaser home page.</p>
+</div>
+<div class="section" id="single-component-searches">
+<h1>Single-component searches</h1>
+<p>For homogeneous structures where only one component needs to be placed, a
+streamlined interface is available.  The tutorial data for this example is
+the A2U-globulin structure, which includes one each of data, PDB, and sequence
+files.  In this interface, it is assumed that multiple PDB files are part of
+a single ensemble; if you instead want to try multiple equally likely
+ensembles and let Phaser pick the best one, use the advanced interface
+(described below).</p>
+<p>Start the GUI by clicking &quot;Phaser-MR (simple one-component interface)&quot;, the second
+item in the list under &quot;Molecular replacement.&quot;  This interface has a single input
+field for all file types, and on most operating systems you can simply drag
+the three files from the project folder into the input field.  Alternatively,
+click &quot;Add file&quot; to open a file dialog.</p>
+<img alt="../images/a2u-globulin_input.png" src="../images/a2u-globulin_input.png" />
+<p>The symmetry information and labels list will automatically be populated when
+the reflections are loaded; you do not need to change the defaults.  You
+must enter either the sequence identity or RMSD for each model in the
+ensemble; in this case an RMSD of 1.0 is appropriate for the single model used.
+If you have no specific idea of the accuracy of the model, it is best to simply
+provide the sequence identity to the target and let Phaser provide the
+corresponding RMSD.
+Because we already entered a sequence, no molecular weight is required, but
+the value for &quot;Component copies&quot; should be set to 4.</p>
+<p>The next tab contains basic search options; you should change &quot;Number of copies
+to search for&quot; to 4.  (While it may seem inefficient to specify the number
+of component copies and the number of search copies separately, this would
+allow us to search for a tetramer, while still only supplying the sequence of
+one chain.)</p>
+<img alt="../images/a2u-globulin_search.png" src="../images/a2u-globulin_search.png" />
+<p>Usually it is best not to specify a resolution limit.  Phaser chooses a
+resolution limit based on the particular problem (accuracy and completeness
+of the model, number of reflections).  If the problem is expected to be
+straightforward, the resolution will automatically be limited to reduce
+runtime while preserving an excellent chance of solving the structure on the
+first pass.</p>
+<p>The other controls on this tab do not need to be modified, but the option for
+alternative space groups deserves special mention.  If there is any ambiguity
+about the precise space group, for instance if the data were processed as
+P222 but the exact combination of screw axes is unknown, or the space group
+could be either P6(1) or P6(5), Phaser can try multiple space groups and
+identify the best one at the translation function stage.  The default is to
+try only the original space group and its enantiomer (if any); this will
+have no effect for the examples used here
+(the MTZ files already contain the correct symmetry), but it would be
+appropriate for the P6(1) versus P6(5) case.  The most permissive setting is
+&quot;All possible in the same pointgroup&quot;.</p>
+<p>Now we are ready to run Phaser: click the Run button on the toolbar.  A new
+tab will appear with a status panel, a list of warnings, and summary output
+(basically excerpted from the log file).  For many structures (including this
+one) there will be one or more warnings, but these do not necessarily mean
+that Phaser will not be successful.  This example should finish in several
+minutes.</p>
+<img alt="../images/a2u-globulin_run.png" src="../images/a2u-globulin_run.png" />
+<p>Once the run is complete, a results tab will appear, showing a summary of the
+solution and output files, with buttons to launch other programs.  The two
+statistics reported are the log-likelihood gain (LLG), which expresses the
+probability of this solution compared to a random-atom model, and the
+translation function Z-score, which denotes the signal-to-noise ratio of
+the solution.  In this case both are excellent, indicating that Phaser found
+an unambiguous solution.</p>
+<img alt="../images/a2u-globulin_results.png" src="../images/a2u-globulin_results.png" />
+<p>At this point we recommend inspecting the maps and crystal packing in Coot.
+Because Phaser only performs rigid-body and group B-factor refinement, the map
+quality will most likely be relatively poor compared to a refined map, with
+many unexplained difference peaks, but the map should still be interpretable
+for a correct solution.</p>
+<p>The appropriate next step would be either rebuilding or refinement, both of
+which can be launched directly from the results tab.  For this example we
+could go straight to refinement; if the structure was instead solved using
+homologous proteins, running AutoBuild would be a better choice.</p>
+</div>
+<div class="section" id="multi-component-searches">
+<h1>Multi-component searches</h1>
+<p>The interface for multi-component and other more difficult searches is considerably
+more complicated, especially since the ensemble and ASU contents inputs are split
+up. The tutorial data for this example is
+&quot;TEM-1 Beta-lactamase/beta-lactamase inhibitor complex&quot; (or &quot;beta-blip&quot;), and
+includes five files: an MTZ file and two each of search models and sequence files.</p>
+<p>Start the standard Phaser-MR GUI by clicking &quot;Phaser-MR&quot; under the &quot;Molecular
+replacement&quot; section.  The first tab that appears defines the experimental
+data; click &quot;Browse...&quot; next to the &quot;Data file&quot; field and select the file
+named &quot;beta_blip_P3221.mtz&quot;.  The unit cell and space group will be
+automatically filled in, and the &quot;Data labels&quot; menu will be populated with
+suitable choices (only one in this case).</p>
+<img alt="../images/phaser_mr_main.png" src="../images/phaser_mr_main.png" />
+<p>The other options in this window are equivalent to those in the simple
+interface, and do not need to be modified, though it is always a good idea
+to provide a title for the job.</p>
+<p>The second tab, &quot;Ensembles&quot;, is where the search models are entered.  First
+we will load the beta-lactamase model: for &quot;Model ID&quot;, enter &quot;beta&quot;, then
+click &quot;Add file&quot; below the list widget and select &quot;beta.pdb&quot;.  This will
+add it to the list with the &quot;Variance&quot; field blank.  Click the &quot;Change
+variance&quot; button, and enter &quot;100&quot; for the sequence identity and click &quot;OK&quot;.</p>
+<img alt="../images/beta_variance.png" src="../images/beta_variance.png" />
+<p>The window should now look like this:</p>
+<img alt="../images/beta_ensemble.png" src="../images/beta_ensemble.png" />
+<p>At the bottom of the window, click &quot;Add PDB ensemble&quot;.  A second ensemble
+sub-tab will appear.  Now repeat the procedure using &quot;blip.pdb&quot; instead.
+(The order in which these ensembles are input is technically not important,
+because Phaser will normally determine the appropriate search order
+automatically.  However, in this case Phaser will indeed search for beta
+first, because it is a significantly larger protein.)</p>
+<p>The third configuration tab, &quot;ASU contents&quot;, is where we tell Phaser what
+scattering mass to expect in the crystal.  If we know the exact molecular
+weight (or number of residues) of the entire structure, we could simply enter
+that here, but we will use sequences instead.  This has the advantage that the
+sequences are then available if we launch AutoBuild from the Results tab.
+The files &quot;beta.seq&quot; and
+&quot;blip.seq&quot; should be input in the &quot;Sequence file&quot; field in successive tabs;
+click the button &quot;Add macromolecule(s)&quot; at the bottom of the window to add
+a tab.  The number of copies is 1 in both cases.  (Here the order in which the
+ASU contents is input really is unimportant.)</p>
+<img alt="../images/blip_component.png" src="../images/blip_component.png" />
+<p>The final configuration tab, &quot;Search procedure&quot;, is where we tell Phaser
+how to use the ensembles we input. Initially only the &quot;Component 1&quot; branch
+is shown. Click on the triple dotted button to its right and a menu will appear
+allowing us to select which of the two ensembles defined earlier Phaser should
+search for. The up-down spin button in the rightmost column lets us specify how
+many copies of this component we want Phaser to attempt to place in the ASU.
+We select the beta ensemble for the first component and choose to search
+for one copy. To specify the blip component we press the &quot;Add Search&quot;
+button, which will add another Component branch to the Search GUI. As before
+we instruct Phaser to search for one component but with the blip ensemble.</p>
+<p>Note: Selecting both ensembles to be searched for in one component would
+mean that Phaser would try them in turn as alternative choices of model for
+the same component, and then select the ensemble yielding the best result.</p>
+<img alt="../images/beta_blip_search.png" src="../images/beta_blip_search.png" />
+<p>At this point we are ready to run Phaser, which should again take only a few
+minutes to complete successfully.</p>
+<img alt="../images/beta_blip_results.png" src="../images/beta_blip_results.png" />
+<p>Note that the Results tab that appears at the end of the job allows us easily
+to launch either the phenix.refine or AutoBuild GUI, with many of the fields
+pre-filled.  If the data provided to Phaser had included Friedel pairs (i.e.
+anomalous data), then a button would also be available to launch the AutoSol
+GUI for MR-SAD phasing.</p>
+</div>
+</div>
+    
+  </body>
+</html>

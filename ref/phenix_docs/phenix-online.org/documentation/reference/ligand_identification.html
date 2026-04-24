@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Automated ligand identification</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="automated-ligand-identification">
+<h1 class="title">Automated ligand identification</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="ligand_identification.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="ligand_identification.html#author-s" id="toc-entry-1"><strong>Author(s)</strong></a></li>
+<li><a class="reference internal" href="ligand_identification.html#purpose" id="toc-entry-2">Purpose</a></li>
+<li><a class="reference internal" href="ligand_identification.html#purpose-of-the-phenix-ligand-identification-command" id="toc-entry-3">Purpose of the phenix.ligand_identification command</a></li>
+<li><a class="reference internal" href="ligand_identification.html#usage" id="toc-entry-4">Usage</a></li>
+<li><a class="reference internal" href="ligand_identification.html#how-the-phenix-ligand-identification-works" id="toc-entry-5">How the phenix.ligand_identification works:</a></li>
+<li><a class="reference internal" href="ligand_identification.html#how-to-run-the-phenix-ligand-identification" id="toc-entry-6">How to run the phenix.ligand_identification</a></li>
+<li><a class="reference internal" href="ligand_identification.html#what-the-phenix-ligand-identification-command-needs-to-run" id="toc-entry-7">What the phenix.ligand_identification command needs to run:</a></li>
+<li><a class="reference internal" href="ligand_identification.html#choice-of-ligand-library-keywords-examples" id="toc-entry-8"><em>Choice of ligand library</em> (keywords+examples)</a></li>
+<li><a class="reference internal" href="ligand_identification.html#output-files-from-phenix-ligand-identification-command" id="toc-entry-9"><em>Output files from phenix.ligand_identification command</em></a></li>
+<li><a class="reference internal" href="ligand_identification.html#multiprocessing" id="toc-entry-10">Multiprocessing</a></li>
+<li><a class="reference internal" href="ligand_identification.html#running-from-a-parameters-file" id="toc-entry-11">Running from a parameters file</a></li>
+<li><a class="reference internal" href="ligand_identification.html#examples" id="toc-entry-12">Examples</a></li>
+<li><a class="reference internal" href="ligand_identification.html#sample-command-line-inputs" id="toc-entry-13">Sample command_line inputs</a></li>
+<li><a class="reference internal" href="ligand_identification.html#possible-problems" id="toc-entry-14">Possible Problems</a></li>
+<li><a class="reference internal" href="ligand_identification.html#specific-limitations-and-problems" id="toc-entry-15">Specific limitations and problems:</a></li>
+<li><a class="reference internal" href="ligand_identification.html#literature" id="toc-entry-16">Literature</a></li>
+<li><a class="reference internal" href="ligand_identification.html#additional-information" id="toc-entry-17">Additional information</a></li>
+<li><a class="reference internal" href="ligand_identification.html#list-of-all-available-keywords" id="toc-entry-18">List of all available keywords</a></li>
+</ul>
+</div>
+<div class="section" id="author-s">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-1"><strong>Author(s)</strong></a></h1>
+<ul class="simple">
+<li>phenix.ligand_identification: Li-Wei Hung</li>
+<li>PHENIX GUI and PDS Server: Nigel W. Moriarty,Nathaniel Echols</li>
+<li>RESOLVE: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-2">Purpose</a></h1>
+</div>
+<div class="section" id="purpose-of-the-phenix-ligand-identification-command">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-3">Purpose of the phenix.ligand_identification command</a></h1>
+<p>The phenix.ligand_identification command carries out fitting of a
+library of 180 most frequently observed
+ligands in the PDB to a given
+electron density map. The program also conducts the analysis and ranking
+of the ligand fitting results.</p>
+<p>The phenix.ligand_identification command works with the ligand library
+provided with the Phenix program by default. It can also take a custom
+ligand library provided by the users.</p>
+</div>
+<div class="section" id="usage">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-4">Usage</a></h1>
+<p>The phenix.ligand_identification task can be run from command
+line, or from the PHENIX GUI.</p>
+</div>
+<div class="section" id="how-the-phenix-ligand-identification-works">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-5">How the phenix.ligand_identification works:</a></h1>
+<p>The phenix.ligand_identification command uses RESOLVE ligand fitting
+methods as described in the <a class="reference external" href="ligandfit.html">LigandFit documentation.</a>
+The phenix.ligand_identification carries out this fitting process for a
+library of 180 most frequently observed ligands in the Protein Data Bank,
+or a custom library as described above, scores and ranks the overall
+fitting results. A real-space refinement is carried out on the ligand by
+default between RESOLVE fitting and Phenix scoring. The scoring
+algorithm takes into consideration of density correlation between ligand
+and density as well as non-bonded interactions between fitted ligand and
+the input model. The output consists of a list of the best fitted
+ligands from the library. The command provides options to view the top
+ranked ligand in coot with or without the electron density (use keyword
+&quot;--open_in_coot=True&quot;).</p>
+</div>
+<div class="section" id="how-to-run-the-phenix-ligand-identification">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-6">How to run the phenix.ligand_identification</a></h1>
+<p>Example commands are provided below. The nsf-d2 files are in
+$PHENIX/phenix_examples/nsf-d2-ligand.  This program accepts
+all <a class="reference external" href="ligandfit.html">LigandFit</a> keywords in addition to the build-in
+keywords listed at the end of this document.</p>
+</div>
+<div class="section" id="what-the-phenix-ligand-identification-command-needs-to-run">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-7">What the phenix.ligand_identification command needs to run:</a></h1>
+<p>The phenix.ligand_identification command needs:</p>
+<ol class="arabic simple">
+<li>a mtz file containing structure factors</li>
+<li>(optional), a PDB file with your protein model without ligand</li>
+</ol>
+</div>
+<div class="section" id="choice-of-ligand-library-keywords-examples">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-8"><em>Choice of ligand library</em> (keywords+examples)</a></h1>
+<p>*default ligand library: no keyword needed</p>
+<p>*to specify a list of ligands in 3-letter codes:</p>
+<pre class="literal-block">
+--ligand_list=&quot;ATP CTP TTP GTP&quot;
+</pre>
+<p>*to use all small molecules with a .pdb extension in the 'ligand_dir'
+as the search library:</p>
+<pre class="literal-block">
+--ligand_dir=/my/compound/library/A1217321
+</pre>
+<p>*to use all ligands fround in sequence and structural homologs of the input model
+as the search library.  (Note, the compilation of ligand library is all done
+internally.  No query is sent throught the network.) :</p>
+<pre class="literal-block">
+--use_pdb_ligand=True
+</pre>
+<p>*to use all ligands associated with proteins of specific function found
+in the PDB as the search library:</p>
+<pre class="literal-block">
+--function=&quot;tyrosine kinase&quot;
+</pre>
+<p>*to use all ligands found in proteins with a specific Enzyme
+Classification number in the PDB:</p>
+<pre class="literal-block">
+--EC=1.1.1.3
+</pre>
+<p>*to use all ligands found in proteins with a specific Pfam accession
+number in the PDB:</p>
+<pre class="literal-block">
+--pfam=PF00042
+</pre>
+<p>*to use all ligands found in proteins with specific SCOP and/or CATH
+terms in the PDB:</p>
+<pre class="literal-block">
+--scop='DNA/RNA-binding 3-helical bundle'
+</pre>
+<pre class="literal-block">
+--cath='Trypsin-like serine proteases'
+</pre>
+<p>*to use all ligands found in proteins with a specific Gene Ontology
+(GO) accession number in the PDB:</p>
+<pre class="literal-block">
+--GO=0009253
+</pre>
+<p>*to use all ligands found in proteins with a specific InterPro ID in
+the PDB:</p>
+<pre class="literal-block">
+--ipro=014838
+</pre>
+<p>*to filter ligand sizes (# of non-H atoms) in ligand library to be used in ligand search:</p>
+<dl class="docutils">
+<dt>::</dt>
+<dd>(use either or both)
+--natom_min=30
+--natom_max=80</dd>
+</dl>
+</div>
+<div class="section" id="output-files-from-phenix-ligand-identification-command">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-9"><em>Output files from phenix.ligand_identification command</em></a></h1>
+<p>When you run phenix.ligand_identification command, the output files
+will be in the directory you started Phenix:</p>
+<ul class="simple">
+<li>A summary file of the fitting results of all ligands:</li>
+</ul>
+<pre class="literal-block">
+overall_ligand_scores.log
+</pre>
+<ul class="simple">
+<li>A summary table listing the results of the top ranked ligands:</li>
+</ul>
+<pre class="literal-block">
+topligand.txt
+</pre>
+<p>The last column &quot;Sequence in library' contains numbers '###' indicating
+the sequence number of the corresponding ligands. The final fitted
+ligand coordinates and all the log files are in the corresponding'###'
+files described below.</p>
+<ul class="simple">
+<li>PDB files with the fitted ligands:</li>
+</ul>
+<pre class="literal-block">
+ligand_fit_pdbs/RSR_FITTED_[3-letter code]_###.pdb
+</pre>
+<ul class="simple">
+<li>Resolve fitting Score files:</li>
+</ul>
+<pre class="literal-block">
+ligand_fit_scores/[3-letter code].scores
+</pre>
+<ul class="simple">
+<li>Map coefficients for the map used for fitting:</li>
+</ul>
+<pre class="literal-block">
+resolve_map.mtz
+</pre>
+<ul class="simple">
+<li>Command file to display results in coot:</li>
+</ul>
+<pre class="literal-block">
+display.com (uses ligid.scm, also in the same directory)
+</pre>
+</div>
+<div class="section" id="multiprocessing">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-10">Multiprocessing</a></h1>
+<p>The phenix.ligand_identification program has build-in multi-
+processing capability. Use keyword</p>
+<pre class="literal-block">
+--nproc=[number of threads]
+</pre>
+<p>to run the command in multiprocessing mode. In general, the processing
+speed is proportional to the the number of CPU cores used, up to the
+maximum free cores the system can allocate at run time. For example, it
+takes about 25 minutes for the nsf-d2 example to run in 8 threaded mode,
+while single-process uses about 180 minutes for the same job on a
+dual-Xeon W5580 machine.</p>
+</div>
+<div class="section" id="running-from-a-parameters-file">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-11">Running from a parameters file</a></h1>
+<p>You can run phenix.ligand_identification from a parameters file. This
+is often convenient because you can generate a default one with:</p>
+<pre class="literal-block">
+phenix.ligand_identification --show_defaults &gt; my_ligand.eff
+</pre>
+<p>and then you can just edit this file to match your needs and run it
+with:</p>
+<pre class="literal-block">
+phenix.ligand_identification  my_ligand.eff
+</pre>
+</div>
+<div class="section" id="examples">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-12">Examples</a></h1>
+</div>
+<div class="section" id="sample-command-line-inputs">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-13">Sample command_line inputs</a></h1>
+<dl class="docutils">
+<dt>1. Standard run of ligand_identification (input protein model and data</dt>
+<dd>file, default ligand library, 8 CPUs)</dd>
+</dl>
+<pre class="literal-block">
+phenix.ligand_identification mtz_in=nsf-d2.mtz model=nsf-d2_noligand.pdb
+ input_labels=F nproc=8
+</pre>
+<dl class="docutils">
+<dt>2. Search ligand from a difference map or pre-calculated map</dt>
+<dd>coefficients from phenix.refine</dd>
+</dl>
+<p>If your refine a model with a command such as,</p>
+<pre class="literal-block">
+phenix.refine data.mtz partial.pdb
+</pre>
+<p>then you will end up with the refined model,</p>
+<pre class="literal-block">
+partial_refine_001.pdb
+</pre>
+<p>and a map coefficients file:</p>
+<pre class="literal-block">
+partial_refine_001_map_coeffs.mtz
+</pre>
+<p>You can then run ligand_identification using the 2Fo-Fc map calculated
+from these map coefficients:</p>
+<pre class="literal-block">
+phenix.ligand_identification mtz_type=diffmap  mtz_in=partial_refine_001_map_coeffs.mtz
+input_labels=&quot;2FOFCWT PH2FOFCWT&quot; model=partial_refine_001.pdb nproc=8
+</pre>
+<p>For Fo-Fc map from the same file you can say:</p>
+<pre class="literal-block">
+phenix.ligand_identification mtz_type=diffmap  mtz_in=partial_refine_001_map_coeffs.mtz
+input_labels=&quot;FOFCWT PHFOFCWT&quot; model=partial_refine_001.pdb nproc=8
+</pre>
+<p>In the above two cases, &quot;model&quot; keyword is optional. If provided,
+non-bonded energy terms will be used in scoring.</p>
+<p>The examples below show various ways of specifying custom ligand
+libraries based on the 'standard run' example above.</p>
+<p>3. Identify ligand from a series of ligands in 3-letter codes</p>
+<pre class="literal-block">
+phenix.ligand_identification mtz_in=nsf-d2.mtz model=nsf-d2_noligand.pdb
+ input_labels=F ligand_list=&quot;ATP GTP CTP TTP ADP GDP CDP TDP A3P GSP NAP AMP GMP CMP TMP&quot;
+</pre>
+<p>4. Identify ligand from a given set of pdb files (could be your compound library) in a specific directory</p>
+<pre class="literal-block">
+phenix.ligand_identification mtz_in=nsf-d2.mtz model=nsf-d2_noligand.pdb
+ input_labels=F ligand_dir=/my/compound/library/A1217321
+</pre>
+<p>This command will take all .pdb files in the ligand_dir and a make a
+custom library to carry out the search</p>
+<p>5. Identify ligand from a library of ligands founds in homologous structures (sequence or structural homologs) of the input pdb file.</p>
+<pre class="literal-block">
+phenix.ligand_identification mtz_in=nsf-d2.mtz model=nsf-d2_noligand.pdb
+ input_labels=F use_pdb_ligand=True
+</pre>
+<p>This command will compile a library of ligands found in homologous pdbs of the 'model=' pdb file from Phenix's internal library.  You can combine this keyword with other functional keywords (function, EC, pfam, ipro ...etc) and the program will compile a non-redundant combined ligand library.  You may further filter the library to limit the sizes of ligands used in the search. See below.  All these can be done in the GUI as well.</p>
+<p>6. Identify ligand from a library composed of all ligands found in Tyrosine kinases in the PDB, and number of non-H atoms between 20 and 40</p>
+<pre class="literal-block">
+phenix.ligand_identification mtz_in=nsf-d2.mtz model=nsf-d2_noligand.pdb
+ input_labels=F function=&quot;Tyrosine kinase&quot; natom_min=20 natom_max=40
+</pre>
+<p>This command could be useful when you want to use a function-specific
+ligand library. The 'function' should be in one of the EC terms. Note in
+the above example, if only &quot;kinase&quot; is specified, ligand found in all
+types of kinases will be searched.</p>
+<p>7. Identify ligand from a library composed of all ligands found in proteins belonging to a specific Enzyme Classification</p>
+<pre class="literal-block">
+phenix.ligand_identification mtz_in=nsf-d2.mtz model=nsf-d2_noligand.pdb
+ input_labels=F EC=1.1.3
+</pre>
+<p>This command could be useful when you want to use a function-specific
+ligand library, and your protein belongs to a EC. Note the EC can be any
+parent set of the actual EC. (e.g. you can use 1.1.3 instead of 1.1.3.1
+although you'll get a broader set of library with EC=1.1.3).</p>
+<p>The nsf-d2 files in the above examples can be found in
+$PHENIX/phenix_examples/nsf-d2-ligand</p>
+</div>
+<div class="section" id="possible-problems">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-14">Possible Problems</a></h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-15">Specific limitations and problems:</a></h1>
+<ul class="simple">
+<li>WHen using a custom ligand library in PDB format, the ligand atoms in the user-provided PDBs
+should be under 'HETATM' records.</li>
+<li>Other ligand-fitting related limitations please refer to the document of the
+<a class="reference external" href="ligandfit.html">LigandFit wizard.</a></li>
+<li>Only crystallographic data are supported currently.</li>
+</ul>
+</div>
+<div class="section" id="literature">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-16">Literature</a></h1>
+<p><ul><li><b>Ligand identification using electron-density map correlations.</b> T.C. Terwilliger, P.D. Adams, N.W. Moriarty, and J.D. Cohn. <a href="https://doi.org/10.1107/S0907444906046233"><i>Acta Crystallogr D Biol Crystallogr</i> <b>63</b>, 101-7 (2006)</a>.</li>
+</ul></p>
+<p><ul><li><b>Automated ligand fitting by core-fragment fitting and extension into density.</b> T.C. Terwilliger, H. Klei, P.D. Adams, N.W. Moriarty, and J.D. Cohn. <a href="https://doi.org/10.1107/S0907444906017161"><i>Acta Crystallogr D Biol Crystallogr</i> <b>62</b>, 915-22 (2006)</a>.</li>
+</ul></p>
+</div>
+<div class="section" id="additional-information">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-17">Additional information</a></h1>
+<p><strong>List of ligands in the PHENIX ligand_identification default library</strong>:</p>
+<pre class="literal-block">
+PG4
+CRY
+CYS
+DIO
+DOX
+GOL
+MO5
+NBN
+OXL
+OXM
+PUT
+PYR
+F3S
+MO6
+PEG
+COA
+DTT
+FS4
+HED
+HEZ
+LI1
+MPD
+SF4
+SIN
+TMN
+TRS
+URA
+BEN
+BEZ
+MET
+NIO
+PGA
+POP
+ASP
+DAO
+FSO
+FUC
+GLU
+LYS
+PEP
+PGE
+PHB
+PHQ
+PLM
+TAR
+XYS
+ADE
+AKG
+7HP
+BGC
+CAM
+HC4
+ORO
+DKA
+GAL
+GLC
+MAN
+MES
+ARG
+PHE
+CIT
+FLC
+MMA
+MPO
+MYR
+NHE
+OLA
+PG4
+AMG
+FER
+NAA
+NAG
+NDG
+SPM
+EPE
+NGA
+PLP
+TRP
+BTN
+F6P
+FTT
+G6P
+LDA
+UPL
+1PE
+BH4
+H4B
+THM
+1PG
+P6G
+U10
+ADN
+BOG
+EST
+FBP
+GSH
+GTT
+NVP
+RET
+UMP
+C5P
+C8E
+DHT
+TMP
+UFP
+CMP
+NCN
+PRP
+BGC
+MAN
+GTS
+IMP
+LAT
+MAL
+SUC
+GLC
+AMP
+FPP
+PQQ
+T44
+2GP
+3GP
+5GP
+TYD
+UDP
+GTX
+SAH
+TDP
+TPP
+IMO
+SAM
+A3P
+ADP
+DCP
+GDP
+NAG
+XYS
+2PE
+CTP
+DAD
+FOK
+TTP
+DTP
+DGA
+FMN
+SAP
+ACP
+ANP
+APC
+ATP
+FOL
+GNP
+GSP
+GTP
+MTX
+MAN
+CB3
+MA4
+UPG
+UD1
+SPO
+HEC
+HEM
+NAG
+NAD
+NAI
+ACR
+GLC
+NAP
+NDP
+DHE
+BPH
+ACO
+BCL
+FAD
+CAA
+GLC
+AP5
+BPB
+B12
+</pre>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1><a class="toc-backref" href="ligand_identification.html#toc-entry-18">List of all available keywords</a></h1>
+<p>Note: To use LigandFit parameters in ligand_identification, the parameter group (i.e. the bold text above the desired keyword) should be added to the keywords. For example,</p>
+<p>*to specify search center:</p>
+<pre class="literal-block">
+search_target.search_center=&quot;10 10 10&quot;
+</pre>
+<p>*to specify number of copies of the ligand in the asymmetric unit:</p>
+<pre class="literal-block">
+search_parameters.number_of_ligands=2
+</pre>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">ligand_identification</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">mtz_in</span><span class="phil-words"> = None </span><span class="phil-help"> Enter an MTZ file name </span></li><li class="phil-param" data-expert="0"><span class="phil-name">mtz_type</span><span class="phil-words"> = *F diffmap </span><span class="phil-help">If input a precalculated difference map, use "D" instead </span></li><li class="phil-param" data-expert="0"><span class="phil-name">input_labels</span><span class="phil-words"> = None </span><span class="phil-help"> Provide a label of F if mtz type is F, provide F, PHI if          mtz if a difference map </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_list</span><span class="phil-words"> = None </span><span class="phil-help"> enter ligands to be searched.  Ligands should be          in 3-letter codes seperated by spaces. For example,          ligand_list="ATP CTP APN FMN".  If no input or uninterpretable,          Default lib will be used.  See phenix.doc for default ligand lib</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_dir</span><span class="phil-words"> = None </span><span class="phil-help"> Directory of your ligand library.  Files in this directory         with .pdb or .cif extentions will be used in ligand search.  If None,         default library will be used. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">work_dir</span><span class="phil-words"> = None </span><span class="phil-help">Top level directory where jobs will be run.  Default is the directory where phenix.ligand_identification is started.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">EC</span><span class="phil-words"> = None </span><span class="phil-help">Provide an EC# of your protein.  The program will screen all ligands found in PDBs with in this Enzyme class or subclass.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">function</span><span class="phil-words"> = None </span><span class="phil-help">Provide function description of your protein. For example, 'kinase'. The program will then screen all ligands found in PDBs associated with your functional terms.  Note: function should belong to partial EC terms.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scop_fold</span><span class="phil-words"> = None </span><span class="phil-help">Provide fold information of your protein in SCOP terms. For example, 'tim barrel'.  The program will then screen all ligands found in PDBS with the partiular folds in SCOP terms</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cath</span><span class="phil-words"> = None </span><span class="phil-help">Provide structural information of protein in CATH terms. For example, 'Alanine racemase'.  The program will then screen all ligands found in PDBs assocated with this CATH term.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pfam</span><span class="phil-words"> = None </span><span class="phil-help">Provide PFam IDs for protein(s). For example 'PF01280'. The program will then screen all ligands found in PDBs of the PF01280 family.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">go</span><span class="phil-words"> = None </span><span class="phil-help">Provide Gene Ontology(GO) information of the protein. For example, '01234'.  The program will then screen all ligands found in PDBs associated with that GO number.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ipro</span><span class="phil-words"> = None </span><span class="phil-help">Provide Interpro ID of the protein. For example, '01740'. The program will then screen all ligands found in PDBs   associated with the specified InterPro ID.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_pdb_ligand</span><span class="phil-words"> = False </span><span class="phil-help">Use ligands found in homologous pdbs of the input model. The progeam will conduct a fast structure and sequence search within Phenix (no internet queries) to identify homologs of  the input pdb. All ligands found in these homologous pdbs will be used to in ligand search.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">natom_min</span><span class="phil-words"> = 4 </span><span class="phil-help"> minimum number of non-H atoms in ligand.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">natom_max</span><span class="phil-words"> = 999 </span><span class="phil-help"> maximum number of non-H atoms in ligand.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model</span><span class="phil-words"> = None </span><span class="phil-help"> Enter a PDB files containing the protein only. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">high_resolution</span><span class="phil-words"> = 2.5 </span><span class="phil-help">specify the high resolution to use. default=2.5 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">low_resolution</span><span class="phil-words"> = 1000 </span><span class="phil-help">Low resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">restart_run</span><span class="phil-words"> = False </span><span class="phil-help"> Use (restart_run = True) to continue unfinished run </span></li><li class="phil-param" data-expert="0"><span class="phil-name">partial_analyze</span><span class="phil-words"> = False </span><span class="phil-help"> Analyze results before jobs complete.  This function
+         is currently not available with command-line version. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncpu</span><span class="phil-words"> = 1 </span><span class="phil-help"> Number of CPUs to use.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_indiv_tries_min</span><span class="phil-words"> = 30 </span><span class="phil-help"> usually 0 to 10, but set up to 300 to try harder
+         to find soln</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_indiv_tries_max</span><span class="phil-words"> = 300 </span><span class="phil-help"> usually 0 to 10, but set up to 300 to try harder
+         to find soln</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_group_search</span><span class="phil-words"> = 4 </span><span class="phil-help"> usually 3, but set up to 10 to try harder to find soln</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_dist</span><span class="phil-words"> = 10 </span><span class="phil-help">usually 10 A; always at least 5. smaller speeds up search</span></li><li class="phil-param" data-expert="0"><span class="phil-name">delta_phi_lig</span><span class="phil-words"> = 40 </span><span class="phil-help"> usually 40 degree increments. set lower to search more</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fit_phi_inc</span><span class="phil-words"> = 20 </span><span class="phil-help"> usually 10 increments. set lower to search more</span></li><li class="phil-param" data-expert="0"><span class="phil-name">local_search</span><span class="phil-words"> = True </span><span class="phil-help"> Usually True; Use False to force complete search</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_center</span><span class="phil-words"> = '' </span><span class="phil-help"> Search center (in A) for ligand search.  Leave it empty or 0 0 0 to ignore.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_near_res</span><span class="phil-words"> = None </span><span class="phil-help"> Search ligand near this protein residue.  Please enter a residue selection
+        syntax, e.g. "chain A and resid 120". Leave it empty or None to ignore.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help"> number of processors to use.  This is
+         used in resolve internal parallelization</span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">debug</span><span class="phil-words"> = False </span><span class="phil-help">debugging output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_ligandfit</span><span class="phil-words"> = True </span><span class="phil-help">use ligandfit to run fitting </span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_mode</span><span class="phil-words"> = *default LigandFit </span><span class="phil-help"> Use default mode (1 trial, faster), or LigandFit mode
+        (5 trials, takes longer, or 1 very short trial with 'quick=True)
+        in ligand fitting</span></li><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = Auto </span><span class="phil-help">Optional temporary work directory</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span><span class="phil-help">Output directory where files are to be written</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dry_run</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and check parameter names</span></li><li class="phil-param" data-expert="0"><span class="phil-name">number_of_ligands</span><span class="phil-words"> = None </span><span class="phil-help"> Total number of ligand sites. Ignored if "None".
+         find_all_ligands will keep looking until the
+         correlation coefficient for the fit of the best ligand
+         is less than cc_min or the number of ligands placed is
+         number_of_ligands, whichever comes first</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_min</span><span class="phil-words"> = 0.75 </span><span class="phil-help"> Ignored if "None".
+         find_all_ligands will keep looking until the
+         correlation coefficient for the fit of the best ligand
+         is less than cc_min or the number of ligands placed is
+         number_of_ligands, whichever comes first</span></li><li class="phil-param" data-expert="0"><span class="phil-name">open_in_coot</span><span class="phil-words"> = False </span><span class="phil-help">If true, Phenix will automatically start Coot after the run is complete.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">non_bonded</span><span class="phil-words"> = True </span><span class="phil-help">If true, non_bonded terms will be applied to the scores           if RSR is used and model exists.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_all_files</span><span class="phil-words"> = False </span><span class="phil-help">If true, all intermediate pdb and log files will be kept.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cif_def_file_list</span><span class="phil-words"> = None </span><span class="phil-help">You can supply cif files for real-space refinement.           example: cif_def_file_list='/my/cif/file1.cif /my/cif/file2.cif' </span></li><li class="phil-param" data-expert="0"><span class="phil-name">real_space_target_weight</span><span class="phil-words"> = 10 </span><span class="phil-help">You can carry change the weight on the real-space term in           real-space refinement on the ligand after fitting.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">ligandfit</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">data</span><span class="phil-words"> = None </span><span class="phil-help">Datafile.  This can be any format if only FP is to be read in. If phases are to be read in then MTZ format is required.  The Wizard will guess the column identification. If you want to specify it you can say input_labels=&amp;quot;FP&amp;quot; ,  or input_labels=&amp;quot;FP PHIB FOM&amp;quot;.   </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand</span><span class="phil-words"> = None </span><span class="phil-help">Three-letter code of ligand, or file containing information  about the ligand (PDB or SMILES)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model</span><span class="phil-words"> = None </span><span class="phil-help">PDB file with model for everything but the ligand </span></li><li class="phil-param" data-expert="0"><span class="phil-name">quick</span><span class="phil-words"> = False </span><span class="phil-help">Set to True for running as quickly as possible. </span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">unit_cell</span><span class="phil-words"> = None </span><span class="phil-help">   Enter cell parameter a b c alpha beta gamma </span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = 0 </span><span class="phil-help">   High-resolution limit. Zero means keep everything. If map_in is specified, resolution must be given.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">space_group</span><span class="phil-words"> = None </span><span class="phil-help">   Space Group symbol (i.e., C2221 or C 2 2 21) </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">file_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_or_file_list</span><span class="phil-words"> = *single_file file_with_list_of_files </span><span class="phil-help">   Choose if you want to input a single file with PDB or other information about the ligand or if you want to input a file containing a list of files with this information for a list of ligands </span></li><li class="phil-param" data-expert="0"><span class="phil-name">input_labels</span><span class="phil-words"> = None </span><span class="phil-help">   Labels for input data columns </span></li><li class="phil-param" data-expert="0"><span class="phil-name">lig_map_type</span><span class="phil-words"> = fo-fc_difference_map fobs_map *pre_calculated_map_coeffs </span><span class="phil-help">   Enter the type of map to use in ligand fitting   fo-fc_difference_map: Fo-Fc difference map phased on partial model (requires FOBS in your input file)      fobs_map: Fo map phased on partial model  (requires  FOBS in your input file) pre_calculated_map_coeffs: map calculated from FP PHIB [FOM] coefficients in input data file (or 2FOFCWT PH2FOFCWT coeffs) If you supply a map just leave this at pre_calculated_map_coeffs. If your labels choice is not available and '---' is present,  you can choose '---'.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_format</span><span class="phil-words"> = *PDB SMILES </span><span class="phil-help">   Enter whether the files contain SMILES strings or PDB formatted information </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">target_output_format</span><span class="phil-words"> = *None pdb mmcif </span><span class="phil-help">Desired output format (if possible). Choices are None ( try to use input format), pdb, mmcif. If output model does not fit in pdb format, mmcif will be used. Default is pdb.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">existing_ligand_file_list</span><span class="phil-words"> = None </span><span class="phil-help">   You can enter a list of PDB files with ligands you have  already fit. These will be used to exclude that region from consideration. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_start</span><span class="phil-words"> = None </span><span class="phil-help">   LigandFit will attempt to put your ligand superimposing on ligand_start if supplied. This must have some of the same atoms as your ligand, but does not have to have all of them. NOTE: all the atom names AND residue numbers in the ligand_start ligand must be present in the ligand_file ligand (and must match exactly)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_in</span><span class="phil-words"> = None </span><span class="phil-help">You can supply a file with NCS information for use with ligands_from_ncs</span></li><li class="phil-param" data-expert="0"><span class="phil-name">input_ligand_compare_file</span><span class="phil-words"> = None </span><span class="phil-help">   If you enter a PDB file with a ligand in it, the coordinates of the newly-built ligand will be compared with the coordinates in this file. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">cif_def_file_list</span><span class="phil-words"> = None </span><span class="phil-help">You can supply cif files for real-space refinement after fitting</span></li><li class="phil-param" data-expert="0"><span class="phil-name">refinement_file</span><span class="phil-words"> = None </span><span class="phil-help">You can supply a file for full refinement containing  F/I SIGF/SIGI FreeR_flag If you supply this file then after real-space refinement   a round of full refinement will be carried out  with phenix.refine</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fobs_labels</span><span class="phil-words"> = None </span><span class="phil-help">Labels for Fobs SigFobs or Iobs SigIobs for refinement_file... same format as for phenix.refine</span></li><li class="phil-param" data-expert="0"><span class="phil-name">r_free_label</span><span class="phil-words"> = None </span><span class="phil-help">Label for FreeR_flag in refinement_file...same format  as for phenix.refine</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_in</span><span class="phil-words"> = None </span><span class="phil-help">Map file (alternative to data file). Can be .ccp4, .map, .mrc and will be converted to map coefficients before use.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">search_parameters</span><ul><li class="phil-param" data-expert="1"><span class="phil-name">fixed_ligand</span><span class="phil-words"> = False </span><span class="phil-help">Use fixed ligand (no rotations of any bonds) if set</span></li><li class="phil-param" data-expert="0"><span class="phil-name">conformers</span><span class="phil-words"> = 1 </span><span class="phil-help">   Enter how many conformers to create. If greater than 1, then ELBOW will always be used to generate them. If 1 then ELBOW will be used if a PDB file is not specified. These conformers are used to identify allowed torsion angles for your ligand. The alternative is to use the empirical rules in RESOLVE. ELBOW takes longer but is more accurate. </span></li><li class="phil-param" data-expert="2"><span class="phil-name">group_search</span><span class="phil-words"> = 0 </span><span class="phil-help">   Enter the ID number of the group from the ligand to use to seed the search for conformations </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_cc_min</span><span class="phil-words"> = 0.75 </span><span class="phil-help">   Enter the minimum correlation coefficient of the ligand to the map to quit searching for more conformations </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_completeness_min</span><span class="phil-words"> = 1 </span><span class="phil-help">   Enter the minimum completeness of the ligand to the map to quit searching for more conformations </span></li><li class="phil-param" data-expert="1"><span class="phil-name">local_search</span><span class="phil-words"> = True </span><span class="phil-help">   If local_search is True then, only the region within search_dist of the point in the map with the highest local rmsd will be searched in the FFT search for fragments </span></li><li class="phil-param" data-expert="1"><span class="phil-name">search_dist</span><span class="phil-words"> = 10 </span><span class="phil-help">   If local_search is True then, only the region within this distance of the point in the map with the highest local rmsd will be searched in the FFT search for fragments </span></li><li class="phil-param" data-expert="2"><span class="phil-name">use_cc_local</span><span class="phil-words"> = False </span><span class="phil-help">   You can specify the use of a local correlation coefficient for scoring ligand fits to the map.   If you do not do this, then the region over which the ligand is scored are all points within 2.5 A of the atoms in the ligand.   If you do specify use_cc_local, then the region over which the ligand is scored are all these points, plus all the contingous points that have density greater than 0.5 * sigma . </span></li><li class="phil-param" data-expert="2"><span class="phil-name">ligands_from_ncs</span><span class="phil-words"> = False </span><span class="phil-help">   You can try to use ncs (from your partial model file or from your ncs_in file) along with any ligands already found   to place additional copies of your ligand. Only applicable if there is one type of ligand.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">max_ligands_from_ncs</span><span class="phil-words"> = 1 </span><span class="phil-help">   You can specify how many of the ligands already found  to consider using NCS (usually 1)</span></li><li class="phil-param" data-expert="1"><span class="phil-name">n_group_search</span><span class="phil-words"> = 3 </span><span class="phil-help">   Enter the number of different fragments of the ligand that will be looked for in FFT search of the map </span></li><li class="phil-param" data-expert="1"><span class="phil-name">n_indiv_tries_max</span><span class="phil-words"> = 10 </span><span class="phil-help">   If 0 is specified, all fragments are searched at once otherwise all are first searched at once then individually up to the number specified </span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_indiv_tries_min</span><span class="phil-words"> = 5 </span><span class="phil-help">   If 0 is specified, all placements of a fragment are tested at once otherwise all are first tested at once then individually up to the number specified </span></li><li class="phil-param" data-expert="0"><span class="phil-name">number_of_ligands</span><span class="phil-words"> = 1 </span><span class="phil-help">   Number of copies of the ligand expected in the asymmetric unit </span></li><li class="phil-param" data-expert="2"><span class="phil-name">offsets_list</span><span class="phil-words"> = 7 53 29 </span><span class="phil-help">   You can specify an offset for the orientation of the  templates in searching for ligands. This is used in generating diversity in models. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">refine_ligand</span><span class="phil-words"> = True </span><span class="phil-help">You can carry out real-space refinement on the ligand after fitting</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_occupancy</span><span class="phil-words"> = 1.0 </span><span class="phil-help">  You can set the initial occupancy of the ligand </span></li><li class="phil-param" data-expert="2"><span class="phil-name">real_space_target_weight</span><span class="phil-words"> = 10. </span><span class="phil-help">You can carry change the weight on the real-space term in real-space refinement on the ligand after fitting</span></li><li class="phil-param phil-scope" data-expert="1"><span class="phil-name">fitting</span><span class="phil-help">Parameters for tracing ligand</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">delta_phi_ligand</span><span class="phil-words"> = 40 </span><span class="phil-help">   Specify the angle (degrees) between successive tries in FFT search for fragments </span></li><li class="phil-param" data-expert="0"><span class="phil-name">fit_phi_inc</span><span class="phil-words"> = 20 </span><span class="phil-help">   Specify the angle (degrees) between rotations around bonds </span></li><li class="phil-param" data-expert="0"><span class="phil-name">fit_phi_range</span><span class="phil-words"> = -180 180 </span><span class="phil-help">   Range of bond rotation angles to search </span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">search_target</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">ligand_near_chain</span><span class="phil-words"> = None </span><span class="phil-help">   You can specify where to search for the ligand either with search_center or with ligand_near_res and ligand_near_chain.   If you set ligand_near_chain=&amp;quot;None&amp;quot; or  leave it blank or do not set it, then all chains will be included.   The keywords ligand_near_res and ligand_near_chain refer to residue/chain in the file defined by input_partial_model_file (or model if running from command line). </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_near_res</span><span class="phil-words"> = None </span><span class="phil-help">   You can specify where to search for the ligand either with search_center or with ligand_near_res and ligand_near_chain   The keywords ligand_near_res and ligand_near_chain refer to residue/chain in the file defined by input_partial_model_file (or model if running from command line). </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_near_pdb</span><span class="phil-words"> = None </span><span class="phil-help">   You can specify where LigandFit should look for your ligands by providing a PDB file containing one or more copies of the ligand. If you want you can provide a PDB file with ligand+ macromolecule and specify the ligand name with name_of_ligand_near_pdb. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">name_of_ligand_near_pdb</span><span class="phil-words"> = None </span><span class="phil-help">   You can specify where LigandFit should look for your ligands by providing a PDB file containing one or more copies of the ligand. If you want you can provide a PDB file with ligand+ macromolecule and specify the ligand name with name_of_ligand_near_pdb. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_center</span><span class="phil-words"> = 0.0 0.0 0.0 </span><span class="phil-help">   Enter coordinates for center of search region (ignored if [0.,0.,0.]) </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">general</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">extend_try_list</span><span class="phil-words"> = True </span><span class="phil-help">   You can fill out the list of parallel jobs to match the number of jobs you want to run at one time, as specified with nbatch. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_id</span><span class="phil-words"> = None </span><span class="phil-help">   You can specify an integer value for the ID of a ligand... This number will be added to whatever residue number the ligand search model in input_lig_file has. The keyword is only valid if a single copy of the ligand is to be found. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">nbatch</span><span class="phil-words"> = 5 </span><span class="phil-help">   You can specify the number of processors to use (nproc) and the number of batches to divide the data into for parallel jobs. Normally you will set nproc to the number of processors available and leave nbatch alone.   If you leave nbatch as None it will be set automatically, with a value depending on the Wizard. This is recommended.   The value of nbatch can affect the results that you get, as the jobs are not split into exact replicates, but are rather run with different random numbers. If you want to get the same results, keep the same value of nbatch. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">   You can specify the number of processors to use (nproc) and the number of batches to divide the data into for parallel jobs. Normally you will set nproc to the number of processors available and leave nbatch alone.   If you leave nbatch as None it will be set automatically, with a value depending on the Wizard. This is recommended.   The value of nbatch can affect the results that you get, as the jobs are not split into exact replicates, but are rather run with different random numbers. If you want to get the same results, keep the same value of nbatch.  If you set nproc=Auto and your machine has n processors,  then it will use n-1 processors, or 1 if only 1 is available</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_command_list</span><span class="phil-words"> = None </span><span class="phil-help">Commands for resolve. One per line in the form: keyword value (put in the quotes.) value can be optional Examples: coarse_grid resolution 200 2.0 hklin test.mtz   . NOTE: for command-line usage you need to enclose the whole set of commands in double quotes and each individual command in single quotes.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">coot_name</span><span class="phil-words"> = "coot" </span><span class="phil-help">   If your version of coot is called something else, then you can specify that here. </span></li><li class="phil-param" data-expert="1"><span class="phil-name">i_ran_seed</span><span class="phil-words"> = 72432 </span><span class="phil-help">   Random seed (positive integer) for model-building and simulated annealing refinement </span></li><li class="phil-param" data-expert="0"><span class="phil-name">raise_sorry</span><span class="phil-words"> = False </span><span class="phil-help">You can have any failure end with a Sorry instead of simply printout to the screen</span></li><li class="phil-param" data-expert="2"><span class="phil-name">background</span><span class="phil-words"> = True </span><span class="phil-help">   When you specify nproc=nn, you can run the jobs in background (default if nproc is greater than 1) or foreground (default if nproc=1).   If you set run_command=qsub (or otherwise submit to a batch queue), then you should set background=False, so that the batch queue can keep track of your runs. There is no need to use background=True in this case because all the runs go as controlled by your batch system. If you use run_command='sh ' (or similar, sh is default) then normally you will use background=True so that all the jobs run simultaneously. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">check_wait_time</span><span class="phil-words"> = 1.0 </span><span class="phil-help">   You can specify the length of time (seconds) to wait  between checking for subprocesses to end</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_wait_time</span><span class="phil-words"> = 1.0 </span><span class="phil-help">   You can specify the length of time (seconds) to wait when looking for a file. If you have a cluster where jobs do not start right away you may need a longer time to wait.  The symptom of too short a wait time is 'File not found'</span></li><li class="phil-param" data-expert="0"><span class="phil-name">wait_between_submit_time</span><span class="phil-words"> = 1.0 </span><span class="phil-help">   You can specify the length of time (seconds) to wait  between each job that is submitted when running sub-processes. This can be helpful on NFS-mounted systems when running  with multiple processors to avoid file conflicts. The symptom of too short a wait_between_submit_time is File exists:....</span></li><li class="phil-param" data-expert="2"><span class="phil-name">cache_resolve_libs</span><span class="phil-words"> = True </span><span class="phil-help">   Use caching of resolve libraries to speed up resolve</span></li><li class="phil-param" data-expert="2"><span class="phil-name">resolve_size</span><span class="phil-words"> = 12 </span><span class="phil-help">   Size for solve/resolve (&amp;quot;&amp;quot;,&amp;quot;_giant&amp;quot;, &amp;quot;_huge&amp;quot;,&amp;quot;_extra_huge&amp;quot; or a number  where 12=giant 18=huge</span></li><li class="phil-param" data-expert="2"><span class="phil-name">check_run_command</span><span class="phil-words"> = False </span><span class="phil-help">You can have the wizard check your run command at startup</span></li><li class="phil-param" data-expert="2"><span class="phil-name">run_command</span><span class="phil-words"> = "sh " </span><span class="phil-help">   When you specify nproc=nn, you can run the subprocesses as jobs in background with sh (default) or submit them to a queue with the command of your choice (i.e., qsub ). If you have a multi-processor machine, use sh. If you have a cluster, use qsub or the equivalent command for your system.   NOTE: If you set run_command=qsub (or otherwise submit to a batch queue), then you should set background=False, so that the batch queue can keep track of your runs. There is no need to use background=True in this case because all the runs go as controlled by your batch system.  If nproc is greater than 1 and you use run_command='sh  '(or similar, sh is default) then normally you will use background=True so that all the jobs run simultaneously. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">queue_commands</span><span class="phil-words"> = None </span><span class="phil-help">You can add any commands that need to be run for your  queueing system. These are written before any other commands in the file that is submitted to your queueing system.   For example on a PBS system you might say: queue_commands='#PBS -N mr_rosetta' queue_commands='#PBS -j oe' queue_commands='#PBS -l walltime=03:00:00' queue_commands='#PBS -l nodes=1:ppn=1'    NOTE: you can put in the characters '&lt;path&gt;' in any  queue_commands line and this will be replaced by a string of  characters based on the path to the run directory. The first  character and last two characters of each part of the path  will be included, separated by '_',up to 15 characters. For  example 'test_autobuild/WORK_5/AutoBuild_run_1_/TEMP0/RUN_1'  would be represented by: 'tld_W_5_A1__TP0_1' </span></li><li class="phil-param" data-expert="0"><span class="phil-name">condor_universe</span><span class="phil-words"> = vanilla </span><span class="phil-help">The universe for condor is usually vanilla. However you might need to set it to local for your cluster</span></li><li class="phil-param" data-expert="0"><span class="phil-name">add_double_quotes_in_condor</span><span class="phil-words"> = True </span><span class="phil-help">You might need to turn on or off double quotes in condor  job submission scripts.  These are already default elsewhere but may interfere with condor paths.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">condor</span><span class="phil-words"> = None </span><span class="phil-help">Specifies if the group_run_command is submitting a  job to a condor cluster.  Set by default to True if  group_run_command=condor_submit, otherwise False. For condor job submission mr_rosetta uses a customized script with condor commands.  Also uses one_subprocess_level=True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">last_process_is_local</span><span class="phil-words"> = True </span><span class="phil-help">If true, run the last process in a group in background  with sh as part of the job  that is submitting jobs. This prevents having the job that is submitting jobs sit and wait for all the others while  doing nothing</span></li><li class="phil-param" data-expert="1"><span class="phil-name">skip_r_factor</span><span class="phil-words"> = False </span><span class="phil-help">   You can skip R-factor calculation if refinement is not done  and maps_only=True</span></li><li class="phil-param" data-expert="1"><span class="phil-name">test_flag_value</span><span class="phil-words"> = Auto </span><span class="phil-help">Normally leave this at Auto (default). This parameter sets the value of the test set that is to be free.  Normally phenix sets up test sets with values of 0 and 1 with 1 as the free set.  The CCP4 convention is values of  0 through 19 with 0 as the free set.  Either of these is recognized by default in Phenix. If you have any other  convention (for example values of 0 to 19 and test set is 1) then you can specify this with test_flag_value.</span></li><li class="phil-param" data-expert="1"><span class="phil-name">skip_xtriage</span><span class="phil-words"> = False </span><span class="phil-help">   You can bypass xtriage if you want. This will prevent you from applying anisotropy corrections, however. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">base_path</span><span class="phil-words"> = None </span><span class="phil-help">   You can specify the base path for files (default is current working directory) </span></li><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = None </span><span class="phil-help">   Define a temporary directory </span></li><li class="phil-param" data-expert="0"><span class="phil-name">local_temp_directory</span><span class="phil-words"> = None </span><span class="phil-help">Write all temporary files to this directory and copy files specified by keep_files back to TEMP directory in working directory at the end of run. Used to speed up read/write operations. NOTE: Deletes all files except those specified by keep_files just like clean_up=True.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">clean_up</span><span class="phil-words"> = None </span><span class="phil-help">   At the end of the entire run the TEMP directories will be removed if clean_up is True.  Also all files except for overall_best_xxx (final) files   and .eff files In the AutoSol_run_xx_ AutoBuild_run_xx_ etc directory will be removed Files listed in keep_files will not be deleted.  If you want to remove files after your run is finished use a command like &amp;quot;phenix.autobuild run=1 clean_up=True&amp;quot; </span></li><li class="phil-param" data-expert="0"><span class="phil-name">print_citations</span><span class="phil-words"> = True </span><span class="phil-help">Print citations at end of run</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solution_output_pickle_file</span><span class="phil-words"> = None </span><span class="phil-help">At end of run, write solutions to this file in output directory if defined</span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param" data-expert="0"><span class="phil-name">top_output_dir</span><span class="phil-words"> = None </span><span class="phil-help">   This is used in subprocess calls of wizards and to tell the Wizard where to look for the STOPWIZARD file. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">wizard_directory_number</span><span class="phil-words"> = None </span><span class="phil-help">   This is used by the GUI to define the run number for  Wizards. It is the same as desired_run_number NOTE: this value can only be specified on the command line,  as the directory number is set before parameters files  are read.</span></li><li class="phil-param" data-expert="1"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">   Command files and other verbose output will be printed </span></li><li class="phil-param" data-expert="2"><span class="phil-name">extra_verbose</span><span class="phil-words"> = False </span><span class="phil-help">   Facts and possible commands will be printed every cycle if True</span></li><li class="phil-param" data-expert="2"><span class="phil-name">debug</span><span class="phil-words"> = False </span><span class="phil-help">   You can have the wizard stop with error messages about the code if you use debug.  Additionally the output goes to the terminal if you specify &amp;quot;debug=True&amp;quot;</span></li><li class="phil-param" data-expert="2"><span class="phil-name">require_nonzero</span><span class="phil-words"> = True </span><span class="phil-help">Require non-zero values in data columns to consider reading in.</span></li><li class="phil-param" data-expert="2"><span class="phil-name">remove_path_word_list</span><span class="phil-words"> = None </span><span class="phil-help">List of words identifying paths to remove from PATH  These can be used to shorten your PATH. For example... cns ccp4 coot would remove all paths containing these  words except those also containing phenix. Capitalization is ignored.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fill</span><span class="phil-words"> = False </span><span class="phil-help">Fill in all missing reflections to resolution res_fill. Applies to density modified maps. See also filled_2fofc_maps in autobuild.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">res_fill</span><span class="phil-words"> = None </span><span class="phil-help">Resolution for filling in missing data (default = highest resolution of any datafile). Only applies to density modified maps. Default is fill to high resolution of data.  Ignored if fill=False</span></li><li class="phil-param" data-expert="0"><span class="phil-name">check_only</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and check initial parameters. Not for general use</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_files</span><span class="phil-words"> = ligandfit*.pdb </span><span class="phil-help">List of files that are not to be cleaned up. wildcards permitted</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">display</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">number_of_solutions_to_display</span><span class="phil-words"> = None </span><span class="phil-help">   Number of solutions to put on screen and to write out </span></li><li class="phil-param" data-expert="0"><span class="phil-name">solution_to_display</span><span class="phil-words"> = 1 </span><span class="phil-help">   Solution number of the solution to display and write out ( use 0 to let the wizard display the top solution) </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">run_control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">ignore_blanks</span><span class="phil-words"> = None </span><span class="phil-help">ignore_blanks allows you to have a command-line keyword with a blank value like &amp;quot;input_lig_file_list=&amp;quot; </span></li><li class="phil-param" data-expert="0"><span class="phil-name">stop</span><span class="phil-words"> = None </span><span class="phil-help">You can stop the current wizard with &amp;quot;stopwizard&amp;quot; or &amp;quot;stop&amp;quot;.   If you type &amp;quot;phenix.autobuild run=3 stop&amp;quot; then this will stop run 3 of autobuild.  </span></li><li class="phil-param" data-expert="0"><span class="phil-name">display_facts</span><span class="phil-words"> = None </span><span class="phil-help">Set display_facts to True and optionally run=[run-number] to display the facts for run run-number.  If you just say display_facts then the facts for the highest-numbered existing run will be shown.   </span></li><li class="phil-param" data-expert="0"><span class="phil-name">display_summary</span><span class="phil-words"> = None </span><span class="phil-help">Set display_summary to True and optionally run=[run-number] to show the summary for run run-number.  If you just say display_summary then the summary for the highest-numbered existing run will be shown.  </span></li><li class="phil-param" data-expert="0"><span class="phil-name">carry_on</span><span class="phil-words"> = None </span><span class="phil-help">Set carry_on to True to carry on with highest-numbered run from where you left off.  </span></li><li class="phil-param" data-expert="0"><span class="phil-name">run</span><span class="phil-words"> = None </span><span class="phil-help">Set run to n to continue with run n where you left off.  </span></li><li class="phil-param" data-expert="0"><span class="phil-name">copy_run</span><span class="phil-words"> = None </span><span class="phil-help">Set copy_run to n to copy run n to a new run and continue where you left off. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">display_runs</span><span class="phil-words"> = None </span><span class="phil-help">List all runs for this wizard. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">delete_runs</span><span class="phil-words"> = None </span><span class="phil-help">List runs to delete: 1 2 3-5 9:12  </span></li><li class="phil-param" data-expert="0"><span class="phil-name">display_labels</span><span class="phil-words"> = None </span><span class="phil-help"> display_labels=test.mtz will list all the labels that identify data in test.mtz.  You can use the label strings that are produced in AutoSol to identify which data to use from a datafile like this: peak.data=&amp;quot;F+ SIGF+ F- SIGF-&amp;quot; # the entire string in quotes counts here You can use the individual labels from these strings as identifiers for data columns in AutoSol and AutoBuild like this: input_refinement_labels=&amp;quot;FP SIGFP FreeR_flags&amp;quot; # each individual label counts </span></li><li class="phil-param" data-expert="0"><span class="phil-name">dry_run</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and check parameter names</span></li><li class="phil-param" data-expert="0"><span class="phil-name">params_only</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and return parameter defaults</span></li><li class="phil-param" data-expert="0"><span class="phil-name">display_all</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and display parameter defaults</span></li><li class="phil-param" data-expert="0"><span class="phil-name">coot</span><span class="phil-words"> = None </span><span class="phil-help">Not presently applicable for ligandfit</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">special_keywords</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">write_run_directory_to_file</span><span class="phil-words"> = None </span><span class="phil-help">Writes the full name of a run directory to the specified file.  This can be used as a call-back to tell a script where the output is going to go.   </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">non_user_parameters</span><span class="phil-help">   These are obsolete parameters and parameters that the  wizards use to communicate among themselves. Not normally  for general use.</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">gui_output_dir</span><span class="phil-words"> = None </span><span class="phil-help">Used only by the GUI</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sg</span><span class="phil-words"> = None </span><span class="phil-help">Obsolete. Use space_group instead</span></li><li class="phil-param" data-expert="0"><span class="phil-name">get_lig_volume</span><span class="phil-words"> = False </span><span class="phil-help">   You can ask to get the volume of the ligand and to then stop</span></li><li class="phil-param" data-expert="0"><span class="phil-name">input_data_file</span><span class="phil-words"> = None </span><span class="phil-help">Not normally used. Use &amp;quot;data=&amp;quot; instead</span></li><li class="phil-param" data-expert="0"><span class="phil-name">input_lig_file</span><span class="phil-words"> = None </span><span class="phil-help">Not normally used. Use &amp;quot;ligand=&amp;quot; instead.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ligand_code</span><span class="phil-words"> = None </span><span class="phil-help">Not normally used. Use &amp;quot;ligand=&amp;quot; instead.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">input_partial_model_file</span><span class="phil-words"> = None </span><span class="phil-help">Not normally used. Use &amp;quot;model=&amp;quot; instead</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cif_already_generated</span><span class="phil-words"> = False </span><span class="phil-help">   You can specify that the ligand cif file is already generated</span></li></ul></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

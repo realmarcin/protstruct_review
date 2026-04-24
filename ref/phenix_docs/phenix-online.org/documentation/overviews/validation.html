@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Model Validation with Crystallographic Data</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="model-validation-with-crystallographic-data">
+<h1 class="title">Model Validation with Crystallographic Data</h1>
+<p><strong>Why</strong></p>
+<p>Comprehensive Validation (X-ray) is a tool that can be used to evaluate
+the plausibility of a model, including its agreement with crystallographic
+X-ray or neutron data. Note that for cryo-EM data you should use
+instead Comprehensive Validation (cryo-EM).</p>
+<p>You should validate an atomic model generated from crystallographic experiments
+by checking if it is consistent with priory knowledge about stereochemistry.
+This information includes covalent geometry, non-bonded interactions, and
+known distributions of side chain and main chain conformations in both
+proteins and nucleic acids. This validation should also extend beyond purely geometric
+measures to include local fit to electron density.</p>
+<p>Validation is performed throughout the structure solution process, which
+consists of cycles of validation, manual or automated
+rebuilding, and automated refinement until a satisfactory model is obtained.
+Useful validation criteria depend on the resolution of the data.</p>
+<p><strong>How</strong></p>
+<p>In Phenix, model validation is provided in the comprehensive validation
+GUI based on the <em>MolProbity</em> tool. This software can be run as a standalone
+program or automatically as part of <em>phenix.refine</em>. Overall model statistics
+are presented in a summary chart with local scores reported as plots and as tables
+listing the outliers on each criterion. The model validation tasks are
+essentially identical to the <em>MolProbity</em> web service. The validation results
+are seamlessly integrated with the graphics programs <em>Coot</em> and <em>PyMOL</em>.</p>
+<p><strong>How to use the validation tools in the Phenix GUI:</strong> <a class="reference external" href="../reference/validation.html">Click here</a></p>
+<p><a class="reference external" href="../reference/molprobity_tool.html">More information about MolProbity</a></p>
+<p><strong>Common issues</strong></p>
+<p><em>Outliers versus errors</em>: In most structures, there will Ramachandran
+and side chain rotamer outliers. If the electron density and surrounding
+chemistry supports the outlier conformation, then it is most likely an
+outlier from prior expectations. In the absence of supporting density and/or
+conflicting local chemistry, it is probably an error that needs correction.</p>
+<p><strong>Related programs</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="../reference/model_vs_data.html">phenix.model_vs_data</a>: This
+program assesses the overall quality of an atomic model with respect
+to the experimental data.</li>
+</ul>
+</div>
+    
+  </body>
+</html>

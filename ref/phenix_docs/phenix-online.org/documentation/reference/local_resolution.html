@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Creating a local resolution map with local_resolution</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="creating-a-local-resolution-map-with-local-resolution">
+<h1 class="title">Creating a local resolution map with local_resolution</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>local_resolution: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>The routine local_resolution is a tool for creating a local resolution
+map showing the local resolution of a cryo-EM map and having the same
+gridding as the cryo-EM map</p>
+</div>
+<div class="section" id="usage-and-how-local-resolution-works">
+<h1>Usage and how local_resolution works:</h1>
+<p>Local resolution is calculated in small boxes cut out from the cryo-EM map,
+where the density near the edges of each box is masked so that it gradually
+diminishes to zero at the edges.  Then the values of local resolution are
+smoothed and placed at grid points of a full-size map matching the original
+map.</p>
+<p>The local resolution map can be used to color a map in display programs
+such as ChimeraX.  In ChimeraX you can simply load in your original map and the
+local resolution map and then specify:</p>
+<p>color sample #1  map #2  palette rainbow</p>
+<p>to color map #1 based on the resolution values in map #2.</p>
+</div>
+<div class="section" id="procedure-used-by-local-resolution">
+<h1>Procedure used by local_resolution</h1>
+<p>The basic inputs to local_resolution are:</p>
+<pre class="literal-block">
+Two unmasked half-maps
+</pre>
+<p>Optional inputs are:</p>
+<pre class="literal-block">
+nominal resolution
+</pre>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-local-resolution">
+<h1>Standard run of local_resolution:</h1>
+<p>You can use local_resolution to get the local resolution in a cryo-EM map:</p>
+<pre class="literal-block">
+phenix.local_resolution half_map_A.mrc half_map_B.mrc
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+<p>If the half-maps are not actually independent the procedure will not work well</p>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+<p>If you have a very large map, this procedure can be really slow.  If your map
+is large but is mostly empty,  it may be helpful to run map_box to select just
+the region of your two half-maps where your molecule is located before running
+local_resolution.</p>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">map_model</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">full_map</span><span class="phil-words"> = None </span><span class="phil-help">Input full map file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">half_map</span><span class="phil-words"> = None </span><span class="phil-help">Input half map files</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model</span><span class="phil-words"> = None </span><span class="phil-help">Input model file</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">local_resolution_map</span><span class="phil-words"> = default </span><span class="phil-help">Local resolution map file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">adjust_local_resolution_coloring</span><span class="phil-words"> = False </span><span class="phil-help">Adjust local resolution coloring based on limits of resolution. Default is to use a standard coloring scheme.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">full_map</span><span class="phil-words"> = default </span><span class="phil-help">Full map file name. Same as input full map if supplied, otherwise result of default run of local_aniso_sharpen on half maps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">overwrite</span><span class="phil-words"> = True </span><span class="phil-help">Overwrite files with same names</span></li><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">Not used</span></li><li class="phil-param" data-expert="0"><span class="phil-name">filename</span><span class="phil-words"> = None </span><span class="phil-help">Not used</span></li><li class="phil-param" data-expert="0"><span class="phil-name">serial</span><span class="phil-words"> = None </span><span class="phil-help">Not used</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">local_resolution</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">method</span><span class="phil-words"> = boxes *fft </span><span class="phil-help">Method for local resolution. Boxes means calculate resolution in boxes and display smoothed values. FFT means use FFT-based method to estimate resolution in one step</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_bins</span><span class="phil-words"> = None </span><span class="phil-help">Number of bins for analyses</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_bins_default_boxes</span><span class="phil-words"> = 2000 </span><span class="phil-help">Default bins for boxes method</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_bins_default_fft</span><span class="phil-words"> = 20 </span><span class="phil-help">Default bins for fft method</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_bin_width</span><span class="phil-words"> = 20 </span><span class="phil-help">Minimum number of Fourier coefficients per bin. Overrides value of n_bins.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_resolution_ratio</span><span class="phil-words"> = 10 </span><span class="phil-help">Maximum resolution as ratio to minimum. Maximum resolution will be truncated at this value</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_boxes</span><span class="phil-words"> = None </span><span class="phil-help">Number of boxes</span></li><li class="phil-param" data-expert="0"><span class="phil-name">box_size_grid_units</span><span class="phil-words"> = None </span><span class="phil-help">Size of core region of boxes (not including region where mask is applied, in grid units</span></li><li class="phil-param" data-expert="0"><span class="phil-name">smoothing_radius_ratio</span><span class="phil-words"> = 1 </span><span class="phil-help">Ratio of smoothing radius to resolution (FFT only)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">Nominal resolution of map</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">multiprocessing</span><span class="phil-words"> = *multiprocessing sge lsf pbs condor pbspro slurm </span><span class="phil-help">Choices are multiprocessing (single machine) or queuing systems Not implemented</span></li><li class="phil-param" data-expert="0"><span class="phil-name">queue_run_command</span><span class="phil-words"> = None </span><span class="phil-help">run command for queue jobs. For example qsub. Not implemented</span></li><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of processors to use (only applies to boxes method).</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

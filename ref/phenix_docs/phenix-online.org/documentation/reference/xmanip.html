@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Structure factor file manipulations with Xmanip</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="structure-factor-file-manipulations-with-xmanip">
+<h1 class="title">Structure factor file manipulations with Xmanip</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>Xmanip: Peter Zwart</li>
+<li>Phil command interpreter: Ralf W. Grosse-Kunstleve</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>Manipulation of reflection data and models</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="command-line-interface">
+<h1>Command line interface</h1>
+<p>xmanip can be invoked via the command line interface with instructions
+given in a specific definition file:</p>
+<pre class="literal-block">
+phenix.xmanip params.def
+</pre>
+<p>The full set of definitions can be obtained by typing:</p>
+<pre class="literal-block">
+phenix.xmanip
+</pre>
+<p>which results in:</p>
+<pre class="literal-block">
+xmanip {
+  input {
+    unit_cell = None
+    space_group = None
+    xray_data {
+      file_name = None
+      labels = None
+      label_appendix = None
+      name = None
+      write_out = None
+    }
+    model {
+      file_name = None
+    }
+  }
+  parameters {
+    action = reindex manipulate_pdb *manipulate_miller
+    reindex {
+      standard_laws = niggli *reference_setting invert user_supplied
+      user_supplied_law = &quot;h,k,l&quot;
+    }
+    manipulate_miller {
+      task = get_dano get_diso lsq_scale sfcalc *custom None
+      output_label_root = &quot;FMODEL&quot;
+      get_dano {
+        input_data = None
+      }
+      get_diso {
+        native = None
+        derivative = None
+        use_intensities = True
+        use_weights = True
+        scale_weight = True
+      }
+      lsq_scale {
+        input_data_1 = None
+        input_data_2 = None
+        use_intensities = True
+        use_weights = True
+        scale_weight = True
+      }
+      sfcalc {
+        fobs = None
+        output = *2mFo-DFc mFo-DFc complex_fcalc abs_fcalc intensities
+        use_bulk_and_scale = *as_estimated user_upplied
+        bulk_and_scale_parameters {
+          d_min = 2
+          overall {
+            b_cart {
+              b_11 = 0
+              b_22 = 0
+              b_33 = 0
+              b_12 = 0
+              b_13 = 0
+              b_23 = 0
+            }
+            k_overall = 0.1
+          }
+          solvent {
+            k_sol = 0.3
+            b_sol = 56
+          }
+        }
+      }
+      custom{
+        code = print &gt;&gt; out, &quot;hello world&quot;
+      }
+    }
+
+    manipulate_pdb{
+      task = apply_operator *set_b
+      apply_operator{
+        operator = &quot;x,y,z&quot;
+        invert=False
+        concatenate_model=False
+        chain_id_increment=1
+      }
+      set_b{
+        b_iso = 30
+      }
+    }
+  }
+  output {
+    logfile = &quot;xmanip.log&quot;
+    hklout = &quot;xmanip.mtz&quot;
+    xyzout = &quot;xmanip.pdb&quot;
+  }
+}
+</pre>
+<p>Detailed explanation of the scopes follow below.</p>
+</div>
+<div class="section" id="parameters-and-definitions">
+<h1>Parameters and definitions</h1>
+<p>The <strong>xmanip.input</strong> scope defines which files and which data xmanip
+reads in:</p>
+<pre class="literal-block">
+input {
+  unit_cell = None        # unit cell. Specify when not in reflection or pdb files
+  space_group = None      # space group. Specify when not in reflection or pdb files
+  xray_data {
+    file_name = None      # File from which data will be read
+    labels = None         # Labels to read in.
+    label_appendix = None # Label appendix: when writing out the new mtz file, this
+                            appendix will be added to the current label.
+    name = None           # A data set name. Useful for manipulation
+    write_out = None      # Determines if this data set will be written to the final
+                            mtz file
+  }
+  model {
+    file_name = None      # An input pdb file
+  }
+}
+</pre>
+<p>One can define as many sub-scopes of xray_data as desired (see
+examples). The specific tasks of xmanip are controlled by the
+<strong>xmanip.parameters.action</strong> key. Possible options are:</p>
+<ul class="simple">
+<li><em>reindex</em></li>
+<li><em>manipulate_pdb</em></li>
+<li><em>manipulate_miller</em></li>
+</ul>
+<p><strong>Reindexing</strong>: reindexing of a data set (and a model) is controlled by
+the <strong>xmanip.parameters.reindex</strong> scope. Standard laws are available:</p>
+<ul class="simple">
+<li><em>niggli</em>: Brings unit cell to the niggli setting.</li>
+<li><em>reference_setting</em>: Brings space group to the reference setting</li>
+<li><em>invert</em>: Inverts a data set</li>
+<li><em>user_supplied</em>: A user supplied reindexing law is used, specified
+by <em>reindex.user_supplied_law</em></li>
+</ul>
+<p><strong>manipulate_pdb</strong>: A pdb file can be modified by either applying a
+symmetry operator to the coordinates (select the <em>apply_operator</em> task
+from the <em>manipulate_pdb.task</em> list. The operator needs to be specified
+by apply_operator.operator. Setting <em>apply_operator.invert</em> to true
+will invert the supplied operator. One can choose to put out the newly
+generated chain with the original chain (set concatenate_model = True).
+The new chain ID can be controlled with the <em>chain_id_increment</em>
+parameter. <strong>manipulate miller</strong>: Reflection data can be manipulate in
+various ways:</p>
+<ul class="simple">
+<li><em>get_dano</em>: Get anomalous differences from the data set with name
+specified by <em>manipulate_miller.get_dano.input_data</em>.</li>
+<li><em>get_diso</em>: Get isomorphous differences (derivative-native) from the
+data sets specified by the names
+<em>manipulate_miller.get_diso.native</em> and
+<em>manipulate_miller.get_diso.derivative</em>. Least squares scaling of
+the derivative to the native can be done on intensities
+(use_intensities=True), with or without using sigmas
+(<em>use_weights</em>) and by scaling the weights if desired (recommended).</li>
+<li><em>lsq_scale</em> : As above, no isomorphous difference are computed,
+<em>only input_data_2</em> is scaled and returned.</li>
+<li><em>sfcalc</em>: Structure factor calculation. Requires a pdb file to be
+read in. Possible output coefficients are</li>
+<li><em>2mFo-DFc</em> (Fobs required. specify <em>sfcalc.fobs</em>).</li>
+<li><em>mFo-DFc</em> (Fobs required. specify <em>sfcalc.fobs</em>).</li>
+<li><em>complex_fcalc</em> (FC,PHIC)</li>
+<li><em>abs_fcalc</em> (FC)</li>
+<li><em>intensities</em> (FC^2)</li>
+</ul>
+<p>bulk solvent and scaling parameters will be either estimated from
+observed data if supplied, or set by the user (using keywords in the
+<em>bulk_and_scale_parameters</em> scope)</p>
+<ul class="simple">
+<li><em>custom</em>: If <em>custom</em> is selected, all data names for the xray data
+will become variable names accessible via the <em>custom</em> interface. The
+``custom`` interface allows one to write a small piece of python
+code that directly works with the python objects them self. Basic
+knowledge of the cctbx and python are needed to bring this to a
+fruitful ending. Please contact the authors for detailed help if
+required. An example is given in the example section.</li>
+</ul>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+<pre class="literal-block">
+Reindexing a data set and model ::
+
+  xmanip {
+    input {
+      xray_data {
+        file_name = mydata.mtz
+        labels = FOBS,SIGFOBS
+        write_out = True
+      }
+      xray_data {
+        file_name = mydata.mtz
+        labels = R_FREE_FLAG
+        write_out = True
+      }
+      model {
+        file_name = mymodel.pdb
+      }
+    }
+    parameters {
+      action = reindex
+      reindex {
+        standard_laws = *niggli
+        user_supplied_law = &quot;h,k,l&quot;
+      }
+    }
+    output {
+      logfile = &quot;xmanip.log&quot;
+      hklout = &quot;reindex.mtz&quot;
+      xyzout = &quot;reindex.pdb&quot;
+    }
+  }
+
+
+Applying a symmetry operator to a pdb file ::
+
+
+  xmanip {
+    input {
+      model {
+        file_name = mymodel.pdb
+      }
+    }
+    parameters {
+      action = manipulate_pdb
+      manipulate_pdb {
+        task = apply_operator
+        apply_operator{
+          operator = &quot;x+1/3,y-2/3,z+1/8&quot;
+        }
+      }
+    }
+    output {
+      logfile = &quot;xmanip.log&quot;
+      xyzout = &quot;shifted.pdb&quot;
+    }
+  }
+
+
+Printing out some useful information for an mtz file ::
+
+  xmanip {
+    input {
+      xray_data {
+        file_name = mydata.mtz
+        labels = FOBS,SIGFOBS
+        name = fobs
+      }
+    }
+    parameters {
+      action = custom
+      custom{
+        code = &quot;&quot;&quot;
+  print &gt;&gt; out, &quot;Printing d_spacings, epsilons and intensities&quot;
+  #change amplitude to intensities
+  fobs = fobs.f_as_f_sq()
+  #get epsilons
+  epsilons = fobs.epsilons().data().as_double()
+  #get d spacings
+  d_hkl = fobs.d_spacings().data()
+  #print the lot to a file
+  output_file = open(&quot;jiffy_result.txt&quot;, 'w')
+  for ii, eps, dd in zip( fobs.data(), epsilons, d_hkl):
+    print &gt;&gt; output_file, ii, eps, dd
+  print &gt;&gt; out, &quot;Done&quot;
+               &quot;&quot;&quot;
+      }
+    }
+  }
+</pre>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">xmanip</span><ul><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">unit_cell</span><span class="phil-words"> = None </span><span class="phil-help">Unit cell parameters</span></li><li class="phil-param" data-expert="0"><span class="phil-name">space_group</span><span class="phil-words"> = None </span><span class="phil-help">space group</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">xray_data</span><span class="phil-help">Scope defining xray data. Multiple scopes are allowed</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">labels</span><span class="phil-words"> = None </span><span class="phil-help">A unique label or unique substring of a label</span></li><li class="phil-param" data-expert="0"><span class="phil-name">label_appendix</span><span class="phil-words"> = None </span><span class="phil-help">Label appendix for output mtz file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">name</span><span class="phil-words"> = None </span><span class="phil-help">An identifier of this particular miller array</span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_out</span><span class="phil-words"> = None </span><span class="phil-help">Determines if this data is written to the output file</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">model</span><span class="phil-help">A model associated with the miller arrays. Only one model can be defined.</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">A model file</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">parameters</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">action</span><span class="phil-words"> = *reindex manipulate_pdb manipulate_miller </span><span class="phil-help">Defines which action will be carried out.</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">reindex</span><span class="phil-help">Reindexing parameters. Acts on coordinates and miller arrays.</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">standard_laws</span><span class="phil-words"> = niggli *reference_setting primitive_setting invert user_supplied </span><span class="phil-help">Choices of reindexing operators. Will be applied on structure and miller arrays.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">user_supplied_law</span><span class="phil-words"> = 'h,k,l' </span><span class="phil-help">User supplied operator.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">manipulate_miller</span><span class="phil-help">Acts on a single miller array or a set of miller arrays.</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">task</span><span class="phil-words"> = *get_dano get_diso lsq_scale sfcalc custom None </span><span class="phil-help">Possible tasks</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_label_root</span><span class="phil-words"> = None </span><span class="phil-help">Output label root</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">get_dano</span><span class="phil-help">Get ||F+| - |F-|| from input data.</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">input_data</span><span class="phil-words"> = None </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">get_diso</span><span class="phil-help">Get |Fder|-|Fnat|</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">native</span><span class="phil-words"> = None </span><span class="phil-help">Name of native data</span></li><li class="phil-param" data-expert="0"><span class="phil-name">derivative</span><span class="phil-words"> = None </span><span class="phil-help">Name of derivative data</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_intensities</span><span class="phil-words"> = True </span><span class="phil-help">Scale on intensities</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_weights</span><span class="phil-words"> = True </span><span class="phil-help">Use experimental sigmas as weights in scaling</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scale_weight</span><span class="phil-words"> = True </span><span class="phil-help">Whether or not to scale the sigmas during scaling</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">lsq_scale</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">input_data_1</span><span class="phil-words"> = None </span><span class="phil-help">Reference data</span></li><li class="phil-param" data-expert="0"><span class="phil-name">input_data_2</span><span class="phil-words"> = None </span><span class="phil-help">Data to be scaled</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_intensities</span><span class="phil-words"> = True </span><span class="phil-help">Scale on intensities</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_weights</span><span class="phil-words"> = True </span><span class="phil-help">Use experimental sigmas as weights in scaling</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scale_weight</span><span class="phil-words"> = True </span><span class="phil-help">Whether or not to scale the sigmas during scaling</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">sfcalc</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">fobs</span><span class="phil-words"> = None </span><span class="phil-help">Data name of observed data</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output</span><span class="phil-words"> = 2mFo-DFc mFo-DFc *complex_fcalc abs_fcalc intensities </span><span class="phil-help">Output coefficients</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_bulk_and_scale</span><span class="phil-words"> = *as_estimated user_upplied </span><span class="phil-help">estimate or use parameters given by user</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">bulk_and_scale_parameters</span><span class="phil-help">Parameters used in the structure factor calculation. Ignored if experimental data is given</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">d_min</span><span class="phil-words"> = 2.0 </span><span class="phil-help">resolution of the data to be calculated.</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">overall</span><span class="phil-help">Bulk solvent and scaling parameters</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">k_overall</span><span class="phil-words"> = 0.1 </span><span class="phil-help">Overall scalar</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">b_cart</span><span class="phil-help">Anisotropic B values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">b_11</span><span class="phil-words"> = 0 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_22</span><span class="phil-words"> = 0 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_33</span><span class="phil-words"> = 0 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_12</span><span class="phil-words"> = 0 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_13</span><span class="phil-words"> = 0 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_23</span><span class="phil-words"> = 0 </span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">solvent</span><span class="phil-help">Solvent parameters</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">k_sol</span><span class="phil-words"> = 0.3 </span><span class="phil-help">Solvent scale</span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_sol</span><span class="phil-words"> = 56.0 </span><span class="phil-help">Solvent B</span></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">custom</span><span class="phil-help">A custom script that uses miller_array data names as variables.</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">code</span><span class="phil-words"> = None </span><span class="phil-help">A piece of python code</span></li><li class="phil-param" data-expert="0"><span class="phil-name">show_instructions</span><span class="phil-words"> = True </span><span class="phil-help">Some instructions</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">manipulate_pdb</span><span class="phil-help">Manipulate elements of a pdb file</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">task</span><span class="phil-words"> = set_b apply_operator *None </span><span class="phil-help">How to manipulate a pdb file</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">set_b</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">b_iso</span><span class="phil-words"> = 30 </span><span class="phil-help">new B value for all atoms</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">apply_operator</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">standard_operators</span><span class="phil-words"> = *user_supplied_operator user_supplied_cartesian_rotation_matrix </span><span class="phil-help">Possible operators</span></li><li class="phil-param" data-expert="0"><span class="phil-name">user_supplied_operator</span><span class="phil-words"> = "x,y,z" </span><span class="phil-help">Actualy operator in x,y,z notation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">invert</span><span class="phil-words"> = False </span><span class="phil-help">Invert operator given above before applying on coordinates</span></li><li class="phil-param" data-expert="0"><span class="phil-name">concatenate_model</span><span class="phil-words"> = False </span><span class="phil-help">Determines if new chain is concatenated to old model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_id_increment</span><span class="phil-words"> = 1 </span><span class="phil-help">Cain id increment</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">user_supplied_cartesian_rotation_matrix</span><span class="phil-help">Rotation,translation matrix in cartesian frame</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">r</span><span class="phil-words"> = None </span><span class="phil-help">Rotational part of operator</span></li><li class="phil-param" data-expert="0"><span class="phil-name">t</span><span class="phil-words"> = None </span><span class="phil-help">Translational part of operator</span></li></ul></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><span class="phil-help">Output files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">logfile</span><span class="phil-words"> = xmanip.log </span><span class="phil-help">Logfile</span></li><li class="phil-param" data-expert="0"><span class="phil-name">hklout</span><span class="phil-words"> = xmanip.mtz </span><span class="phil-help">Ouptut miller indices and data</span></li><li class="phil-param" data-expert="0"><span class="phil-name">xyzout</span><span class="phil-words"> = xmanip.pdb </span><span class="phil-help">output PDB file</span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

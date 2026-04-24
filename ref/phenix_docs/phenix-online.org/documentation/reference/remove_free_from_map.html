@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Remove test set reflections from a map file with remove_free_from_map</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="remove-test-set-reflections-from-a-map-file-with-remove-free-from-map">
+<h1 class="title">Remove test set reflections from a map file with remove_free_from_map</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>remove_free_from_map: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>remove_free_from_map is a tool to remove test set reflections from a
+map coefficients file so that the map can be used in real-space
+refinement without including the test set reflections.</p>
+<p>NOTE: Normally remove_free_from_map is called from build_one_model
+or phase_and_build, but you can run it interactively if you want.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-remove-free-from-map-works">
+<h1>How remove_free_from_map works:</h1>
+<p>remove_free_from_map uses resolve to set all test set reflections to
+zero.</p>
+</div>
+<div class="section" id="output-files-from-remove-free-from-map">
+<h1><em>Output files from remove_free_from_map</em></h1>
+<p><strong>map_coeffs_without_freer_set.mtz</strong>: An MTZ file with test set
+reflections set to F=0</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-remove-free-from-map">
+<h1>Standard run of remove_free_from_map:</h1>
+<p>Running remove_free_from_map is easy. From the command-line you can
+type:</p>
+<pre class="literal-block">
+phenix.remove_free_from_map   map_coeffs.mtz free_r.mtz
+</pre>
+<p>where free_r.mtz has your FreeR_flag indicating which reflections are
+in the test set.</p>
+<p></p>
+</div>
+</div>
+    
+  </body>
+</html>

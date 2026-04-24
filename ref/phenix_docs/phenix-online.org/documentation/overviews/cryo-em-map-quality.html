@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Assessing Map Quality (cryo-EM)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="assessing-map-quality-cryo-em">
+<h1 class="title">Assessing Map Quality (cryo-EM)</h1>
+<p><strong>Why</strong></p>
+<p>The first step after data processing is analysis to assess data
+quality and detect any pathologies that might thwart structure solution.
+The quality of the reconstruction, and therefore the interpretability
+of a cryo-EM map, can deteriorate from many causes including structural
+heterogeneity, radiation damage, and beam-induced sample movement.</p>
+<p>Data quality is typically expressed by the resolution, but this term
+has a different meaning for cryo-EM than crystallographic experiments.
+For a cryo-EM map, the overall resolution (d<sub>FSC</sub>) is usually defined
+as the maximum spatial resolution at which the information content of the map
+is reliable.</p>
+<p>The cryo-EM resolution is typically obtained by analyzing the Fourier shell correlation
+(FSC) for two cryo-EM half-maps binned in resolution shells. If the macromolecule
+is structurally heterogeneous, a single resolution value is adequate.
+'Local resolutions' can be also assigned to different map regions.</p>
+<p><strong>How</strong></p>
+<p>The <em>phenix.mtriage</em> program estimates the resolution of cryo-EM maps
+using several approaches, and then provides a summary of the map
+statistics. The tool requires only a full cryo-EM map (in CCP4, MRC, or
+other related format). However, you can obtain additional information by
+inputting two half-maps and/or an atomic model (in PDB or mmCIF format).</p>
+<p><strong>How to use the phenix.mtriage:</strong> <a class="reference external" href="../reference/mtriage.html">Click here</a></p>
+<p><strong>Common issues</strong></p>
+<p>Program stops: All input maps are expected to be on the same grid. Also,
+box information (e.g., unit cell of CRYST1 record in PDB files) must match
+across all of the inputs.</p>
+<p><strong>Related programs and Documentation</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="../reference/show_map_info.html">phenix.show_map_info</a>:
+This program lists the properties of a map, including the origin, grid points,
+unit cell, and map size.</li>
+<li><a class="reference external" href="../reference/map_box.html">phenix.map_box</a>:
+This program cuts out a box around selected atoms from a larger map
+(MTZ, CCP4, or X-plor format).</li>
+<li><a class="reference external" href="../reference/map_symmetry.html">phenix.map_symmetry</a>:
+Some molecules (e.g., viruses) have high internal symmetry, so you can
+reduce the map to the repeating unit. This program finds such symmetries, and
+<em>phenix.map_box</em> can extract the unique part of the map (using the extract-unique
+option).</li>
+<li><a class="reference external" href="../reference/combine_focused_maps.html">phenix.combine_focused_maps</a>:
+This program creates a weighted composite map from a set of locally focused maps
+and associated models, where each part of each map is weighted by its
+correlation with the corresponding model.</li>
+</ul>
+</div>
+    
+  </body>
+</html>

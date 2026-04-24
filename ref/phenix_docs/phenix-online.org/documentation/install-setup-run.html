@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>How to set up and use Phenix</title>
+    
+    <link rel="stylesheet" type="text/css" href="css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="index.html">
+        <img src="icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="how-to-set-up-and-use-phenix">
+<h1 class="title">How to set up and use Phenix</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="install-setup-run.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="install-setup-run.html#installation" id="toc-entry-1">Installation</a><ul>
+<li><a class="reference internal" href="install-setup-run.html#chatbot-help-on-installation" id="toc-entry-2">Chatbot help on installation</a></li>
+<li><a class="reference internal" href="install-setup-run.html#platform-support" id="toc-entry-3">Platform support</a></li>
+<li><a class="reference internal" href="install-setup-run.html#space-requirements" id="toc-entry-4">Space requirements</a></li>
+<li><a class="reference internal" href="install-setup-run.html#graphical-installer-mac" id="toc-entry-5">Graphical installer - Mac</a></li>
+<li><a class="reference internal" href="install-setup-run.html#graphical-installer-windows" id="toc-entry-6">Graphical installer - Windows</a></li>
+<li><a class="reference internal" href="install-setup-run.html#command-line-installer-macos-and-linux" id="toc-entry-7">Command-line installer (macOS and Linux)</a></li>
+<li><a class="reference internal" href="install-setup-run.html#installation-time" id="toc-entry-8">Installation time</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="install-setup-run.html#running-phenix" id="toc-entry-9">Running Phenix</a><ul>
+<li><a class="reference internal" href="install-setup-run.html#setting-up-the-command-line-environment" id="toc-entry-10">Setting up the command-line environment</a></li>
+<li><a class="reference internal" href="install-setup-run.html#documentation" id="toc-entry-11">Documentation</a></li>
+<li><a class="reference internal" href="install-setup-run.html#help" id="toc-entry-12">Help</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="install-setup-run.html#user-interfaces" id="toc-entry-13">User interfaces</a><ul>
+<li><a class="reference internal" href="install-setup-run.html#the-phenix-gui" id="toc-entry-14">The Phenix GUI</a></li>
+<li><a class="reference internal" href="install-setup-run.html#command-line-interface" id="toc-entry-15">Command Line Interface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="install-setup-run.html#troubleshooting" id="toc-entry-16">Troubleshooting</a><ul>
+<li><a class="reference internal" href="install-setup-run.html#problems-installing-on-linux" id="toc-entry-17">Problems installing on Linux</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="installation">
+<h1><a class="toc-backref" href="install-setup-run.html#toc-entry-1">Installation</a></h1>
+<div class="section" id="chatbot-help-on-installation">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-2">Chatbot help on installation</a></h2>
+<p>You can use the Phenix <a class="reference external" href="reference/chatbot.html">chatbot</a>
+to help you with installation.</p>
+</div>
+<div class="section" id="platform-support">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-3">Platform support</a></h2>
+<p>Phenix is supported on most common Linux platforms (glibc 2.17 or newer),
+macOS version 10.13 or newer for Intel and 11 or newer for Apple Silicon,
+and Windows 10 or newer.</p>
+</div>
+<div class="section" id="space-requirements">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-4">Space requirements</a></h2>
+<p>For the complete Phenix installation you will need approximately 15 GB
+of disk space. During installation, you will need approximately 25 GB
+for temporary files.</p>
+</div>
+<div class="section" id="graphical-installer-mac">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-5">Graphical installer - Mac</a></h2>
+<p>There are installers for Intel processors and for Apple Silicon processors.
+Choose the installer that matches the hardware on your system. Apple
+Silicon installers will not run on Intel systems and the Intel version of
+Phenix will run significantly slower on Apple Silicon systems.</p>
+<p>After downloading the Phenix-xxxx.pkg file use &quot;Open with&quot; and choose
+&quot;Installer.app&quot;. When asked about unknown applications go ahead and hit Open
+(if you just double-click on the file it will say that it is not approved
+by Apple and it will not give you the option to approve it yourself). On
+newer versions of macOS, you will get a message that the installer cannot
+be run. You must then go to System Preferences, and then Privacy &amp; Security.
+At the bottom, you will get an option to run the .pkg installer anyway.
+Click that to run the installer.</p>
+<p>Alternatively, you can run <tt class="docutils literal">xattr <span class="pre">-c</span> &lt;GUI installer name&gt;</tt>, to skip
+the security checks by macOS.</p>
+<p>You will need administrative privileges to install Phenix into <strong>/Applications</strong>.
+For single user installation, the default location is in <strong>${HOME}/Applications</strong>.
+The Phenix application is found inside the Phenix-&lt;version&gt; folder in those
+directories.</p>
+</div>
+<div class="section" id="graphical-installer-windows">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-6">Graphical installer - Windows</a></h2>
+<p>Run the .exe installer and follow the prompts. Windows may have similar
+security prompts like in macOS. Click &quot;More info&quot; and then &quot;Run anyway&quot;
+to run the installer.</p>
+<p>The destination folder should be a path without spaces.</p>
+<p>There will be a new Start Menu folder containing the Phenix GUI application
+and an item for starting a command-line prompt with the Phenix environment.</p>
+</div>
+<div class="section" id="command-line-installer-macos-and-linux">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-7">Command-line installer (macOS and Linux)</a></h2>
+<p>On macOS and Linux, the command-line installers are packaged as <tt class="docutils literal">.sh</tt>
+files. To install, run</p>
+<blockquote>
+<tt class="docutils literal">% bash &lt;installer name&gt;</tt></blockquote>
+<p>for interactive installations. For batch mode (skips interactive prompts), run</p>
+<blockquote>
+<tt class="docutils literal">% bash &lt;installer name&gt; <span class="pre">-b</span> <span class="pre">-p</span> <span class="pre">&lt;prefix&gt;/phenix-&lt;version&gt;</span></tt></blockquote>
+<p>The <tt class="docutils literal"><span class="pre">phenix-&lt;version&gt;</span></tt> is needed to isolate the Phenix installation from
+<tt class="docutils literal">&lt;prefix&gt;</tt>.</p>
+</div>
+<div class="section" id="installation-time">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-8">Installation time</a></h2>
+<p>Installation of the binary version of Phenix requires no compilation, only
+the extraction of compressed packages and then the generation of some data
+files. You will probably have to wait about 15 minutes for the installation
+to complete, depending on the performance of your installation platform.
+However, installation may take upwards of 30 minutes or more if you have
+antivirus software or slow disk speeds.</p>
+</div>
+</div>
+<div class="section" id="running-phenix">
+<h1><a class="toc-backref" href="install-setup-run.html#toc-entry-9">Running Phenix</a></h1>
+<p>If you intend to use the graphical interface and installed Phenix using the
+macOS or Windows graphical installers, no further configuration is necessary -
+just double-click the icon for the main Phenix GUI.  Instructions below are
+for users of the command-line installer and/or programs.</p>
+<div class="section" id="setting-up-the-command-line-environment">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-10">Setting up the command-line environment</a></h2>
+<p>Once you have successfully installed Phenix, to set up your environment
+please source the <tt class="docutils literal">phenix_env</tt> file in the Phenix installation directory
+(for example - replace &quot;&lt;version&gt;&quot; with the actual installed version,
+such as &quot;2.0-5933&quot;):</p>
+<blockquote>
+<p><tt class="docutils literal">% source <span class="pre">&lt;prefix&gt;/phenix-&lt;version&gt;/phenix_env.sh</span></tt> for sh users</p>
+<p><tt class="docutils literal">% source <span class="pre">&lt;prefix&gt;/phenix-&lt;version&gt;/phenix_env.csh</span></tt> for csh users</p>
+</blockquote>
+<p>To simplify the set up of Phenix, you can add this step to your shell
+startup script.</p>
+<p>If you used the graphical Mac installer, you can find the files in the
+phenix-&lt;version&gt; folder in /Applications or ${HOME}/Applications.</p>
+<p>The following environmental variables should now be defined (here with
+example values):</p>
+<pre class="literal-block">
+PHENIX=&lt;installation location&gt;
+PHENIX_PREFIX=&lt;installation location&gt;
+PHENIX_VERSION=&lt;version&gt;
+</pre>
+<p>The <tt class="docutils literal">$PATH</tt> is also updated to put Phenix executables before your other
+commands.</p>
+</div>
+<div class="section" id="documentation">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-11">Documentation</a></h2>
+<p>You can find documentation in the Phenix GUI (under the Help menu).
+Alternatively, you can use a web browser to view the documentation
+supplied with Phenix, by typing:</p>
+<blockquote>
+<tt class="docutils literal">% phenix.doc</tt></blockquote>
+<p>If this does not work because of browser installation issues then you can
+point a web browser to the correct location in your Phenix installation
+(for example):</p>
+<blockquote>
+<tt class="docutils literal">% firefox <span class="pre">${PHENIX_PREFIX}/share/phenix/doc/index.html</span></tt></blockquote>
+<p>For license information please see the LICENSE file.</p>
+<p>For the source of the components see SOURCES.</p>
+</div>
+<div class="section" id="help">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-12">Help</a></h2>
+<p>You can join the Phenix bulletin board and/or view the archives:</p>
+<pre class="literal-block">
+https://phenix-online.org/mailman3/lists/phenixbb.phenix-online.org/
+</pre>
+<p>Alternatively you can send email to:</p>
+<pre class="literal-block">
+help&#64;phenix-online.org  (if you'd like to ask us questions or report bugs)
+</pre>
+</div>
+</div>
+<div class="section" id="user-interfaces">
+<h1><a class="toc-backref" href="install-setup-run.html#toc-entry-13">User interfaces</a></h1>
+<p>Different user interfaces are required depending on the needs of a
+diverse user community.  Most modules in Phenix can be run either through
+a graphical user interface (GUI) or as command-line programs.
+For new users (and those without experience
+with Unix/Linux systems), we recommend using the graphical interface.</p>
+<div class="section" id="the-phenix-gui">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-14">The Phenix GUI</a></h2>
+<p>For new users and anyone unfamiliar with Unix command lines, we recommend
+using the graphical interface.  To run, simply type this command:</p>
+<pre class="literal-block">
+% phenix &amp;
+</pre>
+<p>Please see the other documentation files to get more details about the
+<a class="reference external" href="phenix_gui.html">Phenix GUI</a>.</p>
+</div>
+<div class="section" id="command-line-interface">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-15">Command Line Interface</a></h2>
+<p>Advanced users (or anyone developing automated pipelines) may prefer to use
+the command-line interface.
+This is particularly the case when rapid results are required, such as
+data quality assessment and twinning analysis, or substructure solution
+at the synchrotron beam line. Tools that facilitate the ease of use at
+the early stages of structure solution, such as data analyses
+(phenix.xtriage), substructure solution (phenix.hyss) and reflection
+file manipulations such as the generation of a test set, reindexing and
+merging of data (phenix.reflection_file_converter) are available via
+simple command line interfaces.  Most of the larger programs such as
+phenix.refine and the AutoSol, AutoBuild, and LigandFit wizards are also
+available as command-line tools.</p>
+<p>To illustrate the command line interface, the command used to run the
+program that carries out a data quality and twinning analyses is:</p>
+<blockquote>
+<tt class="docutils literal">phenix.xtriage my_data.sca [options]</tt></blockquote>
+<p>Further options can be given on the command line, or can be specified
+via a parameter file:</p>
+<blockquote>
+<tt class="docutils literal">phenix.xtriage my_parameters.def</tt></blockquote>
+<p>A similar interface is used for macromolecular refinement:</p>
+<blockquote>
+<tt class="docutils literal">phenix.refine my_model.pdb my_data.mtz</tt></blockquote>
+<p>Although SCALEPACK and MTZ formats are indicated in the above example,
+reflection file formats such as D*TREK, CNS/XPLOR or SHELX can be used,
+as the format is detected automatically.</p>
+<p>Help for all command line applications can be obtained by use of the
+flag --help :</p>
+<blockquote>
+<tt class="docutils literal">phenix.refine <span class="pre">--help</span></tt></blockquote>
+<p>There are also many other command line tools (described in detail
+elsewhere in this documentation). You can list them all with</p>
+<blockquote>
+<tt class="docutils literal">phenix.list</tt></blockquote>
+<p>or alternatively,</p>
+<blockquote>
+<tt class="docutils literal">phenix.list ave</tt></blockquote>
+<p>to list all methods that contain the characters ave in their names or
+descriptions.</p>
+<p>Note: all commands have their regular name and name qualified with the
+version. You can always use the version-qualified name to ensure which
+version of a command you are using (in case you have multiple versions
+of Phenix or related applications installed).</p>
+<p>The runtime options for most Phenix tools are controlled using a lightweight
+syntax called PHIL (Python Hierarchial Interface Language), which is designed
+to work both as command-line arguments or as more verbose parameter files.
+A basic overview of PHIL is available in the <a class="reference external" href="file_formats.html#phil">overview of file formats</a>.</p>
+</div>
+</div>
+<div class="section" id="troubleshooting">
+<h1><a class="toc-backref" href="install-setup-run.html#toc-entry-16">Troubleshooting</a></h1>
+<div class="section" id="problems-installing-on-linux">
+<h2><a class="toc-backref" href="install-setup-run.html#toc-entry-17">Problems installing on Linux</a></h2>
+<p>The command-line installer extracts some files into the temporary
+directory and then runs those files. On systems where the temporary
+directory is mounted to be non-executable, you will have to provide
+an alternate temporary directory. To do so, prepend the TMPDIR environment
+variable to the installation command.</p>
+<blockquote>
+<tt class="docutils literal"><span class="pre">TMPDIR=&lt;executable</span> temporary directory&gt; bash &lt;installer name&gt;</tt></blockquote>
+</div>
+</div>
+</div>
+    
+  </body>
+</html>

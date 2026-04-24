@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>PHENIX Examples</title>
+    
+    <link rel="stylesheet" type="text/css" href="css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="index.html">
+        <img src="icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="phenix-examples">
+<h1 class="title">PHENIX Examples</h1>
+<div class="section" id="where-can-i-find-sample-data">
+<h1>Where can I find sample data?</h1>
+<p>You can find sample data in the directories located in: $PHENIX/examples.
+Additionally there is sample MR data in $PHENIX/phaser/tutorial.  The <a class="reference external" href="phenix_gui.html">PHENIX
+GUI</a> provides the ability to automatically set up any of
+the tutorial datasets.  When the GUI is started for the first time, a dialog
+window will appear asking you to create a project:</p>
+<blockquote>
+<img alt="images/new_project.png" src="images/new_project.png" />
+</blockquote>
+<p>Click the button &quot;Set up tutorial data&quot; to select a tutorial.  A new window
+will appear with a drop-down menu listing all of the tutorial datasets grouped
+by category (Experimental phasing, Molecular replacement, etc.).  By default
+the necessary files will be copied to a new directory in your Documents folder
+(if present, otherwise the home directory will be used), but you may use any
+destination you wish.</p>
+<blockquote>
+<img alt="images/tutorial_setup.png" src="images/tutorial_setup.png" />
+</blockquote>
+<p>A README file is available for some projects; this contains important
+information such as the wavelengths and anomalous scattering coefficients (f'
+and f'') for MAD datasets.</p>
+</div>
+<div class="section" id="can-i-easily-run-a-wizard-with-some-sample-data">
+<h1>Can I easily run a Wizard with some sample data?</h1>
+<p>You can run sample data from the command line with a Wizard with a simple
+command. To run p9-sad sample data with the AutoSol wizard, you type:</p>
+<pre class="literal-block">
+phenix.run_example  p9-sad
+</pre>
+<p>This command copies the $PHENIX/examples/p9-sad directory to your working
+directory and executes the commands in the file run.sh.  Documentation for
+running tutorials in the GUI is currently in preparation.</p>
+</div>
+<div class="section" id="what-sample-data-are-available-to-run-automatically">
+<h1>What sample data are available to run automatically?</h1>
+<p>You can see which sample data are set up to run automatically by typing:</p>
+<pre class="literal-block">
+phenix.run_example  --help
+</pre>
+<p>This command lists all the directories in $PHENIX/examples/ that have a
+command file run.sh ready to use. For example:</p>
+<pre class="literal-block">
+phenix.run_example  --help
+
+PHENIX run_example script. Fri Jul  6 12:07:08 MDT 2007
+
+Use: phenix.run_example example_name [--all] [--overwrite]
+Data will be copied from PHENIX examples into subdirectories
+of this working directory
+If --all is set then all examples will be run (takes a long time!)
+If --overwrite is set then the script will overwrite subdirectories
+
+List of available examples:  1J4R-ligand a2u-globulin-mr gene-5-mad
+p9-build p9-sad
+</pre>
+</div>
+<div class="section" id="are-any-of-the-sample-datasets-annotated">
+<h1>Are any of the sample datasets annotated?</h1>
+<p>The PHENIX tutorials listed on the main PHENIX web page will walk you through
+sample datasets, telling you what to look for in the output files. For example,
+the Tutorial 1: Solving a structure using SAD data tutorial uses the p9-sad
+dataset as example. It tells you how to run this example data in AutoSol and
+how to interpret the results.</p>
+</div>
+</div>
+    
+  </body>
+</html>

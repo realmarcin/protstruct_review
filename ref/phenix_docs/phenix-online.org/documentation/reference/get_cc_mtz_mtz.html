@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Correlation of two maps (deprecated, use MapCorrelations)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="correlation-of-two-maps-deprecated-use-mapcorrelations">
+<h1 class="title">Correlation of two maps (deprecated, use MapCorrelations)</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>get_cc_mtz_mtz: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>get_cc_mtz_mtz is a command line tool for adjusting the origin of a
+map so that the map superimposes on another map, and obtaining the
+correlation of the two maps. The maps are calculated from map
+coefficients supplied by the user in two mtz files.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-get-cc-mtz-mtz-works">
+<h1>How get_cc_mtz_mtz works:</h1>
+<p>get_cc_mtz_mtz calculates maps based on the supplied mtz files, then
+uses RESOLVE to find the origin shift compatible with space-group
+symmetry that maximizes the correlation of the two maps. This shift is
+applied to the second map and the correlation of the maps is calculated.</p>
+<p>Several parameters can be set by the user to define how the correlations
+are calculated. By default, maps are calculated using all the
+reflections present (to the specified high-resolution limit, if any) in
+each mtz file.</p>
+<p>If you specify</p>
+<pre class="literal-block">
+use_only_refl_present_in_mtz_1=True
+</pre>
+<p>Then the map calculated using your second mtz file will only include
+reflections that were present in your first mtz file. This removes the
+effects of missing reflections on the correlation.</p>
+<p>If you specify</p>
+<pre class="literal-block">
+scale=True
+</pre>
+<p>then get_cc_mtz_mtz scales the amplitudes from the second input mtz
+file to those in the first input mtz, including an overall B factor and
+a scale factor. This reduces effects of differences in overall B factors
+between the two mtz files on the correlation.</p>
+<p>If you specify</p>
+<pre class="literal-block">
+keep_f_mag=False
+</pre>
+<p>then get_cc_mtz_mtz uses amplitudes from the first input mtz file and
+phases and figure of merit from both to do the correlation. This has the
+effect of removing effects due to differences in amplitudes on the
+correlation, and focusing on differences in phases and figures of merit.</p>
+</div>
+<div class="section" id="output-files-from-get-cc-mtz-mtz">
+<h1><em>Output files from get_cc_mtz_mtz</em></h1>
+<p><strong>offset.log</strong>: Log file for correlation calculation.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-get-cc-mtz-mtz">
+<h1>Standard run of get_cc_mtz_mtz:</h1>
+<p>Running the get_cc_mtz_mtz is easy. From the command-line you can
+type:</p>
+<pre class="literal-block">
+phenix.get_cc_mtz_mtz map_coeffs_1.mtz  map_coeffs_2.mtz
+</pre>
+<p>If you want (or need) to specify the column names from your mtz file,
+you will need to tell get_cc_mtz_mtz what FP and PHIB (and optionally
+FOM) are, in this format:</p>
+<pre class="literal-block">
+phenix.get_cc_mtz_mtz map_coeffs_1.mtz  map_coeffs_2.mtz \
+labin_1=&quot;FP=2FOFCWT PHIB=PH2FOFCWT&quot;  labin_2=&quot;FP=2FOFCWT PHIB=PH2FOFCWT&quot;
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+<ul class="simple">
+<li>Versions of phenix.get_cc_mtz_mtz up to 1.3-final used a different
+set of defaults, with the values,</li>
+</ul>
+<pre class="literal-block">
+scale=True
+keep_f_mag=False
+use_only_refl_present_in_mtz_1=True
+</pre>
+<p>These defaults were changed after version 1.3-final in order to make the
+results independent of the order of the mtz files and to make the
+default be to get the correlation of maps without manipulation.</p>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">get_cc_mtz_mtz</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">mtz_1</span><span class="phil-words"> = None </span><span class="phil-help">MTZ file 1 with coefficients for a map </span></li><li class="phil-param" data-expert="0"><span class="phil-name">mtz_2</span><span class="phil-words"> = None </span><span class="phil-help">MTZ file 2 with coefficients for a map </span></li><li class="phil-param" data-expert="0"><span class="phil-name">labin_1</span><span class="phil-words"> = "" </span><span class="phil-help"> Labin line for MTZ file 1 with map coefficients.
+                 This is optional if get_cc_mtz_mtz
+                 can guess the correct coefficients
+                 for FP PHI and FOM.  Otherwise specify:
+                 LABIN FP=myFP PHIB=myPHI FOM=myFOM
+                 where myFP is your column label for FP </span></li><li class="phil-param" data-expert="0"><span class="phil-name">labin_2</span><span class="phil-words"> = "" </span><span class="phil-help"> Labin line for MTZ file 2 with map coefficients.
+                 This is optional if get_cc_mtz_mtz
+                 can guess the correct coefficients
+                 for FP PHI and FOM.  Otherwise specify:
+                 LABIN FP=myFP PHIB=myPHI FOM=myFOM
+                 where myFP is your column label for FP </span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_in_1</span><span class="phil-words"> = None </span><span class="phil-help">CCP4 or MRC-style map file for file 1 (instead of mtz_1)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_in_2</span><span class="phil-words"> = None </span><span class="phil-help">CCP4 or MRC-style map file for file 2 (instead of mtz_2)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">high-resolution limit for map calculation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">low_resolution</span><span class="phil-words"> = None </span><span class="phil-help">low-resolution limit for map calculation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">offset_suffix</span><span class="phil-words"> = offset </span><span class="phil-help">Suffix for output version of mtz file 2 or map_in_2,   offset to maximize  correlation with mtz file 1</span></li><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = "temp_dir" </span><span class="phil-help">Temporary work directory</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = "" </span><span class="phil-help">Output directory where files are to be written</span></li><li class="phil-param" data-expert="0"><span class="phil-name">gui_output_dir</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_f_mag</span><span class="phil-words"> = True </span><span class="phil-help">If you set keep_f_mag=False then
+           get_cc_mtz_mtz uses amplitudes from
+           the first input mtz file and phases and fom from both to do the
+           correlation. If you specify keep_f_mag=True then the amplitudes from
+           both files are included.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scale</span><span class="phil-words"> = False </span><span class="phil-help">If you set scale=True then get_cc_mtz_mtz scales the
+           amplitudes from
+           the second input mtz file to those in the first input mtz,
+           including an overall B factor and a scale factor.
+           </span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_only_refl_present_in_mtz_1</span><span class="phil-words"> = False </span><span class="phil-help"> You can specify that only reflections present in
+          your first mtz file are used in the comparison.  Note that
+          this means that the order of the files will have an effect
+          on the correlation coefficient</span></li><li class="phil-param" data-expert="0"><span class="phil-name">any_offset</span><span class="phil-words"> = False </span><span class="phil-help">You can search for a match with any offset even
+          though this is not allowed by space-group symmetry</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fix_xyz</span><span class="phil-words"> = False </span><span class="phil-help">You can get map-map correlation with no translations Does not apply to mtz-mtz comparisons</span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = True </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">raise_sorry</span><span class="phil-words"> = False </span><span class="phil-help">Raise sorry if problems</span></li><li class="phil-param" data-expert="0"><span class="phil-name">debug</span><span class="phil-words"> = False </span><span class="phil-help">Debugging output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dry_run</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and check parameter names</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_command_list</span><span class="phil-words"> = None </span><span class="phil-help">You can supply any resolve command here NOTE: for command-line usage you need to enclose the whole set of commands in double quotes (&amp;quot;) and each individual command in single quotes (') like this:  resolve_command_list=&amp;quot;'no_build' 'b_overall 23' &amp;quot; </span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

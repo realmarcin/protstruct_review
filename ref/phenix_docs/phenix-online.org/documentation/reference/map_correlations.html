@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Map correlations (map-model, map-map, optional origin shifts)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="map-correlations-map-model-map-map-optional-origin-shifts">
+<h1 class="title">Map correlations (map-model, map-map, optional origin shifts)</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>map_correlations: Pavel Afonine, Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>Map correlations is a GUI and command-line tool for evaluating the fit of
+models to maps and the correlation between maps.  It has the feature that
+the model or second map can be offset (translated) to maximize the
+correlation.  This offset can be restricted to shifts allowed by
+space-group symmetry (translational_offsets=Allowed_by_symmetry)  or it
+can be any shifts (translational_offsets=Any).</p>
+<p>Maps can be supplied as map files or as map coefficients. Maps and
+map coefficients may not be both used at the same time.</p>
+<p>If a model is supplied, the local correlation for each residue is calculated.</p>
+<p>The total number of files supplied must be exactly two.</p>
+</div>
+<div class="section" id="notes">
+<h1>Notes</h1>
+<p>The map_correlations tool replaces phenix.map_model_cc, phenix.model_map_cc,
+phenix.get_cc_mtz_mtz, phenix.get_cc_mtz_pdb, and phenix.get_cc_map_map.</p>
+</div>
+<div class="section" id="how-map-correlations-works">
+<h1>How map_correlations works:</h1>
+<p>If an optimized translation is requested, map correlations finds the
+optimal translation using RESOLVE.  The translation is calculated
+based on an FFT-based correlation search.
+If two maps (or map coefficients files) are supplied, the second map is
+shifted. If a model is supplied, a model-based map is calculated, and the
+optimal translation for that model-based map is applied to the model</p>
+<p>If you supply a model file, by default model density is calculated
+using the atom types, occupancies and isotropic thermal factors
+(B-values) supplied in that PDB file.</p>
+<p>If you specify b_values=Zero then
+all the B-values are set to zero before calculation of correlations. This
+is useful if you want to compare the clarities of a series of maps, all
+representing the same model. You calculate the map-model correlation of
+each map to your reference model in which all B-values in the reference
+model have been set to zero (Terwilliger et al., 2018):</p>
+</div>
+<div class="section" id="output-files-from-map-correlations">
+<h1>Output files from map_correlations</h1>
+<p><strong>xxx_offset.pdb</strong>: A PDB file offset to match the origin in the mtz file.
+Produced if translational_offsets are requested and a model is supplied.
+<strong>xxx_offset.mtz</strong>: A translated version of the second MTZ file supplied
+(if any),
+offset so that the map calculated from it optimally matches the map from the
+first MTZ file.
+<strong>xxx_offset.ccp4</strong>: A translated version of the second map file supplied,
+(if any) offset so that the map calculated from it optimally matches the map from the
+first map file.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-map-correlations">
+<h1>Standard run of map_correlations:</h1>
+<p>Running map_correlations is easy. From the command-line you can
+type:</p>
+<pre class="literal-block">
+phenix.map_correlations map_coeffs.mtz coords.pdb
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+<p>If map and model are supplied, normally you must supply a value for the
+resolution to which map-model correlations are calculated.</p>
+</div>
+<div class="section" id="references">
+<h1>References</h1>
+<p><ul><li><b>Automated map sharpening by maximization of detail and connectivity.</b> T.C. Terwilliger, P.V. Afonine, Sobolev, OV, and P.D. Adams. <a href="https://doi.org/10.1107/S2059798318004655"><i>Acta Cryst.</i> D<b>74</b>, 545-559 (2018)</a>.</li>
+</ul></p>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">map_correlations</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">translational_offsets</span><span class="phil-words"> = *None Any Allowed_by_symmetry </span><span class="phil-help">Allow origin shifts that are compatible with the map or map coefficients. For cryo-EM data, use None for no offsets or Any if you want to allow translations. For Xray data, use None for no offsets or Allowed_by_symmetry to allow origin offsets compatible with the space group.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_cc_for_auto_resolution</span><span class="phil-words"> = 0.1 </span><span class="phil-help">Minimum CC for automatic resolution estimation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_values</span><span class="phil-words"> = *Keep Zero </span><span class="phil-help">Keep B values as supplied, or set all to zero. Only applies if model is supplied.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">model</span><span class="phil-words"> = None </span><span class="phil-help">Model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_in_1</span><span class="phil-words"> = None </span><span class="phil-help">Map 1</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_in_2</span><span class="phil-words"> = None </span><span class="phil-help">Map 2</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_1</span><span class="phil-words"> = None </span><span class="phil-help">Map coefficients 1</span></li><li class="phil-param" data-expert="3"><span class="phil-name">map_coeffs_1_virtual</span><span class="phil-words"> = None </span><span class="phil-help">Used internally</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_2_virtual</span><span class="phil-words"> = None </span><span class="phil-help">Used internally</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_2</span><span class="phil-words"> = None </span><span class="phil-help">Map coefficients 2</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_labels_1</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_labels_2</span><span class="phil-words"> = None </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">clean_up</span><span class="phil-words"> = True </span><span class="phil-help">Clean up temp directories</span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">directories</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = None </span><span class="phil-help">Optional temporary directory</span></li><li class="phil-param" data-expert="0"><span class="phil-name">gui_output_dir</span><span class="phil-words"> = None </span><span class="phil-help">GUI use only - does not apply to command line version</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">map_model_cc</span><ul><li class="phil-param" data-expert="1"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">Data (map) resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scattering_table</span><span class="phil-words"> = wk1995 it1992 n_gaussian neutron *electron </span><span class="phil-help">Scattering table (X-ray, neutron or electron)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">atom_radius</span><span class="phil-words"> = None </span><span class="phil-help">Atom radius for masking. If undefined then calculated automatically</span></li><li class="phil-param" data-expert="3"><span class="phil-name">keep_map_calc</span><span class="phil-words"> = False </span><span class="phil-help">Keep model-calculated map</span></li><li class="phil-param" data-expert="3"><span class="phil-name">wrapping</span><span class="phil-words"> = None </span><span class="phil-help">You can specify whether your maps wrap around outside boundaries</span></li><li class="phil-param" data-expert="2"><span class="phil-name">ignore_symmetry_conflicts</span><span class="phil-words"> = False </span><span class="phil-help">You can ignore the symmetry information (CRYST1) from coordinate files. This may be necessary if your model has been placed in a box with box_map for example.</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">compute</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">cc_per_chain</span><span class="phil-words"> = True </span><span class="phil-help">Compute local model-map CC for each chain</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_per_residue</span><span class="phil-words"> = True </span><span class="phil-help">Compute local model-map CC for each residue</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_per_residue_group</span><span class="phil-words"> = False </span><span class="phil-help">Compute local model-map CC for each residue group</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fsc</span><span class="phil-words"> = True </span><span class="phil-help">Compute FSC</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_mask</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_volume</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_peaks</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_box</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_image</span><span class="phil-words"> = False </span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name_prefix</span><span class="phil-words"> = None </span><span class="phil-help">Optional prefix (including path) for output files. Default is name of the program and run number</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameters, not used on command line</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">result_file</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

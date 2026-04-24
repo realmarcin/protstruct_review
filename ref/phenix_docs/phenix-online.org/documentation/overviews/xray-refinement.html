@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>X-ray Structure Refinement</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="x-ray-structure-refinement">
+<h1 class="title">X-ray Structure Refinement</h1>
+<p><strong>Why</strong></p>
+<p>In crystallographic structure determination (X-ray or neutron),
+once an atomic model has been built into an electron density map, or
+obtained by molecular replacement, you need to optimize it to best fit
+the experimental data while also preserving good agreement with prior
+chemical knowledge.</p>
+<p>For crystallographic data, this refinement process is usually done
+in reciprocal space. Using a least-squares or maximum-likelihood target,
+the model parameters are changed so the model-derived structure factors
+match the amplitudes or intensities of the experimental structure factors.
+For example, these model parameters can include (a) atomic parameters, such as
+coordinates, atomic displacement parameters, occupancies, and scattering
+factors, and (b) non-atomic parameters that describe contributions from
+bulk solvent, twinning, and crystal anisotropy.</p>
+<p><strong>How</strong></p>
+<p>In Phenix, the primary program for refining atomic models is
+<em>phenix.refine</em>. This applies optimization algorithms (minimization or
+simulated annealing) to change the model parameters (typically
+coordinates and atomic displacement parameters) to improve the fit of
+the model to the data. At the same time, it applies restraints to prior
+chemical information (such as bond lengths, angles, and torsions) to
+maintain good stereochemistry. This customizable program allows multiple
+refinement strategies to be combined and applied to any selected part of
+the model in a single run.</p>
+<p><strong>How to use the phenix.refine GUI:</strong> <a class="reference external" href="../reference/refine_gui.html">Click
+here</a></p>
+<p><a class="reference external" href="../reference/refinement.html">Phenix reference manual for
+phenix.refine</a></p>
+<p><strong>Common issues</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="../faqs/refine.html">Frequently asked questions for structure
+refinement</a></li>
+</ul>
+<p><strong>Related programs</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="../reference/rosetta_refine.html">phenix.rosetta_refine</a>: This
+program combines crystallographic structure refinement algorithms
+from Phenix with physically realistic potentials for model
+optimization from Rosetta. The tool is useful at low resolution,
+where it combines a wide radius of convergence across distinct local minima
+with realistic geometry.</li>
+<li><a class="reference external" href="../reference/ensemble_refinement.html">phenix.ensemble_refinement</a>: This
+program combines crystallographic refinement with molecular dynamics to
+produce  ensemble models fitted to diffraction data. These
+ensemble models can contain ~50-500 individual structures, and can
+simultaneously account for anisotopic and anharmonic atomic
+distributions.</li>
+</ul>
+</div>
+    
+  </body>
+</html>

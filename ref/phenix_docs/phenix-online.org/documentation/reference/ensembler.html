@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Ensemble creation with Ensembler</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="ensemble-creation-with-ensembler">
+<h1 class="title">Ensemble creation with Ensembler</h1>
+<div class="section" id="author-s">
+<h1><strong>Author(s)</strong></h1>
+<ul class="simple">
+<li>ensembler: Gabor Bunkoczi</li>
+<li>PHENIX GUI: Nathaniel Echols</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>Ensembler can be used to superpose multiple chains to be used as an
+ensemble search model for molecular replacement.</p>
+</div>
+<div class="section" id="see-also">
+<h1>See also</h1>
+<p>phenix.sculptor and phenix.ensembler have been superseded by <a class="reference external" href="sculpt_ensemble.html">phenix.sculpt_ensemble</a></p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+<p>Ensembler can be run from the PHENIX GUI and the command line, the only
+difference being the way commands are taken from the user.</p>
+<p>The graphical user interface makes all settings accessible either as
+part of the main window (for frequently used options) or as a dialog box
+<strong>Ensemble generation settings...</strong>. Input files are specified either by
+the <strong>+</strong>/<strong>-</strong> button pair, or by drag-and-drop onto the window area.
+File types are automatically recognized, and added to the relevant input
+section.</p>
+<img alt="../images/ensembler_gui.png" src="../images/ensembler_gui.png" />
+</div>
+<div class="section" id="input-files">
+<h1>Input files</h1>
+<ul class="simple">
+<li><strong>Structures</strong> <em>(compulsory)</em>. The chains that are to be superposed.
+Protein chains are automatically identified, other chains are
+discarded. In case the structure contains multiple chains, these will
+all be used for superposition. Accepted formats: PDB. Recognized
+extensions: <tt class="docutils literal">.pdb</tt>, <tt class="docutils literal">.ent</tt>.</li>
+<li><strong>Alignment</strong> <em>(optional)</em>. In case a user-supplied residue mapping
+is desired, this can be achieved by selecting the appropriate mode
+and supplying alignment files. Accepted extensions (with the
+corresponding format) are <tt class="docutils literal">.aln</tt> (CLUSTAL format), <tt class="docutils literal">.pir</tt>
+(PIR-format) and <tt class="docutils literal">.ali</tt> (relaxed PIR-like format).</li>
+</ul>
+</div>
+<div class="section" id="output-files">
+<h1>Output files</h1>
+<p>The superposed chains can be written out either as a quasi multiple
+model PDB file that is readable by phaser directly (output style
+<tt class="docutils literal">merged</tt>, output file name <tt class="docutils literal">root_merged.pdb</tt>) or as a series of
+files containing each chain separately (output style <tt class="docutils literal">separate</tt>, file
+name <tt class="docutils literal">root_pdb_chain.pdb</tt>, where pdb is the name of the PDB file the
+chain was read from, and chain is the chain identifier). The file name
+<tt class="docutils literal">root</tt> can be changed via the <tt class="docutils literal">root</tt> parameter of the <tt class="docutils literal">output</tt>
+(default: <tt class="docutils literal">ensemble</tt>).</p>
+</div>
+<div class="section" id="description">
+<h1>Description</h1>
+<p>The workflow consists of several stages that can be independently
+configured. These are listed in order of execution, and control parameters
+are accessible from the <tt class="docutils literal">Ensemble generation <span class="pre">settings...</span></tt> dialog box.
+For a summary of all parameters with the corresponding defaults, see the
+<a class="reference internal" href="ensembler.html#additional">Additional information</a> section.</p>
+</div>
+<div class="section" id="residue-mapping">
+<h1>Residue mapping</h1>
+<p>Establishes the equivalence of residues among the input chains. There
+are several options available:</p>
+<ul class="simple">
+<li><tt class="docutils literal">ssm</tt> - Do structure-based SSM alignment (default).</li>
+<li><tt class="docutils literal">muscle</tt> - Generate a sequence alignment with MUSCLE and use that
+to align the residues.</li>
+<li><tt class="docutils literal">multiple_alignment</tt> - A user supplied multiple alignment is used.
+An error message will be raised if this is not present or does not
+cover all present chains.</li>
+<li><tt class="docutils literal">alignments</tt> - A series of alignments is used that <strong>all have the
+same first sequence</strong> (i.e. a series of pairwise alignments against
+the same target sequence). An error message will be raised if these
+do not cover all present chains.</li>
+<li><tt class="docutils literal">resid</tt> - Residue sequence number with insertion code will be used.</li>
+</ul>
+<p>Most common residue mapping mode is <tt class="docutils literal">ssm</tt>. If no SSM alignment can be
+done or this is imprecise (e.g. no secondary structure), <tt class="docutils literal">muscle</tt> is a
+good second choice.</p>
+</div>
+<div class="section" id="atom-mapping">
+<h1>Atom mapping</h1>
+<p>Maps selected atoms within equivalent residues to each other. The
+mapping is done by name hence the order of atoms in the residue does not
+matter. If atoms are missing from certain residues (or if certain
+residues contain extra atoms), a gap will be filled where necessary.
+Atom selection is controlled by the <tt class="docutils literal">atoms</tt> parameter of the
+<tt class="docutils literal">configuration</tt> scope. Default atom selection: CA.</p>
+</div>
+<div class="section" id="superposition">
+<h1>Superposition</h1>
+<p>Equivalent positions are superposed iteratively to find a globally
+optimal solution. There are two superposition algorithms implemented,
+which primarily differ in how they handle gaps in equivalent positions.</p>
+<ul class="simple">
+<li><tt class="docutils literal">gapless</tt>. This algorithm discards all positions where gaps are
+present, For further details, see <a class="reference internal" href="ensembler.html#diamond1992">Diamond (1992)</a>.</li>
+</ul>
+<ul class="simple">
+<li><tt class="docutils literal">gapped</tt>. This algorithm can use all positions as long as there are
+two sites presents (i.e. not gaps), and may give better results for
+chains with distant sequence identity. For the exact algorithm, see
+<a class="reference internal" href="ensembler.html#wangsnoeyink2008">Wang &amp; Snoeyink (2008)</a>.</li>
+</ul>
+<p>Both algorithms use Diamond's formulation to solve the pairwise
+rotational superposition problem (<a class="reference internal" href="ensembler.html#diamond1988">Diamond, 1988</a>).</p>
+<p>An exception is raised if there are less than 3 sites present for
+superposition.</p>
+<p>Multiple superposition is an iterative process and consists of a series
+of pairwise superpositions. The convergence criterion is controlled by
+the <tt class="docutils literal">convergence</tt> parameter (in the <tt class="docutils literal">superposition</tt> scope), which is
+the r.m.s. difference change between two consecutive iterations.</p>
+</div>
+<div class="section" id="weighting">
+<h1>Weighting</h1>
+<p>Automatic weighting can be used to improve superposition, either to
+amplify highly homologous regions or to decrease the effect of incorrect
+site-equivalence (typically arises because of a wrong alignment).
+Implemented weighting schemes are as follows:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal">unit</tt> - Unit weights (equivalent to no weighting).</p>
+</li>
+<li><p class="first"><tt class="docutils literal">robust_resistant</tt> - Robust-resistant weighting scheme (default).
+This tends to converge fast and give reliable results. The exact
+formula for weighting is as follows:</p>
+<pre class="literal-block">
+w = 1 - ( delta2 / tolerance2 )2 if delta &lt; tolerance
+w = 0 (otherwise)
+</pre>
+<p>where <tt class="docutils literal">delta</tt> is the deviation from the average. Tolerance is an
+empirical value, and its optimal value is close to (unweighted r.m.s.d.) <sup>2</sup>
+and can be controlled by the <tt class="docutils literal">critical</tt> parameter of the <tt class="docutils literal">robust_resistant</tt>
+scope.</p>
+</li>
+</ul>
+<p>Weighting is iterated with superposition until weights converge, which
+can be controlled by the <tt class="docutils literal">convergence</tt> parameter of the <tt class="docutils literal">weighting</tt>
+scope.</p>
+<p>In case of highly dissimilar structures (or incorrect residue mapping),
+weight determination may temporarily need to be damped to avoid
+divergence. This is done automatically (in steps controlled by the
+<tt class="docutils literal">incremental_damping_factor</tt> parameter of the <tt class="docutils literal">weighting</tt> scope),
+until a preset value (controlled by the <tt class="docutils literal">max_damping_factor</tt> parameter
+of the <tt class="docutils literal">weighting</tt> scope) is reached, at which point an exception is
+raised.</p>
+</div>
+<div class="section" id="cluster-analysis">
+<h1>Cluster analysis</h1>
+<p>Hierarchical cluster analysis is performed using the pairwise r.m.s.
+differences as a distance measure. The <tt class="docutils literal">clustering</tt> parameter of the
+<tt class="docutils literal">configuration</tt> score can be used to adjust cluster boundaries.</p>
+</div>
+<div class="section" id="chain-trimming">
+<h1>Chain trimming</h1>
+<p>This option trims residues from the final superposed model where the
+unweighted r.m.s.d. is above a certain threshold (<tt class="docutils literal">threshold</tt>
+parameter of the <tt class="docutils literal">trimming</tt> scope). Useful in removing flexible loops,
+etc. Default: no trimming.</p>
+</div>
+<div class="section" id="sorting">
+<h1>Sorting</h1>
+<p>After superposition is complete, the chains can be sorted by sequence
+identity (<tt class="docutils literal">identity</tt>), fraction of common sites wrt all aligned atom
+positions (<tt class="docutils literal">overlap</tt>), weighted r.m.s.d. (<tt class="docutils literal">wrmsd</tt>) or unweighted
+r.m.s.d. (<tt class="docutils literal">unwrmsd</tt>). This is controlled by the <tt class="docutils literal">sort</tt> parameter of
+the <tt class="docutils literal">output</tt> scope. Default: input order (<tt class="docutils literal">input</tt>).</p>
+</div>
+<div class="section" id="command-line">
+<h1>Command line</h1>
+<pre class="literal-block">
+phenix.ensembler \
+    [ command-line switches ] \
+    [ PHIL-format parameter files ] \
+    [ PHIL command-line assignments ] \
+    [ PDB-files ] \
+    [ alignment files ]
+</pre>
+<p>Command-line switches:</p>
+<pre class="literal-block">
+-h, --help            show this help message and exit
+--show-defaults       print PHIL and exit
+-i, --stdin           read PHIL from stdin as well
+-v, --verbosity       set verbosity level (DEBUG,INFO,WARNING,VERBOSE)
+</pre>
+<p>PHIL arguments:</p>
+<p>Everything not starting with a dash('-') is interpreted as a PHIL
+argument. This can be a PHIL-format file containing parameters,
+command-line assignment or a file whose type is automatically recognized
+(based on file extension; structure files and alignment files are
+recognized automatically).</p>
+</div>
+<div class="section" id="specific-limitations-and-possible-problems">
+<h1>Specific limitations and possible problems</h1>
+<div class="section" id="processing-features">
+<h2>Processing features</h2>
+<ul class="simple">
+<li>Ensembler considers each chain individually and therefore it is not
+possible to superpose assemblies. The rationale is that its primary
+purpose is ensemble generation for molecular replacement and since
+intermolecular interactions are weak, assemblies are unlikely to be
+preserved, and one would obtain better models by an assembly of
+ensembles of monomers than the other way round.</li>
+<li>Very short residue segments (shorter than 3 consecutive residues)
+cannot be reliably aligned to the sequence, and these will be
+discarded from the superposition.</li>
+</ul>
+</div>
+<div class="section" id="warning-and-error-messages">
+<h2>Warning and error messages</h2>
+<ul class="simple">
+<li><tt class="docutils literal">No alignments given</tt>: no alignments were specified and a
+user-supplied alignment based mapping method was requested.</li>
+<li><tt class="docutils literal">Unsuitable alignment set: different master sequences</tt>: this
+indicates that the series of input alignments cannot be assembled
+because of a different master sequence.</li>
+<li><tt class="docutils literal">Several alignment files specified; using first one only</tt>: this
+warning indicates that several alignment files were specified, but
+<tt class="docutils literal">multiple_alignment</tt> was selected as mapping mode, which cannot
+assemble alignments.</li>
+<li><tt class="docutils literal">No matching alignment for <span class="pre">chain...</span></tt>: no alignment sequence matches
+<strong>chain ...</strong> and a user-supplied alignment based mapping method was
+requested.</li>
+<li><tt class="docutils literal">SSM <span class="pre">error:...</span></tt>: an error occurred during SSM superposition.</li>
+<li><tt class="docutils literal">Less than 2 chains for superposition</tt>: superposition cannot
+proceed because there are less than 2 chains found.</li>
+<li><tt class="docutils literal">Less than 3 sites for superposition</tt>: superposition cannot proceed
+because there are less than 3 sites available (this is checked after
+discarding gaps). If this error occurs, discarding the chain with the
+lowest overlap (printed just before the error is raised) may allow
+one to proceed.</li>
+<li><tt class="docutils literal">Excessive weight shift, damping weight change</tt>: this warning is
+emitted if weights need to be damped, because all weights are zero.</li>
+<li><tt class="docutils literal">Weight damping recovery exhausted</tt>: this error is raised if even
+after successive rounds of re-weighting, all weights are still zero.
+This either indicates incorrect alignment of the chains or too tight
+expected error.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="references">
+<h1>References</h1>
+<table class="docutils citation" frame="void" id="diamond1988" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[Diamond1988]</td><td><strong>A note on the rotational superposition problem</strong>
+R. Diamond <em>Acta Cryst.</em> <strong>A44</strong>, 211-216 (1988)</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="diamond1992" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[Diamond1992]</td><td><strong>On the multiple simultaneous superposition of molecular structures by rigid body transformations</strong>
+R. Diamond <em>Protein Science</em> <strong>1</strong>, 1279-1287 (1992)</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="wangsnoeyink2008" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[WangSnoeyink2008]</td><td><strong>Defining and computing optimum RMSD for gapped and weighted multiple-structure alignment</strong>
+X. Wang and J. Snoeyink
+<em>EEE/ACM Transactions on Computational Biology and Bioinformatics</em> <strong>5</strong>, 525-533 (2008)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="additional-information">
+<span id="additional"></span><h1>Additional_information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input</span><span class="phil-help">Input files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">model</span><span class="phil-words"> = None </span><span class="phil-help">Input model file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">alignment</span><span class="phil-words"> = None </span><span class="phil-help">Input alignment file</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><span class="phil-help">Output file(s)</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">location</span><span class="phil-words"> = "" </span></li><li class="phil-param" data-expert="0"><span class="phil-name">gui_output_dir</span><span class="phil-words"> = None </span><span class="phil-help">Sets base output directory for Phenix GUI - not used when run from the command line.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">root</span><span class="phil-words"> = ensemble </span><span class="phil-help">Output file root</span></li><li class="phil-param" data-expert="0"><span class="phil-name">style</span><span class="phil-words"> = *merged separate </span><span class="phil-help">Output options for ensemble</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sort</span><span class="phil-words"> = *input identity overlap wrmsd unwrmsd </span><span class="phil-help">Sort ensemble components</span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">configuration</span><span class="phil-help">General parameters for ensemble generation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">mapping</span><span class="phil-words"> = resid alignments multiple_alignment muscle *ssm </span><span class="phil-help">Residue correspondence mapping</span></li><li class="phil-param" data-expert="0"><span class="phil-name">atoms</span><span class="phil-words"> = CA </span><span class="phil-help">Include atom in superpositions</span></li><li class="phil-param" data-expert="0"><span class="phil-name">clustering</span><span class="phil-words"> = 0.5 </span><span class="phil-help">Cutoff distance for cluster analysis</span></li><li class="phil-param" data-expert="0"><span class="phil-name">trim</span><span class="phil-words"> = False </span><span class="phil-help">Trim differing loops</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">superposition</span><span class="phil-help">Superposition setup</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">method</span><span class="phil-words"> = *gapless gapped </span><span class="phil-help">Superposition algorithm</span></li><li class="phil-param" data-expert="0"><span class="phil-name">convergence</span><span class="phil-words"> = 1.0E-4 </span><span class="phil-help">Convergence criterion for superposition</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">weighting</span><span class="phil-help">Parameters for weighting scheme</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">scheme</span><span class="phil-words"> = unit *robust_resistant </span><span class="phil-help">Weighting scheme</span></li><li class="phil-param" data-expert="0"><span class="phil-name">convergence</span><span class="phil-words"> = 1.0E-3 </span><span class="phil-help">Convergence criterion for weight iteration</span></li><li class="phil-param" data-expert="0"><span class="phil-name">incremental_damping_factor</span><span class="phil-words"> = 1.5 </span><span class="phil-help">Damping factor in recovery cycle</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_damping_factor</span><span class="phil-words"> = 3.34 </span><span class="phil-help">Quit recovery if cumulative damping factor is above</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">robust_resistant</span><span class="phil-help">Setting for robust-resistance scheme</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">critical</span><span class="phil-words"> = 9 </span><span class="phil-help">tolerance</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">trimming</span><span class="phil-help">Trimming parameters</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">threshold</span><span class="phil-words"> = 3.0 </span><span class="phil-help">Max position RMSD for inclusion</span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

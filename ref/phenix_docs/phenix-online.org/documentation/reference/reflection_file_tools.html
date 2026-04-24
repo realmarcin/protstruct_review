@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>reflection file tools</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="reflection-file-tools">
+<h1 class="title">reflection file tools</h1>
+<div class="section" id="phenix-reflection-file-converter">
+<h1>phenix.reflection_file_converter</h1>
+<p><strong>Purpose</strong></p>
+<p><tt class="docutils literal">phenix.reflection_file_converter</tt> is a simple utility program that
+allows a straightforward conversion of many reflection file formats
+to <tt class="docutils literal">mtz</tt>, <tt class="docutils literal">cns</tt>, <tt class="docutils literal">scalepack</tt> or <tt class="docutils literal">shelx</tt> format.  Currently, combining
+several dataset into a single output file is not supported.</p>
+<p><strong>Keywords</strong></p>
+<p>Typing:</p>
+<pre class="literal-block">
+phenix.reflection_file_converter --help
+</pre>
+<p>results in:</p>
+<pre class="literal-block">
+Usage: phenix.reflection_file_converter [options] reflection_file ...
+
+Options:
+  -h, --help            show this help message and exit
+  --unit_cell=10,10,20,90,90,120|FILENAME
+                        External unit cell parameters
+  --space_group=P212121|FILENAME
+                        External space group symbol
+  --symmetry=FILENAME   External file with symmetry information
+  --weak_symmetry       symmetry on command line is weaker than symmetry found
+                        in files
+  --resolution=FLOAT    High resolution limit (minimum d-spacing, d_min)
+  --low_resolution=FLOAT
+                        Low resolution limit (maximum d-spacing, d_max)
+  --label=STRING        Substring of reflection data label or number
+  --non_anomalous       Averages Bijvoet mates to obtain a non-anomalous array
+  --r_free_label=STRING
+                        Substring of reflection data label or number
+  --r_free_test_flag_value=FLOAT
+                        Value in R-free array indicating assignment to free
+                        set.
+  --generate_r_free_flags
+                        Generates a new array of random R-free flags (MTZ and
+                        CNS output only).
+  --use_lattice_symmetry_in_r_free_flag_generation
+                        group twin/pseudo symmetry related reflections
+                        together in r-free set (this is the default).
+  --no_lattice_symmetry_in_r_free_flag_generation
+                        opposite of --use_lattice_symmetry_in_r_free_flag_
+                        generation
+  --r_free_flags_fraction=FLOAT
+                        Target fraction free/work reflections (default: 0.10).
+  --r_free_flags_max_free=INT
+                        Maximum number of free reflections (default: 2000).
+  --r_free_flags_format=cns|ccp4
+                        Convention for generating R-free flags
+  --random_seed=INT     Seed for random number generator (affects generation
+                        of R-free flags).
+  --change_of_basis=STRING
+                        Change-of-basis operator: h,k,l or x,y,z or
+                        to_reference_setting, to_primitive_setting,
+                        to_niggli_cell, to_inverse_hand
+  --eliminate_invalid_indices
+                        Remove indices which are invalid given the change of
+                        basis desired
+  --expand_to_p1        Generates all symmetrically equivalent reflections.
+                        The space group symmetry is reset to P1. May be used
+                        in combination with --change_to_space_group to lower
+                        the symmetry.
+  --change_to_space_group=SYMBOL|NUMBER
+                        Changes the space group and merges equivalent
+                        reflections if necessary
+  --write_mtz_amplitudes
+                        Converts intensities to amplitudes before writing MTZ
+                        format; requires --mtz_root_label
+  --write_mtz_intensities
+                        Converts amplitudes to intensities before writing MTZ
+                        format; requires --mtz_root_label
+  --remove_negatives    Remove negative intensities or amplitudes from the
+                        data set
+  --massage_intensities
+                        'Treat' negative intensities to get a positive
+                        amplitude. |Fnew| = sqrt((Io+sqrt(Io**2
+                        +2sigma**2))/2.0). Requires intensities as input and
+                        the flags --mtz, --write_mtz_amplitudes and
+                        --mtz_root_label.
+  --scale_max=FLOAT     Scales data such that the maximum is equal to the
+                        given value (ignored for --shelx)
+  --scale_factor=FLOAT  Multiplies data with the given factor (ignored for
+                        --shelx)
+  --sca=FILE            write data to Scalepack FILE ('--sca .' copies name of
+                        input file)
+  --mtz=FILE            write data to MTZ FILE ('--mtz .' copies name of input
+                        file)
+  --mtz_root_label=STRING
+                        Root label for MTZ file (e.g. Fobs)
+  --cns=FILE            write data to CNS FILE ('--cns .' copies name of input
+                        file)
+  --shelx=FILE          write data to SHELX FILE ('--shelx .' copies name of
+                        input file). Data are automatically scaled if
+                        necessary to fit into 8 column format.
+
+Example: phenix.reflection_file_converter w1.sca --mtz .
+</pre>
+<p><strong>Examples</strong></p>
+<ul>
+<li><p class="first">Convert scalepack into an mtz format. Specify output filename (w1.mtz) and label for intensities (IP -&gt; IP,SIGIP):</p>
+<pre class="literal-block">
+phenix.reflection_file_converter w1.sca --mtz_root_label=IP --mtz=w1.mtz
+</pre>
+</li>
+<li><p class="first">Convert mtz intensities into SHELX .hkl format. Specify output filename (data.hkl):</p>
+<pre class="literal-block">
+phenix.reflection_file_converter data.mtz --label=IOBS,SIGIOBS --shelx=data.hkl
+</pre>
+</li>
+<li><p class="first">Change basis to get data in primitive setting, merge to higher symmetry
+and bring to reference setting (three steps):</p>
+<pre class="literal-block">
+phenix.reflection_file_converter c2.sca --change_of_basis=to_niggli_cell --sca=niggli.sca
+phenix.reflection_file_converter niggli.sca --change_to_space_group=R32:R --sca=r32r.sca
+phenix.reflection_file_converter r32r.sca --change_of_basis=to_reference_setting --sca=r32_hexagonal_setting.sca
+</pre>
+</li>
+</ul>
+</div>
+<div class="section" id="phenix-cns-as-mtz">
+<h1>phenix.cns_as_mtz</h1>
+<p><strong>Purpose</strong></p>
+<p>Converts all data in a CNS reflection file to MTZ format.</p>
+<p><strong>Keywords</strong></p>
+<p>Typing:</p>
+<pre class="literal-block">
+phenix.cns_as_mtz --help
+</pre>
+<p>results in:</p>
+<pre class="literal-block">
+Usage: phenix.cns_as_mtz [options] cns_file
+
+Options:
+  -h, --help            show this help message and exit
+  --unit_cell=10,10,20,90,90,120|FILENAME
+                        External unit cell parameters
+  --space_group=P212121|FILENAME
+                        External space group symbol
+  --symmetry=FILENAME   External file with symmetry information
+  -q, --quiet           suppress output
+
+Example: phenix.cns_as_mtz scale.hkl
+</pre>
+<p><strong>Example</strong></p>
+<p>Extract unit cell parameters and space group symbol from a PDB coordinate
+file and reflection data from a CNS reflection file. Write MTZ file:</p>
+<pre class="literal-block">
+phenix.cns_as_mtz mad_scale.hkl --symmetry minimize.pdb
+</pre>
+</div>
+<div class="section" id="phenix-mtz-dump">
+<h1>phenix.mtz.dump</h1>
+<p><strong>Purpose</strong></p>
+<p>Inspects an MTZ file. Optionally writes data in text format (human
+readable, machine readable, or spreadsheet).</p>
+<p><strong>Keywords</strong></p>
+<p>Typing:</p>
+<pre class="literal-block">
+phenix.mtz.dump --help
+</pre>
+<p>results in:</p>
+<pre class="literal-block">
+Usage: phenix.mtz.dump [options] file_name [...]
+
+Options:
+  -h, --help            show this help message and exit
+  -v, --verbose         Enable CMTZ library messages.
+  -c, --show_column_data
+  -f KEYWORD, --column_data_format=KEYWORD
+                        Valid keywords are: human_readable, machine_readable,
+                        spreadsheet. Human readable is the default. The format
+                        keywords can be abbreviated (e.g. -f s).
+  -b, --show_batches
+  --walk=ROOT_DIR       Find and process all MTZ files under ROOT_DIR
+</pre>
+</div>
+</div>
+    
+  </body>
+</html>

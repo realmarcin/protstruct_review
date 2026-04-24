@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Model editing with Sculptor</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="model-editing-with-sculptor">
+<h1 class="title">Model editing with Sculptor</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="sculptor.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="sculptor.html#author-s" id="toc-entry-1"><strong>Author(s)</strong></a></li>
+<li><a class="reference internal" href="sculptor.html#purpose" id="toc-entry-2">Purpose</a></li>
+<li><a class="reference internal" href="sculptor.html#see-also" id="toc-entry-3">See also</a></li>
+<li><a class="reference internal" href="sculptor.html#conventions" id="toc-entry-4">Conventions</a></li>
+<li><a class="reference internal" href="sculptor.html#usage" id="toc-entry-5">Usage</a><ul>
+<li><a class="reference internal" href="sculptor.html#input-files" id="toc-entry-6">Input files</a></li>
+<li><a class="reference internal" href="sculptor.html#output-files" id="toc-entry-7">Output files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="sculptor.html#outline-of-the-procedure" id="toc-entry-8">Outline of the procedure</a><ul>
+<li><a class="reference internal" href="sculptor.html#preprocessing" id="toc-entry-9">Preprocessing</a></li>
+<li><a class="reference internal" href="sculptor.html#protein-chains" id="toc-entry-10">Protein chains</a><ul>
+<li><a class="reference internal" href="sculptor.html#deletion" id="toc-entry-11">Deletion</a></li>
+<li><a class="reference internal" href="sculptor.html#polishing" id="toc-entry-12">Polishing</a></li>
+<li><a class="reference internal" href="sculptor.html#pruning" id="toc-entry-13">Pruning</a></li>
+<li><a class="reference internal" href="sculptor.html#b-factor-prediction" id="toc-entry-14">B-factor prediction</a></li>
+<li><a class="reference internal" href="sculptor.html#renumber" id="toc-entry-15">Renumber</a></li>
+<li><a class="reference internal" href="sculptor.html#rename" id="toc-entry-16">Rename</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="sculptor.html#non-macromolecular-chains" id="toc-entry-17">Non-macromolecular chains</a></li>
+<li><a class="reference internal" href="sculptor.html#sequence-similarity-calculation" id="toc-entry-18">Sequence similarity calculation</a></li>
+<li><a class="reference internal" href="sculptor.html#command-line" id="toc-entry-19">Command line</a></li>
+<li><a class="reference internal" href="sculptor.html#specific-limitations-and-possible-problems" id="toc-entry-20">Specific limitations and possible problems</a><ul>
+<li><a class="reference internal" href="sculptor.html#processing-features" id="toc-entry-21">Processing features</a></li>
+<li><a class="reference internal" href="sculptor.html#error-messages" id="toc-entry-22">Error messages</a></li>
+<li><a class="reference internal" href="sculptor.html#warning-messages" id="toc-entry-23">Warning messages</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="sculptor.html#references" id="toc-entry-24">References</a></li>
+<li><a class="reference internal" href="sculptor.html#citation" id="toc-entry-25">Citation</a></li>
+<li><a class="reference internal" href="sculptor.html#additional-information" id="toc-entry-26">Additional information</a></li>
+<li><a class="reference internal" href="sculptor.html#list-of-all-available-keywords" id="toc-entry-27">List of all available keywords</a></li>
+</ul>
+</div>
+<div class="section" id="author-s">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-1"><strong>Author(s)</strong></a></h1>
+<ul class="simple">
+<li>sculptor: Gabor Bunkoczi</li>
+<li>PHENIX GUI: Nathaniel Echols</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-2">Purpose</a></h1>
+<p>Sculptor can be used to improve a molecular replacement model using
+additional information available from an alignment and/or structure. It is
+based on an algorithm outlined in <a class="reference internal" href="sculptor.html#schwarzenbacher2004">Schwarzenbacher et al. (2004)</a>.</p>
+</div>
+<div class="section" id="see-also">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-3">See also</a></h1>
+<p>phenix.sculptor and phenix.ensembler have been superseded by <a class="reference external" href="sculpt_ensemble.html">phenix.sculpt_ensemble</a></p>
+</div>
+<div class="section" id="conventions">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-4">Conventions</a></h1>
+<p>The following terms are used with the special meaning:</p>
+<ul class="simple">
+<li><strong>target:</strong> the structure to be solved</li>
+<li><strong>model:</strong> the structure used as a model for the target</li>
+</ul>
+</div>
+<div class="section" id="usage">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-5">Usage</a></h1>
+<p>Sculptor can be run from the PHENIX GUI and the command line, the only
+difference being the way commands are taken from the user.</p>
+<p>The graphical user interface makes all settings accessible either as
+part of the main window (for frequently used options) or through a
+series of dialog boxes under <strong>Settings for:</strong>:</p>
+<ul class="simple">
+<li><em>Main-chain removal</em></li>
+<li><em>Main-chain polishing</em></li>
+<li><em>Sidechain pruning</em></li>
+<li><em>B-factors</em></li>
+<li><em>Renumbering</em></li>
+<li><em>Renaming</em></li>
+</ul>
+<p>The input PDB file is specified in the <strong>PDB file:</strong> input line, while
+alignments and target sequences can be added through the
+<em>Sequence alignment files...</em> and the <em>Sequence files...</em> dialog boxes,
+respectively.</p>
+<img alt="../images/sculptor_input_gui.png" src="../images/sculptor_input_gui.png" />
+<div class="section" id="input-files">
+<h2><a class="toc-backref" href="sculptor.html#toc-entry-6">Input files</a></h2>
+<ul class="simple">
+<li><strong>Structures</strong> <em>(compulsory)</em>. The structure to be modified. Specific
+parts can be selected using CNS-style atom selection syntax. Chains
+are divided into <em>protein</em> and <em>other</em> chain categories, and
+processed according to instructions given for the appropriate chain
+type. Accepted formats: PDB. Recognized extensions: <tt class="docutils literal">.pdb</tt>,
+<tt class="docutils literal">.ent</tt>.</li>
+<li><strong>Alignments</strong> Provides reliability information that can be used for
+calculating modifications for <em>protein</em> chains. The chains are
+automatically associated with the corresponding alignment based on a
+sequence comparison. No alignment information is used when processing
+<em>other</em> chains. If no calculation needs alignment information,
+alignment input is optional, otherwise compulsory. Multiple alignment
+files can be provided to cover all distinct <em>protein</em> chains in the
+structure. By convention, the first sequence of the alignment is the
+<strong>target</strong> sequence, but this can be overridden by using the
+<tt class="docutils literal">target index</tt> parameter of the <tt class="docutils literal">alignment</tt> scope. Accepted
+extensions (with the corresponding format) are <tt class="docutils literal">.aln</tt> (CLUSTAL
+format), <tt class="docutils literal">.pir</tt> (PIR-format) and <tt class="docutils literal">.ali</tt> (relaxed PIR-like
+format).</li>
+<li><strong>Sequence files</strong> In case no alignment is available, sculptor can
+prepare an alignment if the <strong>target</strong> sequence and the corresponding
+<strong>model</strong> chain selection is provided. Multiple sequence files can be
+provided with different target sequences for distinct protein chains.
+Accepted extensions are <tt class="docutils literal">.fasta</tt>, <tt class="docutils literal">.faa</tt> or <tt class="docutils literal">.fa</tt> for FASTA
+format, <tt class="docutils literal">.pir</tt> for PIR-format and <tt class="docutils literal">.seq</tt> or <tt class="docutils literal">.dat</tt> for a
+relaxed PIR/FASTA-like format.</li>
+</ul>
+</div>
+<div class="section" id="output-files">
+<h2><a class="toc-backref" href="sculptor.html#toc-entry-7">Output files</a></h2>
+<p>In <tt class="docutils literal">flexible</tt> mode, the fully processed structure is output. The file
+is named according to the following convention: <tt class="docutils literal">root_pdb.pdb</tt>, where
+<tt class="docutils literal">root</tt> is a user-defined parameter (accessible from the <tt class="docutils literal">output</tt>
+scope), and <tt class="docutils literal">pdb</tt> is the basename of the input PDB file. In
+<tt class="docutils literal">predefined</tt> mode, there is an output file produced for each requested
+protocol, and named according to <tt class="docutils literal">root_pdb_N.pdb</tt>, where N is the
+number of the corresponding protocol.</p>
+</div>
+</div>
+<div class="section" id="outline-of-the-procedure">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-8">Outline of the procedure</a></h1>
+<p>The workflow consists of several stages that can be independently
+configured. These are listed in order of execution. For a summary of all
+keywords with the corresponding defaults, see the <a class="reference internal" href="sculptor.html#additional">Additional information</a>
+section.</p>
+<img alt="../images/sculptor_options_gui.png" src="../images/sculptor_options_gui.png" />
+<div class="section" id="preprocessing">
+<h2><a class="toc-backref" href="sculptor.html#toc-entry-9">Preprocessing</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal">selection</tt>: selects a subset of the input PDB file, using
+CNS-style atom selection syntax. Default: <tt class="docutils literal">all</tt>.</li>
+<li><tt class="docutils literal">remove_alternate_conformations</tt>: selects the first alternate
+conformation for disordered entities, and discards the rest. Also
+involes <tt class="docutils literal">sanitize_occupancies</tt>.</li>
+<li><tt class="docutils literal">sanitize_occupancies</tt>: resets all occupancies to 1.0.</li>
+</ul>
+<p>In addition, chains will be analysed, and solvent atoms will be
+separated from protein chains if they are not separated by <tt class="docutils literal">TER</tt>
+cards.</p>
+</div>
+<div class="section" id="protein-chains">
+<h2><a class="toc-backref" href="sculptor.html#toc-entry-10">Protein chains</a></h2>
+<div class="section" id="deletion">
+<h3><a class="toc-backref" href="sculptor.html#toc-entry-11">Deletion</a></h3>
+<p>Discards residues from a model chain that are unlikely to improve signal
+in molecular replacement. This information is calculated from the
+alignment.</p>
+<p>There are multiple algorithms available:</p>
+<ul class="simple">
+<li><tt class="docutils literal">gap</tt>: Deletes residues that are not present in the target (model
+residue is aligned with a gap). For this algorithm, the supplied
+alignment is used as a pairwise alignment.</li>
+<li><tt class="docutils literal">threshold_based_similarity</tt>: Deletes residues for which the
+sequence similarity is below a certain threshold. All sequences in a
+multiple alignment contribute to the score. Details of the sequence
+similarity calculation are given in the section
+<a class="reference internal" href="sculptor.html#ssim">Sequence similarity calculation</a>.</li>
+</ul>
+<ul class="simple">
+<li><tt class="docutils literal">completeness_based_similarity</tt>: Deletes the same number of
+residues (modified by a fractional offset) as the <tt class="docutils literal">gap</tt> algorithm
+would but residues that get removed are the ones with the lowest
+sequence similarity. This way the default values are valid over a
+much larger sequence similarity range than those in
+<tt class="docutils literal">threshold_based_similarity</tt>. All sequences in a multiple alignment
+contribute to the score. Details of the sequence similarity
+calculation are given in the section <a class="reference internal" href="sculptor.html#ssim">Sequence similarity calculation</a>.</li>
+</ul>
+<p>These algorithms can also be used together in any combination. In this
+case, a residue will be deleted if assigned for deletion by any active
+algorithms.</p>
+</div>
+<div class="section" id="polishing">
+<h3><a class="toc-backref" href="sculptor.html#toc-entry-12">Polishing</a></h3>
+<p>Makes small adjustments to the mainchain of a chain (taking results from
+deletion into account) to make it obey basic macromolecular features.</p>
+<ul class="simple">
+<li><tt class="docutils literal">remove_short</tt>. Deletes additional residue segments from the
+molecule so that no continuous segment is shorter than a preset limit
+(determined by the <tt class="docutils literal">minimum_length</tt> parameter of the
+<tt class="docutils literal">remove_short</tt> scope). Segment boundaries are determined from
+spatial connectivity of residues. This algorithm is primarily
+intended to remove &quot;floating&quot; residues that are the result of
+extensive loop truncation.</li>
+<li><tt class="docutils literal">keep_regular</tt>. Reinstate deleted residues if they are in regular
+secondary structure and the segment marked for deletion is shorter
+than the <tt class="docutils literal">maximum_length</tt> parameter of the <tt class="docutils literal">keep_regular</tt> scope.</li>
+</ul>
+<p>These algorithms can also be used together in combination. In this case,
+the chain will be processed sequentially by both algorithms.</p>
+</div>
+<div class="section" id="pruning">
+<h3><a class="toc-backref" href="sculptor.html#toc-entry-13">Pruning</a></h3>
+<p>This phase determines the level distance from the C<sub>alpha</sub> atom
+up to which a residue sidechain in the model is potentially similar to
+its counterpart in the target.</p>
+<ul class="simple">
+<li><tt class="docutils literal">schwarzenbacher</tt>. Implements the algorithm published by
+Schwarzenbacher <em>et al.</em> (2004), who propose that for optimal
+molecular replacement results a residue sidechain should be truncated
+if aligned with a non-identical residue, and not truncated otherwise.
+The level of truncation is controlled by the <tt class="docutils literal">pruning_level</tt>
+parameter, and defaults to 3 (which corresponds to C<sub>gamma</sub>)
+and can be controlled by the <tt class="docutils literal">pruning_level</tt> parameter of the
+<tt class="docutils literal">schwarzenbacher</tt> scope.</li>
+<li><tt class="docutils literal">Similarity</tt>. Uses sequence similarity values for deciding the
+level of truncation. Residues above <tt class="docutils literal">full_truncation_limit</tt> are not
+truncated at all, those below the <tt class="docutils literal">full_truncation_limit</tt> are
+truncated to C<sub>beta</sub>, and those in between are truncated
+according to the <tt class="docutils literal">pruning_level</tt> parameter (all available from the
+<tt class="docutils literal">similarity</tt> scopei). Results tend to be similar to those given by
+the Schwarzenbacher algorithm; however, it is possible to get high
+similarity values (and full sidechain preservation) for certain
+substitutions (i.e. TYR to PHE), and low-sequence similarity zones
+can end up being truncated to C<sub>beta</sub>. Details of the sequence
+similarity calculation are given in the section
+<a class="reference internal" href="sculptor.html#ssim">Sequence similarity calculation</a>.</li>
+</ul>
+<blockquote>
+</blockquote>
+<p>These algorithms can also be used together in any combination, in which
+case the sidechain will be truncated to the shortest value suggested.</p>
+</div>
+<div class="section" id="b-factor-prediction">
+<h3><a class="toc-backref" href="sculptor.html#toc-entry-14">B-factor prediction</a></h3>
+<p>B-factor prediction tries to increase B-factors for atoms that are
+likely to be more flexible or more in error. The calculation takes
+simple physical properties into account, and these are linearly
+transformed to B-factors (controlled by the <tt class="docutils literal">factor</tt> parameter of the
+corresponding scope). If this value is lower than the <tt class="docutils literal">minimum</tt> (from
+the <tt class="docutils literal">bfactor</tt>scope) parameter, a constant is added to all B-factors
+so that the lowest of those equals to <tt class="docutils literal">minimum</tt> (this is primarily
+intended to avoid negative B-factors).</p>
+<ul class="simple">
+<li><tt class="docutils literal">original</tt>. This uses the original B-factor of atoms. This is
+primarily intended as a contributor to a combination, but can also be
+used to manipulate current B-factors, e.g. set them to a constant
+value.</li>
+<li><tt class="docutils literal">asa</tt>. This calculates accessible surface area for an isolated
+chain and transforms the raw values to B-factors. A high ASA-value
+indicates a potential for flexibility. The calculation can be
+configured by the <tt class="docutils literal">precision</tt> and <tt class="docutils literal">probe_radius</tt> parameters of
+the <tt class="docutils literal">asa</tt> scope.</li>
+<li><tt class="docutils literal">similarity</tt>. Low sequence similarity regions tend to be more
+dissimilar. Details of the sequence similarity calculation are given
+in the section <a class="reference internal" href="sculptor.html#ssim">Sequence similarity calculation</a>.</li>
+</ul>
+<blockquote>
+</blockquote>
+<p>Algorithms can be used in combination, in which case the sum of the
+predicted B-factors is used. This mode can also be used to map sequence
+similarity or accessible surface area to residues/atoms for display
+purposes.</p>
+</div>
+<div class="section" id="renumber">
+<h3><a class="toc-backref" href="sculptor.html#toc-entry-15">Renumber</a></h3>
+<p>Renumbers residues according to the <tt class="docutils literal">target</tt> or <tt class="docutils literal">model</tt> sequence. It
+is also possible to turn renumbering off (option <tt class="docutils literal">original</tt>).</p>
+</div>
+<div class="section" id="rename">
+<h3><a class="toc-backref" href="sculptor.html#toc-entry-16">Rename</a></h3>
+<p>Renames residues according their counterpart in the target sequence. It
+also &quot;morphs&quot; the sidechain, i.e. renames atoms and deletes atoms that
+are not present. It can also generate missing atoms, if their positions
+are determined unambigously by present atoms (available via the
+<tt class="docutils literal">completion</tt> parameter of the <tt class="docutils literal">macromolecule</tt> scope).</p>
+<ul class="simple">
+<li><tt class="docutils literal">cbeta</tt>. Adds C<sub>beta</sub> atom if the residue is not glycine,
+and C, N and C<sub>alpha</sub> atoms are all present.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="non-macromolecular-chains">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-17">Non-macromolecular chains</a></h1>
+<p>Residues in these chains are normally deleted, unless an exception is
+made by specifying the residue codes that are to be retained. This is
+primarily intended to keep a known ligands of protein classes (e.g.
+HEM).</p>
+</div>
+<div class="section" id="sequence-similarity-calculation">
+<span id="ssim"></span><h1><a class="toc-backref" href="sculptor.html#toc-entry-18">Sequence similarity calculation</a></h1>
+<p>Sequence similarity is calculated from the full alignment supplied
+(taking all present sequences into account), using a scoring matrix
+(currently <tt class="docutils literal">blosum50</tt>, <tt class="docutils literal">blosum62</tt>, <tt class="docutils literal">dayhoff</tt> and <tt class="docutils literal">identity</tt> are
+available). Raw scores are then averaged over a <tt class="docutils literal">window</tt> of residues
+(defaults to 5 residues in both directions) that is weighted using
+either <tt class="docutils literal">uniform</tt> or <tt class="docutils literal">triangular</tt> weights. The resulting scores are
+&quot;normalized&quot; so that 1.0 would indicate a perfect alignment, 0.0 would
+be a random match, and -1.0 a (locally) fully gapped alignment (on
+average). Note, it is possible to obtain values outside this range. This
+helps to ensure that defaults are sensible irrespective of the choice
+for the scoring matrix.</p>
+<p>Sequence similarity calculation is configured individually for the steps
+that are using it.</p>
+</div>
+<div class="section" id="command-line">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-19">Command line</a></h1>
+<pre class="literal-block">
+phenix.sculptor \
+    [ command-line switches ] \
+    [ PHIL-format parameter files ] \
+    [ PHIL command-line assignments ] \
+    [ PDB-files ] \
+    [ alignment files ]
+</pre>
+<p>Command-line switches:</p>
+<pre class="literal-block">
+-h, --help            show this help message and exit
+--show-defaults       print PHIL and exit
+-i, --stdin           read PHIL from stdin as well
+-v, --verbosity       set verbosity level (DEBUG,INFO,WARNING,VERBOSE)
+--mode                set mode (flexible,predefined)
+</pre>
+<p>PHIL arguments:</p>
+<p>Everything not starting with a dash ('-') is interpreted as a PHIL
+argument. This can be a PHIL-format file containing parameters,
+command-line assignment or a file whose type is automatically recognized
+(based on file extension). Note that sequence files are not accepted on
+the command line, since associated chains could not easily be guessed
+and require a fully specified parameter scope.</p>
+</div>
+<div class="section" id="specific-limitations-and-possible-problems">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-20">Specific limitations and possible problems</a></h1>
+<div class="section" id="processing-features">
+<h2><a class="toc-backref" href="sculptor.html#toc-entry-21">Processing features</a></h2>
+<ul class="simple">
+<li>Very short residue segments (shorter than 3 consecutive residues)
+cannot be reliably aligned to the sequence, and these will be
+discarded from the model.</li>
+<li>The <tt class="docutils literal">similarity</tt> algorithm from the <tt class="docutils literal">deletion</tt> scope may result
+in residues that are aligned with a gap being included in the model.
+Although this possibly indicates an error in the alignment and is
+potentially beneficial for molecular replacement, this causes a
+problem at the <tt class="docutils literal">rename</tt> stage, as there is no 3-letter residue name
+for a &quot;-&quot;; these residues are tentatively named <tt class="docutils literal">GAP</tt>.</li>
+<li>Residue numbers for GAP residues are built up using the residue
+number of the previous non-GAP residue and an insertion code (A-Z,
+depending on the number of GAP residues after the previous non-GAP
+residue).</li>
+</ul>
+</div>
+<div class="section" id="error-messages">
+<h2><a class="toc-backref" href="sculptor.html#toc-entry-22">Error messages</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal">No pdb files specified</tt>: there are no PDB files to process.</li>
+<li><tt class="docutils literal">No atoms left after atom selection</tt>: the atom selection provided
+results in an empty structure.</li>
+<li><tt class="docutils literal">No alignment</tt>: no alignments have been provided and the
+calculation requires alignment information.</li>
+<li><tt class="docutils literal">No sufficiently similar alignment sequences have been found</tt>: the
+longest exact overlap between the chain sequence and any alignment
+sequences is lower than the <tt class="docutils literal">min_hssp_length</tt> parameter (typically
+6 residues), therefore no alignment corresponds to this chain.</li>
+<li><tt class="docutils literal">Unable to align: matching fraction &lt; min_matching_fraction</tt>: the
+best matching alignment does not match the chain sufficiently
+(specified by the <tt class="docutils literal">min_matching_fraction</tt> parameter, typically
+40%), and it is likely that the alignment is incorrect.</li>
+</ul>
+</div>
+<div class="section" id="warning-messages">
+<h2><a class="toc-backref" href="sculptor.html#toc-entry-23">Warning messages</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal">There are N sequences with longest overlap</tt>: N sequences give
+identical matching statistics with the current chain. Lacking other
+criteria, the first is selected. Ordering is affected by the sequence
+of alignment files passed to the program and the order of sequences
+in the alignment file.</li>
+<li><tt class="docutils literal">Unaligned residues</tt>: certain residues could not be aligned
+reliably with the sequence because they appear in very short segments
+and sequence matching can be arbitrary. The minimum length of an
+accepted segments is controlled by the <tt class="docutils literal">min_hssp_length</tt> parameter.</li>
+<li><tt class="docutils literal">Sequence mismatches</tt>: there are mismatches between the alignment
+and the chain sequence. These are typically caused by unknown
+residues codes assigned to uncommon or modified residues. If the
+sequence identity falls below a preset threshold (controlled by the
+<tt class="docutils literal">min_matching_fraction</tt> parameter), and error is raised.</li>
+<li><tt class="docutils literal">File contains multiple sequences, only the first will be used</tt>:
+the sequence file used to provide the target sequence for given
+chains contains multiple sequences. The first sequence will be
+accepted as correct.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="references">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-24">References</a></h1>
+<table class="docutils citation" frame="void" id="schwarzenbacher2004" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[Schwarzenbacher2004]</td><td><strong>The importance of alignment accuracy for molecular replacement.</strong>
+R. Schwarzenbacher, A. Godzik, S. K. Grzechnik and L. Jaroszewski
+<em>Acta Cryst.</em> <strong>D60</strong>, 1229-1236 (2004)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="citation">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-25">Citation</a></h1>
+<p><strong>Improvement of molecular-replacement models with Sculptor.</strong> G.
+Bunkoczi and R. J. Read <em>Acta Cryst.</em> <strong>D67</strong>, 303-312 (2011)</p>
+</div>
+<div class="section" id="additional-information">
+<span id="additional"></span><h1><a class="toc-backref" href="sculptor.html#toc-entry-26">Additional information</a></h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1><a class="toc-backref" href="sculptor.html#toc-entry-27">List of all available keywords</a></h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">hetero</span><span class="phil-words"> = None </span><span class="phil-help">Keep named hetero residues</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_hssp_length</span><span class="phil-words"> = 6 </span><span class="phil-help">Length of residue segment that indicates a reliable match</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_matching_fraction</span><span class="phil-words"> = 0.4 </span><span class="phil-help">Minimum matching fraction in residue-to-alignment matching</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input</span><span class="phil-help">Input files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">alignment_from_homology_search</span><span class="phil-words"> = None </span><span class="phil-help">Input homology search to use hits as alignments</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">model</span><span class="phil-help">Input pdb file</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">PDB file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">selection</span><span class="phil-words"> = all </span><span class="phil-help">Selection string</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_alternate_conformations</span><span class="phil-words"> = False </span><span class="phil-help">Remove alternate conformations</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sanitize_occupancies</span><span class="phil-words"> = False </span><span class="phil-help">Sets occupancies &gt; 1.0 to 1.0</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_crystal_symmetry</span><span class="phil-words"> = False </span><span class="phil-help">Keeps the crystal symmetry of the model</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">alignment</span><span class="phil-help">Input alignment file</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_index</span><span class="phil-words"> = 1 </span><span class="phil-help">Index of target sequence in alignment</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">sequence</span><span class="phil-help">Input sequence file</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">Sequence file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_ids</span><span class="phil-words"> = None </span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><span class="phil-help">Output options</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param" data-expert="0"><span class="phil-name">folder</span><span class="phil-words"> = . </span><span class="phil-help">Output file folder</span></li><li class="phil-param" data-expert="0"><span class="phil-name">root</span><span class="phil-words"> = sculpt </span><span class="phil-help">Output file root</span></li><li class="phil-param" data-expert="0"><span class="phil-name">format</span><span class="phil-words"> = *pdb coot </span><span class="phil-help">Output file format</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">macromolecule</span><span class="phil-help">Workflow step configuration</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">completion</span><span class="phil-words"> = *cbeta </span><span class="phil-help">Sidechain completion algorithms (* = active)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rename</span><span class="phil-words"> = True </span><span class="phil-help">True: enable; False: disable</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_ptm_if_base_residues_agree</span><span class="phil-words"> = False </span><span class="phil-help">Keep post-translational modification if residues agree</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">deletion</span><span class="phil-help">Configure mainchain deletion</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *gap threshold_based_similarity completeness_based_similarity remove_long </span><span class="phil-help">Available algorithms (* = active)</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gap</span><span class="phil-help">Delete residue if aligned with gap</span><ul /></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">threshold_based_similarity</span><span class="phil-help">Delete residue if sequence similarity is low</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">threshold</span><span class="phil-words"> = -0.2 </span><span class="phil-help">Threshold to accept a residue</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">calculation</span><span class="phil-help">Configure sequence similarity calculation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">matrix</span><span class="phil-words"> = *identity dayhoff blosum50 blosum62 </span><span class="phil-help">Similarity matrix</span></li><li class="phil-param" data-expert="0"><span class="phil-name">window</span><span class="phil-words"> = 5 </span><span class="phil-help">Averaging window width</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weighting</span><span class="phil-words"> = uniform *triangular </span><span class="phil-help">Weighting scheme</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">completeness_based_similarity</span><span class="phil-help">Delete residues based on sequence similarity to get same number of gaps             as the Schwarzenbacher algorithm</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">offset</span><span class="phil-words"> = 0.0 </span><span class="phil-help">Completeness in fraction of model length             (0.0 = completeness from Schwarzenbacher algorithm, useful range: +/-0.05)</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">calculation</span><span class="phil-help">Configure sequence similarity calculation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">matrix</span><span class="phil-words"> = *identity dayhoff blosum50 blosum62 </span><span class="phil-help">Similarity matrix</span></li><li class="phil-param" data-expert="0"><span class="phil-name">window</span><span class="phil-words"> = 5 </span><span class="phil-help">Averaging window width</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weighting</span><span class="phil-words"> = uniform *triangular </span><span class="phil-help">Weighting scheme</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">remove_long</span><span class="phil-help">Delete residue if aligned with gap</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">min_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Minimum length for mainchain segment to remove</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">polishing</span><span class="phil-help">Configure mainchain polishing</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = remove_short keep_regular </span><span class="phil-help">Available algorithms (* = active)</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">remove_short</span><span class="phil-help">Delete short unconnected segments</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">minimum_length</span><span class="phil-words"> = 3 </span><span class="phil-help">Minimum length</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">keep_regular</span><span class="phil-help">Keep residues in secondary structure</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">maximum_length</span><span class="phil-words"> = 1 </span><span class="phil-help">Maximum length</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">pruning</span><span class="phil-help">Configure sidechain pruning</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *schwarzenbacher similarity </span><span class="phil-help">Available algorithms (* = active)</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">schwarzenbacher</span><span class="phil-help">Truncate atoms if target residue != source residue</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pruning_level</span><span class="phil-words"> = 2 </span><span class="phil-help">Level of truncation</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">similarity</span><span class="phil-help">Truncate atoms based on sequence similarity</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pruning_level</span><span class="phil-words"> = 2 </span><span class="phil-help">Level of intermediate truncation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">full_length_limit</span><span class="phil-words"> = 0.2 </span><span class="phil-help">Limit of no truncation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">full_truncation_limit</span><span class="phil-words"> = -0.2 </span><span class="phil-help">Limit for full truncation</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">calculation</span><span class="phil-help">Configure sequence similarity calculation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">matrix</span><span class="phil-words"> = *identity dayhoff blosum50 blosum62 </span><span class="phil-help">Similarity matrix</span></li><li class="phil-param" data-expert="0"><span class="phil-name">window</span><span class="phil-words"> = 5 </span><span class="phil-help">Averaging window width</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weighting</span><span class="phil-words"> = uniform *triangular </span><span class="phil-help">Weighting scheme</span></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">bfactor</span><span class="phil-help">Configure bfactor prediction</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *original similarity asa </span><span class="phil-help">Available algorithms (* = active)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum</span><span class="phil-words"> = 10 </span><span class="phil-help">Minimum allowed value (a constant is added if any B-factors would fall below this value)</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">original</span><span class="phil-help">Use original bfactors to predict new B-values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">factor</span><span class="phil-words"> = 1 </span><span class="phil-help">Transform values by multiplying with a factor</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">similarity</span><span class="phil-help">Use sequence similarity to predict new B-values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">factor</span><span class="phil-words"> = -100 </span><span class="phil-help">Transform values by multiplying with a factor</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">calculation</span><span class="phil-help">Configure sequence similarity calculation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">matrix</span><span class="phil-words"> = *identity dayhoff blosum50 blosum62 </span><span class="phil-help">Similarity matrix</span></li><li class="phil-param" data-expert="0"><span class="phil-name">window</span><span class="phil-words"> = 5 </span><span class="phil-help">Averaging window width</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weighting</span><span class="phil-words"> = uniform *triangular </span><span class="phil-help">Weighting scheme</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">asa</span><span class="phil-help">Use accessible surface area to predict new B-values</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">factor</span><span class="phil-words"> = 2 </span><span class="phil-help">Transform values by multiplying with a factor</span></li><li class="phil-param" data-expert="0"><span class="phil-name">precision</span><span class="phil-words"> = 960 </span><span class="phil-help">Number of points per atom</span></li><li class="phil-param" data-expert="0"><span class="phil-name">probe_radius</span><span class="phil-words"> = 1.4 </span><span class="phil-help">Radius for probing surface accessibility</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">renumber</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use</span><span class="phil-words"> = *target model original </span><span class="phil-help">Mainchain numbering; (* = selected; None: disable)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">start</span><span class="phil-words"> = 1 </span><span class="phil-help">Number for first residue</span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

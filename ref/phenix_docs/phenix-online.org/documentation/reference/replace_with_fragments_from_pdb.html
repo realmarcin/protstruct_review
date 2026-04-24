@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Rebuild a model using fragments from the PDB</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="rebuild-a-model-using-fragments-from-the-pdb">
+<h1 class="title">Rebuild a model using fragments from the PDB</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>replace_with_fragments_from_pdb: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>Create a composite model similar to a supplied model using fragments
+from the PDB.</p>
+<p>This tool can be used in early stages of model-building to try and
+improve parts of a preliminary model by replacing them with similar
+fragments from a deposited structure.</p>
+<p>Note that the composite model may not actually have good geometry because
+the fragments from the PDB are morphed (distorted) to match the supplied
+model and also because the junctions between fragments taken from the PDB
+are not refined.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+<p>replace_with_fragments_from_pdb can create composite models for protein chains</p>
+<p>You can adjust the maximum number of insertions/deletions in each replacement
+fragment and whether to morph structures obtained by SSM matching.</p>
+<p>You can supply a map file for refinement or calculation of map-model
+correlations.</p>
+<p>You can also choose to exclude or include specific PDB entries in SSM
+matching and fragment searching, or exclude all PDB entries with sequences
+similar to a particular PDB entry.</p>
+<p>You can choose to create a replacement for just a selected part of your
+model (by supplying a selection string that specifies what to select).</p>
+</div>
+<div class="section" id="how-replace-with-fragments-from-pdb-works">
+<h1>How replace_with_fragments_from_pdb works:</h1>
+<p>Search structures in the PDB (using SSM matching and fragment searching) for
+fragments similar to segments in a supplied model. Then choose the best
+matching segments for each part of the supplied model and create a composite
+model using the fragments from the PDB.</p>
+<p>replace_with_fragments_from_pdb uses SSM-based (secondary structure matching)
+to find structures in the PDB that are similar to a supplied model. The SSM
+matching is the same as in phenix.superpose_models.</p>
+<p>replace_with_fragments_from_pdb also uses fragment searching to find shorter
+fragments matching each loop (segment between two helices or strands)
+in the supplied model.</p>
+<p>The fragments obtained with fragment searching are always morphed (distorted)
+to make the distance between starting and ending residues match the distance
+in the supplied structure.</p>
+<p>Fragments obtained from SSM matching are optionally morphed to match the
+target structure as well. The distance over which morphing occurs (the
+shift-field distance) is adjustable (typically 10 A), where structure is
+largely preserved over shorter distances and may be changed over longer
+distances.</p>
+<p>The supplied model is then used as a template and matching parts of structures
+from the PDB are superimposed on the template. The best-matching segments
+(smallest rmsd and longest length) are chosen and connected.  Gaps are filled
+if possible by a targeted fragment search of the PDB.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-replace-with-fragments-from-pdb">
+<h1>Standard run of replace_with_fragments_from_pdb:</h1>
+<p>Running replace_with_fragments_from_pdb is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.replace_with_fragments_from_pdb model.pdb nproc=8
+</pre>
+<p>This will find fragments in the PDB similar to model.pdb, put them together
+and write out a new model using these fragments.</p>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+<p>The final model may have poor geometry at connections between fragments, so
+further refinement is normally required.  Additionally the final model may
+have poor geometry within segments because morphing is carried out to
+match the target structure.</p>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">selection</span><span class="phil-words"> = None </span><span class="phil-help">If specified, use selected part of model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">local_pdb_dir</span><span class="phil-words"> = None </span><span class="phil-help">Local PDB mirror (something like /User/files/pdb_mirror/)</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">map_model</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">full_map</span><span class="phil-words"> = None </span><span class="phil-help">Input full map file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">half_map</span><span class="phil-words"> = None </span><span class="phil-help">Input half map files</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model</span><span class="phil-words"> = None </span><span class="phil-help">Input model file</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">rebuilt_model</span><span class="phil-words"> = None </span><span class="phil-help">Output file name. Default is to append _rebuilt to input file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">overwrite</span><span class="phil-words"> = True </span><span class="phil-help">Overwrite files with same names</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">replace_with_fragments_from_pdb</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">refine_cycles</span><span class="phil-words"> = 3 </span><span class="phil-help">Refinement cycles (set to zero to not refine)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_insertions_or_deletions</span><span class="phil-words"> = None </span><span class="phil-help">Maximum insertions/deletions per fragment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">database</span><span class="phil-words"> = *pdb100 pdb2018_90 </span><span class="phil-help">Database to search. pdb100 is unique set of PDB. pdb2018_90 is quality-filtered PDB at 90% identity</span></li><li class="phil-param" data-expert="0"><span class="phil-name">number_of_sequence_neighbors</span><span class="phil-words"> = 100 </span><span class="phil-help">Number of sequence neighbors to search if using pdb100</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_models_to_fetch</span><span class="phil-words"> = 100 </span><span class="phil-help">Maximum models to fetch from PDB</span></li><li class="phil-param" data-expert="0"><span class="phil-name">allow_reverse_connectivity</span><span class="phil-words"> = False </span><span class="phil-help">Allow connectivity to be backwards or mixed</span></li><li class="phil-param" data-expert="0"><span class="phil-name">morph</span><span class="phil-words"> = False </span><span class="phil-help">Morph replacement segments (NOTE: morphing of loops is intrinsic)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">shift_field_distance</span><span class="phil-words"> = None </span><span class="phil-help">Shift field distance. Distance over which morphing leaves model mostly the same. Over longer distances morphing changes model. Default is 10 A.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_include_list</span><span class="phil-words"> = None </span><span class="phil-help">List of PDB ID or pdb ID and chain_id to include (2DY1 or 2DY1_A)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_exclude_list</span><span class="phil-words"> = None </span><span class="phil-help">List of PDB ID or pdb ID and chain_id to exclude (2DY1 or 2DY1_A)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">exclude_similar_to_this_pdb_id</span><span class="phil-words"> = None </span><span class="phil-help">Exclude all PDB chains with sequence identity &gt; maximum_percent_identity_to_this_pdb_id to exclude_similar_to_this_pdb_id</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_percent_identity_to_this_pdb_id</span><span class="phil-words"> = 30 </span><span class="phil-help">Maximum percent identity to supplied PDB chain to include. Exclude all PDB chains with sequence identity &gt; maximum_percent_identity_to_this_pdb_id to exclude_similar_to_this_pdb_id</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_residues_to_try_fragment_search</span><span class="phil-words"> = 30 </span><span class="phil-help">If try_fragment_search_for_short_models and model has no more than maximum_residues_to_try_fragment_search, try simple fragment search first</span></li><li class="phil-param" data-expert="0"><span class="phil-name">try_fragment_search_for_short_models</span><span class="phil-words"> = True </span><span class="phil-help">If try_fragment_search_for_short_models and model has no more than maximum_residues_to_try_fragment_search, try simple fragment search first</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">Nominal resolution of map</span></li><li class="phil-param" data-expert="3"><span class="phil-name">scattering_table</span><span class="phil-words"> = n_gaussian wk1995 it1992 *electron neutron </span><span class="phil-help">Choice of scattering table for structure factor calculations. Standard for X-ray is n_gaussian, for cryoEM is electron.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">sequence</span><span class="phil-words"> = None </span><span class="phil-help">Sequences</span></li><li class="phil-param" data-expert="0"><span class="phil-name">wrapping</span><span class="phil-words"> = None </span><span class="phil-help">You can specify whether the map is wrapped (can map values outside bounds to inside with cell translations).</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of processors (if None, use all available)</span></li><li class="phil-param" data-expert="2"><span class="phil-name">ignore_symmetry_conflicts</span><span class="phil-words"> = False </span><span class="phil-help">You can ignore the symmetry information (CRYST1) from coordinate files. This may be necessary if your model has been placed in a box with box_map for example.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">quick</span><span class="phil-words"> = False </span><span class="phil-help">Run quickly</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Find matching fragments in the PDB (fragment_search)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="find-matching-fragments-in-the-pdb-fragment-search">
+<h1 class="title">Find matching fragments in the PDB (fragment_search)</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>fragment_search: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>Extract a segment from the PDB that is similar to a segment in a supplied model.</p>
+<p>This tool can be used in early stages of model-building to try and
+improve a segment in a preliminary model by replacing it with a similar
+fragment from a deposited structure.</p>
+<p>Note that the fragment from the PDB may not actually have good geometry because
+it is morphed (distorted) to match the supplied model.</p>
+<p>Fragment search differs from replace_with_fragments_from_pdb in that
+fragment_search is looking for a single fragment from the PDB that matches
+a target segment in your model, while replace_with_fragments_from_pdb is
+trying to completely replace your model with a set of fragments.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+<p>fragment_search can find a fragment in the PDB similar to a supplied fragment
+(protein chains only)</p>
+<p>You can adjust the maximum number of insertions/deletions in the replacement
+fragment and whether to morph the fragment.</p>
+<p>You can also choose to exclude or include specific PDB entries
+or exclude all PDB entries with sequences similar to a particular PDB entry.</p>
+<p>You can choose to create a replacement for just a selected part of your
+model (by supplying a selection string that specifies what to select).</p>
+</div>
+<div class="section" id="how-fragment-search-works">
+<h1>How fragment_search works:</h1>
+<p>Fragment searching is done using a quality-filtered set of chains from the PDB,
+filtered at 90% sequence identity (pdb2018_90).
+The curated subset of the PDB consist of non-redundant (&lt;90% identity),
+high-resolution structures (&lt; 2 A) that have very good geometry. The main-chain
+coordinates of these structures are supplied in a database as part of Phenix.</p>
+<p>Potential matching fragments are found by comparing end-to-end distances for
+the target with all fragments of the desired length in structures in the
+database. Fragments with the desired end-to-end distance are then examined
+for matching of distances from end to several internal positions in the
+target fragment. Finally those that match all these are superimposed on
+the target fragment, morphed to match the target fragment,
+and the rmsd of CA positions are used to evaluate the match.</p>
+<p>Morphing includes two steps.  In the first, the fragment is distorted
+with an offset that changes linearly for each residue along the chain and that
+allows the first and last CA positions of the matching fragment to
+superimpose on those of the target fragment.</p>
+<p>In the second step, a distortion field is applied to the matching fragment
+to make it more similar to the target fragment.  This morphing consists of
+calculation of a real-space distortion field that changes over a typical
+distance of about 10 A (set by the parameter distortion_field_length), and
+applying this distortion field to all the atoms in the matching fragment.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-fragment-search">
+<h1>Standard run of fragment_search:</h1>
+<p>Running fragment_search is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.fragment_search model.pdb nproc=8 selection=&quot;chain A and resseq 1:20&quot;
+</pre>
+<p>This will find fragments in the PDB similar to residues 1-20 of model.pdb.</p>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">model</span><span class="phil-words"> = None </span><span class="phil-help">Input PDB file with segments to try and match</span></li><li class="phil-param" data-expert="0"><span class="phil-name">selection</span><span class="phil-words"> = None </span><span class="phil-help">If specified, match selected part of model</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">superposed_model_prefix</span><span class="phil-words"> = None </span><span class="phil-help">Output files with superposed models will begin with this prefix</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">fragment_search</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">trim</span><span class="phil-words"> = True </span><span class="phil-help">Trim models down to match the target fragment. Otherwise return full chain</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_res</span><span class="phil-words"> = None </span><span class="phil-help">Number of residues to get. If None, use number of residues in input fragment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_indel</span><span class="phil-words"> = 0 </span><span class="phil-help">Maximum insertions/deletions relative to n_res</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_half_window</span><span class="phil-words"> = 5 </span><span class="phil-help">Number of residues over which to average morphing shifts</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_gap</span><span class="phil-words"> = 20 </span><span class="phil-help">Maximum gap in match to keep. Interpolate morphing values over gaps up to max_gap. Trim gaps longer than max_gap</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_segment_matching_ca_ca_deviation</span><span class="phil-words"> = 0.8 </span><span class="phil-help">Maximum rmsd between segments to allow a match</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_models</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of models to return</span></li><li class="phil-param" data-expert="0"><span class="phil-name">morph</span><span class="phil-words"> = True </span><span class="phil-help">Morph output models after superposition and before trimming</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_include_list</span><span class="phil-words"> = None </span><span class="phil-help">List of PDB ID or pdb ID and chain_id to include (2DY1 or 2DY1_A)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_exclude_list</span><span class="phil-words"> = None </span><span class="phil-help">List of PDB ID or pdb ID and chain_id to exclude (2DY1 or 2DY1_A)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">exclude_similar_to_this_pdb_id</span><span class="phil-words"> = None </span><span class="phil-help">Exclude all PDB chains with sequence identity &gt; maximum_percent_identity_to_this_pdb_id to exclude_similar_to_this_pdb_id</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_percent_identity_to_this_pdb_id</span><span class="phil-words"> = 30 </span><span class="phil-help">Maximum percent identity to supplied PDB chain to include. Exclude all PDB chains with sequence identity &gt; maximum_percent_identity_to_this_pdb_id to exclude_similar_to_this_pdb_id</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of processors to use. If None, uses all available</span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_files</span><span class="phil-words"> = True </span><span class="phil-help">Write output files</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

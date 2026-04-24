@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Tutorial: RNase-S Refinement</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="tutorial-rnase-s-refinement">
+<h1 class="title">Tutorial: RNase-S Refinement</h1>
+<div class="section" id="overview">
+<h1>Overview</h1>
+<p>This tutorial will show you how to refine a simple structure using the
+<a class="reference external" href="../phenix_gui.html">PHENIX graphical user interface (GUI)</a>.  Please read the
+<a class="reference external" href="../reference/refine_gui.html">phenix.refine documentation</a> before running this tutorial,
+as it will familiarize you with the GUI and the options available for
+refinement.  You may also find the <a class="reference external" href="../dictionary.html">dictionary of terms</a>
+helpful.</p>
+</div>
+<div class="section" id="setup">
+<h1>Setup</h1>
+<p>The example used
+for this tutorial is called <strong>rnase-s</strong>, and can be set up in the GUI as
+<a class="reference external" href="../examples.html">described here</a>.  In the tutorial setup window, select the
+dataset labeled &quot;S. aureofaciens ribonuclease Sa&quot; under &quot;Refinement&quot;, and
+click &quot;Okay&quot;.</p>
+<blockquote>
+<img alt="../images/tutorial_refine_setup.png" src="../images/tutorial_refine_setup.png" />
+</blockquote>
+<p>Once you have created the project, click the button labeled &quot;phenix.refine&quot;
+in the main GUI under &quot;Refinement&quot;.</p>
+</div>
+<div class="section" id="input-files">
+<h1>Input files</h1>
+<p>Only two input files are required for running phenix.refine with this dataset,
+the starting model and the reflections.  These can be added either by dragging
+and dropping them into the input file list from the desktop, or by clicking
+&quot;Add file&quot; and selecting them from the dialog window.</p>
+<blockquote>
+<img alt="../images/tutorial_refine_files.png" src="../images/tutorial_refine_files.png" />
+</blockquote>
+<p>The space group and unit cell will be loaded automatically; these will always
+be taken from the last symmetry-containing file to be added (in this case, the
+PDB file and reflections file both contain the symmetry information).  The
+available data arrays for refinement will be listed in the &quot;Data labels&quot;
+drop-down menu; the first of these is what we want to use, and will be
+selected automatically.  Because this structure predates the use of the R-free
+statistic in refinement, no R-free flags are available; these will be
+generated once refinement starts.</p>
+<p>If you wish you may also input the file <strong>1sar.fa</strong>, which is the protein
+sequence; this is not necessary for refinement itself but will be used to
+validate the model sequence at the end of the run.</p>
+</div>
+<div class="section" id="refinement-options">
+<h1>Refinement options</h1>
+<p>The second configuration tab, <strong>Refinement settings</strong> contains most of the
+essential options for
+running phenix.refine.  The first section controls the model parameters to be
+refined.  For the rnase-s example, the <strong>XYZ coordinates</strong>, <strong>Real-space</strong>,
+<strong>Individual B-factors</strong>, and <strong>TLS</strong> strategies are appropriate.  The
+<strong>Occupancies</strong> strategy is also selected by default, but since the default
+behavior will not affect any of the atoms in the rnase-s input model, it can
+be left on without negatively impacting runtime or the result quality.</p>
+<p>All strategies can be applied to specific atoms by defining atom selections.
+For most of the strategies the default of refining all atoms is appropriate,
+but for TLS a more fine-grained division of groups is appropriate.  Select
+&quot;TLS parameters&quot; from the drop-down menu labeled &quot;Modify selections for&quot;.
+A new window will appear for defining TLS groups (the same window can also be
+opened by clicking &quot;TLS&quot; on the toolbar).  Since PHENIX includes a
+built-in program to identify suitable TLS groups based on the input B-factors,
+we will use this.  Click &quot;Find TLS groups&quot; on the toolbar to start this
+program; it will typically take 15 seconds to several minutes depending on the
+size of the structure and the number of processors used (on Windows this is
+limited to one).</p>
+<blockquote>
+<img alt="../images/tutorial_refine_tls.png" src="../images/tutorial_refine_tls.png" />
+</blockquote>
+<p>When the program is finished, atom selections for the TLS groups will be
+loaded into the list.  Select one of these and click the button labeled
+&quot;View/pick&quot; to display the selection visually; you can modify the selection
+manually if you want, but in this case the automatic selections are suitable.
+You can now save the TLS selections by clicking &quot;Update and exit&quot; on the
+toolbar of the TLS editor window.</p>
+<blockquote>
+<img alt="../images/tutorial_refine_select.png" src="../images/tutorial_refine_select.png" />
+</blockquote>
+<p>In the &quot;Restraints and weighting&quot; section, you should activate the NCS
+restraints option, as the RNase-S structure contains two copies of the
+protein chain.  For &quot;NCS type&quot;, select &quot;torsion-angle&quot;; this will restrain
+the dihedral angles to be similar, instead of the older global-superposition
+based method, which does not allow for the small local deformations between
+chains which are present in this model.</p>
+<p>For this particular structure, optimizing the X-ray/stereochemistry weight
+will be helpful, producing a model with a lower R-free and a smaller gap
+between R-work and R-free.  However, since this takes significantly longer to
+finish, the optimization may be left off for the purposes of running the
+tutorial.  The remainder of the options can also be left in the default state,
+although we recommend experimenting with <strong>Automatically add hydrogens to
+model</strong>, <strong>Update waters</strong>, <strong>Simulated annealing</strong>, and <strong>Fix bad sidechain
+rotamers</strong> to get a feel for how these options affect performance.</p>
+<p>At this point the <strong>Refinement settings</strong> tab should look approximately like
+the image below:</p>
+<blockquote>
+<img alt="../images/tutorial_refine_options.png" src="../images/tutorial_refine_options.png" />
+</blockquote>
+<p>The final tab controls output settings; these can also be left alone, but you
+may wish to set the run title, as this will appear in the job history in the
+main GUI.  The output map coefficients will include a 2mFo-DFc and mFo-DFc
+map.</p>
+</div>
+<div class="section" id="running-the-program">
+<h1>Running the program</h1>
+<p>Click the &quot;Run&quot; button on the toolbar to start the program.  Depending on the
+operating system and local setup, you may have multiple options to run the
+job: by default it will be start in the same process, which will allow faster
+communication with the GUI, but this also means that closing the GUI will
+kill the job.  On Mac and Linux you will also have the option to run the job
+as &quot;detached&quot;, which allows you to close the GUI, but lacks some features.
+Queuing systems are also supported on Linux.  You can also view or edit the
+complete parameters file before running if desired.  In this case, you should
+choose the first item in the menu (&quot;Run now&quot;).</p>
+<p>Because no R-free flags were present in the input file, a dialog will appear
+asking if you want to create new flags, with instructions for how to use these
+flags after refinement:</p>
+<blockquote>
+<img alt="../images/tutorial_refine_newflags1.png" src="../images/tutorial_refine_newflags1.png" />
+</blockquote>
+<p>You should click &quot;Okay&quot; to proceed; if you want to adjust the parameters used
+for creating the flags, click &quot;Cancel&quot; and then edit settings in the dialog
+opened by clicking &quot;Options&quot; under &quot;X-ray data&quot; in the first configuration
+tab, then re-run.  Immediately after the job starts, another window will
+appear warning you that new flags have been created:</p>
+<blockquote>
+<img alt="../images/tutorial_refine_newflags2.png" src="../images/tutorial_refine_newflags2.png" />
+</blockquote>
+<p>This is not an error message, but prevents against unknowingly generating
+new R-free flags by mistake.</p>
+<p>When the process starts, a new tab will appear, which contains two inner
+tabs.  The second tab will be visible at first, and displays the basic
+refinement statistics (including R-factors, bond and angle deviations, and
+validation scores), both for the current model and plotted over the course of
+refinement:</p>
+<blockquote>
+<img alt="../images/tutorial_refine_stats.png" src="../images/tutorial_refine_stats.png" />
+</blockquote>
+<p>The appearance of the R-factor plot is an important indicator of whether the
+selected refinement options are appropriate or not.  In this case, since R-free
+flags were not previously used in refinement, the R-work and R-free will
+start out the same and immediately diverge.  This is expected; however, the
+gap between the two values should stay relatively low, and R-free should still
+decrease over the course of refinement.  A large increase in
+the gap indicates overfitting, and additional restraints and/or a more
+conservative optimization strategy may be required.  If R-free increases
+during refinement, the changes in the model are not justified and the result
+should be discarded.</p>
+<p>The first tab shows the complete log output:</p>
+<blockquote>
+<img alt="../images/tutorial_refine_log.png" src="../images/tutorial_refine_log.png" />
+</blockquote>
+<p>You can also view the log file itself by clicking &quot;View log&quot;. Experienced
+users may not find it necessary to inspect the log, but we recommend that you
+familiarize yourself with its contents, as it contains additional information
+that may be useful for debugging, as well as providing an overview of the
+program logic and workflow.</p>
+<p>While refinement is running, if Coot is available on your system, it will
+be started and the current model and maps will be automatically loaded each
+time they change.  This behavior can be disabled in the preferences (under
+&quot;Graphics&quot;, but Coot can also be started during refinement by clicking
+&quot;Show graphics&quot; in the &quot;Run status&quot; tab.  PyMOL is also supported.  During
+refinement, the current model will be colored in cyan; at the end of
+refinement, the final model will be colored yellow.</p>
+</div>
+<div class="section" id="after-refinement">
+<h1>After refinement</h1>
+<p>Once the job completes, additional tabs will appear reporting the output files,
+final statistics and a variety of <a class="reference external" href="../reference/validation.html">validation criteria</a>:</p>
+<blockquote>
+<img alt="../images/tutorial_refine_summary.png" src="../images/tutorial_refine_summary.png" />
+</blockquote>
+<p>The output files will mostly take the form <strong>${PREFIX}_${RUN_ID}.${EXTENSION}</strong>,
+for instance &quot;rnase-s_refine_19.mtz&quot; in the image above;
+the prefix can be modified in the Output configuration tab.  The run ID will
+be set automatically by the GUI.  Files named using this convention include:</p>
+<blockquote>
+<ul class="simple">
+<li><strong>.log</strong>: the same log output that appears in the GUI.</li>
+<li><strong>.eff</strong>: the final effective parameters, including any automatic
+modifications performed internally.</li>
+<li><strong>.geo</strong>: a complete listing of geometry restraints at the start of
+refinement, including both target and actual values, sorted by deviation
+from ideal.</li>
+<li><strong>.pdb</strong>: the final refined model.</li>
+<li><strong>.mtz</strong>: all reflection data associated with the run, including the
+R-free flags, the input data, the filtered data used in refinement
+(excluding outliers), the final &quot;F(model)&quot; (the calculated structure
+factors, including bulk solvent contribution), and map coefficients
+(including, by default, the 2mFo-DFc map with and without missing F-obs
+substituted by F-calc, the mFo-DFc map, and if anomalous data were used
+in refinement, the anomalous difference map).</li>
+</ul>
+</blockquote>
+<p>Additionally, if modifications were made to the input data, including the
+generation of R-free flags, a file named <strong>${PREFIX}_data.mtz</strong> will be
+included.  If you created a new set of flags, as was done for this tutorial,
+you should always use this MTZ file for future refinements.</p>
+<p>Guidelines for interpreting the validation results can be found in the
+<a class="reference external" href="../reference/validation.html">documentation for the validation GUI</a> or the external
+<a class="reference external" href="http://kinemage.biochem.duke.edu/teaching/csh2008/">Molprobity tutorial</a>
+from the Cold Spring Harbor Laboratory crystallography course.</p>
+</div>
+<div class="section" id="command-line-usage">
+<h1>Command-line usage</h1>
+<p>This tutorial can also be run from the command line, although the final
+validation is only available from the GUI.  The example files can be found
+here:</p>
+<pre class="literal-block">
+$PHENIX/examples/rnase-s
+</pre>
+<p>The equivalent command line arguments for the run described above are:</p>
+<pre class="literal-block">
+phenix.refine rnase-s.pdb rnase25.mtz xray_data.labels=FNAT,SIGFNAT,merged \
+  xray_data.r_free_flags.generate=True ncs=True ncs.type=torsion \
+  refine.strategy=individual_sites+individual_sites_real_space+individual_adp+tls+occupancies \
+  tls.find_automatically=True
+</pre>
+<p>Note that in the GUI, the identification of TLS groups was run interactively
+as a separate step prior to starting the job, rather than automatically
+during refinement.  On the command line, you can run this command to obtain
+the TLS parameters:</p>
+<pre class="literal-block">
+phenix.find_tls rnase-s.pdb
+</pre>
+</div>
+<div class="section" id="references">
+<h1>References</h1>
+<p><ul><li><b>Towards automated crystallographic structure refinement with phenix.refine.</b> P.V. Afonine, R.W. Grosse-Kunstleve, N. Echols, J.J. Headd, N.W. Moriarty, M. Mustyakimov, T.C. Terwilliger, A. Urzhumtsev, P.H. Zwart, and P.D. Adams. <a href="https://doi.org/10.1107/S0907444912001308"><i>Acta Crystallogr D Biol Crystallogr</i> <b>68</b>, 352-67 (2012)</a>.</li>
+</ul></p>
+<p>Sevcik J, Dodson EJ, Dodson GG.  (1991)  Determination and restrained
+least-squares refinement of the structures of ribonuclease Sa and its
+complex with 3'-guanylic acid at 1.8 A resolution.
+<tt class="docutils literal">Acta Crystallogr., Sect.B</tt> <strong>47</strong>:240-253.  PMID: <a class="reference external" href="http://www.ncbi.nlm.nih.gov/pubmed/1654932">1654932</a></p>
+</div>
+</div>
+    
+  </body>
+</html>

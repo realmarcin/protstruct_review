@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>structure_search</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="structure-search">
+<h1 class="title">structure_search</h1>
+<div class="section" id="overview">
+<h1>Overview</h1>
+<p>Structure_search is a tool to quickly identify structural and/or sequence homologs of the input PDB file from the Protein Data Bank. It uses the <a class="reference internal" href="structure_search.html#sarst">SARST</a> algorithm, and it's very fast. A typical search time against the whole PDB is usually less than one second.  There is an option to allow users to obtain a list of ligands found in PDB structures of those homologs.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+<blockquote>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt>Identify and superpose homologous pdbs of mypdb.pdb</dt>
+<dd>phenix.structure_search mypdb.pdb</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>obtain a list of homologs of mypdb.pdb and all ligands found in structures of those homologs</dt>
+<dd>phenix.structure_search mypdb.pdb get_ligand=True</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Use a local PDB mirror and obtain superposed homologs of mypdb.pdb</dt>
+<dd>phenix.structure_search mypdb.pdb PDB_MIRRORDIR=/path/to/pdb_mirror/top-level</dd>
+</dl>
+</li>
+</ul>
+</blockquote>
+<p>More information can be found in input/Output files sections below:</p>
+</div>
+<div class="section" id="input-files">
+<h1>Input files</h1>
+<p>required input:</p>
+<blockquote>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt><strong>pdb_file</strong>: the file containing the protein model of interest.</dt>
+<dd>By default, structure_search will search structure and sequence homologs of the input PDB file.</dd>
+</dl>
+</li>
+</ul>
+</blockquote>
+<p>Optional inputs :</p>
+<blockquote>
+<ul class="simple">
+<li><strong>get_ligand</strong>:&quot;=True&quot; if want a list of ligands found in homologous PDBs,  Default = False.</li>
+<li><strong>job_title</strong>: current job title</li>
+<li><strong>output_prefix</strong>: prefix for output files if needed.</li>
+<li><strong>get_pdb</strong>:Collect and superpose the top N homologous pdbs (default=10).</li>
+<li><strong>coot_display</strong>: Display superposed pdb files in coot. [default=(False/True) as E-value(&gt;/&lt;)1E-18].</li>
+<li><strong>sequence_only</strong>:&quot;=False&quot; Perform only sequence search against PDB database using Phenix' internal DB.</li>
+<li><strong>structure_only</strong>: Perform only structure search against PDB database using the SARST method.</li>
+<li><strong>PDB_MIRRORDIR</strong>: Set option to use local PDB mirror instead of using RCSB server. See 'Using Local PDB mirror' section.</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="output-files">
+<h1>Output files</h1>
+<dl class="docutils">
+<dt>In addition to screen output, these files contains results of structure_search:</dt>
+<dd><ul class="first last simple">
+<li><strong>output_(sequence/structure).txt</strong>: files containing sequence/structure homologs of 'pdb_file' sorted by scores.</li>
+<li><strong>MyBlast_(sequence/structure).log</strong>: Standard BLAST output with selected pairwise alignments. NOTE: for structure alignment, the 'sequences' are structure-based Ramachandran codes (see reference), not 1-letter code for amino acids.</li>
+<li><strong>pdb_ligand.txt</strong> (if get_ligand=True): file containing all ligands found in all homologs from this search.</li>
+<li><strong>superposed PDB files</strong>: Can be found in TEMPPDB_## subdirectory as prompted in the program output.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="using-local-pdb-mirror">
+<h1>Using Local PDB mirror</h1>
+<dl class="docutils">
+<dt>By default the program retrieves homologous PDB mmCIF files from RCSB server for downstream processes.  Users may choose to use their local PDB mirror if environmental variables &quot;PDB_MIRRORDIR&quot;has already been defined in the running shell of phenix.structure_search.  Alternatively, users may define it in the command-line script or specify the path in the GUI. See more details below.</dt>
+<dd><ul class="first last simple">
+<li><strong>PDB_MIRRORDIR</strong>: Defines the top level of the local PDB mirror.  The program will try to retrieve PDB mmCIF files from local mirror unless the path does not exist. Note this assumes the directory tree under it follows that in the RCSB server and will try to access $PDB_MIRRORDIR/data/structures/divided/mmCIF. The progran will fall back to using RCSB server should the path contain errors.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="references">
+<h1>References</h1>
+<p id="sarst">Lo WC, Huang PJ, Chang CH, Lyu PC. BMC Bioinformatics. 2007, 8:307</p>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">structure_search</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb_file</span><span class="phil-words"> = None </span><span class="phil-help"> Enter a PDB file name </span></li><li class="phil-param" data-expert="0"><span class="phil-name">sequence</span><span class="phil-words"> = None </span><span class="phil-help"> Optional Fasta sequence file. Only needed for a quick sequence search against RCSB without a PDB. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_prefix</span><span class="phil-words"> = 'output' </span><span class="phil-help"> Provide an output prefix if needed </span></li><li class="phil-param" data-expert="0"><span class="phil-name">blastpath</span><span class="phil-words"> = None </span><span class="phil-help"> Enter path to blastall executable </span></li><li class="phil-param" data-expert="0"><span class="phil-name">sequence_only</span><span class="phil-words"> = False </span><span class="phil-help"> Do a Blast search against PDBaa sequence instead of
+        doing a Ramanchandran-based structure search</span></li><li class="phil-param" data-expert="0"><span class="phil-name">structure_only</span><span class="phil-words"> = False </span><span class="phil-help"> Do only a Ramanchandran-based structure search. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">db_used</span><span class="phil-words"> = 'rcsb' </span><span class="phil-help">structure database used in search. rcsb, scop95, or AF2</span></li><li class="phil-param" data-expert="0"><span class="phil-name">db</span><span class="phil-words"> = 'rcsb' </span><span class="phil-help">Database used in search. rcsb, scop95, or AF2.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">get_ligand</span><span class="phil-words"> = False </span><span class="phil-help"> Use get_ligand=True to retrive ligands.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">get_ramacode_only</span><span class="phil-words"> = False </span><span class="phil-help"> Generate Rama code for input pdb/cif only.
+        This is for developers only.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">get_xml_only</span><span class="phil-words"> = False </span><span class="phil-help">Get BLAST XML output returned as a string object.
+        No coordinate superposition will be performed. Developers only.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_pdb100aa</span><span class="phil-words"> = False </span><span class="phil-help"> Use PDB100 sequence database for sequence search.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_custom_db</span><span class="phil-words"> = False </span><span class="phil-help"> Use custom database specified by custom_db_files/custom_db_dir.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">custom_db_dir</span><span class="phil-words"> = None </span><span class="phil-help"> The directory of pdb/cif files to make custom database.
+        Default is current directory</span></li><li class="phil-param" data-expert="0"><span class="phil-name">custom_db_files</span><span class="phil-words"> = None </span><span class="phil-help">Filenames of the pdb/cif files seperated by spaces for database.
+        If none specified, all pdb/cif in the custom_db_dir will be collected</span></li><li class="phil-param" data-expert="0"><span class="phil-name">atom_selection</span><span class="phil-words"> = 'all' </span><span class="phil-help">Choose part of the pdb used in the search (default=all).
+        for example: chain B, resseq 113:219, ... etc. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">get_pdb</span><span class="phil-words"> = 10 </span><span class="phil-help"> get_pdb=N will collect and superpose the top N
+         homologous pdbs.  Use get_pdb=0 to disable this option.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">deposited_before</span><span class="phil-words"> = 0 </span><span class="phil-help"> Specify the latest year of matching structures to be considered
+        for scoring. Pdbs deposited after this year will be discarded.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">deposited_after</span><span class="phil-words"> = 0 </span><span class="phil-help"> Specify the earliest year of matching structures to be considered
+        for scoring. Pdbs deposited before this year will be discarded.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">batch_size</span><span class="phil-words"> = 0 </span><span class="phil-help"> Process the pdbs in batch of &lt;batch_size&gt; until &lt;min_match&gt;
+         hits are identified or until all &lt;get_pdb&gt; pdbs are processed</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_match</span><span class="phil-words"> = 0 </span><span class="phil-help"> Finish structure_search when &lt;min_match&gt; matches are found.
+        Usually uses with &lt;trim_ends&gt; to exit the search once find suitable pdbs.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_all_pdb</span><span class="phil-words"> = False </span><span class="phil-help"> Keep all the PDB files, including full PDB, PDB_Chain and
+        superposed PDB_Chain.  Default is False which will keep only superposed
+        PDB_Chain files in the directory specified in the output message.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">trim_ends</span><span class="phil-words"> = False </span><span class="phil-help"> Remove terminal residues of hit pdbs extending beyond those
+        of the the target pdb.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_pdb</span><span class="phil-words"> = True </span><span class="phil-help"> Set to False if no output pdb file is needed. Sometimes useful
+        if use Structure_Search within another program and only want to pass pdb
+        objects.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_results</span><span class="phil-words"> = True </span><span class="phil-help"> Set to False if no output results/log files is needed. Useful
+        when calling Structure_Search within another program and only want to pass pdb
+        objects.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">trim_hit_pdb</span><span class="phil-words"> = False </span><span class="phil-help"> Remove extra domains, extended loops, and unfit portions
+        of hit pdbs after superposed to the target pdb.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pickle_hits</span><span class="phil-words"> = False </span><span class="phil-help"> Pickle blast hit results from xml output.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">coot_display</span><span class="phil-words"> = False </span><span class="phil-help"> (default) Display output pdb files in coot.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ask_coot</span><span class="phil-words"> = True </span><span class="phil-help">prompt for coot display optios</span></li><li class="phil-param" data-expert="0"><span class="phil-name">PDB_MIRRORDIR</span><span class="phil-words"> = None </span><span class="phil-help"> Enter the top directory of local RCSB PDB mirror.  The program
+        will try to retrieve PDBs and/or structure factors from this mirror first.
+        Note this assumes the directory trees under it follows those in RCSB --
+        pdb files as 'pdb####.ent.gz' in PDB_MIRRORDIR/data/structures/divided/pdb directory.
+        If you use PDB's rsync script, this variable would be the same as the $MIRRORDIR set
+        in the script</span></li><li class="phil-param" data-expert="0"><span class="phil-name">PDB_MIRROR_MMCIF</span><span class="phil-words"> = None </span><span class="phil-help"> Enter the parent directory of the mmcif files in the local PDB mirror.
+        MMCIFs will be retrieved from subdirectory ##  where ## are the second and third letters
+        in the PDB id.  This keyword should be $PDB_MIRRORDIR/data/structures/divided/mmcif directory.
+        </span></li><li class="phil-param" data-expert="0"><span class="phil-name">PDB_MIRROR_PDB</span><span class="phil-words"> = None </span><span class="phil-help"> Enter the parent directory of the PDB files in the local PDB mirror.
+        PDBs will be retrieved from subdirectory ##  where ## are the second and third letters
+        in the PDB id.  This keyword should be $PDB_MIRRORDIR/data/structures/divided/pdb directory.
+        We recommend setting PDB_MIRRORDIR and it will take care of both PDB_MIRROR_PDB and
+        others together.  However, users may choose to specify PDB_MIRROR_PDB
+         directly</span></li><li class="phil-param" data-expert="0"><span class="phil-name">PDB_MIRROR_STRUCTURE_FACTORS</span><span class="phil-words"> = None </span><span class="phil-help">Enter the parent directory of the PDB files in the local PDB mirror.
+        structure factors s will be retrieved from subdirectory ##  where ## are the second
+        and third letters in the PDB id.  This keyword should be the same as the
+        $PDB_MIRRORDIR/data/structures/divided/structure_factors directory.
+        We recommend setting PDB_MIRRORDIR and it will take care of both PDB_MIRROR_PDB and
+        DB_MIRROR_STRUCTURE_FACTORS together.  However, users may choose to specify
+        PDB_MIRROR_STRUCTURE_FACTORS directly </span></li><li class="phil-param" data-expert="0"><span class="phil-name">local_pdb_dir</span><span class="phil-words"> = None </span><span class="phil-help"> Enter the path directly to your local PDB repository.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">debug</span><span class="phil-words"> = False </span><span class="phil-help">debugging output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

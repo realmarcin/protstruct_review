@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Density modification with multi-crystal averaging with phenix.multi_crystal_average</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="density-modification-with-multi-crystal-averaging-with-phenix-multi-crystal-average">
+<h1 class="title">Density modification with multi-crystal averaging with phenix.multi_crystal_average</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="multi_crystal_average.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="multi_crystal_average.html#author-s" id="toc-entry-1">Author(s)</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#purpose" id="toc-entry-2">Purpose</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#usage" id="toc-entry-3">Usage</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#how-phenix-multi-crystal-average-works" id="toc-entry-4">How phenix.multi_crystal_average works:</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#output-files-from-phenix-multi-crystal-average" id="toc-entry-5"><em>Output files from phenix.multi_crystal_average</em></a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#graphical-interface" id="toc-entry-6">Graphical interface</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#examples" id="toc-entry-7">Examples</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#standard-run-of-phenix-multi-crystal-average" id="toc-entry-8">Standard run of phenix.multi_crystal_average:</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#run-of-phenix-multi-crystal-average-with-multiple-domains" id="toc-entry-9">Run of phenix.multi_crystal_average with multiple domains:</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#run-of-phenix-multi-crystal-average-using-pdb-files-to-define-the-ncs-asymmetric-unit" id="toc-entry-10">Run of phenix.multi_crystal_average using PDB files to define the NCS asymmetric unit:</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#possible-problems" id="toc-entry-11">Possible Problems</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#specific-limitations-and-problems" id="toc-entry-12">Specific limitations and problems:</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#literature" id="toc-entry-13">Literature</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#additional-information" id="toc-entry-14">Additional information</a></li>
+<li><a class="reference internal" href="multi_crystal_average.html#list-of-all-available-keywords" id="toc-entry-15">List of all available keywords</a></li>
+</ul>
+</div>
+<div class="section" id="author-s">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-1">Author(s)</a></h1>
+<ul class="simple">
+<li>phenix.multi_crystal_average: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-2">Purpose</a></h1>
+<p>phenix.multi_crystal_average is a tool for carrying out density
+modification, including NCS symmetry within a crystal and electron
+density from multiple crystals.</p>
+</div>
+<div class="section" id="usage">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-3">Usage</a></h1>
+</div>
+<div class="section" id="how-phenix-multi-crystal-average-works">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-4">How phenix.multi_crystal_average works:</a></h1>
+<p>The inputs to phenix.multi_crystal_average are a set of PDB files that
+define the NCS within each crystal and the relationships of density
+between crystals, structure factor amplitudes (and optional phases, FOM
+and HL coefficients) for each crystal, and starting electron density
+maps for one or more crystals.</p>
+<p>The PDB files should each be composed of the exact same chains, placed
+in a different position and orientation for each NCS asymmetric unit of
+each crystal. You might create these PDB files by molecular replacement
+starting with the same search model for each crystal. You should not
+refine these MR solutions; they are only used to get the NCS
+relationships and the NCS will be more reliably found if the models for
+all NCS asymmetric units are identical. You can break the NCS asymmetric
+unit into domains and place them independently. You can specify the
+domains by giving them unique chain IDs, (or you can use the routine
+edit_chains.py to do this for you, see below). A separate NCS group
+will be created for each domain. Additionally if your NCS asymmetric
+unit consists of more than one chain (A+B for example) then each chain
+will always be treated as a separate NCS group.</p>
+<p>phenix.multi_crystal_average first uses the supplied PDB files to
+calculate NCS operators relating the NCS asymmetric unit in each crystal
+to all other NCS asymmetric units in that crystal and in other crystals.
+This is done by adding the unique chains in one crystal to each PDB file
+in turn, finding all the NCS relationships from all chains in that
+composite PDB file, and removing duplicate identity transformations. For
+example, suppose the NCS asymmetric unit is one chain (A,B,C....). Then
+to to relate all NCS asymmetric units to the NCS asymmetric unit of
+crystal 0, phenix.multi_crystal_average will compare all chains in the
+PDB file for each crystal to the unique chain in the PDB file for
+crystal 0, generating one NCS operator for each chain in each crystal.
+In this process the unique chain (in this case the NCS asymmetric unit
+of crystal 0) is renamed to a unique name (usually &quot;**&quot;) and a
+composite PDB file is created with this chain along with all the chains
+in the PDB file for the crystal being considered, and
+phenix.simple_ncs_from_pdb is used to find the NCS operators. The
+centroids of the chains defining NCS are used as centers of the regions
+where the NCS operator is to be applied.</p>
+<p>If the supplied PDB files have more than one domain or chain in each NCS
+asymmetric unit, then the domains or chains are grouped into separate
+NCS groups.</p>
+<p>Once NCS operators have been identified, density modification is carried
+out sequentially on data from each crystal. During density modification
+for one crystal, the current electron density maps from all other
+crystals are used in generating target density for density modification
+in exactly the same way as NCS-related density is normally used when
+only a single crystal is available.</p>
+<p>First the asymmetric unit of NCS is defined, in this case including the
+density in all NCS copies within the crystal being density modified as
+well as the density in all NCS copies in all other crystals. The
+asymmetric unit of NCS is the region over which the NCS operators apply.
+It is assumed to be identical for all NCS copies for all crystals, with
+orientation and position identified by the NCS operators. It is
+identified as the region over which all NCS copies have correlated
+density. If a mask for the protein/solvent boundary is supplied (by
+specifying &quot;use_model_mask&quot;), then the asymmetric unit of NCS is
+constrained to be within the non-solvent region of the map.
+Alternatively, if you request that the domains provided in your PDB
+files be used to define the NCS asymmetric unit (by specifying
+&quot;write_ncs_domain_pdb&quot;) then the the NCS asymmetric unit (for each
+NCS group) is limited to the region occupied by the corresponding chains
+in your PDB files.</p>
+<p>Then a target density map is created for the crystal being density
+modified. For each NCS copy in this crystal, the average density for all
+other NCS copies in this and other crystals is used as a target.</p>
+<p>Finally, statistical density modification is carried out using
+histograms of expected density, solvent flattening, and the NCS-based
+target density for this crystal. The process is then repeated for all
+other crystals. For those crystals for which no starting phases were
+available, one additional step is carried out in which the target
+density map is used by itself to calculate a starting electron density
+map (using RESOLVE map-based phasing).</p>
+<p>This entire process is carried out several times, leading to electron
+density maps for all crystals that typically have a high level of
+correlation of density within all NCS copies in each crystal and between
+the corresponding NCS regions in different crystals.</p>
+</div>
+<div class="section" id="output-files-from-phenix-multi-crystal-average">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-5"><em>Output files from phenix.multi_crystal_average</em></a></h1>
+<p><strong>denmod_cycle_1_xl_0.mtz</strong>: Density-modified map coefficients for
+crystal 0, cycle 1. Crystal 0 is the first crystal specified in your
+pdb_list, map_coeff_list, etc.</p>
+<p><strong>denmod_cycle_5_xl_1.mtz</strong>: Density-modified map coefficients for
+crystal 1, cycle 5. These map coefficients are suitable for
+model-building. They also contain HL coefficients that can optionally be
+used in refinement. As the HL coefficients contain information from all
+crystals they may in some cases be useful in refinement (normally you
+would only use experimental HL phase information in refinement as the
+NCS-based information would come from your NCS restraints in
+refinement).</p>
+</div>
+<div class="section" id="graphical-interface">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-6">Graphical interface</a></h1>
+<p>The GUI is listed in the &quot;Maps&quot; category of the main interface. The
+configuration tab contains a set of tabs for the crystal forms: <img alt="image0" src="../images/average_crystal_input.png" />
+The label strings are automatically filled in when an MTZ file is
+loaded; these normally do not need to be further edited. At least one
+crystal form must have map coefficients, and all are required to have
+PDB and data files, as well as the estimated solvent content. All other
+options are on the second tab of the configuration panel: <img alt="image1" src="../images/average_options.png" /> At
+the end of the run, the final density-modified and averaged map
+coefficients will be listed in a new tab. Selecting one of these and
+clicking the Coot or PyMOL buttons below will load the map coefficients
+and corresponding model for that crystal form. <img alt="image2" src="../images/average_results.png" /></p>
+</div>
+<div class="section" id="examples">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-7">Examples</a></h1>
+</div>
+<div class="section" id="standard-run-of-phenix-multi-crystal-average">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-8">Standard run of phenix.multi_crystal_average:</a></h1>
+<p>Running phenix.multi_crystal_average from the command line is easy.
+Usually you will want to edit a small parameter file (run_multi.eff) to
+contain your commands like this:</p>
+<pre class="literal-block">
+# run_multi.eff  commands for running phenix.multi_crystal_average
+# use:   &quot;phenix.multi_crystal_average run_multi.eff&quot;
+multi {
+  crystal {
+     pdb_file= &quot;gene-5.pdb&quot;
+     map_coeffs = &quot;resolve_1_offset.mtz&quot;
+     datafile = &quot;phaser_1_offset.mtz&quot;
+     datafile_labin = &quot;FP=F SIGFP=SIGF PHIB=PHI FOM=FOM HLA=HLA HLB=HLB HLC=HLC HLD=HLD&quot;
+     solvent_content = 0.43
+  }
+  crystal {
+     pdb_file=  &quot;multi.pdb&quot;
+     map_coeffs = &quot;None&quot;
+     datafile =  &quot;multi.pdb.mtz&quot;
+     datafile_labin =  &quot;FP=FP&quot;
+     solvent_content = 0.50
+  }
+}
+</pre>
+<p>Then you can run this with the command:</p>
+<pre class="literal-block">
+phenix.multi_crystal_average run_multi.eff
+</pre>
+<p>In this example we have 2 crystals. Crystal 1 has starting map
+coefficients in crystal_1_map_coeffs.mtz and data for FP in
+crystal_1_data.mtz. The contents of this crystal are represented by
+crystal_1.pdb. The second crystal has no starting map, has data for FP
+as well as PHI and HL coefficients in crystal_2_data.mtz, and the
+contents of this crystal are represented by crystal_2.pdb. The solvent
+contents of the 2 crystals are 0.43 and 0.50, and 5 overall cycles are
+to be done.</p>
+<p>NOTE: Usually you will want to supply coefficients for a
+density-modified map (if available, and perhaps with NCS as well) for
+your starting map coefficients, and you will want to supply experimental
+phases and HL coefficients for your datfiles.</p>
+<p>The column label strings like &quot;FP=FP&quot; are optional...if you say instead
+&quot;None&quot; then phenix.multi_crystal_average will guess them for you.
+NOTE: You need to put quotes around the None. Also note: the order of
+entering pdb_list, map_coeff_list, data_file_list,
+solvent_content_list etc matters. They must all match.</p>
+</div>
+<div class="section" id="run-of-phenix-multi-crystal-average-with-multiple-domains">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-9">Run of phenix.multi_crystal_average with multiple domains:</a></h1>
+<p>If your PDB files have more than one NCS domain within a chain, then you
+may want to split the chains up into sub-chains representing the
+individual NCS domains. This will provide a better definition of the NCS
+operators when the PDB files are analyzed.</p>
+<p>You can use the jiffy &quot;edit_chains.py&quot; to do this. This jiffy splits
+your chains up into sub-chains based on the domains that you specify in
+&quot;edit_chains.dat&quot;.</p>
+<p>NOTE: edit_chains.py only works if your chains have single-letter ID's.
+(It simply adds another character to your chain ID's to make new ones.)
+If you have two-letter chain ID's, then you'll have to do this another
+way. To use it, type:</p>
+<pre class="literal-block">
+phenix.python $PHENIX/phenix/phenix/autosol/edit_chains.py file.pdb edited_file.pdb
+</pre>
+<p>The file edit_chains.dat is required and should look like:</p>
+<pre class="literal-block">
+A 1 321
+A 322 597
+A                 598 750
+A                751 902
+A                903 1082
+B                        1 58
+B 424 425
+B                59 101
+B  343 423
+B                        102 342
+</pre>
+<p>where the letter and residue range is your chain ID and residue range
+for a particular domain. You should specify these for ALL chains in your
+PDB files (not just the unique ones).</p>
+</div>
+<div class="section" id="run-of-phenix-multi-crystal-average-using-pdb-files-to-define-the-ncs-asymmetric-unit">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-10">Run of phenix.multi_crystal_average using PDB files to define the NCS asymmetric unit:</a></h1>
+<p>If you specify the parameter write_ncs_domain_pdb=True, then
+phenix.multi_crystal_average will write out domain-specific PDB files
+for each domain in your model (based on its analysis of NCS, one for
+each NCS group). Then it will use those domain-specific PDB files to
+define the region over which the corresponding set of NCS operators
+apply. This is generally a good idea if you have multiple domains in
+your structure.</p>
+</div>
+<div class="section" id="possible-problems">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-11">Possible Problems</a></h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-12">Specific limitations and problems:</a></h1>
+<ul>
+<li><p class="first">The format for the parameters file for phenix.multi_crystal_average
+has changed (twice) (from a list of inputs for pdb_list etc, to
+several groups of inputs, one for each crystal.)</p>
+</li>
+<li><p class="first">If the NCS asymmetric unit of your crystal contains more than one
+type of chain, phenix.multi_crystal_average will consider it to
+have more than one domain. This limitation comes from
+phenix.simple_ncs_from_pdb, which assigns one NCS group to each
+unique chain in the NCS asymmetric unit. If you would like
+phenix.multi_crystal_average to consider several chains as a single
+NCS group, then you would need to rename your chains and residues so
+that all the residues in a single NCS group have the same chain name
+and so that residue numbers are not duplicated. Normally you not need
+to do this, but if you want to use phenix.multi_crystal_average to
+generate phases for one crystal from another and you have more than
+one chain in the NCS asymmetric unit you would have to do this.</p>
+</li>
+<li><p class="first">If your NCS asymmetric unit has more than one domain (more than one
+type of chain chain, or else multiple domains within a chain that
+have different arrangements in different NCS asymmetric units) then
+phenix.multi_crystal_average requires that you provide map
+coefficients for all crystals. This is because
+phenix.multi_crystal_average cannot use the PDB files you provide
+to generate the NCS asymmetric unit directly at this point (i.e., it
+cannot use pdb_domain in RESOLVE.) Therefore if you don't provide
+map coefficients for one crystal then it does not have a way to
+individually identify the region occupied by each domain in the NCS
+asymmetric unit for that crystal. This isn't a problem if there are
+not multiple domains or types of chains in the NCS asymmetric unit
+because the automatic method for generation of the NCS asymmetric
+unit can be used.</p>
+</li>
+<li><p class="first">Normally you should supply PDB files defining the NCS in your
+crystals in which all the chains have identical sequences and
+conformations within each NCS copy. This is not absolutely required,
+however. If your PDB file contains chains that are not identical then
+NCS will be estimated from the chains you provide. It may be
+necessary to set the parameter:</p>
+<pre class="literal-block">
+simple_ncs_from_pdb.maximize_size_of_groups=True
+</pre>
+<p>to get this to work if the chains have insertions, deletions, or
+sequence differences.</p>
+</li>
+<li><p class="first">The size of the asymmetric unit in the SOLVE/RESOLVE portion of
+phenix.multi_crystal_average is limited by the memory in your
+computer and the binaries used. The Wizard is supplied with
+regular-size (&quot;&quot;, size=6), giant (&quot;_giant&quot;, size=12), huge
+(&quot;_huge&quot;, size=18) and extra_huge (&quot;_extra_huge&quot;, size=36).
+Larger-size versions can be obtained on request.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="literature">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-13">Literature</a></h1>
+<p><ul><li><b>Rapid automatic NCS identification using heavy-atom substructures.</b> T.C. Terwilliger. <a href="https://doi.org/10.1107/S0907444902016384"><i>Acta Crystallogr D Biol Crystallogr</i> <b>58</b>, 2213-5 (2002)</a>.</li>
+</ul></p>
+<p><ul><li><b>Statistical density modification with non-crystallographic symmetry.</b> T.C. Terwilliger. <a href="https://doi.org/doi:10.1107/S0907444902016360"><i>Acta Crystallogr D Biol Crystallogr</i> <b>58</b>, 2082-6 (2002)</a>.</li>
+</ul></p>
+<p><ul><li><b>Maximum-likelihood density modification.</b> T.C. Terwilliger. <a href="https://doi.org/doi:10.1107/S0907444900005072"><i>Acta Crystallogr D Biol Crystallogr</i> <b>56</b>, 965-72 (2000)</a>.</li>
+</ul></p>
+<p><ul><li><b>Map-likelihood phasing.</b> T.C. Terwilliger. <a href="https://doi.org/doi:10.1107/S0907444901013749"><i>Acta Crystallogr D Biol Crystallogr</i> <b>57</b>, 1763-75 (2001)</a>.</li>
+</ul></p>
+</div>
+<div class="section" id="additional-information">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-14">Additional information</a></h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1><a class="toc-backref" href="multi_crystal_average.html#toc-entry-15">List of all available keywords</a></h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">ncs_domain_file</span><span class="phil-words"> = None </span><span class="phil-help">PDB file for identifying region occupied by ncs copies. If specified, region defined by this file is used for ncs domains.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_file</span><span class="phil-words"> = None </span><span class="phil-help">
+           PDB files, one for each crystal (One pdb_file=xxx.pdb per crystal)
+           These should be in the same order as datafiles and map files.
+           They are used to identify the NCS within each crystal and
+           between crystals.  You should create these by placing the
+           unique set of atoms (the NCS asymmetric unit) in each
+           NCS asymmetric unit of each unit cell. Normally you would
+           do this by carrying out molecular replacement on each
+           crystal with the same search model.
+           </span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs</span><span class="phil-words"> = None </span><span class="phil-help">
+              Mtz files with map coefficients.(One map_coeffs=xxx.mtz per crystal).
+              At least one crystal must have map coefficients. Use
+              &amp;quot;None&amp;quot; with quotes
+              for any crystals that do not have starting maps.
+             NOTE: If you have
+              multiple NCS groups then you need map coefficients for all
+              crystals.
+              </span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_labin</span><span class="phil-words"> = None </span><span class="phil-help">
+            Optional labin lines for mtz files with map coefficients. (One
+          map_coeffs_labin=my_labin per crystal, or none at all)
+           They look like map_coeffs_labin=" 'FP=FP PHIB=PHIM FOM=FOMM'"
+           Put each set of labin values inside single quotes, and the whole
+           list inside double quotes.
+           You can leave out a labin statement for a file by putting in &amp;quot;None&amp;quot;
+            and the routine will guess the column labels</span></li><li class="phil-param" data-expert="0"><span class="phil-name">datafile</span><span class="phil-words"> = None </span><span class="phil-help"> Mtz files with structure factors
+            and optional phases and FOM and optional HL coefficients.
+          One datafile for each crystal to be included (One datafile=xxx.mtz
+           for each crystal).
+          </span></li><li class="phil-param" data-expert="0"><span class="phil-name">datafile_labin</span><span class="phil-words"> = None </span><span class="phil-help">
+            Optional labin line for mtz file (In same order as mtz file).
+            It can contain FP SIGFP [PHIB FOM] [HLA HLB HLC HLD].
+           It looks like this:
+           datafile_labin='FP=FP SIGFP=SIGFP PHIB=PHIM FOM=FOMM'
+           You can leave out a labin statement for a file by putting in
+            &amp;quot;None&amp;quot;
+            and the routine will guess the column labels
+            NOTE: If you supply HL coefficients they will be used in phase
+              recombination.  If you supply PHIB or PHIB and FOM and not HL
+              coefficients, then HL coefficients will be derived from your
+              PHIB and FOM and used in phase recombination. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_content</span><span class="phil-words"> = None </span><span class="phil-help">
+            Solvent content (0 to 1, typically 0.5) for each crystal
+            (one solvent_content=xxx for each crystal).
+            </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ha_file</span><span class="phil-words"> = None </span><span class="phil-help">
+           Optional file, normally containing heavy atom sites or other
+           coordinates that are present in this structure, but not in the
+           others. If supplied, the density near (within 2 A) of atoms in
+           this file will not be transferred to other crystals.
+           </span></li><li class="phil-param" data-expert="0"><span class="phil-name">perfect_map_coeffs</span><span class="phil-words"> = None </span><span class="phil-help"> Optional mtz files with perfect map coefficients
+            for comparison. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">perfect_map_coeffs_labin</span><span class="phil-words"> = None </span><span class="phil-help">
+            Optional labin lines for mtz files with perfect map coefficients.
+            For comparison and checking only. Not normally used.
+                  </span></li><li class="phil-param" data-expert="0"><span class="phil-name">update_map</span><span class="phil-words"> = True </span><span class="phil-help">Update the map for this crystal on each cycle. Set to False if this crystal represents a high-resolution model or is otherwise expected to be already as good as it can be.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">averaging</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">cycles</span><span class="phil-words"> = 5 </span><span class="phil-help">
+            Number of cycles of density modification
+             </span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">high-resolution limit for map calculation Default is use all data</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fill</span><span class="phil-words"> = True </span><span class="phil-help">Fill in all missing reflections to resolution res_fill.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">res_fill</span><span class="phil-words"> = None </span><span class="phil-help">Resolution for filling in missing data (default = highest resolution of any datafile) Default is use all data</span></li><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = "temp_dir" </span><span class="phil-help">Optional temporary work directory</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = "" </span><span class="phil-help">Output directory where files are to be written</span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_target_map_and_sigma</span><span class="phil-words"> = False </span><span class="phil-help">Write target map and sigma</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_model_mask</span><span class="phil-words"> = False </span><span class="phil-help">
+            You can use the ncs_domain_pdb PDB files you input to define
+           the solvent boundary if you wish. These will partially define the NCS
+           asymmetric unit (by limiting it to the non-solvent region) but
+           the exact NCS asymmetric unit will always be defined automatically
+           (by the overlap of NCS-related density).
+           Note that this is different than the command write_ncs_domain_pdb
+           which defines individual regions where NCS applies for each
+           domain.
+          </span></li><li class="phil-param" data-expert="0"><span class="phil-name">sharpen</span><span class="phil-words"> = False </span><span class="phil-help">
+            You can sharpen the maps or not in the density-modification process.
+            (They are unsharpened at the end of the process if so).
+            Not normally used, as an anisotropy correction with sharpening
+            is normally applied to all the data.
+          </span></li><li class="phil-param" data-expert="0"><span class="phil-name">equal_ncs_weight</span><span class="phil-words"> = False </span><span class="phil-help">
+            You can fix the NCS weighting to equally weight all copies.
+          </span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_ncs</span><span class="phil-words"> = None </span><span class="phil-help">
+           You can set the weighting on NCS symmetry (and cross-crystal averaging)
+          </span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_ncs_domain_pdb</span><span class="phil-words"> = False </span><span class="phil-help">
+            You can use the input PDB files to define NCS boundaries.
+            The atoms in the PDB files will be grouped into domains
+            during the analysis of NCS and written out to domain-specific
+            PDB files. (If there is only one domain or NCS group then there will
+            be only one domain-specific PDB file and it will be the same as
+            the starting PDB file.) Then the domain-specific PDB files will
+            be used to define the regions over which the corresponding NCS
+            operators apply.
+            Note that this is different than the command use_model_mask which
+            only defines the overall solvent boundary with your model.
+              </span></li><li class="phil-param" data-expert="0"><span class="phil-name">mask_cycles</span><span class="phil-words"> = 1 </span><span class="phil-help">
+            Number of mask cycles in each cycle of density modification
+          </span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_phasing_ab</span><span class="phil-words"> = False </span><span class="phil-help">Use map phasing (A,B instead of r,phi)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_FP_PHIM</span><span class="phil-words"> = False </span><span class="phil-help">Use FP and PHIM as labels for all intermedieat map coeffs . Used to get around problem with labels when they vary.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">no_recombination</span><span class="phil-words"> = False </span><span class="phil-help">Do not recombine with original data. Use just map phases and amplitudes.</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">target_output_format</span><span class="phil-words"> = *None pdb mmcif </span><span class="phil-help">Desired output format (if possible). Choices are None ( try to use input format), pdb, mmcif. If output model does not fit in pdb format, mmcif will be used. Default is pdb.</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">aniso</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">remove_aniso</span><span class="phil-words"> = True </span><span class="phil-help">Remove anisotropy from data files before use Note: map files are assumed to be already corrected</span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_iso</span><span class="phil-words"> = None </span><span class="phil-help">Target overall B value for anisotropy correction. Ignored if remove_aniso = False.  If None, default is minimum of (max_b_iso, lowest B of datasets,   target_b_ratio*resolution)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_b_iso</span><span class="phil-words"> = 40. </span><span class="phil-help">Default maximum overall B value for anisotropy correction.  Ignored if remove_aniso = False. Ignored if b_iso is set.  If used, default is minimum of (max_b_iso,  lowest B of datasets, target_b_ratio*resolution)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_b_ratio</span><span class="phil-words"> = 10. </span><span class="phil-help">Default ratio of target B value to resolution for   anisotropy correction.  Ignored if remove_aniso = False. Ignored if b_iso is set.  If used, default is minimum of (max_b_iso,  lowest B of datasets, target_b_ratio*resolution)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = True </span><span class="phil-help">verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">debug</span><span class="phil-words"> = False </span><span class="phil-help">debugging output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">raise_sorry</span><span class="phil-words"> = False </span><span class="phil-help">Raise sorry if problems</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_xyz</span><span class="phil-words"> = None </span><span class="phil-help">gridding for maps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">coarse_grid</span><span class="phil-words"> = False </span><span class="phil-help">
+            You can set coarse_grid in resolve
+          </span></li><li class="phil-param" data-expert="2"><span class="phil-name">resolve_size</span><span class="phil-words"> = 12 </span><span class="phil-help">   Size for solve/resolve (&amp;quot;&amp;quot;,&amp;quot;_giant&amp;quot;, &amp;quot;_huge&amp;quot;,&amp;quot;_extra_huge&amp;quot; or a number  where 12=giant 18=huge</span></li><li class="phil-param" data-expert="2"><span class="phil-name">resolve_command_list</span><span class="phil-words"> = None </span><span class="phil-help">   Commands for resolve. One per line in the form:   keyword value   value can be optional   Examples:   coarse_grid   resolution 200 2.0   hklin test.mtz   NOTE: for command-line usage you need to enclose the whole set of commands in double quotes (&amp;quot;) and each individual command in single quotes (') like this:  resolve_command_list=&amp;quot;'no_build' 'b_overall 23' &amp;quot; </span></li><li class="phil-param" data-expert="0"><span class="phil-name">dry_run</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and check parameter names</span></li><li class="phil-param" data-expert="3"><span class="phil-name">base_gui_dir</span><span class="phil-words"> = None </span><span class="phil-help">GUI parameter only</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">simple_ncs_from_pdb</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb_in</span><span class="phil-words"> = None </span><span class="phil-help">Input PDB file to be used to identify ncs</span></li><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = "" </span><span class="phil-help">temporary directory (ncs_domain_pdb will be written there)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_domain_pdb_stem</span><span class="phil-words"> = None </span><span class="phil-help">NCS domains will be written to ncs_domain_pdb_stem+"group_"+nn</span></li><li class="phil-param" data-expert="2"><span class="phil-name">write_ncs_domain_pdb</span><span class="phil-words"> = False </span><span class="phil-help">You can write out PDB files representing NCS domains for
+         density modification if you want</span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_ncs_phil</span><span class="phil-words"> = False </span><span class="phil-help">Write out phil parameters for the NCS groups to file in working directory</span></li><li class="phil-param" data-expert="0"><span class="phil-name">show_summary</span><span class="phil-words"> = False </span><span class="phil-help">Show NCS information summary</span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_spec_files</span><span class="phil-words"> = False </span><span class="phil-help">Write .ncs_spec and .resolve representation of NCS groups</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">ncs_search</span><span class="phil-help">Set of parameters for NCS search procedure. Some of them also used for filtering user-supplied ncs_group.</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">enabled</span><span class="phil-words"> = False </span><span class="phil-help">Enable NCS restraints or constraints in refinement (in some cases may be switched on inside refinement program).</span></li><li class="phil-param" data-expert="2"><span class="phil-name">exclude_selection</span><span class="phil-words"> = "element H or element D or water" </span><span class="phil-help">Atoms selected by this selection will be excluded from the model before any NCS search and/or filtering procedures. There is no way atoms defined by this selection will be in NCS.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_similarity_threshold</span><span class="phil-words"> = 0.85 </span><span class="phil-help">Threshold for sequence similarity between matching chains.
+      A smaller value may cause more chains to be grouped together and can lower
+      the number of common residues</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_max_rmsd</span><span class="phil-words"> = 2. </span><span class="phil-help">limit of rms difference between chains to be considered
+       as copies</span></li><li class="phil-param" data-expert="0"><span class="phil-name">residue_match_radius</span><span class="phil-words"> = 4.0 </span><span class="phil-help">Maximum allowed distance difference between pairs of matching atoms of two residues</span></li><li class="phil-param" data-expert="0"><span class="phil-name">try_shortcuts</span><span class="phil-words"> = False </span><span class="phil-help">Try very quick check to speed up the search when chains are identical. If failed, regular search will be performed automatically.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">minimum_number_of_atoms_in_copy</span><span class="phil-words"> = 3 </span><span class="phil-help">Do not create ncs groups where master and copies would contain less than specified amount of atoms</span></li><li class="phil-param" data-expert="3"><span class="phil-name">validate_user_supplied_groups</span><span class="phil-words"> = True </span><span class="phil-help">Enable validation of user-supplied ncs_group. Need to exercise a lot of caution turning this off. This option is for developers only.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">ncs_group</span><span class="phil-help">The definition of one NCS group. Note, that almost always in refinement programs they will be checked and filtered if needed.</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">reference</span><span class="phil-words"> = None </span><span class="phil-help">Residue selection string for the complete master NCS copy</span></li><li class="phil-param" data-expert="0"><span class="phil-name">selection</span><span class="phil-words"> = None </span><span class="phil-help">Residue selection string for each NCS copy location in ASU</span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

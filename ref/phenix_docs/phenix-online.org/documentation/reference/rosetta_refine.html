@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Crystallographic refinement with Rosetta (phenix.rosetta_refine)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="crystallographic-refinement-with-rosetta-phenix-rosetta-refine">
+<h1 class="title">Crystallographic refinement with Rosetta (phenix.rosetta_refine)</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="rosetta_refine.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="rosetta_refine.html#overview" id="toc-entry-1">Overview</a></li>
+<li><a class="reference internal" href="rosetta_refine.html#installation" id="toc-entry-2">Installation</a></li>
+<li><a class="reference internal" href="rosetta_refine.html#execution" id="toc-entry-3">Execution</a></li>
+<li><a class="reference internal" href="rosetta_refine.html#limitations" id="toc-entry-4">Limitations</a></li>
+<li><a class="reference internal" href="rosetta_refine.html#troubleshooting" id="toc-entry-5">Troubleshooting</a></li>
+<li><a class="reference internal" href="rosetta_refine.html#references" id="toc-entry-6">References</a></li>
+<li><a class="reference internal" href="rosetta_refine.html#list-of-all-available-keywords" id="toc-entry-7">List of all available keywords</a></li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h1><a class="toc-backref" href="rosetta_refine.html#toc-entry-1">Overview</a></h1>
+<p>The program phenix.rosetta_refine provides a convenient wrapper for running
+<a class="reference external" href="http://www.rosettacommons.org">Rosetta</a> refinement of protein X-ray crystal
+structures (DiMaio et al. 2013), which integrates the Rosetta methods for
+conformational sampling with the X-ray targets, B-factor refinement, and
+map generation in <a class="reference external" href="refinement.html">phenix.refine</a> (Afonine et al. 2012).
+This is intended for use in difficult cases, especially at low resolution where
+it combines a wide radius of convergence with excellent geometry, and for
+preparing crystal structures for further modelling in Rosetta.</p>
+<p>Currently both the setup and execution of Rosetta refinement have some
+limitations; please read this entire document before attempting to use the
+program!  <strong>Note that Rosetta does not currently run on Windows; you must
+have a Mac or Linux system to use this program.</strong></p>
+</div>
+<div class="section" id="installation">
+<h1><a class="toc-backref" href="rosetta_refine.html#toc-entry-2">Installation</a></h1>
+<p>First, you should install the appropriate version of Phenix.  The binary
+installers should be sufficient; users of the Mac graphical package can
+set up the command-line environment with this command (replacing the version
+number as needed):</p>
+<pre class="literal-block">
+source /Applications/PHENIX-1.8.4-1496/Contents/phenix-1.8.4-1496/phenix_env.sh
+</pre>
+<p>To run phenix.rosetta_refine, you must have installed Rosetta, software developed from the Baker laboratory at the University of Washington.</p>
+<p>See the central <a class="reference external" href="rosetta_install.html">installation notes for Rosetta</a></p>
+</div>
+<div class="section" id="execution">
+<h1><a class="toc-backref" href="rosetta_refine.html#toc-entry-3">Execution</a></h1>
+<p>Running phenix.rosetta_refine is superficially similar to running
+phenix.refine, but with a much more limited set of options.  Required inputs
+are a PDB file, a data file (MTZ format), and CIF restraint files for any
+non-standard ligands.  Other common parameters include the number of processors
+to use, the method for parallelizing Rosetta jobs, and the refinement
+protocol, for example:</p>
+<pre class="literal-block">
+phenix.rosetta_refine model.pdb data.mtz nproc=5 technology=sge protocol=hires
+</pre>
+<p>The default behavior is to run the full refinement protocol as described in
+the program citation, creating five unique models, and picking the model with
+the best free R-factor.  This will then be passed through phenix.refine with
+a null strategy to optimize hydrogen and bulk solvent parameters.  If desired,
+the argument <tt class="docutils literal">postref=True</tt> can be given to enable additional cycles of
+refinement in phenix.refine, including both coordinates and B-factors with
+weight optimization.</p>
+<p>The main choice of refinement strategy is between the &quot;full&quot; and &quot;hires&quot;
+protocols, both of which are described using the RosettaScripts syntax
+(Fleishman et al. 2011).  The &quot;hires&quot; protocol is intended both for
+high-resolution structures and
+in general any structure that is already near convergence.  The XML scripts
+for these methods are included in the Rosetta distribution.  You may also
+create your own XML script with a customized protocol and pass that to
+phenix.rosetta_refine.</p>
+<p>You can ask the program to parallelize jobs across multiple CPUs or several
+different queuing systems; the <tt class="docutils literal">technology</tt> parameter determines the
+method used, and <tt class="docutils literal">nproc</tt> indicates the number of jobs to run at once.  The
+actual number of processes will be limited by the <tt class="docutils literal">number_of_models</tt>
+parameter, which defaults to 5.  Requesting more models may provide
+incremental improvements in some cases but we have found it rarely makes a
+difference of more than 1-2% in R-free.</p>
+<p>Output will be to a new directory with a name such as &quot;rosetta_1&quot;, with the
+directory number increasing sequentially as additional runs are created.
+Because phenix.refine is used as the final step, the output files will be
+identical to those output by that program.</p>
+</div>
+<div class="section" id="limitations">
+<h1><a class="toc-backref" href="rosetta_refine.html#toc-entry-4">Limitations</a></h1>
+<p>The program has several restrictions compared to phenix.refine:</p>
+<blockquote>
+<ul class="simple">
+<li>Molecules are limited to the standard amino acids and a small number of
+common ions and ligands.  If you have additional molecules in your
+model, these will be removed prior to Rosetta refinement and replaced
+afterwards.  <strong>You must still supply and necessary CIFs to the program,
+as these will be used later when running the final phenix.refine step.</strong></li>
+<li>RNA is not supported.</li>
+<li>Alternate conformations are not supported.</li>
+<li>The B-factor refinement is limited to simply isotropic refinement at
+present; for more flexible parameterization you should run phenix.refine
+separately.</li>
+<li>Rosetta scales poorly above approximately 1000 residues; although larger
+structures may work, the performance tends to be worse.</li>
+<li>At present it is not possible to impose NCS restraints on structures in
+Rosetta.</li>
+</ul>
+</blockquote>
+<p>Also note that the program is significantly more processor-intensive, although
+less so than <a class="reference external" href="mr_rosetta.html">MR-Rosetta</a> (DiMaio et al. 2011).  We
+recommend that you use a multiprocessor computer or queuing system for greatest
+efficiency.</p>
+</div>
+<div class="section" id="troubleshooting">
+<h1><a class="toc-backref" href="rosetta_refine.html#toc-entry-5">Troubleshooting</a></h1>
+<p>This program is under development; please address any questions concerning
+its use to <a class="reference external" href="https://phenix-online.org/cdn-cgi/l/email-protection#fb939e978bddd8cdcfc08b939e959283d694959792959ed594899c">help&#64;phenix-online.org</a>.  The following guidelines may be useful
+for best performance:</p>
+<blockquote>
+<ul class="simple">
+<li>The default settings are optimized for difficult structures, where
+conventional refinement gets stuck quickly.  The assumption is that
+fine details such as waters and ligand molecules have not yet been
+added.  For now, the only alternative is the &quot;high-resolution&quot; protocol,
+which employs gentler optimization; additional refinement scripts will be
+provided in the future.</li>
+<li>For optimal results, especially when preparing a structure for further
+Rosetta modelling, you may wish to design your own Rosetta refinement
+protocol using RosettaScripts.</li>
+<li>Unlike methods such as simulated annealing with the default geometry
+restraints, Rosetta refinement will almost never improve the fit to the
+experimental data at the expense of model geometry.  If your structure
+contains severe distortions as a result of aggressive optimization,
+Rosetta refinement may actually degrade the model.</li>
+<li>While Rosetta refinement can improve structures that are outside the
+radius of convergence of traditional crystallographic refinement, it still
+requires that the molecule(s) be correctly placed in the unit cell.  If
+you are uncertain of your molecular replacement solution, we recommend
+trying <a class="reference external" href="mr_rosetta.html">MR-Rosetta</a> instead.</li>
+<li>The tests performed in DiMaio et al. 2013 indicated that the best results
+may come from combining orthogonal refinement methods such as DEN
+(Schroder et al. 2010) with Rosetta.</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="references">
+<h1><a class="toc-backref" href="rosetta_refine.html#toc-entry-6">References</a></h1>
+<p><ul><li><b>Improved low-resolution crystallographic refinement with Phenix and Rosetta.</b> F. DiMaio, N. Echols, J.J. Headd, T.C. Terwilliger, P.D. Adams, and D. Baker. <a href="https://doi.org/10.1038/nmeth.2648"><i>Nat Methods</i> <b>10</b>, 1102-4 (2013)</a>.</li>
+</ul></p>
+<p><ul><li><b>Towards automated crystallographic structure refinement with phenix.refine.</b> P.V. Afonine, R.W. Grosse-Kunstleve, N. Echols, J.J. Headd, N.W. Moriarty, M. Mustyakimov, T.C. Terwilliger, A. Urzhumtsev, P.H. Zwart, and P.D. Adams. <a href="https://doi.org/10.1107/S0907444912001308"><i>Acta Crystallogr D Biol Crystallogr</i> <b>68</b>, 352-67 (2012)</a>.</li>
+</ul></p>
+<p><ul><li><b>Correcting pervasive errors in RNA crystallography through enumerative structure prediction.</b> F.C. Chou, P. Sripakdeevong, S.M. Dibrov, T. Hermann, and R. Das. <a href="https://doi.org/10.1038/nmeth.2262"><i>Nat Methods</i> <b>10</b>, 74-6 (2012)</a>.</li>
+</ul></p>
+<p><ul><li><b>Improved molecular replacement by density- and energy-guided protein structure optimization.</b> F. DiMaio, T.C. Terwilliger, R.J. Read, A. Wlodawer, G. Oberdorfer, U. Wagner, E. Valkov, A. Alon, D. Fass, H.L. Axelrod, D. Das, S.M. Vorobiev, H. Iwaï, P.R. Pokkuluri, and D. Baker. <a href="https://doi.org/10.1038/nature09964"><i>Nature</i> <b>473</b>, 540-3 (2011)</a>.</li>
+</ul></p>
+<p><ul><li><b>RosettaScripts: a scripting language interface to the Rosetta macromolecular modeling suite.</b> S.J. Fleishman, A. Leaver-Fay, J.E. Corn, E.M. Strauch, S.D. Khare, N. Koga, J. Ashworth, P. Murphy, F. Richter, G. Lemmon, J. Meiler, and D. Baker. <a href="https://doi.org/10.1371/journal.pone.0020161"><i>PLoS One</i> <b>6</b>, e20161 (2011)</a>.</li>
+</ul></p>
+<p><ul><li><b>Super-resolution biomolecular crystallography with low-resolution data.</b> G.F. Schröder, M. Levitt, and A.T. Brunger. <a href="https://doi.org/10.1038/nature08892"><i>Nature</i> <b>464</b>, 1218-22 (2010)</a>.</li>
+</ul></p>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1><a class="toc-backref" href="rosetta_refine.html#toc-entry-7">List of all available keywords</a></h1>
+<p>{{phil:phenix.command_line.rosetta_refine}}</p>
+</div>
+</div>
+    
+  <script data-cfasync="false" src="https://phenix-online.org/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

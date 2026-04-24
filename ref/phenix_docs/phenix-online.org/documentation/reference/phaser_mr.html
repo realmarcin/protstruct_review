@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Molecular replacement with the Phaser GUI</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="molecular-replacement-with-the-phaser-gui">
+<h1 class="title">Molecular replacement with the Phaser GUI</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="phaser_mr.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="phaser_mr.html#overview" id="toc-entry-1">Overview</a></li>
+<li><a class="reference internal" href="phaser_mr.html#video-tutorial" id="toc-entry-2">Video Tutorial</a></li>
+<li><a class="reference internal" href="phaser_mr.html#input-files-and-mandatory-parameters" id="toc-entry-3">Input files and mandatory parameters</a></li>
+<li><a class="reference internal" href="phaser_mr.html#additional-parameters" id="toc-entry-4">Additional parameters</a></li>
+<li><a class="reference internal" href="phaser_mr.html#re-using-previous-results" id="toc-entry-5">Re-using previous results</a></li>
+<li><a class="reference internal" href="phaser_mr.html#how-to-read-a-phaser-molecular-replacement-log-file-phaser-mr" id="toc-entry-6">How to read a Phaser molecular replacement log file (Phaser-MR)</a></li>
+<li><a class="reference internal" href="phaser_mr.html#what-to-do-next-after-phaser-mr-molecular-replacement" id="toc-entry-7">What to do next after Phaser-MR molecular replacement</a></li>
+<li><a class="reference internal" href="phaser_mr.html#frequently-asked-questions" id="toc-entry-8">Frequently Asked Questions</a></li>
+<li><a class="reference internal" href="phaser_mr.html#reference" id="toc-entry-9">Reference</a></li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h1><a class="toc-backref" href="phaser_mr.html#toc-entry-1">Overview</a></h1>
+<p><a class="reference external" href="MRage.html">MRage</a> presents a user-friendly and automated frontend to Phaser,
+but especially difficult cases may require finer
+control over parameters.  The Phaser-MR GUI exposes all options available in
+the standalone command-line Phaser software, and allows use of additional
+modes besides MR_AUTO.  It can, for instance, be used to search for individual
+components one at a time with modified parameters, or run each stage of the
+search (rotation, translation, packing, phasing+refinement) separately.</p>
+<p>There is also a simplified GUI for structures with only one component in the
+crystal, allowing the relevant files to be dragged and dropped into the interface.
+This should only be used for such simple cases, and when no difficulties are
+anticipated.</p>
+<p>This document only covers configuration of the Phaser GUI; for a detailed
+explanation of the various terms and search procedures referenced here as well
+as interpretation of results, consult the <a class="reference external" href="mr_overview.html">overview of molecular replacement
+in PHENIX</a> (especially the discussion of &quot;ensembles&quot; and
+&quot;ASU contents&quot;), the <a class="reference external" href="phaser.html">Phaser documentation</a>, or the
+<a class="reference external" href="http://www.phaser.cimr.cam.ac.uk/index.php/Phaser_Crystallographic_Software">Phaser WIKI</a>.  Some common user questions are discussed at the end of this
+section, and in the MR overview page.  New users looking for a step-by-step
+introduction should read the <a class="reference external" href="../tutorials/mr.html">Phaser-MR tutorial</a>.</p>
+</div>
+<div class="section" id="video-tutorial">
+<h1><a class="toc-backref" href="phaser_mr.html#toc-entry-2">Video Tutorial</a></h1>
+<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/lJ7t8dgfFjk" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" ></iframe></div><p>The <a class="reference external" href="https://youtu.be/lJ7t8dgfFjk">tutorial video</a> is available on the
+<a class="reference external" href="https://www.youtube.com/c/phenixtutorials">Phenix YouTube channel</a> and covers the
+following topics:</p>
+<ul class="simple">
+<li>Basic overview</li>
+<li>How to run Phaser MR using the tutorial data.</li>
+</ul>
+</div>
+<div class="section" id="input-files-and-mandatory-parameters">
+<h1><a class="toc-backref" href="phaser_mr.html#toc-entry-3">Input files and mandatory parameters</a></h1>
+<p>The input section is similar to that of MRage, with separate sections for
+reflection data, search ensembles, and scattering information.  Unlike the
+command-line
+version of Phaser, the experimental data may be any file format, and both
+intensities and amplitudes (with or without anomalous data) are allowed.
+The default mode is &quot;Automated molecular replacement&quot; (MR_AUTO); some of the
+other modes require only a subset of the parameters displayed.</p>
+<img alt="../images/phaser_mr_main.png" src="../images/phaser_mr_main.png" />
+<p>All modes require a description of the search ensembles, either
+as PDB files (singly, or superimposed as an ensemble), or map coefficients in
+MTZ format (e.g. for phasing using a low-resolution EM map).  Adding an
+ensemble does not automatically include it in the search; you may, for
+instance, supply several alternate ensembles for a chain, and instruct Phaser
+to try each in turn (see below).</p>
+<p>You must also define the contents of the asymmetric unit (ASU); this is
+usually done by supplying information about the sequence (one chain at a time),
+mass, or
+type and number of residues.  Alternatively, you may give the fractional
+ASU contents of each search ensemble, if known.  It is also possible to
+additionally specify heavy atoms that contribute to scattering, but this is
+rarely necessary.  Note that the ASU contents data does not necessarily have
+a 1:1 correspondence with the search ensembles (see FAQ list below for
+details).  Even if you are only searching for a single
+ensemble out of several (e.g. the protein in a protein-DNA complex), you
+must still supply the expected ASU contents of the entire crystal, because
+Phaser needs to know what fraction of the whole crystal content each search
+model comprises.</p>
+<p>Finally, the &quot;Search procedure&quot; tab defines the steps in the MR search,
+selected from each input ensemble. This is organized as a tree-like table
+with search components as main branches. Expanding a component branch displays the
+ensembles used for the searches. Expanding an ensemble branch displays the name
+of the ensemble's constituent coordinate files or the name of the electron density
+file. Specifying more than one ensemble per
+component will result in the ensemble yielding the best solution being used.
+You do not need to search for all ensembles at once, as described below.</p>
+<img alt="../images/phaser_mr_search.png" src="../images/phaser_mr_search.png" />
+</div>
+<div class="section" id="additional-parameters">
+<h1><a class="toc-backref" href="phaser_mr.html#toc-entry-4">Additional parameters</a></h1>
+<p>The &quot;Output&quot; button at the top of the window controls basic behavior such as
+the resulting file names and verbosity.  All other parameters are set by
+clicking the &quot;Other settings&quot; button, which will open a large dialog window
+with assorted controls.  (Like most such windows in the Phenix GUI, only
+a subset of basic controls may be displayed at first, but this can be changed
+by selecting options in the &quot;User level&quot; menu at the bottom of the window.)
+The available parameters will be slightly different depending on which mode
+you have selected.</p>
+<img alt="../images/phaser_keywords.png" src="../images/phaser_keywords.png" />
+</div>
+<div class="section" id="re-using-previous-results">
+<span id="use-solution"></span><h1><a class="toc-backref" href="phaser_mr.html#toc-entry-5">Re-using previous results</a></h1>
+<p>Phaser can be instructed to start from a previous partial solution; this does
+not use a partial PDB file, but rather the saved results of a previous run.
+For example, a two-part MR solution may be obtained by running in MR_AUTO
+mode to place one ensemble, then modifying the parameters, selecting the
+previous run as the partial solution, and searching for the second ensemble.
+To do this, select the result which you want to use as input from the menu
+labeled &quot;Use partial solution from previous job&quot; (all previous Phaser jobs for
+the current project will be listed in the menu). It is best to do this by
+modifying the configuration of the GUI from the previous Phaser run instead of
+starting from scratch, because the stored solutions do not contain the
+definitions of the search ensembles. This means that the existing ensemble
+definitions must be left unchanged when defining any ensembles needed for
+further searches.</p>
+<p>You may also run each mode separately, e.g. the fast rotation function
+followed by the fast translation function using the previous result, and so
+on.  There are some restrictions on which modes may use which results, thus
+you may not follow a fast rotation function with packing analysis.</p>
+</div>
+<div class="section" id="how-to-read-a-phaser-molecular-replacement-log-file-phaser-mr">
+<h1><a class="toc-backref" href="phaser_mr.html#toc-entry-6">How to read a Phaser molecular replacement log file (Phaser-MR)</a></h1>
+<p>A summary of your Phaser molecular replacement results can be found in the
+very last section of your Phaser-MR log file. It may look something like
+this, where everything between &quot;AUTOMATED MOLECULAR REPLACEMENT&quot; and
+&quot;Citations for Phaser:&quot; is part of the summary:</p>
+<pre class="literal-block">
+*** Phaser Module: AUTOMATED MOLECULAR REPLACEMENT                               2.8.3 ***
+***************************************************************************
+
+** SINGLE solution
+
+** Solution written to PDB file:  GUI_crystals_phaser.1.pdb
+** Solution written to MTZ file:  GUI_crystals_phaser.1.mtz
+   Solution annotation (history):
+   SOLU SET  RF*0 TF*0 LLG=8776 TFZ==67.6 PAK=1 LLG=8776 TFZ==67.6
+   SOLU SPAC I 4
+   SOLU 6DIM ENSE ense_1 EULER    0.0    0.0    0.0 FRAC -1.00 -0.00 -1.00 BFAC -1.03 #TFZ==67.6
+   SOLU ENSEMBLE ense_1 VRMS DELTA -0.1435 #RMSD  0.45 #VRMS  0.24
+
+CPU Time: 0 days 0 hrs 0 mins 13.59 secs (     13.59 secs)
+Finished: Sun Sep 28 10:32:36 2025
+
+--------------------
+EXIT STATUS: SUCCESS
+--------------------
+
+CPU Time: 0 days 0 hrs 0 mins 13.59 secs (     13.59 secs)
+Finished: Sun Sep 28 10:32:36 2025
+
+&lt;/pre&gt;
+&lt;/html&gt;
+Citations for Phaser:
+</pre>
+<p>Here are the elements of this Phaser-MR summary:</p>
+<p>1.  Summary. The first thing you should note about your Phaser-MR result is
+whether you have found a single solution or multiple solutions:</p>
+<pre class="literal-block">
+** SINGLE solution
+</pre>
+<p>The run in this example Phaser-MR run  yielded a single solution.  Typically a
+run with a single solution is a confident run.  A run with more than one
+solution (indicated by a line such as &quot;There were 21 solutions&quot;)
+is typically low-confidence.</p>
+<ol class="arabic simple" start="2">
+<li>Output model and reflections file from a Phaser-MR run:</li>
+</ol>
+<pre class="literal-block">
+** Solution written to PDB file:  GUI_crystals_phaser.1.pdb
+** Solution written to MTZ file:  GUI_crystals_phaser.1.mtz
+</pre>
+<p>The output mtz file from Phaser-MR molecular replacement will contain
+the input X-ray data as well as coefficients for a sigmaA-weighted map.</p>
+<ol class="arabic simple" start="3">
+<li>Table of information about the Phaser-MR solution and its history</li>
+</ol>
+<pre class="literal-block">
+Solution annotation (history):
+SOLU SET  RF*0 TF*0 LLG=8776 TFZ==67.6 PAK=1 LLG=8779 TFZ==70.2
+SOLU SPAC I 4
+SOLU 6DIM ENSE ense_1 EULER    0.0    0.0    0.0 FRAC -1.00 -0.00 -1.00 BFAC -1.03 #TFZ==67.6
+SOLU ENSEMBLE ense_1 VRMS DELTA -0.1 #RMSD  0.7 #VRMS  0.6
+</pre>
+<p>The first line of this history gives the initial LLG and TFZ of the solution
+(8776 and 67.6), followed by the values after refinement (8779 and 70.2).
+The space group of the solution was I4.  The rotation and translations are
+represented by the EULER and FRAC values. The VRMS is the refined RMS variance,
+RMSD is the input RMSD value, and DELTA is the shift with respect to this RMSD.</p>
+<p>After molecular replacement with Phser-MR, you are looking for a high
+final LLG value (60 or more usually indicates a
+confident solution), and a high TFZ (a good value may be in the range of 7
+or more).  Make sure the space group is plausible. You should expect your
+VRMS value to be similar to the input RMSD (small DELTA), and typically
+the VRMS value will be in the range of 0.5-1 for AlphaFold models and 1-2 for
+homology models.</p>
+</div>
+<div class="section" id="what-to-do-next-after-phaser-mr-molecular-replacement">
+<h1><a class="toc-backref" href="phaser_mr.html#toc-entry-7">What to do next after Phaser-MR molecular replacement</a></h1>
+<p>After Phaser-MR molecular replacement if you have obtained a single solution
+with a high value of LLG (over 60) and a high TFZ (7 or more) then you
+will want to look at your solution in detail.  Have a look
+at the sigmaA-weighted map that you can draw with the Phaser output mtz file,
+along with the output Phaser model in the pdb file, for example using Coot.
+The map should match the model reasonably well, though you should not
+expect an exact fit.  Next you may want to refine the model with PhenixRefine,
+or you may want to automatically rebuild the model with AutoBuild, or
+you may want to rebuild by hand.</p>
+<p>If you have obtained multiple solutions in Phaser-MR molecular replacement, or
+if your LLG value is low (under 40) or your TFZ is low (under 6), you may
+want to look carefully at your input data with Xtriage, check your data
+processing, and check your search models to make sure that you are
+working with the best possible data, the right space group, and the best
+available search models.  You may want to try other sources of a search
+model, such as homology models or predicted models.</p>
+</div>
+<div class="section" id="frequently-asked-questions">
+<h1><a class="toc-backref" href="phaser_mr.html#toc-entry-8">Frequently Asked Questions</a></h1>
+<p>These are now covered on a <a class="reference external" href="../faqs/mr.html">separate section</a>.</p>
+</div>
+<div class="section" id="reference">
+<h1><a class="toc-backref" href="phaser_mr.html#toc-entry-9">Reference</a></h1>
+<p><ul><li><b>Phaser crystallographic software.</b> A.J. McCoy, R.W. Grosse-Kunstleve, P.D. Adams, M.D. Winn, L.C. Storoni, and R.J. Read. <a href="https://doi.org/10.1107/S0021889807021206"><i>J Appl Crystallogr</i> <b>40</b>, 658-674 (2007)</a>.</li>
+</ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

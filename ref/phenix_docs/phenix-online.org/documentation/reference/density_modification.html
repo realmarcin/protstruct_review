@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Density modification with  with phenix.density_modification</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="density-modification-with-with-phenix-density-modification">
+<h1 class="title">Density modification with  with phenix.density_modification</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="density_modification.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="density_modification.html#author-s" id="toc-entry-1">Author(s)</a></li>
+<li><a class="reference internal" href="density_modification.html#purpose" id="toc-entry-2">Purpose</a></li>
+<li><a class="reference internal" href="density_modification.html#usage" id="toc-entry-3">Usage</a></li>
+<li><a class="reference internal" href="density_modification.html#how-phenix-density-modification-works" id="toc-entry-4">How phenix.density_modification works</a></li>
+<li><a class="reference internal" href="density_modification.html#density-modification-starting-with-phases-and-hl-coefficients" id="toc-entry-5">Density modification starting with phases and HL coefficients</a></li>
+<li><a class="reference internal" href="density_modification.html#density-modification-with-ncs" id="toc-entry-6">Density modification with NCS</a></li>
+<li><a class="reference internal" href="density_modification.html#density-modification-with-a-model" id="toc-entry-7">Density modification with a model</a></li>
+<li><a class="reference internal" href="density_modification.html#note-on-r-values-in-density-modification" id="toc-entry-8">Note on R-values in density modification</a></li>
+<li><a class="reference internal" href="density_modification.html#output-files-from-phenix-density-modification" id="toc-entry-9"><em>Output files from phenix.density_modification</em></a></li>
+<li><a class="reference internal" href="density_modification.html#examples" id="toc-entry-10">Examples</a></li>
+<li><a class="reference internal" href="density_modification.html#standard-run-of-phenix-density-modification" id="toc-entry-11">Standard run of phenix.density_modification</a></li>
+<li><a class="reference internal" href="density_modification.html#run-specifying-resolution-mask-type-and-output-mtz" id="toc-entry-12">Run specifying resolution, mask type, and output mtz</a></li>
+<li><a class="reference internal" href="density_modification.html#run-specifying-a-mask-for-the-solvent-boundary" id="toc-entry-13">Run specifying a mask for the solvent boundary</a></li>
+<li><a class="reference internal" href="density_modification.html#run-specifying-ncs-operators" id="toc-entry-14">Run specifying NCS operators</a></li>
+<li><a class="reference internal" href="density_modification.html#run-specifying-ncs-operators-and-the-region-where-they-are-to-apply" id="toc-entry-15">Run specifying NCS operators and the region where they are to apply</a></li>
+<li><a class="reference internal" href="density_modification.html#possible-problems" id="toc-entry-16">Possible Problems</a></li>
+<li><a class="reference internal" href="density_modification.html#specific-limitations-and-problems" id="toc-entry-17">Specific limitations and problems:</a></li>
+<li><a class="reference internal" href="density_modification.html#literature" id="toc-entry-18">Literature</a></li>
+<li><a class="reference internal" href="density_modification.html#additional-information" id="toc-entry-19">Additional information</a></li>
+<li><a class="reference internal" href="density_modification.html#list-of-all-available-keywords" id="toc-entry-20">List of all available keywords</a></li>
+</ul>
+</div>
+<div class="section" id="author-s">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-1">Author(s)</a></h1>
+<ul class="simple">
+<li>phenix.density_modification: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-2">Purpose</a></h1>
+<p>phenix.density_modification is a tool to run Resolve to carry out density
+modification, including the use of NCS symmetry and electron-density
+distributions. Masks for the solvent boundary and for the region where
+NCS operators are to be applied can be specified as PDB files with dummy
+atoms marking the masked regions.</p>
+</div>
+<div class="section" id="usage">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-3">Usage</a></h1>
+</div>
+<div class="section" id="how-phenix-density-modification-works">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-4">How phenix.density_modification works</a></h1>
+<p>In phenix.density_modification phases are improved by combining
+any existing phase information with phase probabilities based on
+the agreement of your electron density map with expectations about
+that map. This procedure is known as statisical density modification and
+is carried out by phenix.resolve.  The expectations about a map include:</p>
+<ul class="simple">
+<li>A flat solvent region</li>
+<li>Matching NCS-related density</li>
+<li>Density distributions (histograms of density) matching expected
+distributions</li>
+<li>Density in a region where a model has been built matching expected density
+for the model</li>
+</ul>
+<p>The inputs to phenix.density_modification are :</p>
+<p>Required:</p>
+<ul class="simple">
+<li>F, SIGF: Structure factor amplitudes for your structure.</li>
+</ul>
+<p>Optional:</p>
+<ul class="simple">
+<li>PHIB, FOM, HLA HLB HLC HLC: Phases and figure of merit and Hendrickson
+Lattman (HL) coefficients. These normally come from experimental phasing, but
+they can be from any source.  These are optional if you supply a model.
+The HL coefficients describe the phase probabilities for each phase.</li>
+<li>Model:  This is normally a PDB file containing your current model.
+It can be used as a source of phase information (calculated starting phases)
+and also as a target for density modification.</li>
+<li>NCS operators: These are supplied as a .ncs_spec file
+that you can create by running phenix.find_ncs on a model with NCS or
+using heavy-atom sites and a map or just with a map.</li>
+<li>Solvent boundary file: This is a PDB file that defines the region
+that is not solvent (the macromolecule) as dummy atoms.</li>
+<li>NCS boundary file: This is a PDB file that defines the region
+where NCS is to be applied (all the NCS copies) as dummy atoms.</li>
+</ul>
+</div>
+<div class="section" id="density-modification-starting-with-phases-and-hl-coefficients">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-5">Density modification starting with phases and HL coefficients</a></h1>
+<p>This kind of density modification is normally carried out after
+experimental phasing, but it can also be carried out if you have
+created HL coefficients from your data and a model.</p>
+<p>In these cases you have phases and phase probability information
+(F, SIGF, PHIB FOM, HLA HLB HLC HLD).</p>
+<p>Prior to density modification, the amplitudes (F, SIGF) are normally
+corrected for anisotropy and sharpened. You can control this
+by specifying the target overall B value after sharpening. By default
+the target overall (Wilson) B is 10 times the high-resolution limit
+of the data (or the resolution that you specify), up to a maximum
+of 40 (you can change that too).</p>
+<p>A starting map is calculated from F, PHIB, FOM. The location of the
+macromolecule and solvent are estimated in a probabilistic way using the
+local variation in the map (with a smoothing radius of rad_wang) to
+discriminate between the two.</p>
+<p>Phases are optimized to agree with the HL coefficients and to yield a map
+that has a flat solvent, NCS (if present), and density distributions matching
+model maps.</p>
+</div>
+<div class="section" id="density-modification-with-ncs">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-6">Density modification with NCS</a></h1>
+<p>If you supply NCS operators, phenix.density_modification will automatically
+figure out the region over which this NCS is present. Within this region,
+it will weight the density for NCS calculations according to how similar the
+density is at NCS-related locations.  If you supply an NCS mask, that is used
+instead.  The density at NCS-related locations is used as part of the target
+for density modification.</p>
+</div>
+<div class="section" id="density-modification-with-a-model">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-7">Density modification with a model</a></h1>
+<p>If you supply a model, density modification occurs in several steps.  First
+the data are corrected for anisotropy as above.  Then
+the model is used to estimate phases, fom, and HL coefficients. Then density
+modification is carried out much as described above for experimental phasing.
+Then a final step is carried out in which model density is used as part of the
+target for density modification.</p>
+<p>To instead create HL coefficients from your data and model and use those
+with phenix.density_modification, first run phenix.refine
+to refine your model. Then run phenix.reciprocal_space_arrays with your model
+and data and it will create HL coefficients for you.</p>
+</div>
+<div class="section" id="note-on-r-values-in-density-modification">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-8">Note on R-values in density modification</a></h1>
+<p>The R-value for density modification is quite different from a refinement R.
+Basically the statistical (maximum-likelihood) density modification
+procedure allows calculation of each structure factor based on the values of
+all the other structure factors and the expectations about the map
+(i.e, flat solvent, distribution of density values in protein, ncs, etc.)
+These &quot;map-phasing&quot; structure factors are (at least in the first cycle)
+independent of the starting structure factors and can be compared with the
+measured data and an R-value obtained.  The values of these R-values range
+from about 0.25 to 0.5 in most cases, and when the map is very good usually
+the R values are smaller.  These R values do not involve any atomic model
+so they are quite unlike a refinement R.</p>
+<p>For discussion of how map-likelihood structure factors are calculated in
+Resolve, see  the Map-likelihood phasing reference below.</p>
+</div>
+<div class="section" id="output-files-from-phenix-density-modification">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-9"><em>Output files from phenix.density_modification</em></a></h1>
+<dl class="docutils">
+<dt><strong>denmod.mtz</strong>: Density-modified map coefficients. If you specify</dt>
+<dd>hl_in_output_mtz=True then it will also contain Hendrickson Lattman
+coefficients</dd>
+</dl>
+<p><strong>solvent_boundary.map</strong>: CCP4-style map file showing the solvent boundary</p>
+<p><strong>ncs_boundary.map</strong>: CCP4-style map file showing the asymmetric unit of NCS</p>
+</div>
+<div class="section" id="examples">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-10">Examples</a></h1>
+</div>
+<div class="section" id="standard-run-of-phenix-density-modification">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-11">Standard run of phenix.density_modification</a></h1>
+<p>Running phenix.density_modification from the command line is easy.</p>
+<pre class="literal-block">
+phenix.phenix.density_modification phaser_1.mtz solvent_content=0.5
+</pre>
+<p>In this example, phaser_1.mtz (the output of Phaser experimental phasing)
+normally has F, SIGF, PHIB, FOM, HLA HLB HLC HLD, each of which is
+identified automatically.  Standard density modification using
+these experimental phases and phase probabilities is carried out.</p>
+</div>
+<div class="section" id="run-specifying-resolution-mask-type-and-output-mtz">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-12">Run specifying resolution, mask type, and output mtz</a></h1>
+<pre class="literal-block">
+phenix.phenix.density_modification phaser_1.mtz solvent_content=0.64 \
+resolution=3 output_mtz=denmod_std.mtz mask_type=histograms
+</pre>
+<p>In this example, the high-resolution limit is set to 3 A, the output
+file is denmod_std.mtz, and the solvent mask is identified using a
+histogram-based method (mask_type=histograms).</p>
+</div>
+<div class="section" id="run-specifying-a-mask-for-the-solvent-boundary">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-13">Run specifying a mask for the solvent boundary</a></h1>
+<pre class="literal-block">
+phenix.phenix.density_modification phaser_1.mtz solvent_content=0.64 \
+mask_from_pdb=mask.pdb rad_mask=4
+</pre>
+<p>In this example, the file mask.pdb has dummy atoms that indicate where the
+macromolecule is located.  All points within 4 A (rad_mask=4) of an atom in
+mask.pdb are considered to be within the macromolecule region.</p>
+</div>
+<div class="section" id="run-specifying-ncs-operators">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-14">Run specifying NCS operators</a></h1>
+<pre class="literal-block">
+phenix.phenix.density_modification phaser_1.mtz solvent_content=0.64 \
+ncs_file=ncs.ncs_spec
+</pre>
+<p>In this example, the file ncs.ncs_spec (created with phenix.find_ncs or
+phenix.autosol or phenix.simple_ncs_from_pdb or phenix.autobuild)
+contains the NCS operators. These will be used to automatically find the
+region where NCS applies. Then the NCS-related density will be used as
+part of density modification.</p>
+</div>
+<div class="section" id="run-specifying-ncs-operators-and-the-region-where-they-are-to-apply">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-15">Run specifying NCS operators and the region where they are to apply</a></h1>
+<pre class="literal-block">
+phenix.phenix.density_modification phaser_1.mtz solvent_content=0.64 \
+ncs_file=ncs.ncs_spec ncs_domain_pdb=ncs_mask.pdb rad_mask=5
+</pre>
+<p>This example is like the previous one, except instead of finding the region
+where NCS applies automatically, it is defined by the atoms in ncs_mask.pdb.
+All points within rad_mask (5 A in this example) of an atom in ncs_mask.pdb
+are considered to be within the region where NCS applies.  This is useful
+if you want to apply NCS only to a part of the region where NCS is present.</p>
+</div>
+<div class="section" id="possible-problems">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-16">Possible Problems</a></h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-17">Specific limitations and problems:</a></h1>
+</div>
+<div class="section" id="literature">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-18">Literature</a></h1>
+<p><ul><li><b>Rapid automatic NCS identification using heavy-atom substructures.</b> T.C. Terwilliger. <a href="https://doi.org/10.1107/S0907444902016384"><i>Acta Crystallogr D Biol Crystallogr</i> <b>58</b>, 2213-5 (2002)</a>.</li>
+</ul></p>
+<p><ul><li><b>Statistical density modification with non-crystallographic symmetry.</b> T.C. Terwilliger. <a href="https://doi.org/doi:10.1107/S0907444902016360"><i>Acta Crystallogr D Biol Crystallogr</i> <b>58</b>, 2082-6 (2002)</a>.</li>
+</ul></p>
+<p><ul><li><b>Maximum-likelihood density modification.</b> T.C. Terwilliger. <a href="https://doi.org/doi:10.1107/S0907444900005072"><i>Acta Crystallogr D Biol Crystallogr</i> <b>56</b>, 965-72 (2000)</a>.</li>
+</ul></p>
+<p><ul><li><b>Map-likelihood phasing.</b> T.C. Terwilliger. <a href="https://doi.org/doi:10.1107/S0907444901013749"><i>Acta Crystallogr D Biol Crystallogr</i> <b>57</b>, 1763-75 (2001)</a>.</li>
+</ul></p>
+</div>
+<div class="section" id="additional-information">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-19">Additional information</a></h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1><a class="toc-backref" href="density_modification.html#toc-entry-20">List of all available keywords</a></h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">data_file</span><span class="phil-words"> = None </span><span class="phil-help">Mtz or other data file with intensities or amplitudes</span></li><li class="phil-param" data-expert="0"><span class="phil-name">data_labels</span><span class="phil-words"> = None </span><span class="phil-help">Optional data labels for Iobs,SIGIobs or Fobs,SIGFobs. Input data can be I, F, or I+/I- or F+/F-.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">phib_labels</span><span class="phil-words"> = None </span><span class="phil-help">Optional data label for PHIB. You can force skipping with phib_labels=SKIP</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fom_labels</span><span class="phil-words"> = None </span><span class="phil-help">Optional data label for FOM. You can force skipping with fom_labels=SKIP</span></li><li class="phil-param" data-expert="0"><span class="phil-name">hl_file</span><span class="phil-words"> = None </span><span class="phil-help">Mtz or other data file with HL coefficients. If None assumed to be the same as data_file. Required unless a pdb_file is supplied.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">hl_labels</span><span class="phil-words"> = None </span><span class="phil-help">Optional labels for HL coefficients. You can force skipping with hl_labels=SKIP</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_file</span><span class="phil-words"> = None </span><span class="phil-help">Mtz or other file with map coefficients for starting map. If None assumed to be same as data_file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_labels</span><span class="phil-words"> = None </span><span class="phil-help">Optional labels for map coefficients. You can force skipping with map_coeffs_labels=SKIP</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_file</span><span class="phil-words"> = None </span><span class="phil-help">Optional file with model to be used in density modification. If provided, the density modification will use model density as part of the density modification target. If supplied, HL coefficients are optional.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ha_file</span><span class="phil-words"> = None </span><span class="phil-help">Optional file with heavy-atom sites to be truncated in density modification. Density within rad_mask of a site in this file will be truncated at 2 x the rms of the map. Note: not compatible with mask_from_pdb.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mask_from_pdb</span><span class="phil-words"> = None </span><span class="phil-help">Optional file with dummy atoms marking the region to be considered as the macromolecule in density modification. The region within rad_mask of an atom in this file will be considered within the macromolecule. Note: not compatible with ha_file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">add_mask</span><span class="phil-words"> = None </span><span class="phil-help">Mask will be the union of the standard mask and mask_from_pdb</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_file</span><span class="phil-words"> = None </span><span class="phil-help">Optional file with NCS information (.ncs_spec file). This file can be obtained with phenix.find_ncs or phenix.simple_ncs_from_pdb</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_domain_pdb</span><span class="phil-words"> = None </span><span class="phil-help">Optional file with dummy atoms marking the region where NCS is to be applied. Supersedes ncs_domain_pdb in the ncs_file. Points within rad_mask of an atom in this file are considered for NCS. You need to supply a mask covering all NCS copies. NOTE: the output_ncs_mask_file map shows the boundary of the asymmetric unit of NCS (just one copy) while the input ncs_domain_pdb file must contain all NCS copies.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_commands_file</span><span class="phil-words"> = None </span><span class="phil-help">Optional file with any commands for resolve density modification.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">directories</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = temp_denmod </span><span class="phil-help">Temporary directory. Not normally used. Contents deleted after the run if clean_up=True is specified.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">Resolution for density modification</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_mtz</span><span class="phil-words"> = denmod.mtz </span><span class="phil-help">Output MTZ file with density-modified map coefficients</span></li><li class="phil-param" data-expert="0"><span class="phil-name">hl_in_output_mtz</span><span class="phil-words"> = True </span><span class="phil-help">Calculate density modification HL coefficients and write to output mtz file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_map_file_name</span><span class="phil-words"> = target_map.ccp4 </span><span class="phil-help">Output CCP4-style map with target map. only written if write_target_map_and_sigma is set</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sigma_map_file_name</span><span class="phil-words"> = sigma_map.ccp4 </span><span class="phil-help">Output CCP4-style map with sigma map. only written if write_target_map_and_sigma is set</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_mask_file</span><span class="phil-words"> = solvent_boundary.map </span><span class="phil-help">Output CCP4-style map file with solvent boundary mask.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_ncs_mask_file</span><span class="phil-words"> = ncs_boundary.map </span><span class="phil-help">Output CCP4-style map file with mask marking region used for NCS. NOTE: the output_ncs_mask_file map shows the boundary of the asymmetric unit of NCS (just one copy) while the input ncs_domain_pdb file must contain all NCS copies.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">anisotropy</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">remove_aniso</span><span class="phil-words"> = True </span><span class="phil-help">Remove anisotropy from data and optionally sharpen</span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_iso</span><span class="phil-words"> = None </span><span class="phil-help">Target overall B value for anisotropy correction. Ignored if remove_aniso = False. If None, default is minimum of (max_b_iso, B of dataset, target_b_ratio*resolution)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_b_iso</span><span class="phil-words"> = 40. </span><span class="phil-help">Default maximum overall B value for anisotropy correction. Ignored if remove_aniso = False. Ignored if b_iso is set. If used, default is minimum of (max_b_iso, B of dataset, target_b_ratio*resolution)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_b_ratio</span><span class="phil-words"> = 10. </span><span class="phil-help">Default ratio of target B value to resolution for anisotropy correction. Ignored if remove_aniso = False. Ignored if b_iso is set. If used, default is minimum of (max_b_iso,                     B of dataset, target_b_ratio*resolution)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">denmod</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">rad_wang</span><span class="phil-words"> = None </span><span class="phil-help">Radius for estimation of solvent boundary. Normally chosen automatically.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimize_rad_wang</span><span class="phil-words"> = False </span><span class="phil-help">Optimize value of rad_wang</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mask_type</span><span class="phil-words"> = *None histograms probability wang </span><span class="phil-help">Method for solvent identification. Default is histograms. If you have a SAD dataset with a heavy atom such as Pt or Au then you may wish to choose wang because the histogram method is sensitive to very high peaks. Options are: histograms: compare local rms of map and local skew of map to values from a model map and estimate probabilities. This one is usually the best. probability: compare local rms of map to distribution for all points in this map and estimate probabilities. In a few cases this one is much better than histograms. wang: take points with highest local rms and define as protein.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_content</span><span class="phil-words"> = None </span><span class="phil-help">Solvent content (0 to 1) of the crystal (required)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mask_cycles</span><span class="phil-words"> = 5 </span><span class="phil-help">Mask cycles (overall cycles of density modification)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minor_cycles</span><span class="phil-words"> = 10 </span><span class="phil-help">Minor cycles of density modification for each mask cycle</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rad_mask</span><span class="phil-words"> = 4 </span><span class="phil-help">Radius (A) for mask calculation around heavy-atom sites (ha_file), for definition of protein boundary (mask_from_pdb), and for definition of the region used for NCS (ncs_domain_pdb).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">denmod_with_model</span><span class="phil-words"> = None </span><span class="phil-help">By default if a pdb_file is supplied it will be used in density modification. You can turn this off with denmod_with_model=False</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_waters</span><span class="phil-words"> = True </span><span class="phil-help">Remove waters from model before use in density modification or mask generation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_hetatm</span><span class="phil-words"> = True </span><span class="phil-help">Remove HETATM (ligands, metals etc.) from model before use in density modification or mask generation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_phasing_ab_average_weight</span><span class="phil-words"> = 0.1 </span><span class="phil-help">Add in this fraction of average sigma when calculating weights</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_phasing_ab_weighting</span><span class="phil-words"> = False </span><span class="phil-help">Use weighting in map_phasing_ab output from sigmax</span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_target_map_and_sigma</span><span class="phil-words"> = False </span><span class="phil-help">Write out map files for target rho and sigma</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_phasing_ab</span><span class="phil-words"> = None </span><span class="phil-help">Use map phasing to get estimates of structure factors as x,y and sigmax,sigmay</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">n_xyz</span><span class="phil-words"> = None </span><span class="phil-help">gridding for maps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">clean_up</span><span class="phil-words"> = True </span><span class="phil-help">Remove temp_dir when finished</span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

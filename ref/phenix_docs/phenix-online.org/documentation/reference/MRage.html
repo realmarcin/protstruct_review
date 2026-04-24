@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>MRage: automated molecular replacement</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="mrage-automated-molecular-replacement">
+<h1 class="title">MRage: automated molecular replacement</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="MRage.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="MRage.html#input" id="toc-entry-1">Input</a></li>
+<li><a class="reference internal" href="MRage.html#models" id="toc-entry-2">Models</a></li>
+<li><a class="reference internal" href="MRage.html#symmetry-exploration" id="toc-entry-3">Symmetry exploration</a></li>
+<li><a class="reference internal" href="MRage.html#search-organization" id="toc-entry-4">Search organization</a><ul>
+<li><a class="reference internal" href="MRage.html#composition-stage" id="toc-entry-5">Composition stage</a></li>
+<li><a class="reference internal" href="MRage.html#search-stage" id="toc-entry-6">Search stage</a></li>
+<li><a class="reference internal" href="MRage.html#refinement" id="toc-entry-7">Refinement</a></li>
+<li><a class="reference internal" href="MRage.html#post-processing" id="toc-entry-8">Post-processing</a></li>
+<li><a class="reference internal" href="MRage.html#space-group-exploration" id="toc-entry-9">Space group exploration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="MRage.html#output" id="toc-entry-10">Output</a><ul>
+<li><a class="reference internal" href="MRage.html#solutions" id="toc-entry-11">Solutions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="MRage.html#usage" id="toc-entry-12">Usage</a><ul>
+<li><a class="reference internal" href="MRage.html#graphical-interface" id="toc-entry-13">Graphical interface</a></li>
+<li><a class="reference internal" href="MRage.html#advanced-gui" id="toc-entry-14">Advanced GUI</a></li>
+<li><a class="reference internal" href="MRage.html#command-line" id="toc-entry-15">Command line</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="MRage.html#references" id="toc-entry-16">References</a></li>
+<li><a class="reference internal" href="MRage.html#list-of-all-keywords" id="toc-entry-17">List of all keywords</a></li>
+</ul>
+</div>
+<p><strong>MRage</strong> is generic molecular replacement program that is designed to run
+efficiently with a large number of possible models on parallel hardware. It
+accepts multiple model definitions that are internally processed with
+integrated tools to search models and used for molecular replacement.
+Identified solutions can be used to speed up the search even further by
+model assembly algorithms and limiting search space.</p>
+<div class="section" id="input">
+<h1><a class="toc-backref" href="MRage.html#toc-entry-1">Input</a></h1>
+<p>The composition of the unit cell is specified by inputting components, and
+potential models for the corresponding component in a hierarchical way. It is
+recommended to specify the sequence of a component, which allows for better
+handling of partial models (see <a class="reference internal" href="MRage.html#composition-stage">Composition stage</a>). A stoichiometry of each
+component in the final assembly is also assigned at this stage. The overall
+count of assemblies in the unit cell can either be input or determined
+automatically from the Matthews coefficient. In case no model is known for a
+component, the list of potential models should be left empty.</p>
+</div>
+<div class="section" id="models">
+<h1><a class="toc-backref" href="MRage.html#toc-entry-2">Models</a></h1>
+<p>Models for a component can be specified stepwise with the amount of
+preprocessing required. The following options are available:</p>
+<blockquote>
+<ul class="simple">
+<li><strong>ensemble</strong>. This model is used without modification.</li>
+<li><strong>model collection</strong>. These models will be superposed and optionally trimmed
+using <tt class="docutils literal">phenix.ensembler</tt>, but no modification of sequence, sidechains, or
+B-factors will be performed.</li>
+<li><strong>template</strong>. This model is run through <tt class="docutils literal">phenix.sculptor</tt> with a given
+set of active protocols (<em>default</em>: use all protocols) to remove unrelated
+chain segments and solvent, trim sidechains and weight the model according
+to structure and homology. An alignment can be specified to be used to
+process the structure; in case this is omitted, <tt class="docutils literal">phenix.muscle</tt> will be
+used to align the model to the target sequence.</li>
+<li><strong>homology</strong>. Homology search results. Hits will be fetched from the wwPDB,
+and preprocessed as a <strong>template</strong>. It is possible to limit the homology
+search to the top N hits.</li>
+<li><strong>search</strong>. Performs a BLAST search for homologs and processes the results
+as described above.  Requires component sequence.</li>
+</ul>
+</blockquote>
+<p>These steps are performed on-demand, i.e. if no clear solution could be found
+with available <strong>ensembles</strong>, the program processes the next <strong>template</strong>, or
+fetches the next <strong>homology</strong> search hit, etc.</p>
+</div>
+<div class="section" id="symmetry-exploration">
+<h1><a class="toc-backref" href="MRage.html#toc-entry-3">Symmetry exploration</a></h1>
+<p>Specifies the set of space groups to try in the search. Currently, there are
+three options available:</p>
+<blockquote>
+<ul class="simple">
+<li><strong>dataset</strong>. The space group as specified on the input or read from the
+mtz-file.</li>
+<li><strong>enantiomorph</strong>. The space group has been determined from systematic
+absences. The input space group and its enantiomorph (if exists) will be
+used in the search.</li>
+<li><strong>pointgroup</strong>. Only the point group of the data has been established. All
+space groups compatible with the point group will be tried.</li>
+</ul>
+</blockquote>
+<p>Space group exploration is exhaustive and can take several macrocycles to
+complete. Space groups with clearly inferior results to others are
+incrementally removed from the search until the correct space group is
+established.</p>
+</div>
+<div class="section" id="search-organization">
+<h1><a class="toc-backref" href="MRage.html#toc-entry-4">Search organization</a></h1>
+<p><strong>MRage</strong> employs a sequential search algorithm, in which molecules are found
+consecutively. The algorithm consists of several stages, and also allows the
+exploration of potential space groups.</p>
+<div class="section" id="composition-stage">
+<h2><a class="toc-backref" href="MRage.html#toc-entry-5">Composition stage</a></h2>
+<p>The composition of each partial structure (located in previous macrocycles) is
+compared with the composition of the unit cell. Available models that fit in
+the missing composition are selected for search. In case the modelled sequence
+for a search model is known, the program can account for the fact that a model
+may only be a partial model for a component (e.g. one domain only).</p>
+</div>
+<div class="section" id="search-stage">
+<h2><a class="toc-backref" href="MRage.html#toc-entry-6">Search stage</a></h2>
+<p>Calculations are organized into a search tree that is explored according to
+depth-first traversal. For the underlying calculations, available functions
+from <strong>phaser</strong> <a class="citation-reference" href="MRage.html#phaser" id="citation-reference-1">[PHASER]</a> are used.</p>
+<p>For each partial structure and applicable model, a rotation function is
+calculated. This is then followed up by a translation function calculation.
+Each translation function peaks are checked for packing clashes, and if
+accepted, checked whether are significant, probable solutions or not.
+Calculations are performed in the order of peak score (RF/TF), model quality
+(sequence identity) or partial structure quality (LLG score). Exploration
+continues until a significant solution is found (<em>quick mode</em>) or all
+possibilities has been exhausted (<em>full mode</em>). There is also no thresholding
+step for rotation (<em>rationale</em>: weak signal in rotation function) and
+translation function peaks (<em>rationale</em>: packing check fast). As a consequence,
+more work is performed, but simultaneously this allows weighting translation
+function results with packing overlap, and also avoids pipe stalls, which would
+adversely effect scaling in a parallel environment.</p>
+<p>In quick mode, if a significant solution is found, conventional search
+terminates. However, all models that are alternatives of the model that gave
+this clear solution are superposed onto the solution and refined. This allows
+the quick evaluation of model quality for a potentially large number of
+alternative models. Currently, <strong>SSM</strong> <a class="citation-reference" href="MRage.html#ssm" id="citation-reference-2">[SSM]</a> is used for superposition.</p>
+<p>Parallelisation is done at a function level. Calculations are dispatched until
+the number of assigned CPUs are filled up. Execution can either take place in
+a shared memory environment using threads and processes or using a submission
+queue (currently <em>SGE</em>, <em>LSF</em> and <em>PBS</em> are supported). The degree of
+parallelisation scales with the complexity of the search, and given unlimited
+resources, reduces the runtime to a constant. However, in simple cases (e.g.
+a good model that gives a clear rotation and translation peak), no parallel
+resources can be used.</p>
+</div>
+<div class="section" id="refinement">
+<h2><a class="toc-backref" href="MRage.html#toc-entry-7">Refinement</a></h2>
+<p>Peaks above a certain threshold of the best peak and those that are identified
+as significant solutions are subjected to refinement. After refinement is
+completed, a second thresholding step is performed. Top peaks will be
+subjected to post-processing and also carried forward for the next macrocycle.
+Significant peaks that are below the threshold (e.g. a correct solution for a
+small domain) are also input to the post-processing step, but will not be
+propagated to the next cycle.</p>
+</div>
+<div class="section" id="post-processing">
+<h2><a class="toc-backref" href="MRage.html#toc-entry-8">Post-processing</a></h2>
+<p>Significant solutions are analysed for specific features so that the search
+could be improved.</p>
+<blockquote>
+<ul class="simple">
+<li><strong>Amalgamation</strong>. Assembly of solutions that come from the same starting
+point. In case the &quot;starting point&quot; is empty, allowed origin shifts are
+added to the search. In case the origin is undefined and the space group
+has floating origin, only the rotation component is extracted.</li>
+<li><strong>Rotation peak salvage</strong>. Propagates significant rotation peaks to the
+next stage.</li>
+<li><strong>Regular assembly recognition</strong>. Identifies local point group symmetry
+from the solution.</li>
+<li><strong>Assembly completion</strong>. In case assembly definitions are available (e.g.
+from <strong>regular assembly completion</strong>), and a partial assembly has been
+located, missing molecules are filled in.</li>
+</ul>
+</blockquote>
+<p>No actual calculation is performed, only the possibilities are noted. In case
+the given solution enters the next <a class="reference internal" href="MRage.html#search-stage">Search stage</a> (as determined by
+<a class="reference internal" href="MRage.html#composition-stage">Composition stage</a>), these possibilities will be scored as a priority.</p>
+</div>
+<div class="section" id="space-group-exploration">
+<h2><a class="toc-backref" href="MRage.html#toc-entry-9">Space group exploration</a></h2>
+<p>Search progress in possible space groups is compared. Space groups having
+significant solutions or above the threshold (determined by the best score
+over all space groups) are propagated to the next macrocycle.</p>
+</div>
+</div>
+<div class="section" id="output">
+<h1><a class="toc-backref" href="MRage.html#toc-entry-10">Output</a></h1>
+<p>The program logs all operations it performs. However, this may be difficult to
+follow on the screen, especially when multiple space groups are explored, and
+therefore, after each macrocycle, a summary of all searches performed is
+printed.</p>
+<p>Models generated during the solution process are also saved. This includes
+structure files fetched from the PDB, but also alignments and homology
+searches performed.</p>
+<div class="section" id="solutions">
+<h2><a class="toc-backref" href="MRage.html#toc-entry-11">Solutions</a></h2>
+<p>If the search finishes, solutions are written out in all likely space groups.
+For each space group, the top solution is selected, and all partial solutions
+above a threshold relative to the top solution is considered. Solutions that
+are fully &quot;contained&quot; in a higher scoring solution (i.e. all models correspond
+to a model in the higher scoring solution) are discarded. This way, the top
+solution is output even if the composition is overestimated, but at the same
+time removing incomplete solutions (e.g. 14 molecules out of the total 15)
+that cannot be distinguised based on the final score.</p>
+<p>Solutions are written out in an internal compressed format, which is capable
+of storing a high number of solutions without onerous storage requirements, and
+can be manipulated with provided tools.</p>
+</div>
+</div>
+<div class="section" id="usage">
+<h1><a class="toc-backref" href="MRage.html#toc-entry-12">Usage</a></h1>
+<div class="section" id="graphical-interface">
+<h2><a class="toc-backref" href="MRage.html#toc-entry-13">Graphical interface</a></h2>
+<p>As with the generic Phaser GUI, two interfaces are available for running MRage,
+one designed for single-component searches with minimal customization of input
+models, and an advanced interface that allows all available features to be used.
+These are launched from a single button in the main GUI, which will initially
+pop up an information dialog describing the available options.</p>
+<img alt="../images/mrage_info.png" src="../images/mrage_info.png" />
+<p>The simple GUI is centered around a single input control allowing any combination
+of files to be dragged in:</p>
+<blockquote>
+<ul class="simple">
+<li><strong>Reflections (mandatory)</strong>: these can be in any file or data format;
+only amplitudes or intensities are required.</li>
+<li><strong>Sequence:</strong> should contain a single polymer sequence, in any format.  This
+is highly recommended, and required if you want to perform an automatic
+homology search.</li>
+<li><strong>Template models</strong>: unprocessed PDB files, which will be treated by
+Sculptor as described above.</li>
+<li><strong>Homology search</strong>: HHPred or BLAST results.</li>
+</ul>
+</blockquote>
+<img alt="../images/mrage_simple.png" src="../images/mrage_simple.png" />
+<p>In the simplest cases, only the data and sequence are required; you should then
+select a homology search method in the Options section.  &quot;NCBI BLAST&quot; requires
+internet access; &quot;Local BLAST&quot; requires that BLAST is installed and available
+on the command line.  At this point you can run the program without further
+input.</p>
+<p>Other settings:</p>
+<blockquote>
+<ul class="simple">
+<li><strong>Max. number of hits to use</strong> controls how many PDB entries from the
+homology search are processed by the pipeline.  Increasing this provides
+greater coverage, but at the cost of significantly longer runtimes.</li>
+<li><strong>Resolution cutoff</strong> determines the resolution used for running Phaser;
+this does not need to be changed, but increasing the cutoff will result in
+a faster but less accurate run.</li>
+<li><strong>Parallelization method</strong> controls how the jobs are distributed across the
+available computing resources.  <tt class="docutils literal">multiprocessing</tt> and <tt class="docutils literal">threading</tt> are
+essentially equivalent (although in practice they may behave slightly
+differently), and run locally.  The other options require that you have
+access to one of the supported queuing systems and can submit jobs from the
+computer where you are running the GUI.</li>
+<li><strong>Number of CPUs</strong> controls how many jobs are run at once.  It should not
+exceed the number of processors available, either on the local system or the
+queuing system.  (Note: if you plan to use your computer for other tasks
+while MRage is running, you may wish to leave one CPU core free if possible.)</li>
+<li><strong>Search mode:</strong> sets the thoroughness of the search, as describe in the
+<a class="reference internal" href="MRage.html#search-stage">Search stage</a> section.</li>
+<li><strong>Symmetry exploration</strong> determines the space groups to try (<a class="reference internal" href="MRage.html#symmetry-exploration">Symmetry
+exploration</a>)</li>
+<li><strong>Overall count</strong> is the number of copies of the component to search for in
+the asymmetric unit.</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="advanced-gui">
+<h2><a class="toc-backref" href="MRage.html#toc-entry-14">Advanced GUI</a></h2>
+<p>This version of the GUI moves the description of the crystal contents and search
+information to a separate tab, with input options grouped by component.  The
+first tab is essentially similar to the simple GUI, but the only input field is
+for the reflections file.</p>
+<img alt="../images/mrage_advanced.png" src="../images/mrage_advanced.png" />
+<p>The composition tab contains another set of tabs for each unique component.
+These allow the full range of input files to be specified; some of these have
+additional parameters (such as the mandatory sequence identity for ensembles and
+model collections).  The &quot;Basic info&quot; tab allows the NCBI BLAST search to be run
+interactively if desired (the results will be loaded as a homology result).
+A link to the HHPred server, which does not allow automated queries, is
+available on the &quot;Homology searches&quot; tab.</p>
+<img alt="../images/mrage_component.png" src="../images/mrage_component.png" />
+<p>You must specify the component stoichiometry, i.e. the number of copies of the
+component in the overall assembly.  This is distinct from the &quot;Overall count&quot;
+parameter in the main tab: for instance, if you are trying to solve a structure
+of a hexamer bound to a monomer and expect two copies of the complex in the
+asymmetric unit of the crystal, the overall count is two, and the stoichiometry
+of the components is 6 and 1 for the hexamer and monomer respectively.</p>
+</div>
+<div class="section" id="command-line">
+<h2><a class="toc-backref" href="MRage.html#toc-entry-15">Command line</a></h2>
+<p><tt class="docutils literal">phaser.MRage <span class="pre">[command-line</span> switches] <span class="pre">[PHIL-format</span> parameter files]</tt></p>
+<p>Command-line switches:</p>
+<pre class="literal-block">
+-h, --help            show this help message and exit
+--show-defaults       print PHIL and exit
+-i, --stdin           read PHIL from stdin as well
+-v, --verbosity       set verbosity level (DEBUG,INFO,WARNING,VERBOSE)
+</pre>
+<p>PHIL arguments</p>
+<p>Everything not starting with a dash('-') is interpreted as a PHIL argument.
+This can be a PHIL-format file containing parameters or a command-line
+assignment.</p>
+</div>
+</div>
+<div class="section" id="references">
+<h1><a class="toc-backref" href="MRage.html#toc-entry-16">References</a></h1>
+<table class="docutils citation" frame="void" id="phaser" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="MRage.html#citation-reference-1">[PHASER]</a></td><td><ul><li><b>Phaser crystallographic software.</b> A.J. McCoy, R.W. Grosse-Kunstleve, P.D. Adams, M.D. Winn, L.C. Storoni, and R.J. Read. <a href="https://doi.org/10.1107/S0021889807021206"><i>J Appl Crystallogr</i> <b>40</b>, 658-674 (2007)</a>.</li>
+</ul></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="ssm" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="MRage.html#citation-reference-2">[SSM]</a></td><td><ul><li><b>Secondary-structure matching (SSM), a new tool for fast protein structure alignment in three dimensions.</b> E. Krissinel, and K. Henrick. <a href="https://doi.org/10.1107/S0907444904026460"><i>Acta Crystallogr D Biol Crystallogr</i> <b>60</b>, 2256-68 (2004)</a>.</li>
+</ul></td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="list-of-all-keywords">
+<h1><a class="toc-backref" href="MRage.html#toc-entry-17">List of all keywords</a></h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">hklin</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">labin</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolution_cutoff</span><span class="phil-words"> = 2.5 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">no_tncs</span><span class="phil-words"> = False </span></li><li class="phil-param" data-expert="0"><span class="phil-name">mode</span><span class="phil-words"> = *quick full </span></li><li class="phil-param" data-expert="0"><span class="phil-name">symmetry_exploration</span><span class="phil-words"> = *dataset enantiomorph pointgroup </span></li><li class="phil-param" data-expert="0"><span class="phil-name">packing_pool</span><span class="phil-words"> = 20 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">rotation_peaks_cutoff</span><span class="phil-words"> = 0.75 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">post_refinement_cutoff</span><span class="phil-words"> = 0.75 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">final_selection_cutoff</span><span class="phil-words"> = 0.75 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_factor_refinement</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">significant_peak_threshold</span><span class="phil-words"> = 7.0 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">sculptor_protocols</span><span class="phil-words"> = 1 2 3 4 5 6 7 8 9 10 11 *12 13 all minimal </span></li><li class="phil-param" data-expert="0"><span class="phil-name">template_equivalence</span><span class="phil-words"> = True </span></li><li class="phil-param" data-expert="0"><span class="phil-name">assembly_acceptance_policy</span><span class="phil-words"> = *always observed never </span></li><li class="phil-param" data-expert="0"><span class="phil-name">assembly_ensemble_creation_policy</span><span class="phil-words"> = always *observed never </span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_mirror</span><span class="phil-words"> = *rcsb pdbe pdbj </span></li><li class="phil-param" data-expert="3"><span class="phil-name">exclude_pdb_ids</span><span class="phil-words"> = None </span><span class="phil-help">Developer option to prevent specific structures from being used as search models, in order to test performance with lower sequence identity structures.</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_symmetry</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">unit_cell</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">space_group</span><span class="phil-words"> = None </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">root</span><span class="phil-words"> = "mrage" </span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_solutions_to_write</span><span class="phil-words"> = 0 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">gui_base_dir</span><span class="phil-words"> = None </span><span class="phil-help">Base directory in which the PHENIX GUI will create a folder containing the results. Ignored when running the program from the command line.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">save_aniso_data</span><span class="phil-words"> = False </span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">composition</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">count</span><span class="phil-words"> = None </span><span class="phil-help">Overall number of copies of the complete molecule (which may be multiple components). If left blank, this will be guessed based on the expected solvent content.</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">component</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">sequence</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">mtype</span><span class="phil-words"> = *protein dna rna </span><span class="phil-help">Component type</span></li><li class="phil-param" data-expert="0"><span class="phil-name">stoichiometry</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of copies of this component relative to the overal macromolecule. This is separate from the overall count parameter in the Basic Options tab, which defines the number of copies of the complete unit. For instance, if you expect the basic molecule to be two copies of this component and one copy of a second component, the stoichiometry is 2. If you are searching for an unknown number of copies of a single component, you should leave the stoichiometry set to 1.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">template_list</span><span class="phil-words"> = None </span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">ensemble</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">alignment</span><span class="phil-words"> = None </span><span class="phil-help">Sequence modelled by ensemble</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">coordinates</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">identity</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">error_translation</span><span class="phil-words"> = *default rmsd floored_chothia_and_lesk </span><span class="phil-help">Identity to RMS conversion</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">model_collection</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">trim</span><span class="phil-words"> = False </span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">coordinates</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">identity</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">error_translation</span><span class="phil-words"> = *default rmsd floored_chothia_and_lesk </span><span class="phil-help">Identity to RMS conversion</span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">template</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">alignment</span><span class="phil-words"> = None </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">homology</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_hits</span><span class="phil-words"> = 3 </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">search</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">services</span><span class="phil-words"> = ncbi local </span><span class="phil-help">Performs a BLAST search of the PDB using either a locally installed version of BLAST and the PDB sequence database (requires separate installation), or the NCBI's BLAST server (requires Internet access).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_hits</span><span class="phil-words"> = 3 </span></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">assembly</span><span class="phil-help">Define known assembly</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">use_assembled</span><span class="phil-words"> = False </span><span class="phil-help">Use assembly as model in search or only for completion</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">local_search</span><span class="phil-help">Define local search extent</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">sweep</span><span class="phil-words"> = 5 </span><span class="phil-help">Rotational search radius</span></li><li class="phil-param" data-expert="0"><span class="phil-name">extent</span><span class="phil-words"> = 5 </span><span class="phil-help">Translational search extent</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">component</span><span class="phil-help">Define a component of the assembly</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span><span class="phil-help">Assembly component structure</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">operation</span><span class="phil-help">Model transformation to participate in the assembly</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">euler</span><span class="phil-words"> = 0 0 0 </span><span class="phil-help">Rotation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">displacement</span><span class="phil-words"> = 0 0 0 </span><span class="phil-help">Translation</span></li></ul></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">queue</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">technology</span><span class="phil-words"> = *threading lsf sge pbs </span></li><li class="phil-param" data-expert="0"><span class="phil-name">cpus</span><span class="phil-words"> = 1 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">submission_command</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">qslot_cpus</span><span class="phil-words"> = 1 </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">simple_run</span><span class="phil-help">Parameters for simplified GUI - not intended for command-line use.</span><ul><li class="phil-param" data-expert="3"><span class="phil-name">enable</span><span class="phil-words"> = False </span><span class="phil-help">GUI parameter - not intended for command-line use.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">component_sequence</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">template_model</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">alignment</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">blast_services</span><span class="phil-words"> = ncbi local </span><span class="phil-help">Performs a BLAST search of the PDB using either a locally installed version of BLAST and the PDB sequence database (requires separate installation), or the NCBI's BLAST server (requires Internet access).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_blast_hits</span><span class="phil-words"> = 3 </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>phenix.superpose_maps</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="phenix-superpose-maps">
+<h1 class="title">phenix.superpose_maps</h1>
+<div class="section" id="authors">
+<h1>Authors</h1>
+<blockquote>
+<ul class="simple">
+<li>Pavel Afonine, Nat Echols</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="guidelines-for-use">
+<h1>Guidelines for use</h1>
+<p><tt class="docutils literal">phenix.superpose_maps</tt> is a utility for transforming two maps to the same
+frame of reference, allowing direct comparison of molecular features in
+electron density.  The name is slightly misleading, because the program
+actually performs a superposition of PDB files, then reorients the associated
+maps to follow them.  This is usually done for publication purposes, to
+compare electron density for the same feature(s) in different crystal forms.
+The examples shown here are structures of the protein kinase PKA, one in
+space group P4(2) (PDB ID 1syk), one in space group P2(1)2(1)2(1) (PDB ID
+3fhi).  (These are included in the PHENIX distribution as part of the
+&quot;pka-compare&quot; example.)</p>
+<p>We recommend running this program from the GUI, and this document covers the
+GUI version; however, the command-line program should work equally well, and
+parameters are listed below.</p>
+<p>The program can be started from the main GUI by clicking &quot;Superpose maps&quot;
+in the &quot;Maps&quot; category.  A PDB file and an MTZ file containing map coefficients
+are required for each structure.  Map column labels will be extracted
+automatically and added to the drop-down menus.</p>
+<img alt="../images/superpose_maps.png" src="../images/superpose_maps.png" />
+<p>The program will create a new directory named &quot;SuperposeMaps_X&quot;, where X is
+the job ID (this applies to the GUI version only).
+Output is in either CCP4 or XPLOR map format (we recommend CCP4 maps because
+of the reduced file size).  These can be automatically loaded into Coot or
+PyMOL once the program is finished running.</p>
+<img alt="../images/pymol_pka_maps.png" src="../images/pymol_pka_maps.png" />
+</div>
+<div class="section" id="caveats-and-known-limitations">
+<h1>Caveats and known limitations</h1>
+<blockquote>
+<ul class="simple">
+<li>Output file names are determined automatically; this will be fixed in a
+future version.</li>
+<li>Only one chain is used in the molecular superposition at present.  The
+program will try to guess the appropriate pair of chains to use, but
+you can specify alternate chains if you prefer.</li>
+<li>You may only transform one pair of maps at a time; this limitation will
+be removed in future versions.  In most cases, the same input parameters
+(except MTZ column labels) should always result in the same frame of
+reference for the output maps, so the program may be run serially if
+multiple sets of maps are involved.</li>
+<li>Both input models will be transformed to ensure that all coordinates are
+positive (placing the new map in a simple P1 box).  For the first model,
+only a translation will be involved.</li>
+<li>There is currently no simple way to recover the initial frames of
+reference for the input models; however, the <a class="reference external" href="structure_comparison.html">structure comparison GUI</a> does include this feature (allowing editing
+of transformed models in Coot, followed by refinement in the original
+orientations), although it is limited to a few pre-defined map types.</li>
+<li>Because maps are sampled along a simple grid, reorientation of the map
+requires re-sampling for the new grid.  This requires interpolation of the
+new grid values, and some accuracy will be lost in the process (partly
+depending on the orientation of the new grid relative to the original).
+We have not observed artifacts in the transformed electron density, but
+the grid point values are not precise, and further interpolation is not
+advised.</li>
+<li>All symmetry in the original structures is lost.  Although the regions
+of electron density directly adjacent to the molecules will be preserved,
+there will be a noticeable break where the map file ends.</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="references">
+<h1>References</h1>
+<blockquote>
+<ul class="simple">
+<li>Wu J, Yang J, Kannan N, Madhusudan, Xuong NH, Ten Eyck LF, Taylor SS.
+Crystal  structure of the E230Q mutant of cAMP-dependent protein kinase
+reveals an unexpected apoenzyme conformation and an extended N-terminal A
+helix. Protein Sci. 2005 14:2871-9.
+PubMed PMID: 16253959; PDB ID 1syk</li>
+<li>Kim C, Xuong NH, Taylor SS. Crystal structure of a complex between the
+catalytic and regulatory (RIalpha) subunits of PKA. Science 2005 307:690-6.
+PubMed PMID: 15692043; PDB ID 3fhi</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span></li><li class="phil-param" data-expert="0"><span class="phil-name">dry_run</span><span class="phil-words"> = False </span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">superpose_maps</span><ul><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">map_1</span><span class="phil-words"> = None </span><span class="phil-help">Map coefficients in MTZ format</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_1</span><span class="phil-words"> = None </span><span class="phil-help">PDB file associated with map_1</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_2</span><span class="phil-words"> = None </span><span class="phil-help">Map coefficients in MTZ format</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_2</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">labels_1</span><span class="phil-words"> = None </span><span class="phil-help">MTZ column labels for map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">labels_2</span><span class="phil-words"> = None </span><span class="phil-help">MTZ column labels for map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">d_min_1</span><span class="phil-words"> = None </span><span class="phil-help">High resolution cutoff for map_1</span></li><li class="phil-param" data-expert="0"><span class="phil-name">d_min_2</span><span class="phil-words"> = None </span><span class="phil-help">High resolution cutoff for map_2</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">region</span><span class="phil-words"> = *cell selection </span><span class="phil-help">Region to cover</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolution_factor</span><span class="phil-words"> = 0.3333 </span><span class="phil-help">Map grid spacing (multiplied times resolution)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_format</span><span class="phil-words"> = *ccp4 xplor </span></li><li class="phil-param" data-expert="0"><span class="phil-name">buffer</span><span class="phil-words"> = 10.0 </span><span class="phil-help">Padding around molecule</span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">misc</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">is_difference_map</span><span class="phil-words"> = False </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">superpose_pdbs</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">selection_fixed</span><span class="phil-words"> = None </span><span class="phil-help">Selection of the target atoms to fit to (optional)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">selection_moving</span><span class="phil-words"> = None </span><span class="phil-help">Selection of the atoms that will be fit to selection_fixed (optional)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">selection_default_moving</span><span class="phil-words"> = pepnames and (name ca or name n or name c) and '(altloc " " or altloc "A")' </span><span class="phil-help">Select protein atoms that will be used in superposition after sequence alignment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">selection_default_fixed</span><span class="phil-words"> = pepnames and (name ca or name n or name c) and '(altloc " " or altloc "A")' </span><span class="phil-help">Select protein atoms that will be used in superposition after sequence alignment</span></li><li class="phil-param" data-expert="0"><span class="phil-name">reciprocal_matching</span><span class="phil-words"> = False </span><span class="phil-help">try both orientations for homodimers</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">alignment</span><span class="phil-help">Set of parameters for sequence alignment. Defaults are good for most of cases</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">alignment_style</span><span class="phil-words"> = local *global </span></li><li class="phil-param" data-expert="0"><span class="phil-name">gap_opening_penalty</span><span class="phil-words"> = 1 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">gap_extension_penalty</span><span class="phil-words"> = 1 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">similarity_matrix</span><span class="phil-words"> = blosum50 dayhoff *identity </span></li></ul></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

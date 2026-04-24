@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Processing AlphaFold2, RoseTTAFold and other predicted models</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="processing-alphafold2-rosettafold-and-other-predicted-models">
+<h1 class="title">Processing AlphaFold2, RoseTTAFold and other predicted models</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>process_predicted_model: Tom Terwilliger, Claudia Millan Nebot, Tristan Croll</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>Process model files produced by AlphaFold, RoseTTAFold and other prediction
+software, replacing information these programs put in the B-factor field
+with pseudo-B values and optionally breaking the model into compact domains.</p>
+</div>
+<div class="section" id="background">
+<h1>Background</h1>
+<p>As described in <a class="reference external" href="alphafold.html">AlphaFold and Phenix</a>,
+structure prediction software is now capable of generating models that are
+highly accurate over some or all parts of the models.  Importantly,
+these predictions often come with reliable residue-by-residue estimates of
+uncertainty. The process_predicted_model tool is designed to help you
+remove low-confidence residues and break the model into domains for
+docking or molecular replacement.</p>
+</div>
+<div class="section" id="how-process-predicted-model-works">
+<h1>How process_predicted_model works:</h1>
+<p>The process_predicted_model tool uses estimates of uncertainty supplied
+by structure prediction tools in the B-value (atomic displacement parameters)
+field of a model to create new pseudo-B values, to remove uncertain parts
+of the model, and to break up the model into domains.</p>
+<p>If you used the Phenix server to get an AlphaFold prediction
+(See <a class="reference external" href="predict_model.html">phenix.predict_model</a>), the
+uncertainty estimate will be pLDDT (see section below for details of this
+metric).</p>
+<p>The B-value field in most predicted models represents one of three possible
+values:</p>
+<pre class="literal-block">
+An actual B-value (atomic displacement parameter)
+
+An estimate of error in A (rmsd)
+
+A confidence (LDDT) on a scale of either 0 to 1 or 0 to 100.
+</pre>
+<p>In process_predicted_model, error estimates in A or confidence values are
+first converted to B-values. Then residues with high B-values are removed. Then
+the remaining residues are grouped (optionally) into domains.</p>
+</div>
+<div class="section" id="conversion-of-error-estimates-to-b-values">
+<h1>Conversion of error estimates to B-values</h1>
+<p>Error estimates in A are converted to B-values using the standard formula
+for the relationshiop between rms positional variation and B-values:</p>
+<pre class="literal-block">
+B = rmsd**2  * ((8 * (pi**2)) / 3.0)
+</pre>
+</div>
+<div class="section" id="conversion-of-lddt-values-to-error-estimates">
+<h1>Conversion of LDDT values to error estimates</h1>
+<p>LDDT values are
+LDDT values are first converted to a scale of 0 to 1.  You can specify
+whether the LDDT values in your model are from 0 to 1 (fractional) or
+from 0 to 100.  If you don't specify, a model with all LDDT values between
+0 and 1 is assumed to contain fractional LDDT values.</p>
+<p>Then LDDT values on a scale of 0 to 1 are converted to error estimates using
+an empirical formula from</p>
+<dl class="docutils">
+<dt>::</dt>
+<dd><dl class="first last docutils">
+<dt>Hiranuma, N., Park, H., Baek, M. et al. Improved protein structure</dt>
+<dd>refinement guided by deep learning based accuracy estimation.
+Nat Commun 12, 1340 (2021).
+<a class="reference external" href="https://doi.org/10.1038/s41467-021-21511-x">https://doi.org/10.1038/s41467-021-21511-x</a></dd>
+</dl>
+</dd>
+</dl>
+<p>This empirical formula is:</p>
+<pre class="literal-block">
+RMSD = 1.5 * exp(4*(0.7-LDDT))
+</pre>
+</div>
+<div class="section" id="trimming-away-low-confidence-regions-from-predicted-models">
+<h1>Trimming away low-confidence regions from predicted models</h1>
+<p>Normally it is a good idea to remove low-confidence regions from a predicted
+model before using them as a starting point for experimental
+structure determination.  For AlphaFold2 models, low-confidence corresponds
+approximately to an LDDT value of about 0.7 (on a scale of 0 to 1, or
+70 on a scale of 0 to 100), or to an RMSD value of about 1.5, or to
+a B-value of about 60.  For other types of models these values might vary,
+so you might need to experiment or use values that others have found
+useful.</p>
+<p>After trimming low-confidence residues, you will usually be left with a
+model that has some complete parts of various sizes and some small pieces.</p>
+</div>
+<div class="section" id="splitting-a-trimmed-model-into-domains">
+<h1>Splitting a trimmed model into domains</h1>
+<p>It can be helpful to group the pieces from your trimmed model into
+compact domains, or even to split some pieces into compact domains.
+The process_predicted_model tool allows you to choose a typical domain
+size, and if you want, a maximum number of domains, and then it will
+try to split your model into compact domains.</p>
+<p>There are two methods available.  One is based finding compact domains, the
+other is based on using the predicted alignment error matrix (AlphaFold2 only).</p>
+</div>
+<div class="section" id="finding-domains-from-a-low-resolution-model-representation">
+<h1>Finding domains from a low-resolution model representation</h1>
+<p>The method used is to calculate a low-resolution map based on the input model,
+then to identify large blobs corresponding to domains.  All the residues in
+the structure are assigned to an initial domain.Then the residues are
+regrouped in order to have as few cases where small parts of the model are
+part of one domain but neighboring parts are part of another as possible.</p>
+<p>When using this method, you can easily adjust the number of domains you get
+by adjusting the target domain size (in A). You can also just restrict the
+number using the maximum_domains keyword (less good).</p>
+</div>
+<div class="section" id="finding-domains-using-the-predicted-alignment-error-matrix">
+<h1>Finding domains using the predicted alignment error matrix</h1>
+<p>This method analyzes the predicted alignment error matrix (PAE) provided by
+AlphaFold2 and finds groupings of residues that have small mutual alignment
+error. This often corresponds to domains.</p>
+<p>When using this method you can adjust the number of domains by changing the
+value of pae_power (the exponent applied to pae before using it in finding
+domains).  You can also just restrict the number using the maximum_domains
+keyword (less good).</p>
+</div>
+<div class="section" id="the-plddt-confidence-measure">
+<h1>The pLDDT confidence measure</h1>
+<p>AlphaFold provides residue-level estimates of model accuracy in the form of
+predicted values of the LDDT (Local Difference Distance Test,
+Mariani et al., 2013).  These predicted values are referred to as pLDDT
+values (predicted Local Difference Distance Test).  The LDDT measure is a
+number from zero to one that reflects the similarity of CA positions in
+two structures.</p>
+<p>The LDDT is not a simple measure of accuracy, but rather a composite that is
+based on the CA distances between all pairs of CA atoms in one model and how
+similar these inter-atomic distances are to those in the other model. It is a
+local test, where only inter-atomic distances that are less than 15 Å are
+considered.</p>
+<p>The LDDT is a composite that is generated from the fraction of CA-CA distances
+that are very accurate (less than 0.5 Å off), the fraction that are quite
+accurate (less than 1 Å off), moderately accurate (less than 2 Å off), and
+somewhat accurate (less than 4 Å off).  If all CA-CA distances are within 0.5 Å,
+the resulting score will be 1, if all are more than 4 Å off, the score is zero.
+Note that the LDDT is related to RMSD, but not in a simple way.</p>
+<p>The pLDDT values (predicted Local Difference Distance Test) provided by
+AlphaFold are estimates of the LDDT values.  The pLDDT values are essentially
+unbiased (just as likely to be too low as too high), and reasonably accurate.
+The correlation between pLDDT values and actual LDDT values calculated using
+AlphaFold models and models in the PDB is about 0.7 - 0.75, which means that
+the values of pLDDT you get are useful indicators of model quality but also
+that sometimes AlphaFold will have high confidence in an incorrect prediction
+or low confidence in a correct prediction.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-process-predicted-model">
+<h1>Standard run of process_predicted_model:</h1>
+<p>Running process_predicted_model is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.process_predicted_model my_model.pdb b_value_field_is=lddt
+</pre>
+<p>This will convert the B-value field in my_model.pdb based from LDDT to B-values,
+trim residues with LDDT less than 0.7, and write out a new model with
+individual chains (separate chain ID values) corresponding to
+compact domains.</p>
+</div>
+<div class="section" id="what-to-do-next-after-processpredictedmodel">
+<h1>What to do next after ProcessPredictedModel</h1>
+<p>If you have X-ray data, the next step after ProcessPredictedModel is
+usually molecular replacement with
+<a class="reference external" href="phaser_mr.html">Phaser</a> using your processed model as
+a search model, or automated molecular replacement and rebuilding
+with
+<a class="reference external" href="predict_and_build.html">PredictAndBuild</a>.</p>
+<p>If you have cryo-EM data, the next step after ProcessPredictedModel is
+usually docking your model with
+<a class="reference external" href="em_placement.html">EMPlacement</a> or
+<a class="reference external" href="dock_in_map.html">DockInMap</a> , or automated
+docking and rebuilding with
+<a class="reference external" href="predict_and_build.html">PredictAndBuild</a>.</p>
+<p>Note that
+ProcessPredictedModel normally is applied
+to a model that
+is not yet aligned with your density
+map for cryo-EM or for your crystal unit cell in crystallography. This means
+you normally must carry out some step for placing and orienting your
+ProcessPredictedModel
+model before carrying out refinement or
+any steps that involve comparing your model to data.</p>
+<p>The program ProcessPredictedModel may be run as part of the larger
+<a class="reference external" href="predict_and_build.html">PredictAndBuild</a>
+tool, but it can also be run separately on predicted
+models obtained with
+<a class="reference external" href="predict_model.html">PredictModel</a>
+or from other sources.</p>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+<p>ProcessPredictedModel is designed for processing single chains (a model with
+a single chain ID).</p>
+<p>ProcessPredictedModel can be used for models with multiple chain
+IDs, but you cannot supply a reference structure or a PAE matrix if there
+are multiple chain IDs.  In this case it  will run each chain individually,
+then simply combine them to form the output processed model.</p>
+<p>A new set of default parameters for some parameters are available for use
+with a pae matrix. The original values are:</p>
+<pre class="literal-block">
+minimum_domain_length = 10
+minimum_sequential_residues = 5
+pae_power = 1
+pae_cutoff = 5
+pae_graph_resolution = 0.5
+</pre>
+<p>Alternative parameters are available with the keyword &quot;alt_pae_params=True&quot;
+(or &quot;Use PAE defaults for pae_power=2&quot; in the GUI). These parameters
+may be helpful in cases where small domains are present.  The
+alternative parameters are:</p>
+<pre class="literal-block">
+minimum_domain_length = 20
+minimum_sequential_residues = 10
+pae_power = 2
+pae_cutoff = 4
+pae_graph_resolution = 4
+</pre>
+<p>These parameters can also be set directly.</p>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+<p><ul><li><b>Highly accurate protein structure prediction with AlphaFold.</b> J. Jumper, R. Evans, A. Pritzel, T. Green, M. Figurnov, O. Ronneberger, K. Tunyasuvunakool, R. Bates, A. Žídek, A. Potapenko, A. Bridgland, C. Meyer, S.A.A. Kohl, A.J. Ballard, A. Cowie, B. Romera-Paredes, S. Nikolov, R. Jain, J. Adler, T. Back, S. Petersen, D. Reiman, E. Clancy, M. Zielinski, M. Steinegger, M. Pacholska, T. Berghammer, S. Bodenstein, D. Silver, O. Vinyals, A.W. Senior, K. Kavukcuoglu, P. Kohli, and D. Hassabis. <a href="https://doi.org/doi:10.1038/s41586-021-03819-2"><i>Nature</i> <b>596</b>, 583-589 (2021)</a>.</li>
+</ul>
+<ul><li><b>lDDT: a local superposition-free score for comparing protein structures and models using distance difference tests.</b> V. Mariani, M. Biasini, A. Barbato, and T.. Schwede. <a href="https://doi.org/10.1093/bioinformatics/btt473"><i>Bioinformatics</i> <b>29</b>, 2722-2728 (2013)</a>.</li>
+</ul></p>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">chain_id</span><span class="phil-words"> = None </span><span class="phil-help">If specified, find domains in this chain only. NOTE: only one chain can be used for finding domains at a time.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">selection</span><span class="phil-words"> = None </span><span class="phil-help">If specified, use only selected part of model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pae_file</span><span class="phil-words"> = None </span><span class="phil-help">Optional input json file with matrix of inter-residue estimated errors (pae file)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">distance_model_file</span><span class="phil-words"> = None </span><span class="phil-help">Distance_model_file. A PDB or mmCIF file containing the model corresponding to the PAE matrix. Only needed if weight_by_ca_ca_distances is True and you want to specify a file other than your model file. (Default is to use the model file)</span></li><li class="phil-param" data-expert="3"><span class="phil-name">model</span><span class="phil-words"> = None </span><span class="phil-help">Input predicted model (e.g., AlphaFold model). Assumed to have LDDT values in B-value field (or RMSD values).</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">target_output_format</span><span class="phil-words"> = *None pdb mmcif </span><span class="phil-help">Desired output format (if possible). Choices are None ( try to use input format), pdb, mmcif. If output model does not fit in pdb format, mmcif will be used. Default is pdb.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">processed_model_prefix</span><span class="phil-words"> = None </span><span class="phil-help">Output file with processed models will begin with this prefix. If not specified, the input model file name will be used with the suffix _processed.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remainder_seq_file_prefix</span><span class="phil-words"> = None </span><span class="phil-help">Output file with sequences of deleted parts of model will begin with this prefix</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mark_atoms_to_keep_with_occ_one</span><span class="phil-words"> = False </span><span class="phil-help">Mark atoms to keep with occupancy of 1 and those to remove with zero (default is to remove those that are not desired)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_output_b</span><span class="phil-words"> = 999. </span><span class="phil-help">Limit output B values (so that they fit in old-style PDB format). Note that this limit is applied just before writing output model files, it does not affect anything else. Also if output model is trimmed normally, high-B value residues are already removed, so in most cases this keyword has no effect.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_hydrogen</span><span class="phil-words"> = True </span><span class="phil-help">Remove hydrogen atoms from model on input</span></li><li class="phil-param" data-expert="0"><span class="phil-name">single_letter_chain_ids</span><span class="phil-words"> = False </span><span class="phil-help">Write output files with all chain IDS as single characters. Default is to use original chain ID and to add digits (1-9) for domains.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">process_predicted_model</span><ul><li class="phil-param" data-expert="3"><span class="phil-name">remove_low_confidence_residues</span><span class="phil-words"> = True </span><span class="phil-help">Remove low-confidence residues (based on minimum plddt or maximum_rmsd, whichever is specified)</span></li><li class="phil-param" data-expert="3"><span class="phil-name">continuous_chain</span><span class="phil-words"> = False </span><span class="phil-help">When removing low-confidence residues, only trim from ends</span></li><li class="phil-param" data-expert="3"><span class="phil-name">split_model_by_compact_regions</span><span class="phil-words"> = True </span><span class="phil-help">Split model into compact regions after removing low-confidence residues.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_domains</span><span class="phil-words"> = 3 </span><span class="phil-help">Maximum domains to obtain. You can use this to merge the closest domains at the end of splitting the model. Make it bigger (and optionally make domain_size smaller) to get more domains. If model is processed in chunks, maximum_domains will apply to each chunk.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">domain_size</span><span class="phil-words"> = 15 </span><span class="phil-help">Approximate size of domains to be found (A units). This is the resolution that will be used to make a domain map. If you are getting too many domains, try making domain_size bigger (maximum is 70 A).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">adjust_domain_size</span><span class="phil-words"> = True </span><span class="phil-help">If more that maximum_domains are initially found, increase domain_size in increments of 5 A and take the value that gives the smallest number of domains, but at least maximum_domains.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_domain_length</span><span class="phil-words"> = None </span><span class="phil-help">Minimum length of a domain to keep (reject at end if smaller). Default is 10 if no pae matrix or alt_pae_params=False and 20 for pae_matrix with alt_pae_params=True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_fraction_close</span><span class="phil-words"> = 0.3 </span><span class="phil-help">Maximum fraction of CA in one domain close to one in another before merging them</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_sequential_residues</span><span class="phil-words"> = None </span><span class="phil-help">Minimum length of a short segment to keep (reject at end ). Default is 5 if no pae matrix or alt_pae_params=False and 4 for pae_matrix with alt_pae_params=True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_remainder_sequence_length</span><span class="phil-words"> = 15 </span><span class="phil-help">used to choose whether the sequence of a removed segment is written to the remainder sequence file.</span></li><li class="phil-param" data-expert="3"><span class="phil-name">b_value_field_is</span><span class="phil-words"> = *plddt rmsd b_value </span><span class="phil-help">The B-factor field in predicted models can be pLDDT (confidence, 0-1 or 0-100) or rmsd (A) or a B-factor</span></li><li class="phil-param" data-expert="0"><span class="phil-name">input_plddt_is_fractional</span><span class="phil-words"> = None </span><span class="phil-help">You can specify if the input plddt values (in B-factor field) are fractional (0-1) or not (0-100). By default if all values are between 0 and 1 it is fractional.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_plddt</span><span class="phil-words"> = None </span><span class="phil-help">If low-confidence residues are removed, the cutoff is defined by minimum_plddt or maximum_rmsd, whichever is defined (you cannot define both). A minimum plddt of 0.70 corresponds to a maximum rmsd of 1.5. Minimum plddt values are fractional or not depending on the value of input_plddt_is_fractional.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_rmsd</span><span class="phil-words"> = 1.5 </span><span class="phil-help">If low-confidence residues are removed, the cutoff is defined by minimum_plddt or maximum_rmsd, whichever is defined (you cannot define both). A minimum plddt of 0.70 corresponds to a maximum rmsd of 1.5. Minimum plddt values are fractional or not depending on the value of input_plddt_is_fractional.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">default_maximum_rmsd</span><span class="phil-words"> = 1.5 </span><span class="phil-help">Default value of maximum_rmsd, used if maximum_rmsd is not set</span></li><li class="phil-param" data-expert="0"><span class="phil-name">subtract_minimum_b</span><span class="phil-words"> = False </span><span class="phil-help">If set, subtract the lowest B-value from all B-values just before writing out the final files. Does not affect the cutoff for removing low- confidence residues.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pae_power</span><span class="phil-words"> = None </span><span class="phil-help">If PAE matrix (predicted alignment error matrix) is supplied, each edge in the graph will be weighted proportional to (1/pae**pae_power). Use this to try and get the number of domains that you want (try 1, 0.5, 1.5, 2). Default is 1 alt_pae_params=False and 2 for alt_pae_params=True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pae_cutoff</span><span class="phil-words"> = None </span><span class="phil-help">If PAE matrix (predicted alignment error matrix) is supplied, graph edges will only be created for residue pairs with pae&lt;pae_cutoff. Default is 5 alt_pae_params=False and 4 for alt_pae_params=True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pae_graph_resolution</span><span class="phil-words"> = None </span><span class="phil-help">If PAE matrix (predicted alignment error matrix) is supplied, pae_graph_resolution regulates how aggressively the clustering algorithm is. Smaller values lead to larger clusters. Value should be larger than zero, and values larger than 5 are unlikely to be useful, Default is 0.5 alt_pae_params=False and 4 for alt_pae_params=True</span></li><li class="phil-param" data-expert="0"><span class="phil-name">alt_pae_params</span><span class="phil-words"> = False </span><span class="phil-help">If PAE matrix is supplied, use alternative set of defaults (minimum_domain_length=20 minimum_sequential_residues=10 pae_power=2 pae_cutoff=4 pae_graph_resolution=4). Standard parameters (alt_pae_params=False) are: (minimum_domain_length=10 minimum_sequential_residues=5 pae_power=1 pae_cutoff=5 pae_graph_resolution=0.5).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_by_ca_ca_distance</span><span class="phil-words"> = False </span><span class="phil-help">Adjust the edge weighting for each residue pair according to the distance between CA residues. If this is True, then distance_model can be provided, otherwise supplied model will be used. See also distance_power</span></li><li class="phil-param" data-expert="0"><span class="phil-name">distance_power</span><span class="phil-words"> = 1 </span><span class="phil-help">If weight_by_ca_ca_distance is True, then edge weights will be multiplied by 1/distance**distance_power.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">stop_if_no_residues_obtained</span><span class="phil-words"> = True </span><span class="phil-help">Raise Sorry and stop if processing yields no residues</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_all_if_no_residues_obtained</span><span class="phil-words"> = False </span><span class="phil-help">Keep everything if processing yields no residues</span></li><li class="phil-param" data-expert="0"><span class="phil-name">vrms_from_rmsd_intercept</span><span class="phil-words"> = 0.25 </span><span class="phil-help">Estimate of vrms (error in model) from pLDDT will be based on vrms_from_rmsd_intercept + vrms_from_rmsd_slope * pLDDT where mean pLDDT of non-low_confidence_residues is used.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">vrms_from_rmsd_slope</span><span class="phil-words"> = 1.0 </span><span class="phil-help">Estimate of vrms (error in model) from pLDDT will be based on vrms_from_rmsd_intercept + vrms_from_rmsd_slope * pLDDT where mean pLDDT of non-low_confidence_residues is used.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">break_into_chunks_if_length_is</span><span class="phil-words"> = 1500 </span><span class="phil-help">If a sequence is at least break_into_chunks_if_length_is, break it into chunks of length chunk_size with overlap of overlap_size for domain identification using split_model_by_compact_regions without a pae matrix</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chunk_size</span><span class="phil-words"> = 600 </span><span class="phil-help">If a sequence is at least break_into_chunks_if_length_is, break it into chunks of length chunk_size with overlap of overlap_size for domain identification using split_model_by_compact_regions without a pae_matrix</span></li><li class="phil-param" data-expert="0"><span class="phil-name">overlap_size</span><span class="phil-words"> = 200 </span><span class="phil-help">If a sequence is at least break_into_chunks_if_length_is, break it into chunks of length chunk_size with overlap of overlap_size for domain identification using split_model_by_compact_regions without a pae_matrix</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">write_files</span><span class="phil-words"> = True </span><span class="phil-help">Write output files</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

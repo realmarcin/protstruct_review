@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Setting up tests that can run automatically in the Phenix GUI</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="setting-up-tests-that-can-run-automatically-in-the-phenix-gui">
+<h1 class="title">Setting up tests that can run automatically in the Phenix GUI</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>Automatic GUI tests: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>These tests can be used to make sure that programs in the GUI
+can run properly. They can also be used as an introduction to
+running in the GUI as they are all preset to run.</p>
+</div>
+<div class="section" id="framework">
+<h1>Framework</h1>
+<p>The GUI_TESTS directory has a set of subdirectories (CRYSTALS_A...)
+that can be imported as projects into the Phenix GUI. Once in the GUI, all the
+unique jobs in a project can be run sequentially with the
+&quot;Auto-run all unique jobs&quot; function.</p>
+</div>
+<div class="section" id="updating-the-gui-tests">
+<h1>Updating the GUI tests</h1>
+<p>New projects can be added to the GUI_TESTS directory by creating them
+in the Phenix GUI in an installation of GUI_TESTS.  The existing and new
+projects can then be packaged into a new version of GUI_TESTS automatically.
+Additionally, new jobs can be run in an existing GUI_TESTS module and existing
+jobs can be deleted. On repackaging, the GUI_TESTS will reflect the state of
+these tests in the GUI that was worked on.</p>
+</div>
+<div class="section" id="how-to-set-up-the-tests">
+<h1>How to set up the tests</h1>
+<p>The tests are supplied with Phenix, but you have to install them and
+import them into the GUI to use them. Here is how:</p>
+</div>
+<div class="section" id="install-the-tests">
+<h1>Install the tests</h1>
+<p>Decide where you want to put the GUI_TESTS (in this example, ~/Downloads)</p>
+<dl class="docutils">
+<dt>Go to the phenix_regression directory with GUI_TESTS  (i.e.,</dt>
+<dd>$PHENIX/modules/phenix_regression/gui/auto_run). If $PHENIX is not defined,
+you will need to type in the full path.</dd>
+</dl>
+<pre class="literal-block">
+cd $PHENIX/modules/phenix_regression/gui/auto_run
+</pre>
+<p>To install in ~/Downloads, type:</p>
+<pre class="literal-block">
+./install_gui_tests.sh ~/Downloads
+</pre>
+<dl class="docutils">
+<dt>This will install the GUI_TESTS directory with the right path names in</dt>
+<dd>~/Downloads.</dd>
+</dl>
+<p>Start the Phenix GUI. You might want to do this from the
+command line instead of clicking an icon so that the log goes to the
+terminal window.</p>
+<blockquote>
+<ul class="simple">
+<li>In the Phenix GUI:  select &quot;Import Project&quot;.</li>
+<li><dl class="first docutils">
+<dt>Navigate to your new GUI_TESTS directory, then to each subdirectory</dt>
+<dd>(CRYSTALS_A CRYSTALS_B, etc) and import each one individually.</dd>
+</dl>
+</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="run-a-test">
+<h1>Run a test</h1>
+<p>You are now ready to run one or all the tests.  To run just one test:</p>
+<blockquote>
+<ul class="simple">
+<li>In the Phenix GUI, select one of these projects (MODEL_A) and go
+to Job History.</li>
+<li>Select any job and hit &quot;restore&quot; or double click it</li>
+<li>The job will be restored and you can run it with &quot;Run&quot;</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="run-a-group-of-tests">
+<h1>Run a group of tests</h1>
+<blockquote>
+<ul class="simple">
+<li>In the Phenix GUI, select one of these projects (MODEL_A) and go
+to Job History.</li>
+<li>Hit &quot;Auto-run all unique jobs&quot;</li>
+<li><dl class="first docutils">
+<dt>The jobs will be run sequentially.  Look for any errors.</dt>
+<dd>A few jobs will require clicking &quot;OK&quot; to go on. (It will stop and wait for
+your OK). It will also stop on most errors.  Tests that cannot be
+run this way are in the ONE_BY_ONE project. For these, just reload the
+job and run it.</dd>
+</dl>
+</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="modifying-the-gui-tests-jobs">
+<h1>Modifying the GUI_TESTS jobs</h1>
+<p>You can modify the GUI_TESTS jobs in any way and save the new version in
+phenix_regression.  Details below.  Basically: install the GUI_TESTS,
+create new jobs, delete any jobs that you do not want saved,
+create new projects (must be subdirectories of the directory GUI_TESTS),
+whatever.  Then package up the new version you have created with the
+instructions below, and commit it to the repository.</p>
+</div>
+<div class="section" id="details-of-modifying-the-gui-tests-jobs-by-creating-a-new-set-of-tests">
+<h1>Details of modifying the GUI_TESTS jobs by creating a new set of tests</h1>
+<p>When you have a new installation that you would like to save, you can use the
+create_new_gui_tests_package.csh script in your GUI_TESTS directory.
+NOTE: Script is c-shell so it won't work on bash for now.</p>
+<ol class="arabic simple">
+<li>Get into your GUI_TESTS directory:</li>
+</ol>
+<pre class="literal-block">
+cd GUI_TESTS
+</pre>
+<p>2. Decide where your new installation package goes. The instructions here
+will put it in your ~/Downloads directory and you can copy it
+to your regression phenix_regression/gui/auto_run directory:</p>
+<ol class="arabic simple" start="3">
+<li>Create a new installation package:</li>
+</ol>
+<pre class="literal-block">
+./create_new_gui_tests_package.csh ~/Downloads
+
+cp ~/Downloads/GUI_TESTS.tgz $PHENIX/modules/phenix_regression/gui/auto_run/
+</pre>
+<p>This will overwrite the GUI_TESTS.tgz package in Downloads, and if you copy it,
+the one in you regression directory.  You can put your new installation
+package anywhere you like.</p>
+</div>
+</div>
+    
+  </body>
+</html>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Finding a program or test using find_program</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="finding-a-program-or-test-using-find-program">
+<h1 class="title">Finding a program or test using find_program</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>find_program: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>The routine find_program will show all the programs that match
+supplied text (either in program name or in program descriptions).
+The locations of the programs (which tab in the GUI or command-line
+name) are shown.</p>
+<p>Alternatively, find_program can search for a regression test based on
+words in the name of the test or based on the name of a module that
+is tested by that regression test.</p>
+<p>Lastly, find_program can find all the Python programs that have changed
+since last checking in programs to github and list all the regression
+tests that test those programs.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-find-program-works">
+<h1>How find_program works:</h1>
+</div>
+<div class="section" id="searches-for-programs">
+<h1>Searches for programs:</h1>
+<p>Find_program uses the list of programs and short descriptions in
+the file $PHENIX/modules/phenix/phenix/utilities/phenix_list_help.py
+as a list of program names. Additionally it compiles program names
+and descriptions from $PHENIX/modules/phenix/wxGUI2/Programs/__init__.params
+and $PHENIX/modules/phenix/wxGUI2/Home/Tools.py.</p>
+<dl class="docutils">
+<dt>Find_program then makes a list of all programs, descriptions, and locations.</dt>
+<dd>This list is then searched with the search_text values provided.</dd>
+</dl>
+</div>
+<div class="section" id="searches-for-regression-tests">
+<h1>Searches for regression tests:</h1>
+<p>Find_program can also look for and display regression tests.  A
+database (test_and_module_info.pkl) of regression tests and all the
+modules called by each test is created using the tool
+phenix_regression.get_test_and_module_info.  This database is read
+by find_program and can be searched either by words from the name of
+a regression test (providing the full path of the regression test), or
+by words from the name of a module (providing the full path of
+regression tests that use that module).</p>
+<p>The search for regression tests by module is a way to find a test that
+will run a module that you are interested in.</p>
+</div>
+<div class="section" id="search-for-regression-tests-affecting-all-changed-programs">
+<h1>Search for regression tests affecting all changed programs:</h1>
+<p>Find_program can find all the Python programs that have changed since the last
+check-in to github (it uses git to do this). Then for each of these programs,
+it finds all the regression tests that are affected.  Then it lists all
+the regression tests it finds.</p>
+<p>This search is a way to find all the tests that could possibly fail due
+to any changed Python module. Note that this search will not find C++
+code that is affected. It will also not find code that is accessed in tests
+using the easy_run command which uses a system call that does not pass back
+traceback information.</p>
+</div>
+<div class="section" id="running-regression-tests">
+<h1>Running regression tests</h1>
+<p>The standard framework for running regression tests is described in
+<a class="reference external" href="regression_tests.html">Running Phenix regression tests</a> .  This
+approach uses find_program if you use the git or sort options.</p>
+</div>
+<div class="section" id="standard-run-of-find-program">
+<h1>Standard run of find_program:</h1>
+<p>You can use find_program to find a program like this:</p>
+<pre class="literal-block">
+phenix.find_program search_text=autosol
+</pre>
+<p>You can also use it to try and find a regression test that exercises
+a routine with the word anomalous in it (anywhere) and also the
+word signal (anywhere):</p>
+<pre class="literal-block">
+phenix.find_program search_type=tests search_tests_by=function_called search_text=anomalous search_text=signal
+</pre>
+</div>
+<div class="section" id="setting-up-the-database-for-find-program">
+<h1>Setting up the database for find_program:</h1>
+<p>You can update the database for find_program by running the tool</p>
+<pre class="literal-block">
+phenix_regression.get_test_and_module_info nproc=64
+</pre>
+<p>in an empty directory. This will take a while (perhaps an hour or so
+with nproc=64) and produce a file called:</p>
+<pre class="literal-block">
+test_and_module_info.pkl
+</pre>
+<p>You can copy this file to its official location at:</p>
+<pre class="literal-block">
+$PHENIX/modules/phenix_regression/misc/test_and_module_info.pkl
+</pre>
+<p>and then find_program will use this new version. You can also
+specify where this .pkl file is located with the keyword:</p>
+<pre class="literal-block">
+phenix_test_database_file=xxx.pkl
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+<p>The search_tests and git_affected_tests features of find_program do not find
+C++ code that is affected by a test (only Python code).</p>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">all_tests</span><span class="phil-words"> = False </span><span class="phil-help">Find all regression tests</span></li><li class="phil-param" data-expert="0"><span class="phil-name">git_affected_tests</span><span class="phil-words"> = False </span><span class="phil-help">Find regression tests to cover all changed Python files in github</span></li><li class="phil-param" data-expert="0"><span class="phil-name">directories_to_search</span><span class="phil-words"> = phenix cctbx_project solve_resolve </span><span class="phil-help">Directories to search to find changed files</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_type</span><span class="phil-words"> = *programs tests </span><span class="phil-help">You can search for programs (real_space_refine) or tests (tst_ncs.py). For programs, your search text must match part of the program name or its description. For tests you can search based on the name of the test or based on the name of any function that is accessed by the test.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">search_text</span><span class="phil-words"> = None </span><span class="phil-help">Text to search for. If multiple, any match is displayed. If search_text=ANY (must be capitalized) or None (empty) then searches will match any text. Each entry of search_text counts as one search term. So if there are two entries of search text like &lt; density modification &gt; and &lt;autosol&gt; , then if all_search_terms_required=True, the phrase &lt; density modification &gt; and the word &lt; autosol &gt; must both appear somewhere in the name or description to be selected.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">case_sensitive_search</span><span class="phil-words"> = False </span><span class="phil-help">Normally searches are case-insensitive. You can force a case-sensitive search with this keyword.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">all_search_terms_required</span><span class="phil-words"> = True </span><span class="phil-help">All search terms required (a AND b AND c). Alternative is to match any search terms (a OR b OR c). Each entry of search_text counts as one search term. So if there are two entries of search text like &lt; density modification &gt; and &lt;autosol&gt; , then if all_search_terms_required=True, the phrase &lt; density modification &gt; and the word &lt; autosol &gt; must both appear somewhere in the name or description to be selected.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">try_splitting_text</span><span class="phil-words"> = True </span><span class="phil-help">If no programs are found, try splitting search text entries into individual words and search for all the words in any order.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ignore_hyphens</span><span class="phil-words"> = True </span><span class="phil-help">Ignore hyphens in searches</span></li><li class="phil-param" data-expert="0"><span class="phil-name">number_to_display</span><span class="phil-words"> = 20 </span><span class="phil-help">Number of programs or tests to display. Up to this number of entries will be shown.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">show_tests_by_module</span><span class="phil-words"> = True </span><span class="phil-help">Show tests by module</span></li><li class="phil-param" data-expert="0"><span class="phil-name">find_programs_without_tests</span><span class="phil-words"> = None </span><span class="phil-help">Find programs without tests</span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">program_data_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Input data file name with program information</span></li><li class="phil-param" data-expert="0"><span class="phil-name">read_program_data_if_available</span><span class="phil-words"> = True </span><span class="phil-help">Read program data</span></li><li class="phil-param" data-expert="0"><span class="phil-name">phenix_test_database_file</span><span class="phil-words"> = None </span><span class="phil-help">Input database file (.pkl) with information about all Phenix tests and modules that are called by those tests. This is normally found automatically</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">program_data_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Output data file name with program information</span></li><li class="phil-param" data-expert="0"><span class="phil-name">files_with_tests_file_name</span><span class="phil-words"> = files_with_tests.txt </span><span class="phil-help">Output data file name with list of files with tests</span></li><li class="phil-param" data-expert="0"><span class="phil-name">files_with_no_tests_file_name</span><span class="phil-words"> = files_with_no_tests.txt </span><span class="phil-help">Output data file name with list of files with no tests</span></li><li class="phil-param" data-expert="0"><span class="phil-name">modules_with_tests_file_name</span><span class="phil-words"> = modules_with_tests.txt </span><span class="phil-help">Output data file name with list of modules with tests</span></li><li class="phil-param" data-expert="0"><span class="phil-name">modules_with_no_tests_file_name</span><span class="phil-words"> = modules_with_no_tests.txt </span><span class="phil-help">Output data file name with list of modules with no tests</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">programs</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">include_program_description</span><span class="phil-words"> = True </span><span class="phil-help">Search in documentation string</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">tests</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">search_tests_by</span><span class="phil-words"> = *test_name function_called </span><span class="phil-help">For tests you can search based on the name of any function that is called by the test. This is a way to find a test that will run a function that you are interested in. The alternative is to search by the name of the test.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

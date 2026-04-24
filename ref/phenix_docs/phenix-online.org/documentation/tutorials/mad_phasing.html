@@ -1,0 +1,864 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Tutorial: Solving a structure with MAD data</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="tutorial-solving-a-structure-with-mad-data">
+<h1 class="title">Tutorial: Solving a structure with MAD data</h1>
+<div class="section" id="introduction">
+<h1>Introduction</h1>
+<p>This tutorial will use some moderately good MAD data (3 wavelengths from
+a gene-5 protein SeMet dataset diffracting to 2.6 A) as an example of
+how to solve a MAD dataset with AutoSol. It is designed to be read all
+the way through, giving pointers for you along the way. Once you have
+read it all and run the example data and looked at the output files, you
+will be in a good position to run your own data through AutoSol.</p>
+</div>
+<div class="section" id="setting-up-to-run-phenix">
+<h1>Setting up to run PHENIX</h1>
+<p>If PHENIX is already installed and your environment is all set, then if
+you type:</p>
+<pre class="literal-block">
+echo $PHENIX
+</pre>
+<p>then you should get back something like this:</p>
+<pre class="literal-block">
+/xtal//phenix-1.3
+</pre>
+<p>If instead you get:</p>
+<pre class="literal-block">
+PHENIX: undefined variable
+</pre>
+<p>then you need to set up your PHENIX environment. See the <a class="reference external" href="../install-setup-run.html">PHENIX
+installation</a> page for details of how to do this. If you
+are using the C-shell environment (<strong>csh</strong>) then all you will need to do
+is add one line to your <strong>.cshrc</strong> (or equivalent) file that looks like
+this:</p>
+<pre class="literal-block">
+source /xtal/phenix-1.3/phenix_env
+</pre>
+<p>(except that the path in this statement will be where <strong>your</strong> PHENIX is
+installed). Then the next time you log in <strong>$PHENIX</strong> will be defined.</p>
+</div>
+<div class="section" id="running-the-demo-gene-5-data-with-autosol">
+<h1>Running the demo gene-5 data with AutoSol</h1>
+<p>To run AutoSol on the demo gene-5 data, make yourself a <strong>tutorials</strong>
+directory and <strong>cd</strong> into that directory:</p>
+<pre class="literal-block">
+mkdir tutorials
+cd tutorials
+</pre>
+<p>Now type the phenix command:</p>
+<pre class="literal-block">
+phenix.run_example --help
+</pre>
+<p>to list the available examples. Choosing <strong>gene-5-mad</strong> for this
+tutorial, you can now use the phenix command:</p>
+<pre class="literal-block">
+phenix.run_example gene-5-mad
+</pre>
+<p>to solve the gene-5 structure with AutoSol. This command will copy the
+directory <strong>$PHENIX/examples/gene-5-mad</strong> to your current directory
+(<strong>tutorials</strong>) and call it <strong>tutorials/gene-5-mad/</strong> . Then it will run
+AutoSol using the command file <strong>run.sh</strong> that is present in this
+<strong>tutorials/gene-5-mad/</strong> directory.</p>
+<p>This command file <strong>run.sh</strong> is simple. It says:</p>
+<pre class="literal-block">
+#!/bin/sh
+echo &quot;Running AutoSol on gene-5 protein data...&quot;
+phenix.autosol  gene-5-mad.eff
+</pre>
+<p>The first line (<strong>#!/bin/sh</strong>) tells the system to interpret the
+remainder of the text in the file using the sh (or bash) -shell
+(<strong>sh</strong>).</p>
+<p>The command <strong>phenix.autosol gene-5-mad.eff</strong> runs the command-line
+version of AutoSol with the parameters in the file gene-5-mad.eff (see
+<a class="reference external" href="../reference/autosol.html">Automated Structure Solution using AutoSol</a> for all the
+details about AutoSol including a full list of keywords).</p>
+<p>The file gene-5-mad.eff is a typical PHENIX parameters file:</p>
+<pre class="literal-block">
+# parameters for autosol run with gene-5 3-wavelength MAD data
+#
+autosol {
+  atom_type = Se
+  sites = 2
+  seq_file = sequence.dat
+  crystal_info {
+    space_group = C2
+    unit_cell = 76.08 27.97 42.36 90 103.2 90
+    resolution = 2.6
+  }
+  wavelength {
+    data = high.sca
+    lambda = 0.9600
+    f_prime = -1.5
+    f_double_prime = 3
+  }
+  wavelength {
+    data = peak.sca
+    lambda = 0.9792
+    f_prime = -3
+    f_double_prime = 4
+  }
+  wavelength {
+    data = infl.sca
+    lambda = 0.9798
+    f_prime = -5
+    f_double_prime = 2
+  }
+}
+</pre>
+<p>Notice how the brackets ({ and }) work in this file. Everything in this
+file after the word &quot;autosol&quot; that is between the opening left-bracket
+({) and and the closing right-bracket (}) is part of the autosol
+&quot;scope&quot;. The AutoSol wizard looks for &quot;autosol { lots of parameters }&quot;
+and interprets everything inside these brackets. Everything outside the
+scope &quot;autosol&quot; is ignored.</p>
+<p>Within the autosol scope there are some keywords like &quot;atom_type = Se&quot;,
+these are normally one per line.</p>
+<p>There are also additional scopes, with keywords inside them. For example
+the space_group and unit_cell information are inside the scope
+&quot;crystal_info&quot;.</p>
+<p>The information about each wavelength of data is in a separate scope
+called &quot;wavelength&quot;. You can have as many of these as you like. Within
+this scope you can define the datafile name, the wavelength (lambda),
+and f_prime and f_double_prime values for that wavelength.</p>
+<p>The MAD data to be used to solve the structure is in the datafiles
+<strong>peak.sca</strong>, <strong>infl.sca</strong> and <strong>high.sca</strong> These datafiles are in
+Scalepack premerged format, which means that there is just one instance
+of each reflection and the cell parameters are in the file, so we do not
+need to provide the cell parameters or the space group (unless the ones
+in the .sca files are incorrect!)</p>
+<p>The resolution of the data is to about 2.6 A.</p>
+<p>Although the <strong>phenix.run_example gene-5-mad</strong> command has just run
+AutoSol from a script (<strong>run.sh</strong>), you can run AutoSol yourself from
+the command line with the same <strong>phenix.autosol gene-5-mad.eff</strong>
+command. You can also run AutoSol from a GUI. <a class="reference external" href="../reference/running-wizards.html">Running a Wizard from a
+GUI, the command-line</a>.</p>
+</div>
+<div class="section" id="where-are-my-files">
+<h1>Where are my files?</h1>
+<p>Once you have started AutoSol or another Wizard, an <strong>output directory</strong>
+will be created in your current (working) directory. The first time you
+run AutoSol in this directory, this <strong>output directory</strong> will be called
+<strong>AutoSol_run_1_</strong> (or <strong>AutoSol_run_1_/</strong>, where the slash at the
+end just indicates that this is a directory). All of the output from run
+<strong>1</strong> of AutoSol will be in this directory. If you run AutoSol again, a
+new subdirectory called <strong>AutoSol_run_2_</strong> will be created.</p>
+<p>Inside the directory <strong>AutoSol_run_1_</strong> there will be one or more
+temporary directories such as <strong>TEMP0</strong> created while the Wizard is
+running. The files in this temporary directory may be useful sometimes
+in figuring out what the Wizard is doing (or not doing!). By default
+these directories are emptied when the Wizard finishes (but you can keep
+their contents with the command <strong>clean_up=False</strong> if you want.)</p>
+</div>
+<div class="section" id="what-parameters-did-i-use">
+<h1>What parameters did I use?</h1>
+<p>Once the AutoSol wizard has started (when run from the command line), a
+<strong>parameters file</strong> called <strong>autosol.eff</strong> will be created in your
+<strong>output directory</strong> (e.g., <strong>AutoSol_run_1_/autosol.eff</strong>). This
+<strong>parameters file</strong> has a header that says what command you used to run
+AutoSol, and it contains all the starting values of all parameters for
+this run (including the defaults for all the parameters that you did not
+set).</p>
+<p>The <strong>autosol.eff</strong> file is good for more than just looking at the
+values of parameters, though. If you copy this file to a new one (for
+example <strong>autosol_lores.eff</strong>) and edit it to change the values of some
+of the parameters (<strong>resolution=3.0</strong>) then you can re-run AutoSol with
+the new values of your parameters like this:</p>
+<pre class="literal-block">
+phenix.autosol autosol_lores.eff
+</pre>
+<p>This command will do everything just the same as in your first run but
+use only the data to 3.0 A.</p>
+</div>
+<div class="section" id="reading-the-log-files-for-your-autosol-run-file">
+<h1><em>Reading the log files for your AutoSol run file</em></h1>
+<p>While the AutoSol wizard is running, there are several places you can
+look to see what is going on. The most important one is the overall log
+file for the AutoSol run. This log file is located in:</p>
+<pre class="literal-block">
+AutoSol_run_1_/AutoSol_run_1_1.log
+</pre>
+<p>for run <strong>1</strong> of AutoSol. (The second <strong>1</strong> in this log file name will
+be incremented if you stop this run in the middle and restart it with a
+command like <strong>phenix.autosol run=1</strong>).</p>
+<p>The <strong>AutoSol_run_1_1.log</strong> file is a running summary of what the
+AutoSol Wizard is doing. Here are a few of the key sections of the log
+files produced for the <strong>gene-5</strong> MAD dataset.</p>
+</div>
+<div class="section" id="summary-of-the-command-line-arguments">
+<h1>Summary of the command-line arguments</h1>
+<p>Near the top of the log file you will find:</p>
+<pre class="literal-block">
+ ------------------------------------------------------------
+Starting AutoSol with the command:
+
+phenix.autosol
+
+Reading effective parameters from gene-5-mad.eff
+</pre>
+<p>This is just telling you how you ran AutoSol. Next comes a list of the
+values of all the parameters that were used to run AutoSol. It is the
+same as the file &quot;autosol.eff&quot; that is written to record these values.
+The beginning of this file looks like:</p>
+<pre class="literal-block">
+autosol {
+  atom_type = &quot;Se&quot;
+  lambda = None
+  f_prime = None
+  f_double_prime = None
+  wavelength_name = peak inf high low remote
+  sites = 2
+  sites_file = None
+  seq_file = &quot;sequence.dat&quot;
+</pre>
+<p>Here anything that is None was not set. Also anything that has a list of
+choices (wavelength_name in this case) is not set unless a &quot;*&quot; is next
+to one of the choices.</p>
+<p>This first set of parameters are all keywords that apply to all datasets
+or are shortcuts for setting keywords that apply to a single dataset.
+For example &quot;atom_type=Se&quot; will set the atom_type for all wavelengths
+and all derivatives.</p>
+<p>Later in the parameters file comes each wavelength:</p>
+<pre class="literal-block">
+wavelength {
+   wavelength_name = peak inf high low remote
+   data = &quot;high.sca&quot;
+   labels = None
+   atom_type = None
+   lambda = 0.96
+   f_prime = -1.5
+   f_double_prime = 3
+   sites = 2
+   sites_file = None
+   group = 1
+   added_wavelength = False
+ }
+</pre>
+<p>Here are listed all the values that you have set for this wavelength.
+The group is a number you can set to identify what group of
+wavelengths/natives/derivatives this wavelength is a part of. That lets
+you enter MIR+SAD or any other combinations of datasets. The
+&quot;added_wavelength&quot; keyword is added by the wizard and just marks
+whether you specifically added this wavelength or not.</p>
+</div>
+<div class="section" id="reading-the-datafiles">
+<h1>Reading the datafiles.</h1>
+<p>The AutoSol Wizard will read in your datafiles and check their contents,
+printing out a summary for each one:</p>
+<pre class="literal-block">
+HKLIN ENTRY:  high.sca
+FILE TYPE scalepack_merge
+GUESS FILE TYPE MERGE TYPE sca premerged
+LABELS['IPLUS', 'SIGIPLUS', 'IMINU', 'SIGIMINU']
+Unit cell: (76.08, 27.97, 42.36, 90, 103.2, 90)
+Space group: C 1 2 1 (No. 5)
+CONTENTS: ['high.sca', 'sca', 'premerged', 'C 1 2 1',
+[76.079999999999998, 27.969999999999999, 42.359999999999999, 90.0, 103.2, 90.0],
+2.5940784397029653, ['IPLUS', 'SIGIPLUS', 'IMINU', 'SIGIMINU']]
+Total of 3 input data files
+['peak.sca', 'infl.sca', 'high.sca']
+</pre>
+</div>
+<div class="section" id="guessing-cell-contents">
+<h1>Guessing cell contents</h1>
+<p>The AutoSol Wizard uses the sequence information in your sequence file
+(<strong>sequence.dat</strong>) and the cell parameters and space group to guess the
+number of NCS copies and the solvent fraction, and the number of total
+methionines (approximately equal to the number of heavy-atom sites for
+SeMet proteins):</p>
+<pre class="literal-block">
+AutoSol_guess_setup_for_scaling  AutoSol  Run 1 Thu Mar  6 21:43:20 2008
+Solvent fraction and resolution and ha types/scatt fact
+This is the last dataset to scale
+Guessing setup for scaling dataset 1
+SG C 1 2 1
+cell [76.079999999999998, 27.969999999999999, 42.359999999999999, 90.0, 103.2, 90.0]
+Number of residues in unique chains in seq file: 87
+Unit cell: (76.08, 27.97, 42.36, 90, 103.2, 90)
+Space group: C 1 2 1 (No. 5)
+CELL VOLUME :87758.6787391
+N_EQUIV:4
+GUESS OF NCS COPIES: 1
+SOLVENT FRACTION ESTIMATE: 0.46
+Total residues:87
+Total Met:2
+resolution estimate: 2.59
+</pre>
+</div>
+<div class="section" id="running-phenix-xtriage">
+<h1>Running phenix.xtriage</h1>
+<p>The AutoSol Wizard automatically runs phenix.xtriage on each of your
+input datafiles to analyze them for twinning, outliers, translational
+symmetry, and other special conditions that you should be aware of. You
+can read more about xtriage in <a class="reference external" href="../reference/xtriage.html">Data quality assessment with
+phenix.xtriage</a>. Part of the summary output from xtriage
+for this dataset looks like this:</p>
+<pre class="literal-block">
+The largest off-origin peak in the Patterson function is 12.60% of the
+height of the origin peak. No significant pseudotranslation is detected.
+
+The results of the L-test indicate that the intensity statistics
+behave as expected. No twinning is suspected.
+</pre>
+</div>
+<div class="section" id="testing-for-anisotropy-in-the-data">
+<h1>Testing for anisotropy in the data</h1>
+<p>The AutoSol Wizard tests for anisotropy by determining the range of
+effective anisotropic B values along the principal lattice directions.
+If this range is large and the ratio of the largest to the smallest
+value is also large then the data are by default corrected to make the
+anisotropy small (see <a class="reference external" href="../reference/autosol.html#anch26">Analyzing and scaling the
+data</a> in the AutoSol web page for more discussion
+of the anisotropy correction). In the <strong>gene-5</strong> case, the range of
+anisotropic B values is small and no correction is made:</p>
+<pre class="literal-block">
+Range of aniso B:  24.58 27.92
+Not using aniso-corrected data files as the range of aniso b  is
+only  3.43  and 'correct_aniso' is not set
+</pre>
+<p>Note that if any one of the datafiles in a MAD dataset has a high
+anisotropy, then by default all of them will be corrected for
+anisotropy.</p>
+</div>
+<div class="section" id="scaling-mad-data-and-estimating-fa-values">
+<h1>Scaling MAD data and estimating FA values</h1>
+<p>The AutoSol Wizard uses SOLVE localscaling to scale MAD data. The
+procedure is basically to scale all the data to the most complete
+dataset, ignoring anomalous differences, to create a reference dataset.
+Then all F+ and F- observations at all wavelengths are scaled to this
+reference dataset, and then the data are merged to the asymmetric unit,
+averaging duplicate observations. During this process outliers that
+deviate from the reference values by more that <strong>ratio_out</strong>
+(default=1) standard deviations (using all data in the appropriate
+resolution shell to estimate the SD) are rejected.</p>
+<p>After scaling, the values of <strong>f’</strong> and <strong>f&quot;</strong> are refined based on the
+relative values of anomalous differences at the various wavelengths and
+the relative values of dispersive differences among the data at
+different wavelengths. Then FA values (estimates of the heavy-atom
+structure factor) are estimated. These FA values can often be more
+useful than the anomalous differences at any of the individual
+wavelengths because they combine the anomalous and dispersive
+information. At the same time as FA values are calculated, an estimate
+of the phase difference between the structure factor of the
+anomalously-scattering atoms and the structure factor corresponding to
+all other atoms can be estimated. This phase difference is useful later
+in calculating Fourier maps showing the positions of the
+anomalously-scattering atoms.</p>
+</div>
+<div class="section" id="choosing-datafiles-with-high-signal-to-noise">
+<h1>Choosing datafiles with high signal-to-noise</h1>
+<p>For MAD data the AutoSol Wizard analyzes the correlation of anomalous
+differences at the various wavelengths. The anomalous difference for a
+particular reflection is related to the f&quot; value at each wavelength.
+Consequently if the data are good then the anomalous differences at
+different wavelengths (but for the same reflections) are highly
+correlated. A shell of resolution in which the anomalous differences
+have a correlation of about 0.3 or greater has some useful information.
+A strong SeMet dataset will have an overall correlation of 0.6-0.7 for
+the peak and high energy remote wavelengths. You can see this analysis
+in the log file <strong>dataset_scale_1.log</strong> for this MAD dataset:</p>
+<pre class="literal-block">
+Correlation of anomalous differences at different wavelengths.
+(You should probably cut your data off at the resolution where
+ this drops below about 0.3. A good dataset has correlation
+ between peak and remote of at least 0.7 overall. Data with
+ correlations below about 0.5 probably are not contributing much.)
+
+           CORRELATION FOR
+           WAVELENGTH PAIRS
+ DMIN    1 VS 2   1 VS 3   2 VS 3
+
+ 5.18     0.79     0.89     0.73
+ 3.88     0.68     0.75     0.55
+ 3.63     0.68     0.72     0.46
+ 3.43     0.53     0.61     0.41
+ 3.24     0.51     0.58     0.26
+ 3.11     0.51     0.59     0.36
+ 2.98     0.36     0.54     0.13
+ 2.85     0.50     0.45     0.35
+ 2.72     0.28     0.30     0.10
+ 2.59     0.32     0.23     0.14
+
+ ALL      0.55     0.66     0.40
+</pre>
+<p>During scaling, the AutoSol Wizard estimates the signal-to-noise in each
+datafile and the resolution where there is significant signal-to-noise
+(above 0.3:1 signal-to-noise). In this case, the FA's appear to have the
+highest signal-to-noise (3.1) and the inflection data the lowest (0.5):</p>
+<pre class="literal-block">
+ FILE DATA:FA.sca sn: 3.078877
+FILE DATA:peak.sca sn: 2.313605
+FILE DATA:high.sca sn: 1.365164
+FILE DATA:infl.sca sn: 0.3432194
+order of datasets for trying phasing:['FA.sca', 'peak.sca', 'high.sca', 'infl.sca']
+</pre>
+</div>
+<div class="section" id="running-hyss-to-find-the-heavy-atom-substructure">
+<h1>Running HYSS to find the heavy-atom substructure</h1>
+<p>The HYSS (hybrid substructure search) procedure for heavy-atom searching
+uses a combination of a Patterson search for 2-site solutions with
+direct methods recycling. The search ends when the same solution is
+found beginning with several different starting points. The HYSS log
+files are named after the datafile that they are based on and the type
+of differences (ano, iso) that are being used. In this <strong>gene-5</strong> MAD
+dataset, the HYSS logfile is <strong>peak.sca_ano_1.sca_hyss.log</strong>. The key
+part of this HYSS log file is:</p>
+<pre class="literal-block">
+Entering search loop:
+p = peaklist index in Patterson map
+f = peaklist index in two-site translation function
+cc = correlation coefficient after extrapolation scan
+r = number of dual-space recycling cycles
+cc = final correlation coefficient
+
+p=000 f=000 cc=0.144 r=015 cc=0.280 [ best cc: 0.280 ]
+p=000 f=001 cc=0.134 r=015 cc=0.282 [ best cc: 0.282 0.280 ]
+Number of matching sites of top 2 structures: 3
+p=000 f=002 cc=0.100 r=015 cc=0.234 [ best cc: 0.282 0.280 ]
+p=001 f=000 cc=0.181 r=015 cc=0.263 [ best cc: 0.282 0.280 0.263 ]
+Number of matching sites of top 2 structures: 3
+Number of matching sites of top 3 structures: 3
+p=001 f=001 cc=0.146 r=015 cc=0.277 [ best cc: 0.282 0.280 0.277 0.263 ]
+Number of matching sites of top 2 structures: 3
+Number of matching sites of top 3 structures: 3
+Number of matching sites of top 4 structures: 3
+p=001 f=002 cc=0.142 r=015 cc=0.278 [ best cc: 0.282 0.280 0.278 0.277 0.263 ]
+Number of matching sites of top 2 structures: 3
+Number of matching sites of top 3 structures: 3
+Number of matching sites of top 4 structures: 3
+Number of matching sites of top 5 structures: 3
+</pre>
+<p>Here a correlation coefficient of 0.5 is very good (0.1 is hopeless, 0.2
+is possible, 0.3 is good) and 2 sites were found that matched in the
+first two tries. The program continues until 5 structures all have
+matching sites, then ends and prints out the final correlations, after
+taking the top 2 sites.</p>
+</div>
+<div class="section" id="finding-the-hand-and-scoring-heavy-atom-solutions">
+<h1>Finding the hand and scoring heavy-atom solutions</h1>
+<p>Normally either hand of the heavy-atom substructure is a possible
+solution, and both must be tested by calculating phases and examining
+the electron density map and by carrying out density modification, as
+they will give the same statistics for all heavy-atom analysis and
+phasing steps. Note that in chiral space groups (those that have a
+handedness such as <strong>P61</strong>, both hands of the <strong>space group</strong> must be
+tested. The AutoSol Wizard will do this for you, inverting the hand of
+the heavy-atom substructure and the space group at the same time. For
+example, in space group <strong>P61</strong> the hand of the substructure is inverted
+and then it is placed in space group <strong>P65</strong>.</p>
+<p>The AutoSol Wizard scores heavy-atom solutions based on two criteria by
+default. The first criterion is the skew of the electron density in the
+map (<strong>SKEW</strong>). Good values for the skew are anything greater than 0.1.
+In a MAD structure determination, the heavy-atom solution with the
+correct hand may have a more positive skew than the one with the inverse
+hand. The second criterion is the correlation of local RMS density
+(<strong>CORR_RMS</strong>). This is a measure of how contiguous the solvent and
+non-solvent regions are in the map. (If the local rms is low at one
+point and also low at neighboring points, then the solvent region must
+be relatively contiguous, and not split up into small regions.) For MAD
+datasets, SOLVE is used for calculating phases. For a MAD dataset, a
+figure of merit of 0.5 is acceptable, 0.6 is fine and anything above 0.7
+is very good.</p>
+<p>The first three solutions scored are all quite good. Here is the first
+and best one:</p>
+<pre class="literal-block">
+SCORING SOLUTION 1: Solution 1 using HYSS on FA.sca. Dataset #1 SG=&quot;C 1 2 1&quot;, wi
+th 2 sites
+Number of scoring criteria:  2
+Using BAYES-CC (Bayesian estimate of CC of map to perfect) as scores
+Evaluating solution 1
+FOM found:  0.59
+Number of scoring criteria:  2
+Using BAYES-CC (Bayesian estimate of CC of map to perfect) as scores
+...
+Scoring for this solution now...
+
+AutoSol_run_1_/TEMP0/resolve.scores SKEW 0.2597009
+AutoSol_run_1_/TEMP0/resolve.scores CORR_RMS 0.8756687
+
+CC-EST (BAYES-CC) SKEW : 56.1 +/- 18.3
+CC-EST (BAYES-CC) CORR_RMS : 55.7 +/- 36.1
+ESTIMATED MAP CC x 100:  57.9 +/- 14.1
+</pre>
+<p>The <strong>ESTIMATED MAP CC x 100</strong> is an estimate of the quality of the
+experimental electron density map (not the density-modified one). A set
+of real structures was used to calibrate the range of values of each
+score that were obtained for phases with varying quality. The resulting
+probability distributions are used above to estimate the correlation
+between the experimental map and an ideal map for this structure. Then
+all the estimates are combined to yield an overall Bayesian estimate of
+the map quality. These are reported as CC x 100 +/- 2SD. These estimated
+map CC values are usually fairly close, so if the estimate is 57.9 +/-
+14.1 then you can be confident that your structure is not only solved
+but that you will have a good map when it is density modified.</p>
+<p>In this case the datasets used to find heavy-atom substructures were the
+FA values in <strong>FA.sca</strong> and the peak data in <strong>peak.sca_ano_1.sca</strong>.
+For each dataset one solution was found, and that solution and its
+inverse were scored. The scores were (skipping extra text below):</p>
+<pre class="literal-block">
+SCORING SOLUTION 1: Solution 1 using HYSS on FA.sca.
+Dataset #1 SG=&quot;C 1 2 1&quot;, with 2 sites
+ESTIMATED MAP CC x 100:  57.9 +/- 14.1
+
+SCORING SOLUTION 2: Solution  2 using HYSS on FA.sca and taking inverse.
+Dataset #1 SG=&quot;C 1 2 1&quot;, with 2 sites
+ESTIMATED MAP CC x 100:  42.0 +/- 24.3
+
+SCORING SOLUTION 3: Solution 3 using HYSS on peak.sca_ano_1.sca.
+Dataset #1 SG=&quot;C 1 2 1&quot;, with 2 sites
+ESTIMATED MAP CC x 100:  53.2 +/- 16.7
+
+SCORING SOLUTION 4: Solution  4 using HYSS on peak.sca_ano_1.sca and taking inverse.
+Dataset #1 SG=&quot;C 1 2 1&quot;, with 2 sites
+ESTIMATED MAP CC x 100:  53.1 +/- 16.7
+</pre>
+<p>In this case the best score was using the FA values and taking the
+original hand (ESTIMATED MAP CC x 100: 57.9 +/- 14.1), and score for the
+inverted hand of the heavy-atom substructure was worse (ESTIMATED MAP CC
+x 100: 42.0 +/- 24.3) and so the hand was clear.</p>
+</div>
+<div class="section" id="final-phasing-with-solve">
+<h1>Final phasing with SOLVE</h1>
+<p>Once the best heavy-atom solution or solutions are chosen based on
+<strong>ESTIMATED MAP CC</strong>, these are used in a final round of phasing with
+SOLVE (for MAD phasing). The log file from phasing for solution <strong>1</strong> is
+in <strong>solve_1.prt</strong>. This SOLVE log file repeats the correlation
+analysis of anomalous differences between data at each wavelength. Then
+it carries out a detailed refinement of the scattering factors at each
+wavelength. Finally the heavy-atom model is refined and phases are
+calculated with Bayesian correlated MAD phasing. The final occupancies
+and coordinates are listed at the end:</p>
+<pre class="literal-block">
+                   SITE  ATOM       OCCUP     X       Y       Z         B
+CURRENT VALUES:      1    Se       0.9609  0.4842  0.5199  0.5931   52.0344
+CURRENT VALUES:      2    Se       0.5891  0.4723  0.3052  0.4479   60.0000
+</pre>
+<p>In this case the occupancy of one site is quite near 1 and the other is
+lower. The second site is a selenomethionine that is not well ordered
+(it is the N-terminal residue in the protein).</p>
+</div>
+<div class="section" id="statistical-density-modification-with-resolve">
+<h1>Statistical density modification with RESOLVE</h1>
+<p>After MAD phases are calculated with SOLVE, the AutoSol Wizard uses
+RESOLVE density modification to improve the quality of the electron
+density map. The statistical density modification in RESOLVE takes
+advantage of the flatness of the solvent region and the expected
+distribution of electron density in the region containing the
+macromolecule, as well as any NCS that can be found from the heavy-atom
+substructure. The weighted structure factors and phases (FWT, PHWT) from
+SOLVE are used to calculate the starting map for RESOLVE, and the
+experimental structure factor amplitudes (FP) and MAD
+Hendrickson-Lattman coefficients from SOLVE are used in the density
+modification process. The output from RESOLVE for solution 1 can be
+found in <strong>resolve_1.log</strong>. Here are key sections of this output.</p>
+<p>First, the plot of how many points in the &quot;protein&quot; region of the map
+have each possible value of electron density. The plot below is
+normalized so that a density of zero is the mean of the solvent region,
+and the standard deviation of the density in the map is 1.0. A perfect
+map has a lot of points with density slightly less than zero on this
+scale (the points between atoms) and a few points with very high density
+(the points near atoms), and no points with very negative density. Such
+a map has a very high skew (think &quot;skewed off to the right&quot;). This map
+is good, with a positive skew, though it is not perfect.</p>
+<pre class="literal-block">
+Plot of Observed (o) and model (x) electron density distributions for protein
+region, where the model distribution is given by,
+ p_model(beta*(rho+offset)) = p_ideal(rho)
+and then convoluted with a gaussian with width of sigma
+where sigma, offset and beta are given below under &quot;Error estimate.&quot;
+
+
+                         0.03..................................................
+                             .                   .                            .
+                             .                 xx.                            .
+                             .               xxooxx                           .
+                             .              xo   . xx                         .
+                             .             xx    .  xx                        .
+                             .            xo     .    xo                      .
+               p(rho)        .           ox      .     xo                     .
+                             .          xx       .      xo                    .
+                             .          x        .       xxo                  .
+                             .        ox         .         xx                 .
+                             .        xx         .           xx               .
+                             .       xx          .            xxx             .
+                             .    oxx            .              oxxx          .
+                             .  oxx              .                oxxxxx      .
+                        0.0  xxxx......................................oxxxxxxx
+
+                            -2        -1         0         1         2        3
+
+                                 normalized rho (0 = mean of solvent region)
+-------------------------------------------------------------------------------
+</pre>
+<p>After density modification is complete, this plot becomes much more like
+one from a perfect structure:</p>
+<pre class="literal-block">
+                         0.03..................................................
+                             .                   .                            .
+                             .                   .                            .
+                             .             xxxxoo.                            .
+                             .            xxoooxx.                            .
+                             .          xxo      xoo                          .
+                             .          oo       .xxo                         .
+               p(rho)        .         x         .  x                         .
+                             .        x          .   xx                       .
+                             .      ox           .    oxxx                    .
+                             .     ox            .      oxxxx                 .
+                             .    xx             .         ooxxxxxx           .
+                             .   ox              .              oooxxxxxx     .
+                             . oxx               .                   o oxxxxxx.
+                             xxxx                .                           xo
+                        0.0  x................................................x
+
+                            -2        -1         0         1         2        3
+
+                                 normalized rho (0 = mean of solvent region)
+-------------------------------------------------------------------------------
+</pre>
+<p>The key statistic from this RESOLVE density modification is the R-factor
+for comparison of observed structure factor amplitudes (FP) with those
+calculated from the density modification procedure (FC). In this
+<strong>gene-5</strong> MAD phasing the R-factor is very low:</p>
+<pre class="literal-block">
+Overall R-factor for FC vs FP: 0.284 for       2669 reflections
+</pre>
+<p>An acceptable value is anything below 0.35; below 0.30 is good.</p>
+</div>
+<div class="section" id="generation-of-freer-flags">
+<h1>Generation of FreeR flags</h1>
+<p>The AutoSol Wizard will create a set of free R flags indicating which
+reflections are not to be used in refinement. By default 5% of
+reflections (up to a maximum of 2000) are reserved for this test set. If
+you want to supply a reflection file <strong>hires.mtz</strong> that has higher
+resolution than the data used to solve the structure, or has a test set
+already marked, then you can do this with the keyword
+<strong>input_refinement_file=hires.mtz</strong>. The files to be used for
+model-building and refinement are listed in the AutoSol log file:</p>
+<pre class="literal-block">
+Copying  AutoSol_run_1_/solve_1.mtz  and adding free R flags for refinement
+input_data_file_use:  AutoSol_run_1_/solve_1.mtz
+labin_use:  labin FP=FP SIGFP=SIGFP PHIB=PHIB FOM=FOM HLA=HLA HLB=HLB HLC=HLC HLD=HLD
+Adding FreeR_flag to  AutoSol_run_1_/TEMP0/solve_1.mtz
+...
+THE FILE AutoSol_run_1_/resolve_1.mtz will be used for model-building
+THE FILE exptl_fobs_phases_freeR_flags_1.mtz will be used for refinement
+</pre>
+</div>
+<div class="section" id="model-building-with-resolve">
+<h1>Model-building with RESOLVE</h1>
+<p>The AutoSol Wizard by default uses a very quick method to build just the
+secondary structure of your macromolecule. This is controlled by the
+keywords <strong>helices_strands_only=True</strong> and
+<strong>helices_strands_start=True</strong>. If you set
+<strong>helices_strands_only=True</strong> then only secondary structure will be
+built. If you instead set <strong>helices_strands_start=True</strong> then a
+secondary-structure model will be built and then it will be extended
+with standard RESOLVE model-building. The Wizard will guess from your
+sequence file whether the structure is protein or RNA or DNA (but you
+can tell it if you want with (<strong>chain_type=PROTEIN</strong>).</p>
+<p>If the quick model-building does not build a satisfactory model (if the
+correlation of map and model is less than
+<strong>acceptable_secondary_structure_cc=0.35</strong>), then model-building is
+tried again with the standard build procedure, essentially the same as
+one cycle of model-building with the AutoBuild Wizard (see the web page
+<a class="reference external" href="../reference/autobuild.html">Automated Model Building and Rebuilding with
+AutoBuild</a>, except that if you specify
+<strong>thoroughness=quick</strong> as we have in this example, the model-building is
+done less comprehensively to speed things up.</p>
+<p>In this case the secondary-structure-only model-building produces an
+initial model with 38 residues built and side chains assigned to 0, and
+which has a model-map correlation of 0.40</p>
+<pre class="literal-block">
+Secondary-structure model:  AutoSol_run_1_/TEMP0/Build_1.pdb
+Log file:  Build_1.log  copied to  Build_1.log
+Models to combine and extend:  ['Build_1.pdb']
+Using CC to score in combine_extend
+Model 2: Residues built=38  placed=0  Chains=5  Model-map CC=0.40 (Build_combine
+_extend_2.pdb)
+This is new best model with cc =  0.4
+Refining model:  Build_combine_extend_2.pdb
+Model: AutoSol_run_1_/TEMP0/refine_2.pdb  R/Rfree=0.50/0.50
+</pre>
+<p>After several cycles of model completion, the model-map correlation is
+now reasonably good (0.63), the model-building is considered successful
+and the refined initial model is written out to <strong>refine_12.pdb</strong> in
+the output directory. It is still just a preliminary model, but it is
+good enough to tell that the structure is solved. For full
+model-building you will want to go on and use the AutoBuild Wizard (see
+the web page <a class="reference external" href="../reference/autobuild.html">Automated Model Building and Rebuilding with
+AutoBuild</a> )</p>
+</div>
+<div class="section" id="the-autosol-summary-dat-summary-file">
+<h1>The AutoSol_summary.dat summary file</h1>
+<p>A quick summary of the results of your AutoSol run is in the
+<strong>AutoSol_summary.dat</strong> file in your output directory. This file lists
+the key files that were produced in your run of AutoSol (all these are
+in the output directory) and some of the key statistics for the run,
+including the scores for the heavy-atom substructure and the
+model-building and refinement statistics. These statistics are listed
+for all the solutions obtained, with the highest-scoring solutions
+first. Here is part of the summary for this <strong>gene-5</strong> MAD dataset:</p>
+<pre class="literal-block">
+----------CURRENT SOLUTIONS FOR RUN 1 : -------------------
+ *** FILES ARE IN THE DIRECTORY: AutoSol_run_1_ ****
+
+Solution # 1  BAYES-CC: 57.9 +/- 14.1 Dataset #1   FOM: 0.5
+
+Solution 1 using HYSS on FA.sca. Dataset #1 SG=&quot;C 1 2 1&quot;
+Dataset number: 1
+Dataset type: mad
+Datafiles used: ['high.sca', 'peak.sca', 'infl.sca']
+Sites: 2 (Already used for Phasing at resol of 2.6)
+NCS information  in: AutoSol_1.ncs_spec
+Experimental phases in: solve_1.mtz
+Experimental phases plus FreeR_flags for refinement in:
+   exptl_fobs_phases_freeR_flags_1.mtz
+Density-modified phases in: resolve_1.mtz
+HA sites (PDB format) in: ha_1.pdb_formatted.pdb
+Sequence file in: sequence.dat
+Model in: refine_12.pdb
+  Residues built: 65
+  Side-chains built: 10
+  Chains: 6
+  Overall model-map correlation: 0.63
+  R/R-free: 0.42/0.48
+Scaling logfile in: dataset_1_scale.log
+HYSS logfile in: FA.sca_hyss.log
+Phasing logfile in: solve_1.prt
+Density modification logfile in: resolve_1.log (R=0.28)
+Build logfile in: Build_combine_extend_12.log
+
+ Score type:       SKEW    CORR_RMS
+Raw scores:        0.26      0.88
+100x EST OF CC:   56.10     55.69
+
+Heavy atom sites (fractional):
+xyz       0.486     -0.480      0.592
+xyz       0.473      0.324      0.450
+</pre>
+</div>
+<div class="section" id="how-do-i-know-if-i-have-a-good-solution">
+<h1>How do I know if I have a good solution?</h1>
+<p>Here are some of the things to look for to tell if you have obtained a
+correct solution:</p>
+<ul class="simple">
+<li>How much of the model was built? More than 50% is good, particularly
+if you are using the default of helices_strands_only=True. If less
+than 25% of the model is built, then it may be entirely incorrect.
+Have a look at the model. If you see clear sets of parallel or
+antiparallel strands, or if you see helices and strands with the
+expected relationships, your model is going to be correct. If you see
+a lot of short fragments everywhere, your model and solution is going
+to be incorrect. How many side-chains were fitted to density? More
+than 25% is ok, more than 50% is very good.</li>
+<li>What is the R-factor of the model? This only applies if you are
+building a full model (not for helices_strands_only=True). For a
+solution at moderate to high resolution (2.5 A or better) the
+R-factor should be in the low 30's to be very good. For
+lower-resolution data, an R-factor in the low 40's is probably
+largely correct but the model is not very good.</li>
+<li>What was the overall signal-to-noise in the data? Above 1 is good,
+below 0.5 is very low.</li>
+<li>What are the individual CC-BAYES estimates of map correlation for
+your top solution? For a good solution they are all around 50 or
+more, with 2SD uncertainties that are about 10-20.</li>
+<li>What is the overall &quot;ESTIMATED MAP CC x 100&quot; of your top solution.
+This should also be 50 or more for a good solution. This is an
+estimate of the map correlation before density modification, so if
+you have a lot of solvent or several NCS-related copies in the
+asymmetric unit, then lower values may still give you a good map.</li>
+<li>What is the difference in &quot;ESTIMATED MAP CC x 100&quot; between the top
+solution and its inverse? If this is large (more than the 2SD values
+for each) that is a good sign.</li>
+</ul>
+</div>
+<div class="section" id="what-to-do-next">
+<h1>What to do next</h1>
+<p>Once you have run AutoSol and have obtained a good solution and model,
+the next thing to do is to run the AutoBuild Wizard. If you run it in
+the same directory where you ran AutoSol, the AutoBuild Wizard will pick
+up where the AutoSol Wizard left off and carry out iterative
+model-building, density modification and refinement to improve your
+model and map. See the web page <a class="reference external" href="../reference/autobuild.html">Automated Model Building and Rebuilding
+with AutoBuild</a> for details on how to run AutoBuild.</p>
+<p>If you do not obtain a good solution, then it's not time to give up yet.
+There are a number of standard things to try that may improve the
+structure determination. Here are a few that you should always try:</p>
+<ul class="simple">
+<li>Try setting thoroughness=thorough if it had previously been set to
+quick. This can make a big difference, though it takes longer.</li>
+<li>Try setting max_choices to a larger number, or desired_coverage to
+a higher value.</li>
+<li>Have a careful look at all the output files. Work your way through
+the main log file (e.g., <strong>AutoSol_run_1_1.log</strong>) and all the
+other principal log files in order beginning with scaling
+(<strong>dataset_1_scale.log</strong>), then looking at heavy-atom searching
+(<strong>FA.sca_hyss.log</strong>), phasing (e.g., <strong>solve_10.log</strong> or
+<strong>solve_xx.log</strong> depending on which solution <strong>xx</strong> was the top
+solution) and density modification (e.g., <strong>resolve_xx.log</strong>). Is
+there anything strange or unusual in any of them that may give you a
+clue as to what to try next? For example did the phasing work well
+(high figure of merit) yet the density modification failed? (Perhaps
+the hand is incorrect). Was the solvent content estimated correctly?
+(You can specify it yourself if you want). What does the xtriage
+output say? Is there twinning or strong translational symmetry? Are
+there problems with reflections near ice rings? Are there many
+outlier reflections?</li>
+<li>Try a different resolution cutoff. For example 0.5 A lower resolution
+than you tried before. Often the highest-resolution shells have
+little useful information for structure solution (though the data may
+be useful in refinement and density modification).</li>
+<li>Try a different rejection criterion for outliers. The default is
+<strong>ratio_out=10.0</strong> (toss reflections with delta F more than 10 times
+the rms delta F of all reflections in the shell). Try instead
+<strong>ratio_out=3</strong> to toss outliers.</li>
+<li>If the heavy-atom substructure search did not yield plausible
+solutions, try searching with HYSS using the command-line interface,
+and vary the resolution and number of sites you look for. Can you
+find a solution that has a higher <strong>CC</strong> than the one found in
+AutoSol? If so, you can read your solution in to AutoSol with
+<strong>sites_file=my_sites.pdb</strong>.</li>
+<li>Was an anisotropy correction applied in AutoSol? If there is some
+anisotropy but no correction was applied, you can force AutoSol to
+apply the correction with <strong>correct_aniso=True</strong>.</li>
+<li>Try related space groups. If you are not positive that your space
+group is P212121, then try other possibilities with different or no
+screw axes.</li>
+</ul>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+<p>For details about the AutoSol Wizard, see <a class="reference external" href="../reference/autosol.html">Automated structure solution
+with AutoSol</a>. For help on running Wizards, see <a class="reference external" href="../reference/running-wizards.html">Using
+the PHENIX Wizards</a>.</p>
+</div>
+</div>
+    
+  </body>
+</html>

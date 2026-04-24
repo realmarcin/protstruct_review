@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Density Modification</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="density-modification">
+<h1 class="title">Density Modification</h1>
+<p><strong>Why</strong></p>
+<p>The crystallographic phase problem can be solved using experimental
+phasing or molecular replacement. In both cases, these initial phases may
+be inaccurate due to experimental errors, low signal-to-noise, or
+model bias. Therefore, it is usually necessary to improve the phases
+by exploiting our prior knowledge about electron density distributions
+in the crystal. In the case of single wavelength (SAD) or single derivative
+(SIR) data, this step is essential for resolving the inherent phase
+ambiguity in these experiments.</p>
+<p>The phase improvement procedure is usually referred to as density modification
+because new phase estimates are obtained by modifying the electron
+density to conform to prior expectations. For example, methods to improve
+phases include solvent flattening, histogram matching, and non-crystallographic
+symmetry averaging (if NCS is present). The result of the procedure
+should be a better set of phases, which can be used to make a map for
+interpretation (i.e., model building).</p>
+<p><strong>How</strong></p>
+<p>In Phenix, several programs carry out density modification (see the list of Related programs
+below). Density modification can be performed using either a set of experimental
+phases (i.e., Hendrickson-Lattmann coefficients) or experimental amplitudes
+and an atomic model (from which the phases are calculated). The density
+modification program will try to automatically determine solvent content
+and non-crystallographic relationships between regions of density.</p>
+<p><strong>How to use the phenix Resolve density modification GUI:</strong> <a class="reference external" href="../reference/autobuild_gui.html#standalone-density-modification">Click
+here</a></p>
+<p><strong>Tutorial on density modification :</strong> <a class="reference external" href="../reference/autobuild_gui.html#density-modification-video-tutorial">Click
+here</a></p>
+<p><strong>Related programs</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="../reference/density_modification.html">phenix.density_modification</a>: This
+program performs iterative phase improvement with <em>Resolve</em> density modification,
+including the use of non-crystallographic symmetry and electron-density distributions.</li>
+<li><a class="reference external" href="../reference/multi_crystal_average.html">phenix.multi_crystal_average</a>: This
+program improves phases interactively and averages electron density, both
+within a crystal and between crystals. This very powerful technique can
+generate high quality phases in some circumstances.</li>
+<li><a class="reference external" href="../reference/ncs_average.html">phenix.ncs_average</a>: This program averages
+the electron density for molecules related by non-crystallographic symmetry. No
+iterative phase improvement is performed, just a single round of
+averaging.  This is useful for improving signal-to-noise in maps for
+model building.</li>
+</ul>
+</div>
+    
+  </body>
+</html>

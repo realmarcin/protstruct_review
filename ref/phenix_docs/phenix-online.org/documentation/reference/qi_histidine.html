@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>QM Flipping (QMF)</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="qm-flipping-qmf">
+<h1 class="title">QM Flipping (QMF)</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="qi_histidine.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="qi_histidine.html#authors" id="toc-entry-1">Authors</a></li>
+<li><a class="reference internal" href="qi_histidine.html#introduction" id="toc-entry-2">Introduction</a></li>
+<li><a class="reference internal" href="qi_histidine.html#running-an-example" id="toc-entry-3">Running an example</a></li>
+<li><a class="reference internal" href="qi_histidine.html#literature" id="toc-entry-4">Literature</a></li>
+</ul>
+</div>
+<div class="section" id="authors">
+<h1><a class="toc-backref" href="qi_histidine.html#toc-entry-1">Authors</a></h1>
+<p>Nigel W. Moriarty</p>
+</div>
+<div class="section" id="introduction">
+<h1><a class="toc-backref" href="qi_histidine.html#toc-entry-2">Introduction</a></h1>
+<p>Histidine can be protonated on either or both of the two nitrogen atoms of the
+imidazole moiety. Each of the three possible forms occur as a result of the
+stereochemical environment of the histidine sidechain. In an atomic model,
+comparing the possible protonation states <em>in situ</em>, looking at possible
+H-bonding and metal coordination, it is possible to predict which is most
+likely correct. We describe a more direct method that uses quantum mechanical
+methods to calculate – also <em>in situ</em> – the minimum geometry and energy for
+comparison, and therefore more accurate identification of the most likely
+protonation state.</p>
+<p>QMF is part of the Quantum Interface (QI) module that covers the interaction of
+Phenix with QM packages.</p>
+</div>
+<div class="section" id="running-an-example">
+<h1><a class="toc-backref" href="qi_histidine.html#toc-entry-3">Running an example</a></h1>
+<p>QMF can only be run stand-alone in the mmtbx.quantum_interface procedure as it's
+not reasonable to do this during refinement. Using the same example as QMR of
+PDB:<strong>4w53</strong>, download from the PDB website using:</p>
+<pre class="literal-block">
+~&gt; phenix.fetch_pdb 4w53 --mtz
+</pre>
+<p>Command to produce PHIL scope for QM minimisation using
+mmtbx.quantum_interface is:</p>
+<pre class="literal-block">
+~&gt; mmtbx.quantum_interface 4w53.pdb iterate_NQH=HIS
+</pre>
+<p>which will fail because of the bulk test for hydrogen atoms.</p>
+<pre class="literal-block">
+Sorry: Model must have Hydrogen atoms
+</pre>
+<p>Also note that the
+write_qmr_phil=True option writes a PHIL file. In this example, the format of
+the PHIL file works for QI interface but the default works for phenix.refine.Add Hydrogen atoms to the model using:</p>
+<pre class="literal-block">
+~&gt; phenix.ready_set 4w53.pdb
+</pre>
+<p>which produces a file with hydrogens atoms – 4w53.updated.pdb. It also may
+produce a restraints file that needs to be used next but in this case
+because the restraints for BNZ (benzene) are shipped with Phenix it is not
+necessary to supply to the program unless you want a different list of restraints
+(not ideal values).
+This file can be created cheaply but is needed as the skeleton for the QMR
+values to be inserted in the bond, angle and torsion restraints. So, we
+can repeat the quantum interface command with the new files.:</p>
+<pre class="literal-block">
+~&gt; mmtbx.quantum_interface 4w53.updated.pdb iterate_NQH=HIS
+</pre>
+<p>This will prompt for the selection of the ligand which in this case is “1”.</p>
+<pre class="literal-block">
+   1 : &quot;chain A and resid   31  and resname HIS&quot;
+   2 : &quot;chain A and resid  200  and resname MBN&quot;
+   3 : &quot;chain A and resid  201  and resname EPE&quot;
+
+Enter selection by choosing number or typing a new one ~&gt;
+</pre>
+<p>The result is a PHIL scope for MBN QMR restraints:</p>
+<pre class="literal-block">
+4w53.updated_A_31_HIS.phil.
+</pre>
+<p>There is also a command given to run the six configurations.</p>
+<pre class="literal-block">
+~&gt; mmtbx.quantum_interface 4w53.updated.pdb iterate_NQH=HIS 4w53.updated_A_31_HIS.phil  run_qmr=True qi.nproc=6
+</pre>
+<p>Note that you can edit the number of nproc to run all six configurations at once.</p>
+<p>Once the jobs are done the important metrics are listed in the table:</p>
+<pre class="literal-block">
+Energies in units of kcal/mol
+  Proton energy used : 94.5100 kcal/mol
+
+0. HD1                  : rotamer &quot;t70&quot;
+1. HD1, HE2             :    -1272.239 kcal/mol ~&gt;       3.19 kcal/mol. H-Bonds : 14 rmsd :    0.03 rotamer &quot;t70&quot;
+2. HD1 only             :    -1275.425 kcal/mol ~&gt;       0.00 kcal/mol. H-Bonds : 14 rmsd :    0.03 rotamer &quot;t70&quot;
+3. HE2 only             :    -1249.172 kcal/mol ~&gt;      26.25 kcal/mol. H-Bonds : 13 rmsd :    0.10 rotamer &quot;t70&quot;
+4. HD1, HE2 flipped     :    -1258.856 kcal/mol ~&gt;      16.57 kcal/mol. H-Bonds : 12 rmsd :    0.18 rotamer &quot;t-90&quot;
+5. HD1 only flipped     :    -1265.615 kcal/mol ~&gt;       9.81 kcal/mol. H-Bonds : 13 rmsd :    0.22 rotamer &quot;t-90&quot;
+6. HE2 only flipped     :    -1254.390 kcal/mol ~&gt;      21.03 kcal/mol. H-Bonds : 12 rmsd :    0.20 rotamer &quot;t-90&quot;
+</pre>
+<p>A Coot command is supplied:</p>
+<pre class="literal-block">
+phenix.start_coot qm_work_dir/iterate_HIS_01_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pdb qm_work_dir/iterate_HIS_02_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pdb qm_work_dir/iterate_HIS_03_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pdb qm_work_dir/iterate_HIS_04_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pdb qm_work_dir/iterate_HIS_05_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pdb qm_work_dir/iterate_HIS_06_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pdb
+</pre>
+<p>And a list of PyMOL commands:</p>
+<pre class="literal-block">
+phenix.pymol qm_work_dir/iterate_HIS_01_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pml &amp;
+phenix.pymol qm_work_dir/iterate_HIS_02_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pml &amp;
+phenix.pymol qm_work_dir/iterate_HIS_03_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pml &amp;
+phenix.pymol qm_work_dir/iterate_HIS_04_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pml &amp;
+phenix.pymol qm_work_dir/iterate_HIS_05_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pml &amp;
+phenix.pymol qm_work_dir/iterate_HIS_06_cluster_final_A_31_HIS_3.5_C_D_T_PM6-D3H4_EPS_equals_78.4.pml &amp;
+</pre>
+<p>Finally the information about the lowest (and near) energy configuration:</p>
+<pre class="literal-block">
+!!!   2. HD1 only             :    -1275.425 kcal/mol ~&gt;       0.00 kcal/mol. H-Bonds : 14 rmsd :    0.03 rotamer &quot;t70&quot; SAME
+
+Close
+  &gt;&lt;   1. HD1, HE2             :    -1272.239 kcal/mol ~&gt;       3.19 kcal/mol. H-Bonds : 14 rmsd :    0.03 rotamer &quot;t70&quot;
+</pre>
+</div>
+<div class="section" id="literature">
+<h1><a class="toc-backref" href="qi_histidine.html#toc-entry-4">Literature</a></h1>
+<p><ul><li><b>Protonation of histidine rings using quantum mechanical methods.</b> N.W. Moriarty, J. Moussa, and P.D. Adams.  <i>Acta Cryst.</i> (2024).</li>
+</ul></p>
+<p><ul><li><b>In situ ligand restraints from quantum-mechanical methods.</b> D. Liebschner, N.W. Moriarty, B.K. Poon, and P.D. Adams. <a href="https://doi.org/10.1107/S2059798323000025"><i>Acta Cryst.</i> D<b>79</b>, 100-110 (2023)</a>.</li>
+</ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

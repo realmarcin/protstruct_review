@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Tutorial: Fitting a flexible ligand into a difference electron density map</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="tutorial-fitting-a-flexible-ligand-into-a-difference-electron-density-map">
+<h1 class="title">Tutorial: Fitting a flexible ligand into a difference electron density map</h1>
+<div class="section" id="overview">
+<h1>Overview</h1>
+<p>This tutorial describes how to use the <a class="reference external" href="../reference/ligandfit_gui.html">LigandFit wizard</a>
+to automatically place an ATP molecule in a difference map.  An older tutorial
+covering use of LigandFit on the command line is <a class="reference external" href="ligandfit_cmdline.html">still available</a>.</p>
+</div>
+<div class="section" id="setup">
+<h1>Setup</h1>
+<p>The dataset for this tutorial is &quot;N-ethylmaleimide sensitive factor + ATP&quot;,
+which can be automatically created as a project in the Phenix GUI.  Three
+files are included: a ligand-free model, experimental data (MTZ file), and
+the ligand itself.  Once you have created the project, open the LigandFit GUI
+under the &quot;Ligands&quot; category.  The files can be added to the input list by
+dragging them from the desktop, or by clicking the &quot;Add file&quot; button and
+selecting them from the browser window.</p>
+<img alt="../images/nsfd2_ligandfit_input.png" src="../images/nsfd2_ligandfit_input.png" />
+<p>The space group and unit cell will be automatically loaded from the data
+file, and suitable column labels added to the &quot;Input labels&quot; menu.  In this
+case, we only have amplitudes available, so these will be used as input, and
+LigandFit will calculate an Fo-Fc map using model phases.  However, in many
+cases you will obtain optimal results by using an mFo-DFc map such as those
+output by <a class="reference external" href="../reference/refine_gui.html">phenix.refine</a> or <a class="reference external" href="../reference/create_maps.html">phenix.maps</a>.</p>
+<p>For this example, the rest of the parameters can be left on default settings;
+consult the <a class="reference external" href="../reference/ligandfit_gui.html">full documentation</a> for explanation of what
+these mean.  The only exception is &quot;Number of processors&quot;; if you have
+multiple processor cores available, you can set this higher.  Note that since
+the ligand structure has already been
+characterized in the PDB, we could simply enter the three-letter residue name
+(&quot;ATP&quot;) under &quot;Ligand code&quot;, instead of supplying the ATP as a PDB file.
+However, this will increase the runtime, since <a class="reference external" href="../reference/elbow_gui.html">eLBOW</a> will
+be run to generate coordinates.</p>
+</div>
+<div class="section" id="running-the-program">
+<h1>Running the program</h1>
+<p>Click &quot;Run&quot; on the toolbar ot launch LigandFit.  A new tab will appear
+showing the log output:</p>
+<img alt="../images/nsfd2_ligandfit_status.png" src="../images/nsfd2_ligandfit_status.png" />
+<p>LigandFit will start several child processes to sample a wide variety of
+ligand conformations.  The &quot;Parallel jobs&quot; tab will show the output of the
+individual runs as they progress; the best result will be selected for
+real-space refinement and be copied to the main output directory.</p>
+<img alt="../images/nsfd2_ligandfit_jobs.png" src="../images/nsfd2_ligandfit_jobs.png" />
+<p>At the end of the run, the summary tab will list the essential output files
+and the statistics for the final result, and active the buttons to launch
+other programs.</p>
+<img alt="../images/nsfd2_ligandfit_summary.png" src="../images/nsfd2_ligandfit_summary.png" />
+<p>Clicking &quot;Open in Coot&quot; will start Coot and load the difference map, starting
+model, and ligand structure.  Click on the result in the summary tab to
+zoom in on the ligand in Coot.  Further refinement is essential, but we can
+see that the fit is already very good.  (The excess difference density near
+the phosphate atoms belongs to an unmodeled magnesium ion and coordinating
+waters.)</p>
+<img alt="../images/nsfd2_ligandfit_coot.png" src="../images/nsfd2_ligandfit_coot.png" />
+</div>
+<div class="section" id="references">
+<h1>References</h1>
+<p><ul><li><b>Automated ligand fitting by core-fragment fitting and extension into density.</b> T.C. Terwilliger, H. Klei, P.D. Adams, N.W. Moriarty, and J.D. Cohn. <a href="https://doi.org/10.1107/S0907444906017161"><i>Acta Crystallogr D Biol Crystallogr</i> <b>62</b>, 915-22 (2006)</a>.</li>
+</ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>phenix.reduce: tool for adding hydrogens to a PDB model</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="phenix-reduce-tool-for-adding-hydrogens-to-a-pdb-model">
+<h1 class="title">phenix.reduce: tool for adding hydrogens to a PDB model</h1>
+<p><strong>Purpose</strong></p>
+<p>phenix.reduce is a command line tool for adding hydrogens to a PDB
+structure file. Hydrogens are added in standardized geometry with optimization
+of the orientations of OH, SH, NH3+, Met methyls, Asn and Gln sidechain amides,
+and His rings. Both proteins and nucleic acids can be processed. HET groups can
+also be processed as long as the atom connectivity is provided. The program is
+described in <a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S0022283698924019">Word, et al.(1999). J. Mol. Biol. 285, 1735-1747</a>. For more
+information visit: <a class="reference external" href="http://kinemage.biochem.duke.edu/software/reduce.php">http://kinemage.biochem.duke.edu/software/reduce.php</a></p>
+<p><strong>How to run</strong></p>
+<p>phenix.reduce is run from the command line:</p>
+<pre class="literal-block">
+% phenix.reduce [pdb_file] [options]
+</pre>
+<p><strong>To get information about command line options type</strong>:</p>
+<pre class="literal-block">
+% phenix.reduce
+</pre>
+<p>or for a longer list:</p>
+<pre class="literal-block">
+% phenix.reduce -h
+</pre>
+<p><strong>Hydrogens in refinement</strong></p>
+<p>Please refer to phenix.refine documentation to see how hydrogen atoms are used
+in structure refinement.</p>
+</div>
+    
+  </body>
+</html>

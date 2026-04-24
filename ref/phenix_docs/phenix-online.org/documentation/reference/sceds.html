@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>phenix.sceds: SCEDS - identify domains with normal mode analysis</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="phenix-sceds-sceds-identify-domains-with-normal-mode-analysis">
+<h1 class="title">phenix.sceds: SCEDS - identify domains with normal mode analysis</h1>
+<p><strong>Description</strong></p>
+<p>SCEDS is useful for identifying domains in a model to be used by molecular replacement when it is
+anticipated that there may be conformational motion of one or more domains relative to the domains
+in the target structure. Typically in such cases MR underperforms as it is not possible to
+match both domains onto the target structure. By partitioning a multidomain structure into distinct
+domains it is then possible to do MR searches with each separate domain and achieve a clearer solution than
+would otherwise have been possible.
+Domains are identified with a normal mode analysis. See literature reference
+below.</p>
+<p>To use SCEDS supply it with the MR model and execute it. Depending on the size of the model it may
+take some time before it completes.</p>
+<img alt="../images/SCEDS1.png" src="../images/SCEDS1.png" />
+<p>Output is one or more domains each saved into separate pdb files. These can then be used in
+molecular replacement. It is good practice to inspect the identified domains in a graphical viewer
+such as Coot or Pymol.</p>
+<img alt="../images/SCEDS2.png" src="../images/SCEDS2.png" />
+<p>The structure with PDB id 1XHB before running SCEDS. Two distinct domains can be discerned
+in the structure.</p>
+<img alt="../images/SCEDS3.png" src="../images/SCEDS3.png" />
+<p>After running SCEDS the two domains have been identified and saved into separate pdb files.</p>
+<div class="section" id="literature">
+<h1>Literature</h1>
+<p><strong>SCEDS: protein fragments for molecular replacement in Phaser</strong>
+McCoy AJ, Nicholls RA, Schneider TR <a class="reference external" href="http://scripts.iucr.org/cgi-bin/paper?ba5209">Acta Cryst. D69, 2216-2225 (2013)</a></p>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">file_name</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">root</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">gui_output_dir</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param" data-expert="0"><span class="phil-name">validate_domains</span><span class="phil-words"> = True </span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">keywords</span><ul><li class="phil-param phil-scope" data-expert="1"><span class="phil-name">nma</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">mode</span><span class="phil-words"> = 5 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">combinations</span><span class="phil-words"> = 2 </span></li></ul></li><li class="phil-param phil-scope" data-expert="2"><span class="phil-name">enm</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">oscillators</span><span class="phil-words"> = *rtb all </span></li><li class="phil-param" data-expert="0"><span class="phil-name">rtb_maxblocks</span><span class="phil-words"> = 125 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">rtb_nresidues</span><span class="phil-words"> = 0 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">radius</span><span class="phil-words"> = 5 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">force</span><span class="phil-words"> = 1 </span></li></ul></li><li class="phil-param phil-scope" data-expert="1"><span class="phil-name">perturb</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">increment</span><span class="phil-words"> = *rms dq </span></li><li class="phil-param" data-expert="0"><span class="phil-name">dq</span><span class="phil-words"> = None </span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">rms</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">step</span><span class="phil-words"> = 0.2 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum</span><span class="phil-words"> = 0.3 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">direction</span><span class="phil-words"> = forward backward *tofro </span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="1"><span class="phil-name">sceds</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">enable</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ndom</span><span class="phil-words"> = 2 </span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">weight</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">equality</span><span class="phil-words"> = 1 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">sphericity</span><span class="phil-words"> = 4 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">density</span><span class="phil-words"> = 1 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">continuity</span><span class="phil-words"> = 0 </span></li></ul></li></ul></li><li class="phil-param phil-scope" data-expert="1"><span class="phil-name">ddm</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">slider</span><span class="phil-words"> = 0 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">cluster</span><span class="phil-words"> = *max first last </span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">distance</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">step</span><span class="phil-words"> = 50 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">min</span><span class="phil-words"> = 1 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">max</span><span class="phil-words"> = 5 </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">separation</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">min</span><span class="phil-words"> = 7 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">max</span><span class="phil-words"> = 14 </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">sequence</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">min</span><span class="phil-words"> = 0 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">max</span><span class="phil-words"> = 1 </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">join</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">min</span><span class="phil-words"> = 2 </span></li><li class="phil-param" data-expert="0"><span class="phil-name">max</span><span class="phil-words"> = 12 </span></li></ul></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

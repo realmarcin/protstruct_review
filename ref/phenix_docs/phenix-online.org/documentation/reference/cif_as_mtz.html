@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Importing structures from the PDB</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="importing-structures-from-the-pdb">
+<h1 class="title">Importing structures from the PDB</h1>
+<p>Unlike most other reflection formats, the CIF files used by the PDB to store
+experimental data are not supported for direct input to PHENIX.
+<tt class="docutils literal">phenix.cif_as_mtz</tt> is a simple utility for importing these files, and can
+automatically identify and fix several errors common in the PDB, such as
+incorrectly labeled intensities in place of amplitudes.  Unfortunately, many
+structures fail to parse properly, so this tool is not guaranteed to work in
+all cases.</p>
+<div class="section" id="using-the-phenix-gui">
+<h1>Using the PHENIX GUI</h1>
+<p>Open the main GUI and click &quot;Import CIF structure factors&quot; under the
+&quot;Reflection tools&quot; category.  Only the CIF file is required, but a PDB file
+will often be necessary to obtain the correct symmetry information.  Click
+&quot;Use model to guess data type&quot; if you want PHENIX to do a sanity check on
+the labeled amplitudes (which may not really be amplitudes!).</p>
+<img alt="../images/cif_as_mtz.png" src="../images/cif_as_mtz.png" />
+<p>If you know the PDB ID but haven't downloaded the necessary files yet, you
+can simply enter the ID into the box in the upper right corner and click &quot;Run&quot;,
+and the PDB and CIF files will be fetched automatically from the RCSB web
+server.</p>
+</div>
+<div class="section" id="command-line-use">
+<h1>Command-line use</h1>
+<p>The output of <tt class="docutils literal">phenix.cif_as_mtz</tt> without arguments is show below:</p>
+<pre class="literal-block">
+Usage: phenix.cif_as_mtz [reflection_cif_file] [options]
+
+Options:
+  -h, --help            show this help message and exit
+  --unit-cell=10,10,20,90,90,120|FILENAME
+                        External unit cell parameters
+  --space-group=P212121|FILENAME
+                        External space group symbol
+  --symmetry=FILENAME   External file with symmetry information
+  --output-file-name=OUTPUT_FILE_NAME
+                        Output mtz file name.
+  --use-model=USE_MODEL
+                        Use PDB model to make better guess about reflection
+                        data type.
+  --wavelength-id=WAVELENGTH_ID
+                        Extract data set with given wavelength_id.
+  --crystal-id=CRYSTAL_ID
+                        Extract data set with given crystal_id.
+  --show-details-if-error
+                        Show data details for some errors.
+  --show-log            Show some output.
+  --merge               Merge non-unique data (preserves anomalous pairs)
+  --eliminate_sys_absent
+                        Remove systematic absences
+  --map_to_asu          Map HKL indices to canonical asymmetric unit
+  --incompatible_flags_to_work_set
+                        When merging place reflections with incompatible
+                        flags into the working set.
+
+Example: phenix.cif_as_mtz r1o9ksf.ent --symmetry=pdb1o9k.ent
+</pre>
+<p>The <tt class="docutils literal"><span class="pre">--symmetry</span></tt> argument is frequently required due to missing symmetry
+information; in these cases you should use the equivalent PDB file.  Most of
+the other options are usually not necessary, but <tt class="docutils literal"><span class="pre">--use-model</span></tt> is often
+helpful to get the data type right.</p>
+<p>As a shortcut to download the files from the RCSB (or mirror) website, PHENIX
+includes a tool for fetching data for a given PDB code:</p>
+<blockquote>
+phenix.fetch_pdb 2hr0
+phenix.fetch_pdb -x 2hr0</blockquote>
+<p>The argument &quot;-x&quot; specifies that the structure factors should be downloaded
+instead of the PDB file.  (This will only work if the authors deposited their
+data.)</p>
+</div>
+<div class="section" id="output">
+<h1>Output</h1>
+<p>Assuming that the data were successfully extracted, the program will create an
+MTZ file with columns FOBS, SIGFOBS (these will be treated as group by most
+applications in PHENIX), and R-free-flags.  In many cases there will be fewer
+reflections in the output than data lines in the CIF file; this is due to
+the presence of non-numeric or otherwise unintelligible values.</p>
+</div>
+</div>
+    
+  </body>
+</html>

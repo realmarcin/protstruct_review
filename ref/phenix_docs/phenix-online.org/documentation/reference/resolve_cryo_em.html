@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Density modification of cryo EM maps with resolve_cryo_em</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="density-modification-of-cryo-em-maps-with-resolve-cryo-em">
+<h1 class="title">Density modification of cryo EM maps with resolve_cryo_em</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>resolve_cryo_em: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>The routine resolve_cryo_em is a tool for carrying out density modification
+of cryo-EM maps</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+<p>Density modification with resolve_cryo_em is carried out using two
+half-maps, along with the FSC-based resolution and a sequence file specifying
+the contents of the map.</p>
+<p>Density modification can also be carried out by using the initial
+density-modified map or a single supplied model
+as a basis for generating multiple models, then using model-based density
+as part of the density modification target to yield a model-based
+density modified map.</p>
+</div>
+<div class="section" id="video-tutorial">
+<h1>Video Tutorial</h1>
+<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/4axYwCn2VWI" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" ></iframe></div><p>The <a class="reference external" href="https://youtu.be/4axYwCn2VWI">tutorial video</a> is available on the
+<a class="reference external" href="https://www.youtube.com/channel/UCcdI0hfHngWAZLJWynxPQWg">Phenix YouTube channel</a> and covers the
+following topics:</p>
+<ul class="simple">
+<li>basic overview</li>
+<li>how to run resolve_cryo_em via the GUI</li>
+</ul>
+</div>
+<div class="section" id="how-resolve-cryo-em-works">
+<h1>How resolve_cryo_em works:</h1>
+<p>Density modification with resolve_cryo_em is based on two ideas.
+One is that the errors in Fourier coefficients representing a cryo-EM map are
+(to some extent) uncorrelated. This means that one Fourier coefficient does
+not know about the errors in another one. (Note that this is not including
+errors that are correlated simply because the molecule is small and is
+placed in a large map. Correlated errors in this context are those where one
+Fourier coefficient has been adjusted to compensate for errors in another one.)</p>
+<p>The other is that some features in a map are known in advance.  This could
+include features such as the flatness of the solvent region, distributions
+of map values in the solvent and macromolecule region, similarities of
+symmetry-related regions.</p>
+<p>Then the way density modification works is that Fourier coefficients for
+the map are adjusted to agree both with the original map and with
+the expected features. This improves the Fourier coefficients,
+and the key result is that the map improves everywhere, not just where
+the information about expected features was available.</p>
+<p>Unique features of density modification for cryo-EM are that two half-maps with
+independent errors are available in cryo-EM (allowing estimation of
+errors), and that the errors in Fourier coefficients are (more or less)
+distributed as two-dimensional Gaussians (i.e both phase and amplitude
+errors).  This leads to many differences in implementation density
+modification in crystallography though core elements are identical.</p>
+</div>
+<div class="section" id="using-resolve-cryo-em">
+<h1>Using resolve_cryo_em:</h1>
+<p>Normally you will access the functionality of resolve_cryo_em by running
+the ResolveCryoEM tool in the Phenix GUI.  You can also run it from the
+command line. You may wish to run it from the command line in background
+with multiprocessing if you are running with denmod_with_models=True as this
+can take a long time (perhaps 1 day x 16 processors if you have 250
+residues in the unique part of your model).</p>
+<p>Half-maps: Supply two unmasked half maps. Half maps are maps created using
+half of the data. They are full-size, but just contain less accurate
+information. Normally half-maps are named something like my_map_1.ccp4 and
+my_map_2.ccp4, for half maps 1 and 2.
+The half-maps can be sharpened but it does
+not make much of a difference. They must be unmasked and they must still have
+noise in the solvent region.  They can be boxed with a soft boundary (if they
+are boxed specify box_before_analysis=False so it isn't done again)</p>
+<p>Sequence file:  Supply a sequence file with the sequence of the molecule. Be
+sure to put in all copies of the molecule (i.e. a 24-mer needs 24 chains). (You can also supply one copy of the molecule and specify copies=24 if you want.)</p>
+<p>Model file:  You can supply a model; if you do then the model will be randomized
+and refined against the half-maps to yield 8 models for each half map. These
+will be used in model-based density modification.</p>
+<p>Automatically-generated models:  You can specify density_modify_with_model=True
+and not supply any model. In this case 8 models will be automatically
+generated for each half-map and used in model-based density modification.</p>
+</div>
+<div class="section" id="procedure-used-by-resolve-cryo-em">
+<h1>Procedure used by resolve_cryo_em</h1>
+<p>The basic inputs to resolve_cryo_em are:</p>
+<pre class="literal-block">
+Two unmasked half-maps
+sequence file or molecular mass or solvent fraction
+</pre>
+<p>Optional inputs are:</p>
+<pre class="literal-block">
+Full map (Recombined with density-modified half maps)
+Model (Used to generate multi-model representation for density modification)
+Symmetry file (Supply with model or if automatic model generation is
+   used to limit the modeling to the unique part of the map. Alternatively,
+   used in density modification in cases where the symmetry is not part
+   of the reconstruction process).
+Mask file (Used to identify the region where the macromolecule is present)
+</pre>
+<p>The procedure used by resolve_cryo_em has several steps:</p>
+<pre class="literal-block">
+Boxing of maps:  If the supplied maps are much larger than the molecule,
+the maps are trimmed down to about 5 A bigger than the largest dimension
+of the molecule (estimated from a low-res mask and the molecular
+volume based on sequence or as specified) in each direction, using
+a soft mask at the edges of the box.
+
+Resolution estimate and half-map sharpening of maps: The half-maps are
+compared as a function of resolution and the resolution (FSC=0.143)
+is estimated and the maps are sharpened based on the estimated map quality
+of the full (averaged) map.  A full map is calculated.
+
+Generation of map-value (density) histograms:  The full map is analyzed
+to identify the distribution of map values in the solvent and
+macromolecule region.  These histograms are optionally used in density
+modification.
+
+Map-phasing of half-maps:  Each half map is used in a process of
+map-based estimation of new Fourier coefficients using a
+maximum-likelihood procedure. In essence, one Fourier coefficient is
+removed from the map at a time. Then a new value of that Fourier coefficient
+is found that maximizes the likelihood of the map given all the other
+Fourier coefficients. The likelihood is calculated from the agreement of
+the histograms of the (new) map with expected histograms.  For example,
+if the solvent region is expected to be flat, then the new map has a
+high likelihood if it is flat in the solvent region.  By varying the one
+Fourier coefficient the flatness of the solvent region will change. Similarly
+the histograms of density in the region of the macromolecule will change
+depending on the value of the one Fourier coefficient. The best value for
+each Fourier coefficient is then used to calculated a map-phasing map.
+
+Estimation of errors:  Fourier coefficients for the two starting
+half-maps and the two density-modified maps are compared to give FSC
+values as a function of resolution.  These FSC values are used to estimate
+correlated and uncorrelated errors in the four maps and to identify
+optimal weighting between original and density-modified maps.
+
+Recombination of original and map-phasing half-maps:  Based on the
+estimated errors in original and map-phasing half-maps, all four maps
+are recombined to create a new density-modified map.  Additionally,
+each half-map and associated map-phasing half map are recombined to
+create two new density-modified half-maps.
+
+Optional real-space and sigma weighting:  The smoothed local rms differences
+between original half maps and between density-modified half maps are
+used (optionally) to identify location-specific weighting for the
+original and density-modified maps.  The variance of Fourier coefficients
+among the four maps are used (optionally) to weight individual final
+Fourier coefficients.
+
+Optional starting with unsharpened maps.  The input half maps are used in the
+density modification step without adjusting the resolution dependence
+of the maps with half-map sharpening.  This can be useful
+for high-resolution maps.  Note that whether or not this option is
+selected, normally an overall B-factor is still applied to the input maps
+based on the nominal resolution.&nbsp; The difference therefore is in the
+details of the resolution dependence which is adjusted in the default
+case based on a comparison of half-maps, but not with density
+modify unsharpened maps.  The overall B-factor
+applied before density modification is controlled by the&nbsp;remove_aniso
+and b_iso keywords.&nbsp; By default remove_aniso=True and b_iso is
+target_b_ratio*resolution (target_b_ratio=10), so before density
+modification whatever resolution dependence and anisotropy is present in
+the each map is adjusted to yield an overall B of b_iso and no anisotropy.
+
+
+Optional alternative final sharpening of maps.  The final sharpening normally
+consists of two parts.  One is scaling the map in shells of resolution
+based on the estimated correlation of the map coefficients at each
+resolution with the true ones.  This is controlled by the
+keyword final_scale_with_fsc_ref.   The second part of final scaling is
+scaling Fourier coefficients in each shell of resolution either to match
+the low-resolution shell or to match the scaled half-maps, or to
+be part-way between these (controlled by the keyword geometric_scaling).
+
+Optional spectral scaling and local sharpening.  The final
+map is optionally scaled with a resolution-dependent scale factor
+representing the radial part of a typical Fourier transform of a
+macromolecule.  The final map is optionally locally resolution-filtered
+(local sharpening).  The final map is also optionally blurred slightly
+with a blurring dependent on the overall resolution of the map.
+
+Optional use of an input full map.  If you supply a full map in addition
+to the half-maps then the full map will be recombined with the two
+map-phasing half-maps instead of the average of the two original
+half-maps being recombined.  This could improve the final map if your
+full map has been filtered in some special way.
+
+Optional density modification with multiple models.  You can generate
+multiple-model representations of each of your two half maps either
+by supplying a single model (it will be randomized and refined against
+each half-map) or by specifying density_modify_with_model=True (models
+will be generated automatically).  The multiple models will be used to
+estimate the density at each point near the models along with a guess of
+the uncertainty of that density.  These are used to create a target map
+for density modification that is based on model density and the
+map from standard density modification, weighted according to their
+uncertainty estimates.  This target map is then used in density modification
+(as a target for the region containing the model), where Fourier coefficients   that lead to a map that is more similar to the target density are considered
+more likely thatn those that do not.  This procedure necessarily can
+introduce model bias, but this is greatly reduced by the use of multiple
+models, uncertainty estimates, and the likelihood-based density modification.
+You may with to use a finer resolution for density modification
+(dm_resolution) if you include model information because the model can
+provide higher-resolution information that simple density modification.
+
+Density modification including symmetry that is not part of reconstruction
+symmetry.  If your molecule has symmetry that was not used in the
+reconstruction process, it can be used in density modification. Supply a
+symmetry_file (.ncs_spec file) that you can obtain with the find_ncs tool
+in phenix (uses a model or density) and it will be included.
+</pre>
+</div>
+<div class="section" id="procedure-used-by-resolve-cryo-em-for-density-modification-with-model-building">
+<h1>Procedure used by resolve_cryo_em for density modification with model-building</h1>
+<p>Density modification with model-building adds additional cycles to the
+density modification procedure in which multiple models are built using
+map_to_model and the averaged density and uncertainty in the average density
+is used to combine the model density with the initial density-modified map.</p>
+<p>The procedure includes:</p>
+<pre class="literal-block">
+Create initial density-modified half-maps and full map
+
+Create N (typically 16) variants of the full map by changing the resolution
+cutoff, spectral_scaling, and blurring of the map.
+
+Build a model into each modified full map. If symmetry file supplied,
+  build only the unique part of the model.
+
+Refine some of the models against half-map 1 and some against half-map 2
+
+Create one composite model based on all models
+
+Create model density for each half-map based on the models refined againt
+that map.  This model density will have a mean value and variance for each
+point in the map near to at least 3 models.
+
+Create composite density for each half-maps by combining the model density
+with the density-modified half-map, weighting the model density according to
+its consistency among models.
+
+Density-modify each composite half-map, and create a new set of density
+modified half-maps and full map, as in the procedure for standard
+density modification.
+
+Sharpen the resulting maps using model-based sharpening with the composite
+model.
+
+Note that this procedure takes a lot of computation.
+</pre>
+</div>
+<div class="section" id="note-on-r-values-in-density-modification">
+<h1>Note on R-values in density modification</h1>
+<p>The R-value for density modification is quite different from a refinement
+R value or Rfree value.
+Basically the statistical (maximum-likelihood) density modification
+procedure allows calculation of each structure factor based on the values of
+all the other structure factors and the expectations about the map
+(i.e, flat solvent, distribution of density values in protein, ncs, etc.)
+These map-phasing structure factors are (at least in the first cycle)
+independent of the starting structure factors and can be compared with the
+measured data and an R-value obtained.  The values of these R-values range
+from about 0.25 to 0.5 in most cases, and when the map is very good usually
+the R values are smaller.  These R values do not involve any atomic model
+so they are quite unlike a refinement R.</p>
+<p>For discussion of how map-likelihood structure factors are calculated in
+Resolve, see  the Map-likelihood phasing reference below.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-resolve-cryo-em">
+<h1>Standard run of resolve_cryo_em:</h1>
+<p>You can use resolve_cryo_em to density-modify a cryo-EM map:</p>
+<pre class="literal-block">
+phenix.resolve_cryo_em half_map_A.mrc half_map_B.mrc seq_file=seq.dat
+</pre>
+</div>
+<div class="section" id="what-to-expect-with-density-modification">
+<h1>What to expect with density modification</h1>
+<p>If density modification is working well, you should see:</p>
+<pre class="literal-block">
+An improvement in reported resolution. Typically this is small..from 0.05 A
+to 0.5 A.  If it is zero...it probably did not work.
+
+More fine detail. Density modification mostly changes
+the high-resolution part of your map. (The low-resolution part of your map
+is generally already very good, and usually if it is not then density
+modification can't fix it. Occasionally low and high-resolution aspects
+of a map can improve.)  Compare your original (auto-sharpened) map with
+your density-modified map and see if side chains and carbonyl oxygens are more
+clear and if the connectivity of the chain improves.
+
+If you supply or generate models, you should see improved high-resolution
+detail in the region of the model.  You are not likely to see improvement
+away from the model as you would in crystallography.  The multiple models
+generated are basically identifying what locations in your map are
+compatible with being the location of an atom, based on the density already
+there and the geometrical restrictions on a model. That information then
+is included in density modification and improves density in the region of
+the model but is not strong enough to improve density elsewhere.
+</pre>
+</div>
+<div class="section" id="what-to-try-to-improve-your-map">
+<h1>What to try to improve your map</h1>
+<p>Usually you should first just run with all defaults, supplying two half-maps
+and a sequence file and nominal resolution. See how the map looks and use it
+as a baseline. Then some things to try to improve the map are:</p>
+<pre class="literal-block">
+Add a full map file to recombine it with density-modified half-maps. This
+can be helpful if your full map has been processed in a way that makes it
+much better than an average of your half-maps.
+
+Add a mask file to exclude part of the map. If your map has some huge noise
+peaks or just density that is not part of your molecule, you can try to
+exclude it by supplying a mask file (a map file with 1 where your molecule is
+located and 0 elsewhere).
+
+If you have a model, you can supply the model and it will be used to generate
+a multi-model representation of your molecule. This multi-model representation
+will be used in density modification. Note that you should supply a
+symmetry file if there is symmetry in your reconstruction so that only
+the unique part needs to be analyzed.
+
+If you don't have a model but your resolution is high (about 3.5 A or better),
+you can improve your map by automatically generating a multi-model
+representation of your structure. This is used in the same way as the
+multi-model representation starting with a supplied model, and a symmetry
+file is helpful to identify just the unique part of the molecule.
+
+You can try changing
+the resolution (overall) and the density-modification resolution.  Normally
+the resolution is the gold-standard resolution from comparing your half-maps.
+However varying this may help.  The density-modification resolution is
+normally set automatically to be somewhat finer than the overall resolution,
+but its exact value does have an effect so you could try different values.
+
+You can try changing some of the defaults that occasionally help. One is
+setting density_modify_unsharpened_maps=True (density modifies the original
+half-maps without auto-sharpening them). Another is setting
+final_scale_with_fsc_ref=False (applies final resolution-dependent scaling
+that is part-way between standard half-map FSC-based sharpening and
+constant amplitudes over all resolutions).
+These usually are best for high_resolution maps (&lt; 3 A).
+
+Real_space_weighting, sigma_weighting, and spectral_scaling may improve the
+final map.  Real-space weighting weights original and density-modified maps
+based on their local uncertainties.  Sigma-weighting weights them by
+uncertainties in individual Fourier coefficients.  Spectral scaling scales the
+final map by resolution to match the resolution-dependence of a typical
+protein.
+</pre>
+</div>
+<div class="section" id="how-to-tell-how-well-density-modification-is-working">
+<h1>How to tell how well density modification is working</h1>
+<p>Density modification changes the sharpening of your map, so just because the
+map looks better or worse doesn't necessarily mean that anything important
+has happened.</p>
+<p>If you have two maps and you want to know which is the better one, here
+are some things you can do:</p>
+<pre class="literal-block">
+1. Create a matched version of your maps that have the same
+resolution-dependence using phenix.map_sharpening. Run it like this:
+
+phenix.map_sharpening n_bins=100 auto_sharpen_methods=external_map_sharpening
+     external_map_file=target_map.map map_to_change.map resolution=4.1
+     sharpened_map_file=map_to_change_matched.map
+
+Now you can look at target_map.map and map_to_change_matched.map and
+differences you see are due to intrinsic properties of the maps, not just
+sharpening.
+
+2. If you have a good model, refine the model against each map.  Then use
+phenix.mtriage to estimate the resolution where the FSC(map,model)==0.5
+for each map. The map with a lower value of this resolution may be better.
+
+3. As in #2, once you have a pair of maps and a model refined against
+each map, you can run phenix.map_sharpening with each map and model and
+it will print out the average FSC for each.  The one with the higher
+overall FSC may be better.
+</pre>
+</div>
+<div class="section" id="output-files-from-cryo-em-density-modification">
+<h1>Output files from cryo EM density modification</h1>
+<p>The principal output files from ResolveCryoEM cryo-EM density modification
+are:</p>
+<pre class="literal-block">
+denmod_map.ccp4 -- a density-modified (improved) map
+denmod_resolution_map.ccp4 -- a map showing the resolution of denmod_map.ccp4
+</pre>
+<p>You can view the density-modified map (denmod_map.ccp4), colored based on
+the resolution from denmod_resolution_map.ccp4, using ChimeraX.</p>
+<p>Note that ResolveCryoEM may output a model called &quot;merged_model.pdb&quot; if you
+run it using a model. This merged_model.pdb is not necessarily an improved
+model. It is just a merged version of the input models.  If you do not
+supply a model ResolveCryoEM will not output any models.</p>
+</div>
+<div class="section" id="what-to-do-next-after-cryo-em-density-modification">
+<h1>What to do next after cryo EM density modification</h1>
+<p>You can use your density-modified cryo-EM map anywhere that you need your
+clearest map (refinement, model-building, ligand fitting, validation). Do
+keep in mind that this is map can have some bias, or systematic errors. For
+example density that is in the solvent region can be flattened somewhat. If a
+model is used in density modification, be careful in interpreting any features
+that are not present at all without density modification.</p>
+<p>Often the next step after resolve_cryo_em will be model-building with
+predict_and_build or map_to_model.  Alternatively you might carry out
+docking with EmPlacement or DockInMap. You might also try map sharpening with
+the map_sharpening tool and compare that map with the density-modified one.</p>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+<p>If the half-maps have been masked the procedure may not work well.</p>
+<p>If the solvent noise is very non-uniform the procedure may work poorly.
+By default a rectangular solid region enclosing the molecule is cut out
+and used in density modification.  You can supply a boxed map and
+set the keyword box_before_analysis=False to avoid this.</p>
+<p>If the maps have very prominent density away from the macromolecule this
+may interfere with density modification. You can get around this by supplying
+a mask (as a map, 1=inside the molecule).</p>
+<p>If there is non-macromolecule but real density in the maps this
+may interfere with density modification (for example, lipid density).</p>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+<p>If your computer does not have a lot of memory and you use multiple
+processors (nproc bigger than 1) then resolve_cryo_em can crash.  If this
+happens try nproc=1.</p>
+<p>Density modification introduces some correlations between half-maps
+due to solvent flattening. This can have a small effect on the resolution
+estimates obtained with half-map FSC.  The resolution estimates provided
+by the program are corrected for this effect.</p>
+<p>If you use the real_space_weighting or sigma_weighting or
+sharpening_type=local_final_half_map options there may be some
+extra correlations between half-maps introduced.  Calculating resolution
+using FSC between these density-modified maps can lead to overstating the
+resolution. The resolution estimates provided by the program are before
+applying these weighting schemes (unless you specify local_methods_final_cycle = False and run multiple cycles) so they are not normally affected by this.</p>
+<p>The density modification procedure works best in the resolution range of about 4.5 A or better, but occasionally works very well at lower resolutions (not
+tested beyond 9 A).  The procedure does not work in every case (we do not
+have a great metric for success but about half of cases appear to be
+improved according to the metrics described above).
+Varying the parameters can have a substantial effect on the outcome.</p>
+<p>Model-based density modification necessarily biases the map towards the models
+that are built.  By building multiple models, the effect of this bias is
+reduced but not eliminated.  For example if the starting map has an error that
+causes models to be built with a side chain the wrong place, the new model-
+based density will show even more density in that location.  That is,
+this process can accentuate errors in the original maps if they match
+plausible locations of atoms in a model.  Balancing this, the procedure
+generally does not appear to yield density at positions where there is no
+density in the original map even if atoms are located there in a model.
+It is important that the original or non-model-based maps be consulted to
+evaluate any specific density in the map.</p>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+<p><ul><li><b>Improvement of cryo-EM maps by density modification.</b> T.C. Terwilliger, S.J. Ludtke, R.J. Read, P.D. Adams, and Afonine. <a href="https://doi.org/10.1038/s41592-020-0914-9"><i>Nature Methods</i> <b>17</b>, 923-927 (2020)</a>.</li>
+</ul>
+<ul><li><b>Map-likelihood phasing.</b> T.C. Terwilliger. <a href="https://doi.org/doi:10.1107/S0907444901013749"><i>Acta Crystallogr D Biol Crystallogr</i> <b>57</b>, 1763-75 (2001)</a>.</li>
+</ul></p>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">half_map_file_name_1</span><span class="phil-words"> = None </span><span class="phil-help">Half map file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">half_map_file_name_2</span><span class="phil-words"> = None </span><span class="phil-help">Half map file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Optional map file name. If you supply a full map it will be used in recombination with the density modified half maps. If you have a good full map this may be useful.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_map_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Input target map file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mask_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Input mask file name (as map file with 1 for macromolecule, 0 solvent, smoothly varying between 1 and 0). Used instead of automatic mask to define region where map correlations are calculated.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model_1</span><span class="phil-words"> = None </span><span class="phil-help">Model to be randomized to generate multiple-model representation of structure in density modification. Normally eight models will be generated for each half-map. If multiple model_1 and model_2 files are supplied then they will be used directly and should be refined against half_map_1 or denmod_half_map_1 before supplying them. Normally supply at least minimum_model_files corresponding to half-map 1 and the same for half-map 2. Generated automatically if density_modify_with_model is set and no model is supplied. If supplied, at least minimum_model_files must be supplied for each half-map.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model_2</span><span class="phil-words"> = None </span><span class="phil-help">Model corresponding to half-map 2 (unique part of model) to use in density modification. All model_2 models should be refined against half_map_2 or denmod_half_map_2 before supplying them. Normally supply at least minimum_model_files corresponding to half-map 2 and the same for half-map 1. Generated automatically if density_modify_with_model is set.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_model_files</span><span class="phil-words"> = 3 </span><span class="phil-help">Minimum number of models representing half-maps 1 and 2. NOTE: must be at least 2.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">denmod_map_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Optional input density-modified full map. Normally generated automatically</span></li><li class="phil-param" data-expert="0"><span class="phil-name">denmod_half_map_file_name_1</span><span class="phil-words"> = None </span><span class="phil-help">Optional input density-modified half map file 1. Normally generated automatically</span></li><li class="phil-param" data-expert="0"><span class="phil-name">denmod_half_map_file_name_2</span><span class="phil-words"> = None </span><span class="phil-help">Optional input density-modified half map file 2. Normally generated automatically</span></li><li class="phil-param" data-expert="0"><span class="phil-name">truncate_density_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Input model file containing atomic coordinates around which density is to be truncated at 2 sigma in density modification. This can be used to truncate high density for heavy atoms or high density that is away from the macromolecule so that they do not interfere with density modification. Note that this means that the density in these regions will typically be much lower after density modification. See also rad_mask, the radius around the coordinates to mask.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rad_mask</span><span class="phil-words"> = 5 </span><span class="phil-help">Radius around truncate_density atom positions to truncate density in density modification</span></li><li class="phil-param" data-expert="0"><span class="phil-name">histograms_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Input histograms file name. Normally this file is created automatically</span></li><li class="phil-param" data-expert="0"><span class="phil-name">guess_histograms_path</span><span class="phil-words"> = True </span><span class="phil-help">If histograms path is too long, try to guess the path based on the resolve default path and the working directory</span></li><li class="phil-param" data-expert="0"><span class="phil-name">symmetry_file</span><span class="phil-words"> = None </span><span class="phil-help">Symmetry file used to apply symmetry during density modification and model-building. Required if density_modify_with_model is set and ncs_copies is greater than 1. Normally not used as NCS is part of the map symmetry</span></li><li class="phil-param" data-expert="0"><span class="phil-name">seq_file</span><span class="phil-words"> = None </span><span class="phil-help">Sequence file used to estimate volume occupied by the molecule and to generate models (if density_modify_with_model is set) . Either supply all copies of each chain or supply the unique part of the sequence file and use ncs_copies to specify how many copies of this are present. If ncs_copies = 1 or None, then the seq_file must include all copies (i.e, if a dimer, must have two copies of the chain) and no NCS will be applied. (Fasta format or sequences separated by blank lines)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb_out</span><span class="phil-words"> = None </span><span class="phil-help">Merged model (composite model obtained from model-building steps)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">initial_map_file_name</span><span class="phil-words"> = initial_map.ccp4 </span><span class="phil-help">Output scaled original map file name. Only written out if apply_cc_star_to_initial_map is True. (Otherwise the initial map is highly sharpened and not suitable for viewing).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model_density_map_file_name</span><span class="phil-words"> = model_density_12.ccp4 </span><span class="phil-help">Output map containing density used as model-based target in density modification.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">denmod_map_file_name</span><span class="phil-words"> = denmod_map.ccp4 </span><span class="phil-help">Denmod map file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">denmod_blur_50_map_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Output scaled denmod map file name, blurred with B of 50</span></li><li class="phil-param" data-expert="0"><span class="phil-name">denmod_half_map_1_file_name</span><span class="phil-words"> = denmod_half_map_1.ccp4 </span><span class="phil-help">Output scaled denmod half map 1 file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">denmod_half_map_2_file_name</span><span class="phil-words"> = denmod_half_map_2.ccp4 </span><span class="phil-help">Output scaled denmod half map 2 file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_phasing_half_map_1_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Map phasing half map 1 file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_phasing_half_map_2_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Map phasing half map 2 file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_mask_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Output mask file</span></li><li class="phil-param" data-expert="2"><span class="phil-name">temp_dir</span><span class="phil-words"> = None </span><span class="phil-help">Temporary directory. Default is resolve_cryo_em_xx where xx creates new directory. If specified, temp_dir will be used or created and used, and the working directory will be resolve_cryo_em_xx inside the specified temp_dir. Does not apply if running from GUI.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">restore_full_size</span><span class="phil-words"> = False </span><span class="phil-help">Restore full size of maps on output by padding with zeroes.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resample_on_fine_grid</span><span class="phil-words"> = False </span><span class="phil-help">Resample output maps on fine grid with scale of resampling_ratio to starting resolution of map. Requires input maps have origin at (0, 0, 0).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resampling_ratio_to_resolution</span><span class="phil-words"> = 0.2 </span><span class="phil-help">Ratio of gridding for output map to starting resolution of map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_pixel_size</span><span class="phil-words"> = None </span><span class="phil-help">You can specify the output pixel size. This will set resample_on_fine_grid to True and adjust the gridding to result in the specified pixel size.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_cubic_boxing</span><span class="phil-words"> = False </span><span class="phil-help">When boxing map, make a cubic box</span></li><li class="phil-param" data-expert="0"><span class="phil-name">soft_mask_at_end</span><span class="phil-words"> = False </span><span class="phil-help">When boxing map, create a soft mask around the edges at the end. This is in addition to the soft_mask that is used in the analysis step. Does not apply if restore_full_size is used.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">local_resolution_smoothing_radius_ratio</span><span class="phil-words"> = 1 </span><span class="phil-help">Ratio of smoothing radius to resolution (local resolution only)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">adjust_local_resolution_coloring</span><span class="phil-words"> = False </span><span class="phil-help">Adjust local resolution coloring based on limits of resolution. Default is to use a standard coloring scheme.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_directory</span><span class="phil-words"> = None </span><span class="phil-help">Location for output files</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">Estimated resolution of full map data. Used to set dm_resolution</span></li><li class="phil-param" data-expert="3"><span class="phil-name">original_resolution</span><span class="phil-words"> = None </span><span class="phil-help">Original resolution (set automatically).</span></li><li class="phil-param" data-expert="3"><span class="phil-name">minimum_resolution</span><span class="phil-words"> = None </span><span class="phil-help">Minimum resolution (set automatically).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_xyz</span><span class="phil-words"> = None </span><span class="phil-help">Gridding for resolve density modification calculation. Normally set automatically as same as gridding of input map after boxing.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">auto_gridding</span><span class="phil-words"> = None </span><span class="phil-help">Automatically set gridding in resolve density modification based on the resolution (not same as input map)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_model_mask</span><span class="phil-words"> = False </span><span class="phil-help">Use model mask if a model is supplied. Only applies if use_model_as_target is False</span></li><li class="phil-param" data-expert="0"><span class="phil-name">soft_mask</span><span class="phil-words"> = True </span><span class="phil-help">Use soft mask when boxing map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">soft_mask_radius</span><span class="phil-words"> = None </span><span class="phil-help">Radius for soft mask when boxing map. Default is twice the resolution of the map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_copies</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of copies in the entire structure of whatever is in seq_file or whatever is specified as the molecular_mass. You can leave ncs_copies = None or ncs_copies = 1 and specify entire molecule in seq_file or molecular mass. Or you can set ncs_copies = xx and specify just the unique part of the sequence or molecular_mass.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">box_before_analysis</span><span class="phil-words"> = None </span><span class="phil-help">Cut out and soft-mask a box of density around the molecule before density modification. If you have already boxed your map specify False, otherwise normally specify True.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">box_cushion</span><span class="phil-words"> = 5 </span><span class="phil-help">Buffer around box of density around molecule to be cut out for density modification</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_select</span><span class="phil-words"> = False </span><span class="phil-help">Use density_select option to cut out molecule in box_before_analysis</span></li><li class="phil-param" data-expert="0"><span class="phil-name">box_with_model_if_present</span><span class="phil-words"> = True </span><span class="phil-help">Use model to box density before analysis (if present)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">close_index</span><span class="phil-words"> = None </span><span class="phil-help">Index within this value of edge is considered close. If edge of proposed box is within close_index of end, take the whole box.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_close_index</span><span class="phil-words"> = 10 </span><span class="phil-help">Smallest value for estimate of close_index</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_close_index_ratio</span><span class="phil-words"> = 10 </span><span class="phil-help">Close index will be larger of min_close_index and cell grid units divided by min_close_index_ratio.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_content</span><span class="phil-words"> = None </span><span class="phil-help">Solvent fraction (content) of the cell. You can specify the fraction of the volume of this cell that is taken up by the macromolecule. Normally set automatically. Values go from 0 to 1. This number applies to the boxed map if boxing is done here.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_content_iterations</span><span class="phil-words"> = 3 </span><span class="phil-help">Iterations of solvent fraction estimation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">molecular_mass</span><span class="phil-words"> = None </span><span class="phil-help">Molecular mass of molecule in Da. Used as alternative method of specifying solvent content. If ncs_copies is specified, total molecular mass = molecular_mass times ncs_copies.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fraction_of_max_mask_threshold</span><span class="phil-words"> = None </span><span class="phil-help">threshold of standard deviation map in low resolution mask identification of solvent content. Used if no solvent content and no molecular mass and no sequence file are specified. A good value is 0.05.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">wang_radius</span><span class="phil-words"> = None </span><span class="phil-help">Local averaging radius for solvent identification in masking. Default is 1.5* resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">denmod_wang_radius</span><span class="phil-words"> = None </span><span class="phil-help">Local averaging radius for solvent identification in density modification Default is 1.5* resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">smoothing_radius</span><span class="phil-words"> = None </span><span class="phil-help">Radius for mask smoothing. Default is twice resolution.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">buffer_radius</span><span class="phil-words"> = None </span><span class="phil-help">Radius for mask buffer in map_box. Default is smoothing radius value.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_smoothing_radius</span><span class="phil-words"> = 5 </span><span class="phil-help">Minimum radius for mask smoothing.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_solvent_content</span><span class="phil-words"> = 0.5 </span><span class="phil-help">Stop and ask for a bigger box if solvent content appears to be less than minimum_solvent_content</span></li><li class="phil-param" data-expert="0"><span class="phil-name">maximum_solvent_content</span><span class="phil-words"> = 0.9999 </span><span class="phil-help">Stop and ask for a smaller box if solvent content appears to be more than maximum_solvent_content</span></li><li class="phil-param" data-expert="0"><span class="phil-name">overall_delta_b</span><span class="phil-words"> = -30 </span><span class="phil-help">Overall delta B to apply to model map coefficients, relative to overall B of the map. (-30 means get the overall B of the map, subtract 30, set B of atoms in model to this value.)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_bins</span><span class="phil-words"> = 100 </span><span class="phil-help">Number of resolution bins for sharpening. Default is 100. More bins may help slightly but will slow down density modification.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">set_resolution_to_dm_resolution</span><span class="phil-words"> = True </span><span class="phil-help">Set resolution to dm_resolution once it is determined</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dm_resolution_offset_list</span><span class="phil-words"> = None </span><span class="phil-help">List of resolution offsets to try for density modification. Applied if quick = False</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dm_resolution_list</span><span class="phil-words"> = None </span><span class="phil-help">List of resolutions to try for density modification. Normally set automatically</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dm_resolution</span><span class="phil-words"> = None </span><span class="phil-help">High-resolution limit for density modification. Normally set automatically from input resolution.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dm_res_a</span><span class="phil-words"> = 2.4 </span><span class="phil-help">dm_resolution will be guessed from resolution with the formula: res_dm = a + b*(res-res_c) + d * (res-res_c)**2</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dm_res_b</span><span class="phil-words"> = 0.99 </span><span class="phil-help">dm_resolution will be guessed from resolution with the formula: res_dm = a + b*(res-res_c) + d * (res-res_c)**2</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dm_res_c</span><span class="phil-words"> = 3.0 </span><span class="phil-help">dm_resolution will be guessed from resolution with the formula: res_dm = a + b*(res-res_c) + d * (res-res_c)**2</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dm_res_d</span><span class="phil-words"> = -0.2 </span><span class="phil-help">dm_resolution will be guessed from resolution with the formula: res_dm = a + b*(res-res_c) + d * (res-res_c)**2</span></li><li class="phil-param" data-expert="0"><span class="phil-name">chain_type</span><span class="phil-words"> = *None PROTEIN RNA DNA </span><span class="phil-help">Chain type. Determined automatically from sequence file if not given. Mixed chain types are fine (leave blank if so).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sequence</span><span class="phil-words"> = None </span><span class="phil-help">Optional sequence. Can be used instead of a seq_file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scattering_table</span><span class="phil-words"> = n_gaussian wk1995 it1992 *electron neutron </span><span class="phil-help">Choice of scattering table for structure factor calculations. Standard for X-ray is n_gaussian, for cryoEM is electron.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">strategy</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">calculate_local_resolution</span><span class="phil-words"> = True </span><span class="phil-help">Get local resolution map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">geometric_scale</span><span class="phil-words"> = True </span><span class="phil-help">Use geometric mean of low-res scale factor and shell scale factor in scaling. Prior to FSCref scaling, the low-res scale factor would make Fourier coefficients in each shell of resolution match those in the lowest-resolution shell (on average). The shell scale factor would make them match the resolution dependence of the (scaled) half-maps. The geometric mean is partway between these. Note: not applied if final_scale_with_fsc_ref is True.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">geometric_scale_half_maps_only</span><span class="phil-words"> = False </span><span class="phil-help">Use geometric mean only for half-maps, not map combination</span></li><li class="phil-param" data-expert="0"><span class="phil-name">geometric_scale_not_half_maps</span><span class="phil-words"> = False </span><span class="phil-help">Use geometric mean except for half-maps, only map combination</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_value</span><span class="phil-words"> = None </span><span class="phil-help">Target value in scaling. None means scale to input map. You can use geometric_scale = False target_value = 1000 final_scale_with_fsc_ref = False to have a more-or-less resolution-independent final map (an E-map).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">final_scale_with_fsc_ref</span><span class="phil-words"> = True </span><span class="phil-help">Adjust final resolution-dependent average Fourier coefficient amplitudes to match estimated correlation with true cofficients (FSCref). This uses fixed_target_value = 1000 in recombination and turns off geometric_scale in map recombination</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fixed_target_value</span><span class="phil-words"> = 1000 </span><span class="phil-help">Fixed target value to use if specified.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">include_all_in_target_norm</span><span class="phil-words"> = False </span><span class="phil-help">Include all input data in calculating average values for normalization. Alternative is just half-map data</span></li><li class="phil-param" data-expert="0"><span class="phil-name">require_significant_hm12</span><span class="phil-words"> = None </span><span class="phil-help">Require significant FSC for half-maps (within min_hm12ab_ratio of FSC for density-modified maps). Default is True except when models are used.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">half_map_fsc_to_keep_only</span><span class="phil-words"> = 0.9 </span><span class="phil-help">If half-map fsc is this value or greater, skip density modification in this shell. Used to prevent density-modified information from making low-resolution terms worse than they started out.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimize_r_value</span><span class="phil-words"> = False </span><span class="phil-help">Optimize choice of histograms/sharpening based on R-value for density modification. Alternative is based on estimated improvement in resolution.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimize_sharpening_method</span><span class="phil-words"> = None </span><span class="phil-help">Try unsharpened and half-map sharpened map coefficients as starting point for density modification, then auto-set overall sharpening if remove_aniso = true, then density modify and choose based on minimum density modification R value</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_modify_density_target_start_with_denmod</span><span class="phil-words"> = False </span><span class="phil-help">Start with density-modified maps in density_modify_density_target</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_modify_model_simple_merge</span><span class="phil-words"> = False </span><span class="phil-help">Merge model_density with original without another density modification run. Normally choose either density_modify_model_simple_merge or density_modify_density_target for model-based density modification.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_modify_density_target</span><span class="phil-words"> = True </span><span class="phil-help">Use density from unmerged models as target for density modification</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_model_variance</span><span class="phil-words"> = True </span><span class="phil-help">Use estimate of model variance to weight density target.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mask_density_target</span><span class="phil-words"> = True </span><span class="phil-help">Mask density target to use only region where model was present</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_merged_models_in_denmod</span><span class="phil-words"> = False </span><span class="phil-help">Use merged model in density modification (one for each half map)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_tight_mask</span><span class="phil-words"> = False </span><span class="phil-help">Use tight mask in average_maps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model_mask_radius</span><span class="phil-words"> = 3 </span><span class="phil-help">Radius for masking density from model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">no_denmod_after_model</span><span class="phil-words"> = False </span><span class="phil-help">No density modification after recombining model information. Not implemented.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_correlated_fsc</span><span class="phil-words"> = False </span><span class="phil-help">Assume errors in model-based FSC values are highly correlated</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_maximum_inside_mask</span><span class="phil-words"> = False </span><span class="phil-help">Use map_1 density (original) if higher than map_2 (model-based) inside map_2 mask in average_maps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sd_smoothing_radius_ratio</span><span class="phil-words"> = 0.75 </span><span class="phil-help">Radius for smoothing density sd estimates as ratio to resolution. Used in average_maps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">smooth_model_map</span><span class="phil-words"> = False </span><span class="phil-help">Smooth model map in average_maps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_on_model</span><span class="phil-words"> = 1 </span><span class="phil-help">Weight on model in average_maps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sharpen_map_data_before_scaling</span><span class="phil-words"> = True </span><span class="phil-help">Sharpen input map data before using it to scale half-map and model data</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_half_datasets_for_sigmas_by_reflection</span><span class="phil-words"> = False </span><span class="phil-help">Use differences between F1 and F2 for sigmas ( times 0.707). Alternative is use these differences in shells only. Do not use this as it introduces correlations between half-datasets.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fix_amplitudes</span><span class="phil-words"> = False </span><span class="phil-help">Fix amplitudes, only change phases</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_variance</span><span class="phil-words"> = True </span><span class="phil-help">Use model variance in model-based density modification</span></li><li class="phil-param" data-expert="0"><span class="phil-name">refine_symmetry_in_denmod</span><span class="phil-words"> = True </span><span class="phil-help">Refine symmetry operators in density modification.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_symmetry_in_denmod</span><span class="phil-words"> = False </span><span class="phil-help">Use symmetry in density modification. Normally not used as maps already have symmetry applied.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">symmetry_in_denmod_last_cycle_only</span><span class="phil-words"> = True </span><span class="phil-help">Use symmetry in density modification only on last cycle (if use_symmetry_in_denmod = True).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fraction_ncs</span><span class="phil-words"> = None </span><span class="phil-help">Fraction of macromolecule expected to follow symmetry. Use None to identify automatically</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_denmod_map_in_denmod_with_model</span><span class="phil-words"> = False </span><span class="phil-help">Use density-modified map to start density modification with model</span></li><li class="phil-param" data-expert="0"><span class="phil-name">refine</span><span class="phil-words"> = True </span><span class="phil-help">Refine models</span></li><li class="phil-param" data-expert="0"><span class="phil-name">refine_after_randomize</span><span class="phil-words"> = False </span><span class="phil-help">Refine models after running randomize routine. Note that randomize (used in density_modify_with_single_model) already refines the multiple models but does not refine B. This refines them further including B values. It may be better to keep B values of zero for the multiple-models and skip this.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sequence_models</span><span class="phil-words"> = None </span><span class="phil-help">Get sequences of models. Default is True if models are generated automatically at a resolution of sequence_models_resolution or better (normally 3.5 A) and False otherwise. Note that if a very big model this can take a really long time.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sequence_models_resolution</span><span class="phil-words"> = 3.5 </span><span class="phil-help">Resolution at which sequence_models is normally applied if models are generated automatically.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rerun_with_avail_seq</span><span class="phil-words"> = True </span><span class="phil-help">Rerun sequence alignment with parts of the sequence already used removed. With a large structure this can take a long time.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_map_files</span><span class="phil-words"> = True </span><span class="phil-help">Write out final map files</span></li><li class="phil-param" data-expert="0"><span class="phil-name">write_boxed_map_files</span><span class="phil-words"> = False </span><span class="phil-help">Write out boxed versions of input map files</span></li><li class="phil-param" data-expert="0"><span class="phil-name">delta_resolution</span><span class="phil-words"> = 0.0 0.5 </span><span class="phil-help">Resolution offsets to try in model-building</span></li><li class="phil-param" data-expert="0"><span class="phil-name">macro_cycles</span><span class="phil-words"> = 3 </span><span class="phil-help">Cycles of real-space refinement in model-building and randomization</span></li><li class="phil-param" data-expert="0"><span class="phil-name">build_thoroughness</span><span class="phil-words"> = *None quick medium thorough </span><span class="phil-help">Thoroughness of model-building</span></li><li class="phil-param" data-expert="0"><span class="phil-name">build_methods</span><span class="phil-words"> = high_density_from_model no_high_density_from_model </span><span class="phil-help">Build methods to try in model-building. Allowed methods: trace_and_build phase_and_build high_density_from_model no_high_density_from_model quick medium</span></li><li class="phil-param" data-expert="0"><span class="phil-name">backup_build_methods</span><span class="phil-words"> = phase_and_build </span><span class="phil-help">Build methods to try in model-building if initial methods do not yield enough models. Allowed methods: trace_and_build phase_and_build high_density_from_model no_high_density_from_model quick medium</span></li><li class="phil-param" data-expert="0"><span class="phil-name">vary_blur_and_spectral_scaling_with_model</span><span class="phil-words"> = True </span><span class="phil-help">In density_modify_with_model, generate maps with and without blur_by_resolution and spectral_scaling (4 maps)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_modify_with_model</span><span class="phil-words"> = None </span><span class="phil-help">Run model-based density modification. If one model is supplied, randomize and generate multi-model representation for each half-map. Models are deleted unless verbose = True. If multiple models (at least minimum_model_files) are supplied for each half-map, use them. Otherwise generate models and refine against half-maps. Use model information in density modification.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">randomize_single_model</span><span class="phil-words"> = True </span><span class="phil-help">Randomize single model if supplied.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_modify_with_single_model</span><span class="phil-words"> = None </span><span class="phil-help">Density modify with single model by randomizing model before use Normally used internally only.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model_cycles</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of cycles of model-based density modification. Normally use 1 if you supply a single model (if you use more it will generate new models on cycles 2-...). Use 1 or a few if you are generating new models.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model_sharpen</span><span class="phil-words"> = True </span><span class="phil-help">Carry out model-based sharpening based on final model if density modifying with model information</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_model_as_target</span><span class="phil-words"> = True </span><span class="phil-help">Use model as target in density modification. Alternative is to use density based on model as target for density modification.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">omit_with_model</span><span class="phil-words"> = False </span><span class="phil-help">Use omit maps in density_modify_with_model. Only applies if use_model_as_target is True. Not implemented</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_box_target</span><span class="phil-words"> = None </span><span class="phil-help">Target number of boxes in omit maps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scale_rmsd</span><span class="phil-words"> = 1 </span><span class="phil-help">Scale on RMSD estimate for model-map agreement</span></li><li class="phil-param" data-expert="0"><span class="phil-name">patterns</span><span class="phil-words"> = False </span><span class="phil-help">Use resolve_patterns to identify patterns in map and use them in density modification. Requires box_before_analysis.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">update_starting_map</span><span class="phil-words"> = True </span><span class="phil-help">Update starting half maps each cycle using half-maps from previous cycle.. Alternative is to restart with original (sharpened) half maps each cycle.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">update_histograms</span><span class="phil-words"> = True </span><span class="phil-help">Update histograms each cycle using working map. Alternative is to use input histogram file or generate histograms once.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">database_list</span><span class="phil-words"> = None </span><span class="phil-help">List of histogram database entries to try one at a time if optimizing histograms. Database 0 is local database for this run. Databases 1 2 3 4 5 are 1 - 3 A databases. Default is 5 for quick [0, 5] for non-quick</span></li><li class="phil-param" data-expert="0"><span class="phil-name">database_number</span><span class="phil-words"> = None </span><span class="phil-help">Use this database entry by default (0 is local database, 5 std)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rad_smooth_ratio</span><span class="phil-words"> = 1 </span><span class="phil-help">Ratio of rad_smooth to resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">spectral_scaling</span><span class="phil-words"> = False </span><span class="phil-help">Scale average Fourier coefficient amplitude vs resolution to match spectrum expected for a protein in a box of solvent. This can restore resolution-dependent features of a map.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">blur_by_resolution</span><span class="phil-words"> = False </span><span class="phil-help">Blur after half-map averaging by B = 10 times resolution. This can be used along with blur by resolution factor to apply a slight blurring that may make the final map easier to interpret.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">blur_by_resolution_factor</span><span class="phil-words"> = 10 </span><span class="phil-help">Blur after half-map averaging by B = blur_by_resolution_factor times resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sigma_weighting</span><span class="phil-words"> = None </span><span class="phil-help">In recombination step, weight individual fourier coefficients based on estimated variances: 1/sqrt(normalized_variance). Can be combined with real_space_weighting. Can cause correlations between density-modified half maps so that half-map FSC values may overstate resolution.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">average_neighbors</span><span class="phil-words"> = False </span><span class="phil-help">In sigma_weighting, average neighboring weights</span></li><li class="phil-param" data-expert="0"><span class="phil-name">apply_cc_star_to_initial_map</span><span class="phil-words"> = None </span><span class="phil-help">Apply resolution-dependent cc_star (FSCref) weighting to initial map before density modification. Default is True. If False, apply any other scaling but set cc_star = 1.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">local_methods_final_cycle</span><span class="phil-words"> = True </span><span class="phil-help">Apply any local sharpening/averaging only on last cycle</span></li><li class="phil-param" data-expert="0"><span class="phil-name">real_space_weighting</span><span class="phil-words"> = None </span><span class="phil-help">In recombination step, weight maps in half-map averaging based on local half-map variance in real space (smoothed with smoothing_radius). Can be combined with sigma_weighting. Can cause correlations between density-modified half maps so that half-map FSC values may overstate resolution.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sharpening_type</span><span class="phil-words"> = None half_map *final_half_map local_final_half_map </span><span class="phil-help">Sharpening to apply at each stage. Half-map means scale data in each shell to maximum then multiply by estimated FSCref from input first half maps. Final_half_map means same except use estimate of FSCref for final maps. Final_local_half_map uses local FSCref estimates.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cycles</span><span class="phil-words"> = 1 </span><span class="phil-help">Cycles of density modification</span></li><li class="phil-param" data-expert="0"><span class="phil-name">damping</span><span class="phil-words"> = None </span><span class="phil-help">Damping of shifts on each cycle.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_r_value_improvement_per_cycle</span><span class="phil-words"> = 0.001 </span><span class="phil-help">Minimum r_value improvement to keep cycling. Does not apply if dampling is used.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">force_cycles</span><span class="phil-words"> = True </span><span class="phil-help">Keep results of last cycle even if not better</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_improvement_per_cycle</span><span class="phil-words"> = -1 </span><span class="phil-help">Minimum improvement to keep cycling. Does not apply if dampling is used.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">zero_half_dataset_correlation</span><span class="phil-words"> = False </span><span class="phil-help">Assume correlation between density-modified half-datasets is zero.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">very_high_error</span><span class="phil-words"> = 100 </span><span class="phil-help">If an error (asqr, bsqr, csqr, ssqr) is this big or bigger, require it to keep this value for all subsequent bins</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_cut</span><span class="phil-words"> = 0.2 </span><span class="phil-help">Estimate of minimum highly reliable CC in half-map FSC. Used to decide at what CC value to smooth the remaining CC values. Also used to decide whether scale_using_last will apply</span></li><li class="phil-param" data-expert="0"><span class="phil-name">correct_for_final_value</span><span class="phil-words"> = True </span><span class="phil-help">Correct FSC values for correlated errors by assuming that the last smoothed value represents the correlated error</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_cc_for_rescale</span><span class="phil-words"> = 0.1 </span><span class="phil-help">Min reliable CC in half-maps. Used along with cc_cut and scale_using_last to correct for small errors in FSC estimation at high resolution. If the value of FSC near the high-resolution limit is above max_cc_for_rescale, assume these values are correct and do not correct them.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scale_using_last</span><span class="phil-words"> = 3 </span><span class="phil-help">If set, assume that the last scale_using_last bins in the FSC for half-map or model sharpening are about zero (corrects for errors int the half-map process). Only applies if these values are less than cc_cut</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mask_atoms_atom_radius</span><span class="phil-words"> = 5 </span><span class="phil-help">Atom radius in model masking</span></li><li class="phil-param" data-expert="0"><span class="phil-name">control_no_denmod</span><span class="phil-words"> = False </span><span class="phil-help">Run dummy density modification just flattening solvent as estimated by probability mask</span></li><li class="phil-param" data-expert="0"><span class="phil-name">zero_solvent</span><span class="phil-words"> = False </span><span class="phil-help">Zero solvent region (for testing)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">randomize_solvent</span><span class="phil-words"> = False </span><span class="phil-help">Randomize solvent region (for testing). Also set solvent_content and solvent_noise_ratio to run this.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_noise_ratio</span><span class="phil-words"> = 0.4 </span><span class="phil-help">Solvent noise ratio for randomize_solvent</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_bins_for_solvent_noise</span><span class="phil-words"> = True </span><span class="phil-help">Use bins in solvent noise</span></li><li class="phil-param" data-expert="0"><span class="phil-name">require_non_identical_half_maps</span><span class="phil-words"> = True </span><span class="phil-help">Require half maps that are not identical</span></li><li class="phil-param" data-expert="0"><span class="phil-name">density_modify_unsharpened_maps</span><span class="phil-words"> = None </span><span class="phil-help">Use unsharpened (original) half maps in density modification. Normally using the sharpened map is better but it may be worth trying with unsharpened maps.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">default_fom</span><span class="phil-words"> = 0.9 </span><span class="phil-help">Default FOM value if unknown</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">anisotropy</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">remove_aniso</span><span class="phil-words"> = True </span><span class="phil-help">Remove anisotropy from data and optionally sharpen before density modification</span></li><li class="phil-param" data-expert="0"><span class="phil-name">b_iso</span><span class="phil-words"> = None </span><span class="phil-help">Target overall B value for anisotropy correction. Ignored if remove_aniso = False. If None, default is target_b_ratio*resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_b_iso</span><span class="phil-words"> = None </span><span class="phil-help">Default maximum overall B value for anisotropy correction. Ignored if remove_aniso = False. Recommended if b_iso is set. If used, default is minimum of (max_b_iso, B of dataset, target_b_ratio*resolution)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_b_ratio_list</span><span class="phil-words"> = 10. 20. </span><span class="phil-help">Set of ratios of target B to resolution to try. Applied if quick = False and ignored if remove_aniso = False or b_iso is set</span></li><li class="phil-param" data-expert="0"><span class="phil-name">target_b_ratio</span><span class="phil-words"> = 10. </span><span class="phil-help">Default ratio of target B value to resolution for anisotropy correction. Ignored if remove_aniso = False. Ignored if quick or b_iso is set. If used, default is minimum of (max_b_iso,                     B of dataset, target_b_ratio*resolution)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">quick</span><span class="phil-words"> = True </span><span class="phil-help">Quick run, do not optimize dm_resolution, target_b_iso or histogram database. Turns off real_space_weighting and sigma_weighting unless they are set.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ignore_symmetry_conflicts</span><span class="phil-words"> = False </span><span class="phil-help">Ignore symmetry conflicts in input files</span></li><li class="phil-param" data-expert="0"><span class="phil-name">wrapping</span><span class="phil-words"> = False </span><span class="phil-help">Allow wrapping of map around boundaries</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ignore_limitations</span><span class="phil-words"> = False </span><span class="phil-help">Ignore restrictions on what can be run</span></li><li class="phil-param" data-expert="0"><span class="phil-name">stop_after_mask</span><span class="phil-words"> = False </span><span class="phil-help">Stop after getting mask</span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_dirs</span><span class="phil-words"> = 1000 </span><span class="phil-help">Maximum number of directories (trace_and_build_xxx)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_size</span><span class="phil-words"> = None </span><span class="phil-help">Size of resolve to use. </span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_command_file</span><span class="phil-words"> = None </span><span class="phil-help">File with commands for resolve</span></li><li class="phil-param" data-expert="0"><span class="phil-name">multiprocessing</span><span class="phil-words"> = *multiprocessing sge lsf pbs condor pbspro slurm </span><span class="phil-help">Choices are multiprocessing (single machine) or queuing systems</span></li><li class="phil-param" data-expert="0"><span class="phil-name">queue_run_command</span><span class="phil-words"> = None </span><span class="phil-help">run command for queue jobs. For example qsub.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of processors to use. NOTE: by default multiple processors will only be used in the map-to-model step (this is because multiprocessing requires writing out nproc sets of huge files and it can be very slow with distributed queues.). You can override this with force_nproc = True.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">force_nproc</span><span class="phil-words"> = False </span><span class="phil-help">Use all processors in all steps. If not set then multiprocessing will not be used in average_maps</span></li><li class="phil-param" data-expert="3"><span class="phil-name">random_seed</span><span class="phil-words"> = 171731 </span><span class="phil-help">Random seed</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_wait_time</span><span class="phil-words"> = 1 </span><span class="phil-help">Max time to wait for files to appear. Increase if files seem to be missing during run.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">test_gui</span><span class="phil-words"> = None </span><span class="phil-help">Run from command line but test GUI features</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

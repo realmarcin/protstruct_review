@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Removing protein chains built into RNA density with remove_poor_fragments</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="removing-protein-chains-built-into-rna-density-with-remove-poor-fragments">
+<h1 class="title">Removing protein chains built into RNA density with remove_poor_fragments</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>remove_poor_fragments: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>This routine takes a model that contains RNA and protein and tries to
+identify fragments of protein that were accidentally built into RNA
+density.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+<p>When carrying out model-building for complexes between protein and RNA it
+sometimes happens that protein can be built accidentally into regions that
+are really RNA. The phenix.remove_poor_fragments tool is used to try and
+identify such incorrectly-built regions.</p>
+</div>
+<div class="section" id="how-remove-poor-fragments-works">
+<h1>How remove_poor_fragments works:</h1>
+<p>The key idea in this approach is that these incorrectly-built regions tend
+to be isolated (not in the middle of a protein domain) and to have lower
+map-model correlation than the correct parts of the protein chains.  The
+phenix.remove_poor_fragments tool ranks all protein segments on these
+criteria and removes the worst ones. The threshold that is chosen based
+on the number of residues of RNA expected in the molecule that were not
+built, the fraction of protein that was built, and the quality of the
+model, using the formula:</p>
+<p>residues_to_remove = A * protein_built * rna_not_built/(cc*protein_present)</p>
+<p>where cc is the map-model correlation for the protein part of the model,
+protein_present is the number of protein residues in the sequence file,
+protein_built are residues of protein built, and rna_not_built are
+residues of RNA in the sequence file minus the number built.</p>
+<p>The logic of this formula is that there is a certain volume, proportional
+to rna_not_built, that is really RNA that might be accidentally built as
+protein. Furthermore the logic is that the number of residues of protein
+that might be built in that volume is higher if more residues of protein
+have been built and higher if the model-map correlation for the protein
+model is low. These relationships were seen in an analysis of ribosome
+structures. A scale factor A of 0.53 relating the optimal number of
+residues to remove to the other factors was found empirically.</p>
+</div>
+<div class="section" id="output-files-from-remove-poor-fragments">
+<h1><em>Output files from remove_poor_fragments</em></h1>
+<p><strong>trimmed_pdb.pdb</strong>: A PDB file with your trimmed model.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-remove-poor-fragments">
+<h1>Standard run of remove_poor_fragments:</h1>
+<p>Running remove_poor_fragments is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.remove_poor_fragments model_with_protein_and_rna.pdb \
+   seq.dat \
+   map.ccp4
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">map_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Map file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_file</span><span class="phil-words"> = None </span><span class="phil-help">File with map coefficients (alternative to map file)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeffs_labels</span><span class="phil-words"> = None </span><span class="phil-help">Optional label specifying which columns of of map coefficients to use</span></li><li class="phil-param" data-expert="0"><span class="phil-name">model_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Model file names. Normally only one specified.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_pdb_file_name</span><span class="phil-words"> = trimmed_pdb.pdb </span><span class="phil-help">Model file name</span></li><li class="phil-param" data-expert="0"><span class="phil-name">seq_file_name</span><span class="phil-words"> = None </span><span class="phil-help">Sequence file name. Used to calculate n_protein_in_complex, n_rna_in_complex and rna_ratio</span></li><li class="phil-param" data-expert="0"><span class="phil-name">select_good_models</span><span class="phil-words"> = True </span><span class="phil-help">Select good models from input models and write to output PDB file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cutoff_method</span><span class="phil-words"> = *volume_of_rna_not_built sigma_cutoff </span><span class="phil-help">Choice of method for deciding how many residues to remove. Volume of RNA not built means calculate the volume in the structure that should be RNA, subtract the volume of RNA actually built, weight by 1/mean map CC and the scale factor rna_volume_ratio. Sigma cutoff means use a cutoff based on resolution and ratio of RNA:protein residues in the model with parameters. Default is Volume of RNA not built.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rna_volume_ratio</span><span class="phil-words"> = 0.53 </span><span class="phil-help">Scale factor on RNA volume used to decide how many residues to remove.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_protein_in_complex</span><span class="phil-words"> = None </span><span class="phil-help">Number of protein residues in complex. Normally obtained from sequence file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_rna_in_complex</span><span class="phil-words"> = None </span><span class="phil-help">Number of RNA residues in complex. Normally obtained from sequence file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_protein_in_model</span><span class="phil-words"> = None </span><span class="phil-help">Number of protein residues in model. Normally obtained from the input model. Note distinction from n_protein_in_complex which is how many there are based on the sequence file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_rna_in_model</span><span class="phil-words"> = None </span><span class="phil-help">Number of RNA residues in model. Normally obtained from the input model. Note distinction from n_protein_in_complex which is how many there are based on the sequence file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rna_ratio</span><span class="phil-words"> = None </span><span class="phil-help">Used to estimate optimal cutoff in sigma_cutoff method. Calculated automatically from sequence file. Note that this whole procedure is optimized for cases where the rna_ratio is greater than 0.2.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">toss_sigma_cutoff_a</span><span class="phil-words"> = 1.4 </span><span class="phil-help">For sigma_cutoff method, At the conclusion of the procedure, the worst portion of chains, with low z-scores, is removed. The cutoff is toss_sigma_cutoff=toss_sigma_cutoff_a+ toss_sigma_cutoff_b*(resolution-3.0)+ toss_sigma_cutoff_c*(rna_ratio-0.5). You can just set the value by setting toss_sigma_cutoff_a and setting toss_sigma_cutoff_b and toss_sigma_cutoff_c to zero. To accept a few more chains, increase toss_sigma_cutoff_a by a little (try 0.1 higher).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">toss_sigma_cutoff_b</span><span class="phil-words"> = -1.1 </span><span class="phil-help">For sigma_cutoff method, At the conclusion of the procedure, the worst portion of chains, with low z-scores, is removed. The cutoff is toss_sigma_cutoff=toss_sigma_cutoff_a+ toss_sigma_cutoff_b*(resolution-3.0)+ toss_sigma_cutoff_c*(rna_ratio-0.5)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">toss_sigma_cutoff_c</span><span class="phil-words"> = -3.3 </span><span class="phil-help">For sigma_cutoff method, At the conclusion of the procedure, the worst portion of chains, with low z-scores, is removed. The cutoff is toss_sigma_cutoff=toss_sigma_cutoff_a+ toss_sigma_cutoff_b*(resolution-3.0)+ toss_sigma_cutoff_c*(rna_ratio -0.5)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">Resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">metrics</span><span class="phil-words"> = *mean_delta_rama *map_value *cc fraction_with_neighbor n_residues fraction_favored </span><span class="phil-help">Metrics for a chain (fragment) being likely to be correct. Mean_delta_rama is mean change in Ramachandran angles between neighboring residues. Map_value is maximum map value at coordinates of a CA atom in chain for low_resolution map (typically 30 A) calculated from the model. Fraction_with_neighbor is fraction of residues in a chain near another chain. N_residues is length of chain. Fraction_favored is fraction of residues with favored Ramachandran angles</span></li><li class="phil-param" data-expert="0"><span class="phil-name">low_resolution_map_d_min</span><span class="phil-words"> = 30 </span><span class="phil-help">Resolution for low-resolution map showing location of molecule</span></li><li class="phil-param" data-expert="0"><span class="phil-name">distance_cutoff</span><span class="phil-words"> = 7 </span><span class="phil-help">In Score for fraction_with_neighbor, a residue in the same chain has to be within distance_cutoff to count as being close to another chain</span></li><li class="phil-param" data-expert="0"><span class="phil-name">any_in_series</span><span class="phil-words"> = 4 </span><span class="phil-help">Score for fraction_with_neighbor, fraction of residues in a chain that are near another chain, counts a residue as close if any residue in a string of any_in_a_series is near another chain</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_offset</span><span class="phil-words"> = 10 </span><span class="phil-help">In Score for fraction_with_neighbor, a residue in the same chain has to be separated by n_offset to count as being from another chain</span></li><li class="phil-param" data-expert="0"><span class="phil-name">atom_selection</span><span class="phil-words"> = "name ca and (not element Ca)" </span><span class="phil-help">Specification of atoms to use in fraction_with_neighbor. Normally CA only</span></li><li class="phil-param" data-expert="0"><span class="phil-name">top_half_value</span><span class="phil-words"> = 2. </span><span class="phil-help">The top set of chains (typically about one half) are used to estimate statistics for good chains. Value is 1/top_half_value.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cross_validate</span><span class="phil-words"> = True </span><span class="phil-help">Cross-validate values of mean/sd for each metric.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimize_weights</span><span class="phil-words"> = False </span><span class="phil-help">Optimize weights. Develpment only. Only applies if model_file_name specifies a model with good chains in a structure, second_model_file_name specifies one with poor chains in the same structure, and weights are to be optimized.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_cycle</span><span class="phil-words"> = 2 </span><span class="phil-help">Number of minor cycles of estmation of histograms.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_big_cycle</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of big cycles of estmation of histograms.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_mean_delta_rama</span><span class="phil-words"> = 1 </span><span class="phil-help">Weight on mean_delta_rama metric</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_map_value</span><span class="phil-words"> = 1 </span><span class="phil-help">Weight on map_value metric</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_cc</span><span class="phil-words"> = 1 </span><span class="phil-help">Weight on cc metric</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_fraction_favored</span><span class="phil-words"> = 1 </span><span class="phil-help">Weight on fraction_favored metric</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_n_residues</span><span class="phil-words"> = 1 </span><span class="phil-help">Weight on n_residues metric</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_fraction_with_neighbor</span><span class="phil-words"> = 1 </span><span class="phil-help">Weight on fraction_with_neighbor metric</span></li><li class="phil-param" data-expert="0"><span class="phil-name">minimum_number_of_fragments</span><span class="phil-words"> = 10 </span><span class="phil-help">Minimum number of fragments evaluated with a metric to use that metric.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">distance_cutoff_for_split_model</span><span class="phil-words"> = 5. </span><span class="phil-help">Distance cutoff for splitting chain into fragments.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

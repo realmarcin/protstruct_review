@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Generating a polder map</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="generating-a-polder-map">
+<h1 class="title">Generating a polder map</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="polder.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="polder.html#overview" id="toc-entry-1">Overview</a></li>
+<li><a class="reference internal" href="polder.html#running-the-program" id="toc-entry-2">Running the program</a></li>
+<li><a class="reference internal" href="polder.html#video-tutorial" id="toc-entry-3">Video Tutorial</a></li>
+<li><a class="reference internal" href="polder.html#how-to-interpret-the-output-log-file" id="toc-entry-4">How to interpret the output .log file</a></li>
+<li><a class="reference internal" href="polder.html#examples" id="toc-entry-5">Examples</a></li>
+<li><a class="reference internal" href="polder.html#what-if-no-ligand-has-been-modeled-yet" id="toc-entry-6">What if no ligand has been modeled yet?</a></li>
+<li><a class="reference internal" href="polder.html#other-options" id="toc-entry-7">Other options</a></li>
+<li><a class="reference internal" href="polder.html#reference" id="toc-entry-8">Reference</a></li>
+<li><a class="reference internal" href="polder.html#list-of-all-available-keywords" id="toc-entry-9">List of all available keywords</a></li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h1><a class="toc-backref" href="polder.html#toc-entry-1">Overview</a></h1>
+<p>A polder map is an omit map which excludes the bulk solvent around the
+omitted region. This way, weak densities, which can be obscured by bulk
+solvent, may become visible. Typical omitted regions are:</p>
+<blockquote>
+<ul class="simple">
+<li>ligands</li>
+<li>residues protruding into solvent area and with unclear side chain
+orientations (such as lysine, arginine, etc.)</li>
+<li>C- or N-terminal residues</li>
+</ul>
+</blockquote>
+<p>It is not recommended to omit large portions of the model at once (as
+the excluded bulk solvent volume might become too large) or to omit
+single atoms. Instead: several residues or one ligand are typical
+selections for polder maps. It should be kept in mind that <tt class="docutils literal">phenix.polder</tt>
+does map calculations, no bias-removal strategies (such as refinement,
+annealing, etc.) are applied.</p>
+<p>A presentation file with examples can be found <a class="reference external" href="https://www.phenix-online.org/presentations/phenix_polder.pdf">here</a>.</p>
+</div>
+<div class="section" id="running-the-program">
+<h1><a class="toc-backref" href="polder.html#toc-entry-2">Running the program</a></h1>
+<p><tt class="docutils literal">phenix.polder</tt> can be executed via the GUI, or the command line:</p>
+<pre class="literal-block">
+% phenix.polder model.pdb data.mtz selection='chain B and resseq 3'
+</pre>
+<p>This command calculates an omit map of residue 3 in chain B. Common file
+formats are supported (.pdb and .cif for models; .mtz, .hkl files for data).
+The syntax for the <a class="reference external" href="atom_selections.html">selections</a> is the same as used
+by other phenix tools.</p>
+<p>The output of <tt class="docutils literal">phenix.polder</tt> consists of a single MTZ file, named
+<tt class="docutils literal">polder_map_coeffs.mtz</tt> by default. This file will contain amplitudes and phases
+for two maps:</p>
+<blockquote>
+<ul class="simple">
+<li><strong>mFo-DFc_polder:</strong> map coefficients of polder omit map</li>
+<li><strong>mFo-DFc_omit:</strong> map coefficients for omit map where bulk solvent floods into
+omitted region. It is equivalent to remove the selection from the model and
+to calculate a difference map. This map can be used for comparison with the
+polder map.</li>
+</ul>
+</blockquote>
+<p>To load the maps manually in Coot, choose the &quot;Open MTZ, mmCIF, fcf or phs...&quot;
+option and activate the &quot;Is a Difference Map&quot; option in the window which opens
+after choosing the filename</p>
+</div>
+<div class="section" id="video-tutorial">
+<h1><a class="toc-backref" href="polder.html#toc-entry-3">Video Tutorial</a></h1>
+<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/TcTuMJayh5c?ecver=2" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" ></iframe></div><p>The <a class="reference external" href="https://youtu.be/TcTuMJayh5c">tutorial video</a> is available on the
+<a class="reference external" href="https://www.youtube.com/channel/UCcdI0hfHngWAZLJWynxPQWg">Phenix YouTube channel</a> and covers the
+following topics:</p>
+<ul class="simple">
+<li>basic overview</li>
+<li>how to run phenix.polder via the GUI</li>
+<li>example of a polder map for molecule MES 88 in structure 1ABA</li>
+</ul>
+</div>
+<div class="section" id="how-to-interpret-the-output-log-file">
+<h1><a class="toc-backref" href="polder.html#toc-entry-4">How to interpret the output .log file</a></h1>
+<p>After running <tt class="docutils literal">phenix.polder</tt>, a log file called 'polder.log' is created in the
+output directory.
+The log file can be viewed by clicking on the &quot;Run status&quot; tab after the job is
+finished. Alternatively, the log file can be opened from the command line.</p>
+<p>The log file can be divided in five parts:</p>
+<p><strong>1. Summary of input parameters:</strong> As most phenix tools, the header of the log file
+lists the input parameters used to perform the calculations.</p>
+<p><strong>2. List of atoms used for the polder OMIT selection:</strong> The atoms which are used to
+define the region where the bulk solvent is excluded are listed here. It is
+recommended to check this list to see if the atom selection was correct. The
+list is in PDB format, therefore containing the atom name, residue number,
+chain, coordinates, etc.</p>
+<p><strong>3. Crystallographic R- and Rfree-factors:</strong> for the unmodified input model and
+data, for polder map computation and for 'conventional' OMIT map
+calculation</p>
+<p><strong>4. List of correlation coefficients for assessing the confidence of
+interpreting the polder map:</strong> Details on how these CC values are calculated
+are described in the paper about <tt class="docutils literal">phenix.polder</tt> (see reference at the end
+of the page). If CC(1,3) is larger than CC(1,2) and CC(2,3), then the density
+most likely corresponds to the atomic features of the polder OMIT selection.
+If CC(1,2) and CC(2,3) are larger or comparable to CC(1,3), then the density
+in the OMIT region resembles to bulk solvent density.</p>
+<p><strong>5. Values for plotting the Discrepancy function D(q).</strong> This table should be
+rarely used.</p>
+<img alt="../images/polder3.png" src="../images/polder3.png" />
+<img alt="../images/polder4.png" src="../images/polder4.png" />
+</div>
+<div class="section" id="examples">
+<h1><a class="toc-backref" href="polder.html#toc-entry-5">Examples</a></h1>
+<p>The following two figures show examples where polder maps are more informative
+than conventional OMIT maps.</p>
+<img alt="../images/polder1.png" src="../images/polder1.png" />
+<p>Solvent molecule MES88 in structure 1ABA. The positive
+and negative mFobs-DFmodel OMIT difference density is displayed in green and red,
+respectively. (a) OMIT map contoured at +/-3σ. (b) Polder map contoured at +/-3σ.
+In the OMIT map, there is only some density for the O, N and S atoms.
+The polder map shows difference electron density for the entire molecule</p>
+<img alt="../images/polder2.png" src="../images/polder2.png" />
+<p>Residue Gln H105 in structure 1F8T: (a) Original 2mFobs-DFmodel (blue, 1σ contour)
+and mFobs-DFmodel maps,(b) OMIT map and (c) polder map f. The positive and negative
+mFobs-DFmodel difference density contoured at 3σ is displayed in green and red,
+respectively. In (c), the GLN side chain was real space refined in COOT.
+There is no density for the GLN side chain in the 2mFobs-DFmodel map (a),
+and the residual mFobs-DFmodel map has a negative peak at the side chain position,
+suggesting that the modeled orientation is incorrect. The OMIT map (b) shows
+no density for the glutamine side chain. The polder map shows continuous v-shaped
+density suggesting a different orientation for the side chain (c).</p>
+</div>
+<div class="section" id="what-if-no-ligand-has-been-modeled-yet">
+<h1><a class="toc-backref" href="polder.html#toc-entry-6">What if no ligand has been modeled yet?</a></h1>
+<p>To compute a polder map, the ligand has to be present in the model.
+To calculate a difference map excluding locally the bulk solvent around a
+density peak, use the compute_box option of polder, which has a separate
+<a class="reference external" href="polder_box.html">documentation page</a> .</p>
+</div>
+<div class="section" id="other-options">
+<h1><a class="toc-backref" href="polder.html#toc-entry-7">Other options</a></h1>
+<p>There are several other programs in Phenix for calculating omit maps.</p>
+<blockquote>
+<ul class="simple">
+<li><a class="reference external" href="composite_omit_map.html">phenix.composite_omit_map</a> can produce
+relatively bias-free maps by computing a number of omit maps covering
+specific regions, and then combining the areas around the omitted regions.
+Default options allows the bulk solvent mask to extend into the omitted
+region</li>
+<li><a class="reference external" href="refinement.html">phenix.refine</a> can be used to manually generate omit
+maps for a smaller selection of the model by specifying the
+<tt class="docutils literal">omit_selection</tt> keyword.  The single-omit mode of the composite omit
+map program is equivalent to this.</li>
+<li><a class="reference external" href="maps.html">phenix.maps</a> can generate simple omit maps without refinement.</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="reference">
+<h1><a class="toc-backref" href="polder.html#toc-entry-8">Reference</a></h1>
+<p><a class="reference external" href="https://scripts.iucr.org/cgi-bin/paper?ba5254">D. Liebschner, P. V. Afonine, N. W. Moriarty, B. K. Poon, O. V. Sobolev,
+T. C. Terwilliger and P. D. Adams, Polder maps: Improving OMIT maps by
+excluding bulk-solvent, Acta Cryst. D, 73, 148-157</a></p>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1><a class="toc-backref" href="polder.html#toc-entry-9">List of all available keywords</a></h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_exclusion_mask_selection</span><span class="phil-words"> = None </span><span class="phil-help">Atoms around which bulk solvent mask is set to zero</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scattering_table</span><span class="phil-words"> = *n_gaussian wk1995 it1992 neutron electron </span><span class="phil-help">Scattering table for structure factors calculations</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_file_name_prefix</span><span class="phil-words"> = None </span><span class="phil-help">Prefix for output filename</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mask_output</span><span class="phil-words"> = False </span><span class="phil-help">Additional output: ccp4 maps containing the solvent mask for inital model (mask_all.ccp4), when ligand is omitted (mask_omit.ccp4) and the mask used for polder (mask_polder.ccp4)</span></li><li class="phil-param" data-expert="3"><span class="phil-name">debug</span><span class="phil-words"> = False </span><span class="phil-help">Additional output: biased omit map (ligand used for mask calculation but omitted from model)</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">polder</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">resolution_factor</span><span class="phil-words"> = 0.25 </span><span class="phil-help">Used to determine the grid step = resolution_factor * high resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">sphere_radius</span><span class="phil-words"> = 5 </span><span class="phil-help">Radius of sphere around atoms where solvent mask is reset to zero</span></li><li class="phil-param" data-expert="0"><span class="phil-name">box_buffer</span><span class="phil-words"> = None </span><span class="phil-help">Buffer around selection box: Increase the box for resetting the mask by a buffer.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">compute_box</span><span class="phil-words"> = False </span><span class="phil-help">Reset mask within a box (parallel to unit cell axes) defined by an atom selection</span></li><li class="phil-param" data-expert="0"><span class="phil-name">altloc_scale</span><span class="phil-words"> = False </span><span class="phil-help">Apply special scaling procedure for alternate conformations (only one residue, no mix)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">data_column_label</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">free_column_label</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

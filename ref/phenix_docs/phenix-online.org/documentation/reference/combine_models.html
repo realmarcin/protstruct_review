@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Merging two models with combine_models</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="merging-two-models-with-combine-models">
+<h1 class="title">Merging two models with combine_models</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>combine_models: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>This routine takes a model and finds pieces of a second model file that
+improve its fit to density when they replace the corresponding pieces in
+the first model.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+<p>The main uses of phenix.combine_models are:</p>
+<ul class="simple">
+<li>Taking the best parts of 2 models and merging them to make a new
+model.</li>
+<li>Replacing a segment in one model with a corresponding segment from
+another.</li>
+</ul>
+</div>
+<div class="section" id="how-combine-models-works">
+<h1>How combine_models works:</h1>
+<p>The phenix.combine_models tool can combine the best parts of two or more
+models. You can use it in either of two different ways.
+One approach keeps segments in the models intact, and the
+second applies crossovers within segments.</p>
+<p>In the first approach (merge_by_segment_correlation=True), each fragment
+in each model is scored based on correlation to the map. The scoring also
+includes a weight based on the square root of the length of the segment. It
+also includes weights based on whether a segment has been assigned to the
+sequence and the number of secondary structure hydrogen bonds in that
+segment.  This approach can combine chains of different types as well. A
+final increment is added to the score for a segment if it is considered
+very likely to be correct with different thresholds for chains of
+different types.</p>
+<p>Then the segments are picked in rank order to create a composite model. Any
+part of a segment that does not overlap an existing part of the composite
+model is kept. If symmetry is present, overlaps include that symmetry.</p>
+<p>In the second approach, (merge_by_segment_correlation=False), a working
+model is created by taking all of the first model supplied and filling
+in any empty regions with fragments from other models. Then one by one,
+the segments in the working model are recombined with all other segments.
+To carry out recombination between two chains, residues that match in the
+two chains are identified. Then for each segment between matching pairs of
+residues, whichever chain has the higher correlation to the map is kept to
+create a composite model.</p>
+<p>This second approach to combine_models starts with two input models.
+The first model is used as the default; if nothing can be found in the
+second model that is better
+than what is in the first model, then that part of the first model is
+kept. The second model is used as a template for improving the first
+model. Fragments of the second model are considered as alternatives for
+corresponding segments in the first model.</p>
+<p>The fit of the models to density is used to decide which of a pair of
+fragments is best. In general, the correlation of model density with the
+map is used as the criterion. In cases where unequal numbers of residues
+are considered, then this correlation is weighted by the square root of
+the number of residues in each case. During the optional
+merge_second_model step, the scoring is optionally based on
+correlation of density, or by default, based on density at the positions
+of the main-chain atoms in the model.</p>
+<p>If the two input models are not in the same asymmetric unit of the
+crystal, then combine_models will move the pieces from the second model
+to the corresponding locations in the first model. In this way the final
+model has all its parts in the same place.</p>
+<p>The second approach in combine_models has four main steps, each of
+which is optional:</p>
+<ul class="simple">
+<li>Selecting parts of the input models to consider, using atom
+selections. This step allows you to do things such as removing a
+segment from the first model, then crossing with the corresponding
+segment from the second model, effectively replacing that segment in
+a way that you specify.</li>
+<li>Creating as complete a starting model as possible
+(merge_second_model=True). This is done by cutting the second model
+into small pieces and reassembling the first model, considering these
+pieces along with all the segments in the first model as potential
+pieces of the reassembled model. The result is a new working model.</li>
+<li>Crossing the working model with the second input model, allowing only
+equal-length crossovers (matching=True). In this step, pairs of
+segments in the working model and the second input model that have
+overlapping residues are considered, one at a time. The local map
+correlation is calculated for each residue in each fragment. Then at
+each position, the coordinates from one fragment or the other are
+chosen, with the choice crossing over between one fragment and the
+other only at positions where the main-chain atoms in the residue are
+within match_distance (default 0.5 A) of each other.</li>
+<li>Crossing the working model with the second input model, allowing only
+unequal-length crossovers (non_matching=True). This step is just
+like the previous one, except that only unequal-length crossovers are
+considered. If this method is included, then it may be necessary to
+reassign the sequence afterwards as the alignment may change</li>
+<li>Checking the sequence. If unequal-length crossovers are made, then
+the sequence alignment to the model may need to be changed. This step
+carries that out.</li>
+</ul>
+</div>
+<div class="section" id="output-files-from-combine-models">
+<h1><em>Output files from combine_models</em></h1>
+<p><strong>combine_models.pdb</strong>: A PDB file with your combined model.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-combine-models">
+<h1>Standard run of combine_models:</h1>
+<p>Running combine_models is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.combine_models pdb_in=first.pdb \
+   second_pdb_in=second.pdb \
+   seq.dat \
+   map_coeffs.mtz
+</pre>
+<p>This will combine first.pdb and second.pdb based on fit to the map from
+map_coeffs.mtz, recheck the sequence alignment to seq.dat, and write
+out the resulting model.</p>
+</div>
+<div class="section" id="ranking-all-fragments-and-picking-the-best-ones">
+<h1>Ranking all fragments and picking the best ones:</h1>
+<blockquote>
+<dl class="docutils">
+<dt>phenix.combine_models pdb_in=model.pdb </dt>
+<dd>seq.dat map_coeffs.mtz merge_by_segment_correlation=True</dd>
+</dl>
+</blockquote>
+<p>This will score each segment (fragment), then work down from best to worst,
+keeping any part of any segment that does not overlap with a better-scoring
+segment.</p>
+</div>
+<div class="section" id="selecting-pieces-from-the-two-models">
+<h1>Selecting pieces from the two models:</h1>
+<p>To take first.pdb and then see if residues A21-A30 of second.pdb can
+improve it, you can type:</p>
+<pre class="literal-block">
+phenix.combine_models pdb_in=first.pdb \
+   second_pdb_in=second.pdb \
+   seq.dat \
+   map_coeffs.mtz \
+   second_pdb_in_atom_selection=&quot;(chain A and resid 21:30)&quot; \
+</pre>
+</div>
+<div class="section" id="replacing-a-specific-segment">
+<h1>Replacing a specific segment:</h1>
+<p>To take first.pdb and then see if residues A21-A30 and B21-B30 can be
+improved by replacing them with residues C10-C20 and D10-D20 of
+second.pdb, you can tell combine_models to ignore residues A22-A29 and
+B22-B29 and to consider only residues C10-C20 and D10-D20 of second.pdb:</p>
+<pre class="literal-block">
+phenix.combine_models pdb_in=first.pdb \
+   second_pdb_in=second.pdb \
+   seq.dat \
+   map_coeffs.mtz \
+   pdb_in_atom_selection=&quot;(not  ( (chain A or chain B) and resid 22:29) )&quot; \
+   second_pdb_in_atom_selection=&quot;( (chain C or chain D) and resid 10:20)&quot; \
+</pre>
+</div>
+<div class="section" id="crossing-two-models-that-have-entirely-matched-residues">
+<h1>Crossing two models that have entirely matched residues:</h1>
+<p>If your first.pdb and second.pdb have exactly the same residues present,
+and just differ in coordinates, then you might want to preserve all the
+connectivity by skipping the merge_second_model step, and by skipping
+the non_matching crossover step, and by skipping the reassignment of
+sequence. You can type preserve_connectivity=True as a shortcut for
+this:</p>
+<pre class="literal-block">
+phenix.combine_models pdb_in=first.pdb \
+   second_pdb_in=second.pdb \
+   seq.dat \
+   map_coeffs.mtz \
+   preserve_connectivity=True
+</pre>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+<p>If you are supplying a very big map, running combine_models can require a lot
+of memory.  In this case, you may want to run map_box
+with your map and a model file that contains all your models.  This will box
+the map around the region where your models
+are located and make a much smaller map that will require less memory.</p>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb_in</span><span class="phil-words"> = None </span><span class="phil-help">Input starting PDB file. This model will be the default output model. Parts of the model that are better in the second model  be replaced by the second model.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">pdb_in_atom_selection</span><span class="phil-words"> = None </span><span class="phil-help">Any selection specified with pdb_in_atom_selection is  applied to the pdb_in input model before using it.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">second_pdb_in</span><span class="phil-words"> = None </span><span class="phil-help">Input second PDB file.  Parts that are better in this model will replace corresponding parts of the first model.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">second_pdb_in_atom_selection</span><span class="phil-words"> = None </span><span class="phil-help">Any selection specified with second_pdb_in_atom_selection is  applied to the second_pdb_in input model before using it . If multiple second_pdb_in files are supplied, the same number  of atom selections are expected.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_in</span><span class="phil-words"> = None </span><span class="phil-help">CCP4 or MRC-style map file (alternative to mtz_in)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">mtz_in</span><span class="phil-words"> = None </span><span class="phil-help">Input MTZ file with map coefficients</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_coeff_labels</span><span class="phil-words"> = None </span><span class="phil-help">If map coefficients cannot be identified automatically from your MTZ file, you can specify the label or labels  for them. (Please separate labels with blank space,  MTZ columns grouped together separated by commas with no blanks.) You can specify: map_coeff_labels (e.g., FWT,PHIFWT) amplitudes and phases (e.g., FP,SIGFP PHIB) or amplitudes, phases, weights (e.g., FP,SIGFP PHIB FOM)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">seq_file</span><span class="phil-words"> = None </span><span class="phil-help">Sequence file for sequence alignment </span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_file</span><span class="phil-words"> = None </span><span class="phil-help">Input NCS spec file for use with segment_and_split_map.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">target_output_format</span><span class="phil-words"> = *None pdb mmcif </span><span class="phil-help">Desired output format (if possible). Choices are None ( try to use input format), pdb, mmcif. If output model does not fit in pdb format, mmcif will be used. Default is pdb.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">pdb_out</span><span class="phil-words"> = combine_models.pdb </span><span class="phil-help">Output PDB file </span></li><li class="phil-param" data-expert="0"><span class="phil-name">log</span><span class="phil-words"> = combine_models.log </span><span class="phil-help">Output log file</span></li><li class="phil-param" data-expert="0"><span class="phil-name">params_out</span><span class="phil-words"> = combine_models_params.eff </span><span class="phil-help">Parameters file to rerun combine_models</span></li><li class="phil-param" data-expert="0"><span class="phil-name">linkage_output_file</span><span class="phil-words"> = linkage_output.pkl </span><span class="phil-help">Linkage dictionary</span></li><li class="phil-param" data-expert="0"><span class="phil-name">output_directory</span><span class="phil-words"> = None </span><span class="phil-help">Not used (output directory for passing to map_to_model)</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">chain_type</span><span class="phil-words"> = *PROTEIN DNA RNA </span><span class="phil-help">   You can specify whether to include protein, DNA, or RNA  If you use merge_by_segment_correlation you can include   multiple chain types and chain_type is ignored</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">High-resolution limit</span></li><li class="phil-param" data-expert="0"><span class="phil-name">solvent_content</span><span class="phil-words"> = None </span><span class="phil-help">Solvent fraction of the cell. If this is density cut out from a bigger cell, you can specify the fraction of the volume of this cell that is taken up by the macromolecule. Normally set automatically. Values go from 0 to 1.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">space_group</span><span class="phil-words"> = None </span><span class="phil-help">Space group (normally read from the data file)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">unit_cell</span><span class="phil-words"> = None </span><span class="phil-help">Unit Cell (normally read from the data file)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_inside_box</span><span class="phil-words"> = True </span><span class="phil-help">Place centers of all chains inside (0,1). This is required during normal operation.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_sg_symmetry</span><span class="phil-words"> = None </span><span class="phil-help">Not used</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">directories</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = "" </span><span class="phil-help">Output directory where files are to be written</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crossing</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">high_resolution</span><span class="phil-words"> = None </span><span class="phil-help">Resolution used in map calculation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">match_distance</span><span class="phil-words"> = 1.5 </span><span class="phil-help">Residue pairs must have rmsd of match_distance (A) or lower to  be crossed. A value between 0.5 A and 1.5 A is generally best.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">merge_by_segment_correlation</span><span class="phil-words"> = False </span><span class="phil-help">Split all models into segments (breaking where residue numbers are not sequential), rank segments by correlation to map weighted by number of atoms, take highest-scoring non-overlapping segments. Followed by standard merge with all unused segments.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_all_of_first_model</span><span class="phil-words"> = None </span><span class="phil-help">Try to keep all of first model. Applies to merge_by_segment_correlation only. Does not work fully if trim_to_au is used.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimize_ncs</span><span class="phil-words"> = False </span><span class="phil-help">Optimize NCS after merge_by_segment_correlation. NOTE: assumes that all NCS operators are allowed and may not place the resulting model in density if the NCS is not present in the density.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">trim_to_au</span><span class="phil-words"> = True </span><span class="phil-help">Split up any chains that are in multiple NCS au</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_rms</span><span class="phil-words"> = 1 </span><span class="phil-help">Weight on closest approach of fragments</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_cut</span><span class="phil-words"> = 0.90 </span><span class="phil-help">Eliminate NCS copies with CC less than cc_cut of max</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_cc</span><span class="phil-words"> = 0.1 </span><span class="phil-help">Weight on CC in optimizing NCS (typically 10)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_rad_gyr</span><span class="phil-words"> = 0.1 </span><span class="phil-help">Weight on radius of gyration in optimize_ncs</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_substitutions</span><span class="phil-words"> = 3 </span><span class="phil-help">Substitutions in optimization</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_consider</span><span class="phil-words"> = 20 </span><span class="phil-help">Substitutions in optimization applied to last n_consider fragments</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_random_opt</span><span class="phil-words"> = 0 </span><span class="phil-help">Try factor</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_optimize_tries</span><span class="phil-words"> = 500 </span><span class="phil-help">Maximum optimization steps</span></li><li class="phil-param" data-expert="0"><span class="phil-name">overlap_tolerance</span><span class="phil-words"> = None </span><span class="phil-help">Minimum separation between N/C1'/P atoms in separate chains. Applies to merge_by_segment_correlation only. Default is 3 A for C1'/P and 2 A for N</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_overlap_tolerance_factor</span><span class="phil-words"> = 1.5 </span><span class="phil-help">Overlap tolerance required for NCS-related chains. Typically larger than for chains in same NCS au to ensure they do not overlap</span></li><li class="phil-param" data-expert="0"><span class="phil-name">very_good_protein_score</span><span class="phil-words"> = 20.0 </span><span class="phil-help">Score indicating in combination with very_good_protein_cc that an PROTEIN fragment is almost certainly correct</span></li><li class="phil-param" data-expert="0"><span class="phil-name">very_good_protein_cc</span><span class="phil-words"> = 0.75 </span><span class="phil-help">CC indicating in combination with very_good_protein_score that an PROTEIN fragment is almost certainly correct</span></li><li class="phil-param" data-expert="0"><span class="phil-name">very_good_rna_score</span><span class="phil-words"> = 7.0 </span><span class="phil-help">Score indicating in combination with very_good_rna_cc that an RNA fragment is almost certainly correct</span></li><li class="phil-param" data-expert="0"><span class="phil-name">very_good_rna_cc</span><span class="phil-words"> = 0.60 </span><span class="phil-help">CC indicating in combination with very_good_rna_score that an RNA fragment is almost certainly correct</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_fractional</span><span class="phil-words"> = 0.05 </span><span class="phil-help">Minimum fraction of a chain remaining after removing parts occupied by a better-scoring chain</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_fractional_multiple_chain_types</span><span class="phil-words"> = 0.35 </span><span class="phil-help">Minimum fraction of a chain remaining after removing parts occupied by a better-scoring chain. Applies if multiple chain types are present (otherwise min_fractional applies)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_residues_in_score</span><span class="phil-words"> = 20 </span><span class="phil-help">Maximum number of residues to use when increasing score by sqrt(n_residues)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">weight_by_ss</span><span class="phil-words"> = False </span><span class="phil-help">Apply extra weight on residues with H-bonds</span></li><li class="phil-param" data-expert="0"><span class="phil-name">assignment_weight</span><span class="phil-words"> = None </span><span class="phil-help">Apply extra weight on residues assigned to sequence</span></li><li class="phil-param" data-expert="0"><span class="phil-name">extra_weight_h_bonds</span><span class="phil-words"> = 1. </span><span class="phil-help">Extra weight on residues with H-bonds</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_absolute</span><span class="phil-words"> = 5 </span><span class="phil-help">Minimum residues in a chain remaining after removing parts occupied by a better-scoring chain</span></li><li class="phil-param" data-expert="0"><span class="phil-name">merge_remainder</span><span class="phil-words"> = True </span><span class="phil-help">Merge remainder in merge_by_segment_correlation</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dump_remainder</span><span class="phil-words"> = False </span><span class="phil-help">If merge_remainder is False and dump_remainder is True, dump the remainder pdb to remainder.pdb</span></li><li class="phil-param" data-expert="0"><span class="phil-name">ncs_in_cell_only</span><span class="phil-words"> = True </span><span class="phil-help">Only consider NCS-related molecules that are in cell</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_only_if_centers_outside</span><span class="phil-words"> = False </span><span class="phil-help">Remove outside cell only if centers outside cell. Modifies remove_outside_cell. Must set remove_outside_cell as well to apply.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_outside_cell</span><span class="phil-words"> = False </span><span class="phil-help">Remove chains with atoms outside cell</span></li><li class="phil-param" data-expert="0"><span class="phil-name">merge_segments</span><span class="phil-words"> = False </span><span class="phil-help">Identify segments in first and second models For each gap or end in first model, try to insert or attach a segment from the second model. If selected, no other merging is done.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_segment_length</span><span class="phil-words"> = 5 </span><span class="phil-help">Segments shorter than this will be ignored in merge_segments.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">merge_second_model</span><span class="phil-words"> = True </span><span class="phil-help">Cut second model into pieces and merge them into first model. (Useful for filling in gaps in first model.)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">merge_both_models</span><span class="phil-words"> = False </span><span class="phil-help">Cut first and second models into pieces and merge them (useful for combining all pieces of both models). Alternative to merge_second_model.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">trim_in_merge</span><span class="phil-words"> = False </span><span class="phil-help">Trim all the fragments of first and second model back to match density before merging of models. See also remove_bad_fragments in merge which removes bad fragments (after any trimming is done).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_bad_fragments_in_merge</span><span class="phil-words"> = True </span><span class="phil-help">Remove bad fragments in merge. See also trim_in_merge which trims back fragments before trying to merge them.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">extend_in_merge</span><span class="phil-words"> = False </span><span class="phil-help">Extend fragments of first and second model  during merging of models</span></li><li class="phil-param" data-expert="0"><span class="phil-name">fragment_length</span><span class="phil-words"> = 10 </span><span class="phil-help">Length of pieces that second model will be cut down to in  merge_second_model or merge_both_models</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_cc_in_combine_extend</span><span class="phil-words"> = None </span><span class="phil-help">You can choose to use the correlation of density rather than density at atomic positions to score models in the  merge_second_model or merge_both_models step.  This  may be useful at lower resolution (&amp;gt; 3 A)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">matching</span><span class="phil-words"> = True </span><span class="phil-help">Carry out crossover using segments that match (have the same number of residues)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">non_matching</span><span class="phil-words"> = True </span><span class="phil-help">Carry out crossover using segments that do not match (do not  have the same number of residues)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">check_sequence</span><span class="phil-words"> = None </span><span class="phil-help">After running all other procedures, redo the sequence  assignment. This may be necessary if the models did not have the same sequence assignments or if unassigned  pieces are now put together and can be assigned. If None, then check_sequence will be set to True  if non_matching=True.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">preserve_connectivity</span><span class="phil-words"> = None </span><span class="phil-help">This is a shortcut for turning off merge_second_model, merge_both_models, non_matching, and check_sequence.  It is useful if your two models have the same residues, just with different  coordinates, and you want to maintain the connectivity.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">merge_only</span><span class="phil-words"> = None </span><span class="phil-help">This is a shortcut for turning off everything except  merge_second_model and merge_both_models.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">standard_merge</span><span class="phil-words"> = None </span><span class="phil-help">Merge by reading all chains and running resolve merging.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">wang_radius</span><span class="phil-words"> = 5 </span><span class="phil-help">Smoothing radius for solvent identification</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_min</span><span class="phil-words"> = 0.20 </span><span class="phil-help">Minimum map-model correlation to keep a segment after refinement</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_ratio_min</span><span class="phil-words"> = None </span><span class="phil-help">Minimum map-model correlation relative to maximum to keep a segment after refinement</span></li><li class="phil-param" data-expert="0"><span class="phil-name">combine_models_score_min</span><span class="phil-words"> = None </span><span class="phil-help">Minimum score for a chain in combine_models (after helices_strands). Score is mostly defined by sqrt(n_atoms)*overall map CC .</span></li><li class="phil-param" data-expert="0"><span class="phil-name">cc_min_rna</span><span class="phil-words"> = 0.25 </span><span class="phil-help">Minimum map-model correlation (RNA building)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">map_inside_box</span><span class="phil-words"> = None </span><span class="phil-help">Map final chains inside unit cell</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of processors to use</span></li><li class="phil-param" data-expert="0"><span class="phil-name">multiprocessing</span><span class="phil-words"> = *multiprocessing sge lsf pbs condor pbspro slurm </span><span class="phil-help">Choices are multiprocessing (single machine) or queuing systems</span></li><li class="phil-param" data-expert="0"><span class="phil-name">queue_run_command</span><span class="phil-words"> = None </span><span class="phil-help">run command for queue jobs. For example qsub.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">raise_sorry</span><span class="phil-words"> = False </span><span class="phil-help">Raise sorry if problems</span></li><li class="phil-param" data-expert="0"><span class="phil-name">return_on_failure</span><span class="phil-words"> = False </span><span class="phil-help">Just return on failure</span></li><li class="phil-param" data-expert="0"><span class="phil-name">debug</span><span class="phil-words"> = False </span><span class="phil-help">Debugging output</span></li><li class="phil-param" data-expert="0"><span class="phil-name">dry_run</span><span class="phil-words"> = False </span><span class="phil-help">Just read in and check parameter names</span></li><li class="phil-param" data-expert="0"><span class="phil-name">i_ran_seed</span><span class="phil-words"> = 351219 </span><span class="phil-help">random seed</span></li><li class="phil-param" data-expert="0"><span class="phil-name">resolve_command_list</span><span class="phil-words"> = None </span><span class="phil-help">You can supply any resolve command here NOTE: for command-line usage you need to enclose the whole set of commands in double quotes (&amp;quot;) and each individual command in single quotes (') like this:  resolve_command_list=&amp;quot;'no_build' 'b_overall 23' &amp;quot; </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

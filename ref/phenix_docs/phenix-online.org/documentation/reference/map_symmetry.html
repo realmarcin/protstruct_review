@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Identifying symmetry in a map with map_symmetry</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="identifying-symmetry-in-a-map-with-map-symmetry">
+<h1 class="title">Identifying symmetry in a map with map_symmetry</h1>
+<div class="section" id="author-s">
+<h1>Author(s)</h1>
+<ul class="simple">
+<li>map_symmetry: Tom Terwilliger</li>
+</ul>
+</div>
+<div class="section" id="purpose">
+<h1>Purpose</h1>
+<p>The routine map_symmetry will identify the symmetry in a map and create a
+file with the symmetry operations. Normally this is used to identify the
+symmetry used in processing a cryo-EM map.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage</h1>
+</div>
+<div class="section" id="how-map-symmetry-works">
+<h1>How map_symmetry works:</h1>
+<p>Map-symmetry uses the density at a set of randomly-chosen points in a map
+to identify the symmetry in a map from a set of pre-defined symmetry types that
+include point-group symmetry as well as helical symmetry.  For each possible
+symmetry, the correlation of values at symmetry-related points is calculated.
+The score for the symmetry type is the square root of the number of elements
+in the symmetry multiplied by the map correlation for that symmetry.</p>
+<p>By default, map-symmetry assumes that the principal axes of
+symmetry in a map are along
+x, y, or z, and that helical symmetry is helical along z.  The software
+has a database of 45 common symmetry elements and point groups, along with
+alternative settings of some of these. The user can specify a specific symmetry
+type to examine (e.g., I for icosahedral or D7 for a 7-fold axis along z
+perpendicular to a 2-fold axis along x or along y), or all elements in the
+database can be examined.</p>
+<p>You can also use map-symmetry to find general (point-group or non-point-group)
+symmetry using the keyword &quot;find_ncs_directly=True&quot;.  In this case a density
+search will be carried out using spheres of density in the regions where the map varies the most as templates. Any similar density (with any translations or
+rotations) will indicate map symmetry.</p>
+<p>For helical symmetry, a Fourier transform of the density is examined along the
+c* axis to find periodicity along z likely to correspond to the helical
+translation.  These likely translations (and integer fractions of them) are
+tested along with possible rotations to check for helical symmetry.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples</h1>
+</div>
+<div class="section" id="standard-run-of-map-symmetry">
+<h1>Standard run of map_symmetry:</h1>
+<p>Running map_symmetry is easy. From the command-line you can type:</p>
+<pre class="literal-block">
+phenix.map_symmetry emd_8750.map symmetry=D7
+</pre>
+<p>where emd_8750.map is a map (CCP4, mrc or other related format), and in
+this case you are specifying that only D7 symmetry should be considered.
+An output file containing the symmetry (also known as NCS in Phenix)
+operators will be created (map_symmetry.ncs_spec).</p>
+<p>You can leave the symmetry as default (symmetry=ALL), or
+you can specify symmetry
+with the name of a symmetry (symmetry=D7) or with a file with symmetry
+operators in the same format as
+map_symmetry.ncs_spec (symmetry_file=sym.ncs_spec).</p>
+<p>Note that to find helical symmetry, you have to explicitly set the
+keyword include_helical_symmetry=True.</p>
+</div>
+<div class="section" id="what-to-do-after-map-symmetry">
+<h1>What to do after map_symmetry</h1>
+<p>Map symmetry will provide you with a symmetry file that shows the symmetry
+of your cryo-EM map.  You can use this symmetry file in many later steps in
+cryo-EM structure determination, such as in density modification and
+model-building.  You can use it as well to identify the asymmetric unit
+of your map by supplying it along with your map to map_box.
+You can also use this symmetry file to construct a full
+model from just the asymmetric unit of your model using apply_ncs.</p>
+</div>
+<div class="section" id="possible-problems">
+<h1>Possible Problems</h1>
+</div>
+<div class="section" id="specific-limitations-and-problems">
+<h1>Specific limitations and problems:</h1>
+<p>Helical symmetry is assumed to be along the z-axis.</p>
+</div>
+<div class="section" id="notes-on-map-symmetry-in-phenix">
+<h1>Notes on map symmetry in Phenix:</h1>
+<p>Helical symmetry is more difficult to analyze than other symmetries.
+(a) Having the helical parameters (rotation about z, rise) is very
+helpful because finding these is not so easy and takes some time with
+map_symmetry.
+(b) Helical symmetry has several different forms as well. There is
+1-start (normal) and 2-start (two sets of helices, not handled
+automatically in Phenix).  Helical symmetry is usually identified
+using a Fourier transform along Z.
+(c) As helical symmetry is not common and takes longer to find automatically,
+finding helical symmetry is off by default and requires setting the
+keyword include_helical_symmetry to True to look for it.
+(d) Only one-start helical symmetry is found automatically. For other
+symmetries, a symmetry file (.ncs_spec) would need to be supplied.</p>
+<p>For other symmetries, having the information about symmetry type (D, O, etc)
+is slightly useful, but generally it is quick to identify these symmetries
+by direct testing.  Note that knowing that symmetry is D2 (for example)
+does not actually define the matrices. There are two settings for D2 (and
+many others), one with the two-fold along x and one with the two-fold
+along the x=y, z=0 line. It is even more complicated for icosahedral
+symmetries.</p>
+<p>Phenix uses the method mmtbx/ncs/ncs/generate_ncs_ops to generate NCS
+operators for all the common symmetries that are found in cyo-EM maps.
+If there are symmetries that we do not recognize, this is the place to
+put them.</p>
+<p>In Phenix map analysis and model building and manipulation code,
+the mmtbx.ncs.ncs object is used to handle the symmetry relationships for
+cryo-EM symmetry.  There is another NCS object that is used inside the
+model object.</p>
+</div>
+<div class="section" id="literature">
+<h1>Literature</h1>
+</div>
+<div class="section" id="additional-information">
+<h1>Additional information</h1>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1>List of all available keywords</h1>
+<p><ul class="phil"><li class="phil-param" data-expert="0"><span class="phil-name">job_title</span><span class="phil-words"> = None </span><span class="phil-help">Job title in PHENIX GUI, not used on command line</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">input_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">map_file</span><span class="phil-words"> = None </span><span class="phil-help">File with CCP4-style map.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">symmetry_file</span><span class="phil-words"> = None </span><span class="phil-help">Optional symmetry file (.ncs_spec format or BIOMT records) with reconstruction symmetry</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">output_files</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">symmetry_out</span><span class="phil-words"> = symmetry_from_map.ncs_spec </span><span class="phil-help">Output file (.ncs_spec format) describing symmetry in the map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">temp_dir</span><span class="phil-words"> = temp_dir </span><span class="phil-help">Temp directory</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">crystal_info</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">resolution</span><span class="phil-words"> = None </span><span class="phil-help">High-resolution limit for main search. This can be lower resolution than the data. The search is quicker at lower resolution. .short_caption = High-resolution limit</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_sg_symmetry</span><span class="phil-words"> = False </span><span class="phil-help">If you set use_sg_symmetry=True then the symmetry of the space group will be used. For example in P1 a point at one end of the unit cell is next to a point on the other end. Normally for cryo-EM data this should be set to False and for crystal data it should be set to True.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">reconstruction_symmetry</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">symmetry</span><span class="phil-words"> = ANY </span><span class="phil-help">Symmetry used in reconstruction. For example D7, C3, C2 I (icosahedral),T (tetrahedral), or ANY (try everything and use the highest symmetry found). Not needed if symmetry is supplied.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">must_be_consistent_with_space_group_number</span><span class="phil-words"> = None </span><span class="phil-help">Searches for symmetry must be compatible with this space group number.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">include_helical_symmetry</span><span class="phil-words"> = False </span><span class="phil-help">You can include or exclude searches for helical symmetry</span></li><li class="phil-param" data-expert="0"><span class="phil-name">symmetry_center</span><span class="phil-words"> = None </span><span class="phil-help">Center (in A) for Symmetry operators (if ncs is found automatically). If set to None, guess is the center of the cell (see use_unit_cell_center) and then if that fails, found automatically as the center of the density in the map.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">check_grid_offset</span><span class="phil-words"> = True </span><span class="phil-help">Check optimizing map center by moving up to 1 grid unit in each direction</span></li><li class="phil-param" data-expert="0"><span class="phil-name">use_unit_cell_center</span><span class="phil-words"> = True </span><span class="phil-help">Use center of full unit cell as guess of center of cell</span></li><li class="phil-param" data-expert="0"><span class="phil-name">find_ncs_directly</span><span class="phil-words"> = False </span><span class="phil-help">You can use find_ncs_from_density to find arbitrary NCS. Try this if your NCS is not proper NCS and not helical.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">optimize_center</span><span class="phil-words"> = False </span><span class="phil-help">Optimize position of symmetry center. Also checks for center at (0,0,0) vs center of map</span></li><li class="phil-param" data-expert="0"><span class="phil-name">helical_rot_deg</span><span class="phil-words"> = None </span><span class="phil-help">helical rotation about z in degrees</span></li><li class="phil-param" data-expert="0"><span class="phil-name">helical_trans_z_angstrom</span><span class="phil-words"> = None </span><span class="phil-help">helical translation along z in Angstrom units</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_helical_optimizations</span><span class="phil-words"> = 2 </span><span class="phil-help">Number of optimizations of helical parameters when finding NCS</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_helical_ops_to_check</span><span class="phil-words"> = 5 </span><span class="phil-help">Number of helical operations in each direction to check when finding NCS</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_helical_rotations_to_check</span><span class="phil-words"> = None </span><span class="phil-help">Number of helical rotations to check when finding NCS</span></li><li class="phil-param" data-expert="0"><span class="phil-name">two_fold_along_x</span><span class="phil-words"> = None </span><span class="phil-help">Specifies D or I or T two-fold is along x (True) or y (False). If None, both are tried.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">smallest_object</span><span class="phil-words"> = None </span><span class="phil-help">Dimension of smallest object to consider when finding symmetry. Default is 5 * resolution</span></li><li class="phil-param" data-expert="0"><span class="phil-name">score_basis</span><span class="phil-words"> = ncs_score cc *None </span><span class="phil-help">Symmetry score basis. Normally ncs_score (sqrt(n)* cc) is used except for identification of helical symmetry</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scale_weight_fractional_translation</span><span class="phil-words"> = 1.05 </span><span class="phil-help">Give slight increase in weighting in helical symmetry search to translations that are a fraction (1/2, 1/3) of the d-spacing of the peak of intensity in the fourier transform of the density.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">random_points</span><span class="phil-words"> = 300 </span><span class="phil-help">Number of random points in map to examine in finding symmetry</span></li><li class="phil-param" data-expert="0"><span class="phil-name">identify_ncs_id</span><span class="phil-words"> = True </span><span class="phil-help">If Symmetry is not point-group symmetry, try each possible operator when evaluating Symmetry and choose the one that results in the most uniform density at Symmetry-related points.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">min_ncs_cc</span><span class="phil-words"> = 0.80 </span><span class="phil-help">Minimum Symmetry CC to keep operators when identifying automatically</span></li><li class="phil-param" data-expert="0"><span class="phil-name">n_rescore</span><span class="phil-words"> = 5 </span><span class="phil-help">Number of Symmetry operators to rescore</span></li><li class="phil-param" data-expert="0"><span class="phil-name">op_max</span><span class="phil-words"> = 14 </span><span class="phil-help">If ncs_type is ANY, try up to op_max-fold symmetries</span></li><li class="phil-param" data-expert="0"><span class="phil-name">tol_r</span><span class="phil-words"> = 0.02 </span><span class="phil-help">tolerance in rotations for point group or helical symmetry</span></li><li class="phil-param" data-expert="0"><span class="phil-name">abs_tol_t</span><span class="phil-words"> = 2 </span><span class="phil-help">tolerance in translations (A) for point group or helical symmetry</span></li><li class="phil-param" data-expert="0"><span class="phil-name">max_helical_operators</span><span class="phil-words"> = None </span><span class="phil-help">Maximum helical operators (if extending existing helical operators)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rel_tol_t</span><span class="phil-words"> = .05 </span><span class="phil-help">tolerance in translations (fractional) for point group or helical symmetry</span></li><li class="phil-param" data-expert="0"><span class="phil-name">require_helical_or_point_group_symmetry</span><span class="phil-words"> = False </span><span class="phil-help">normally helical or point-group symmetry (or none) is expected. However in some cases (helical + rotational symmetry for example) this is not needed and is not the case.</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">control</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">nproc</span><span class="phil-words"> = 1 </span><span class="phil-help">Number of processors to use</span></li><li class="phil-param" data-expert="3"><span class="phil-name">random_seed</span><span class="phil-words"> = 171731 </span><span class="phil-help">Random seed</span></li><li class="phil-param" data-expert="0"><span class="phil-name">quick</span><span class="phil-words"> = True </span><span class="phil-help">Run quickly if possible</span></li><li class="phil-param" data-expert="0"><span class="phil-name">verbose</span><span class="phil-words"> = False </span><span class="phil-help">Verbose output</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">gui</span><span class="phil-help">GUI-specific parameter required for output directory</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">output_dir</span><span class="phil-words"> = None </span></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>

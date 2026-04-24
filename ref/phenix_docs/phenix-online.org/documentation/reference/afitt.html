@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>Running phenix.refine using AFITT gradients for ligands</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="running-phenix-refine-using-afitt-gradients-for-ligands">
+<h1 class="title">Running phenix.refine using AFITT gradients for ligands</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="afitt.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="afitt.html#authors" id="toc-entry-1">Authors</a></li>
+<li><a class="reference internal" href="afitt.html#theory-and-background" id="toc-entry-2">Theory and Background</a></li>
+<li><a class="reference internal" href="afitt.html#running-refinement-with-phenix-and-afitt" id="toc-entry-3">Running refinement with Phenix and AFITT</a></li>
+<li><a class="reference internal" href="afitt.html#auxiliary-functions" id="toc-entry-4">Auxiliary functions</a></li>
+<li><a class="reference internal" href="afitt.html#literature" id="toc-entry-5">Literature</a></li>
+</ul>
+</div>
+<div class="section" id="authors">
+<h1><a class="toc-backref" href="afitt.html#toc-entry-1">Authors</a></h1>
+<p>Pawel Janowski and Nigel W. Moriarty</p>
+</div>
+<div class="section" id="theory-and-background">
+<h1><a class="toc-backref" href="afitt.html#toc-entry-2">Theory and Background</a></h1>
+<p>AFITT refinement in Phenix combines the power and functionality of
+Phenix crystallographic refinement with OpenEye
+AFITT's <a class="citation-reference" href="afitt.html#wlodek2006" id="citation-reference-1">[Wlodek2006]</a> implementation of the
+MMFF94s <a class="citation-reference" href="afitt.html#halgren1996" id="citation-reference-2">[Halgren1996]</a> force field for accurate modeling of small
+molecule stereochemistry.  In combination they provide the user with a
+cutting-edge crystallographic refinement package while ensuring
+chemically sensible ligand geometry that significantly reduces
+conformational strain as compared to traditional
+refinement. Phenix.refine is a component of the highly regarded Phenix
+suite of crystallography software. AFITT is OpenEye's comprehensive
+package for ligands in crystallography. It provides an automated real
+space ligand fitting process, refinement dictionary generator,
+implementation of MMFF94, MMFF94s, PM3 and AM1 force fields and the
+OpenEye's core SZYBKI optimizer.</p>
+<p>Phenix.refine employs a maximum likelihood approach to minimize the
+following residual or energy function:</p>
+<blockquote>
+E_{Phenix}=E_{x-ray}+E_{geometry}</blockquote>
+<p>where, in the presence of ligands, the second term in the above
+equation can be further broken down into:</p>
+<blockquote>
+E_{geometry}=E_{protein}+E_{ligand_non-bonded}+E_{ligand_bonded}</blockquote>
+<p>Phenix-AFITT replace Phenix's bonded ligand term with an AFITT term,
+thus yielding the following final energy function:</p>
+<blockquote>
+E_{Phenix-AFITT}=E_{x-ray}+E_{geometry}-E_{ligand_bonded}^{Phenix}+E_{ligand_bonded}^{AFITT}</blockquote>
+<p>Phenix's implementation of AFITT is versatile, easy to use and powerful.
+It can support
+any ligand for which a cif dictionary has been created. Refinements
+can include different types of ligands and multiple instances of each
+ligand type. Support for ligands with full or partial alternate
+conformations is fully integrated as is refinement of ligands
+covalently bound to the macromolecule.</p>
+</div>
+<div class="section" id="running-refinement-with-phenix-and-afitt">
+<h1><a class="toc-backref" href="afitt.html#toc-entry-3">Running refinement with Phenix and AFITT</a></h1>
+<p>First, the user should make sure that the latest version of Phenix and
+AFITT are installed. On Linux and OSX, make sure that the OE_EXE
+environment variable is set and points to the execuable (usually flynn). For
+example:</p>
+<pre class="literal-block">
+[~:]$ echo $OE_EXE
+/usr/local/bin/flynn
+</pre>
+<p>Second prepare the .pdb, .mtz and .cif dictionaries for the ligand in
+your model. Now running Phenix-AFITT refinement is just a question
+of running standard Phenix.refine with some additional keywords. For
+example like this:</p>
+<pre class="literal-block">
+phenix.refine mymodel.pdb mymodel.mtz myligand.cif use_afitt=True
+       afitt.ligand_file=myligand.cif afitt.ligand_names=UNL,BCL
+</pre>
+<p>The above command will run Phenix.refine with AFITT energy and
+gradients applied to the ligands UNL and BCL according to the topology
+provided in the file myligand.cif. The following is the full list of
+AFITT-related keyword that the user can specify on the command line
+when running Phenix.refine:</p>
+<blockquote>
+<dl class="docutils">
+<dt>REQUIRED KEYWORDS</dt>
+<dd><p class="first">use_afitt - turn on ligand refinement with AFITT. (default = False)</p>
+<dl class="last docutils">
+<dt>afitt.ligand_file_name - relative path to cif dictionary file that</dt>
+<dd>defines the ligand topology for AFITT. Note that this can be
+different from the cif file provided to Phenix.refine on the
+command line without any keyword. The former specifies the
+topology of the ligand for AFITT. The actual bond and angle
+parameters in it are irrelevant. The latter specifies the both
+topology and parameters of non-standard residues for Phenix. Any
+ligands that are not refined by AFITT (using the &quot;ligand_names&quot;
+keyword) will be refined by Phenix.refined using the parameters in
+this file.</dd>
+<dt>afitt.ligand_names - three letter ligand name codes. If multiple</dt>
+<dd>ligand types are being refined, separate each three letter code by
+a comma, no spaces. For a given ligand name, AFITT will refine all
+instances of that ligand as well as alternate conformations of
+each ligand.</dd>
+</dl>
+</dd>
+</dl>
+<p>OPTIONAL KEYWORDS</p>
+<blockquote>
+<p>afitt.ff - AFITT force field to use. Options are: mmff94s, mmff94, am1, pm3. (default=mmff94s)</p>
+<p>afitt.scale - weight to place on the AFITT ligand energy term. (default=10)</p>
+</blockquote>
+</blockquote>
+</div>
+<div class="section" id="auxiliary-functions">
+<h1><a class="toc-backref" href="afitt.html#toc-entry-4">Auxiliary functions</a></h1>
+<p>Two auxiliary command line programs are provided for
+convenience. <em>mmtbx.afitt</em> returns the AFITT ligand
+conformational energy given a pdb file (for coordinates) and cif file
+(for topology) and the three letter names of the ligands the user is
+querying. Optionally the user can specify the AFITT force field to use
+using the &quot;-ff&quot; keyword (default=MMFF94s). Example usage:</p>
+<pre class="literal-block">
+[~/work/afitt:]$ mmtbx.afitt 1cvu.pdb 1cvu.cif BOG,ACD
+  BOG_702_ AFITT_ENERGY:  2152.1468
+  BOG_703_ AFITT_ENERGY:  2151.5215
+  BOG_704_ AFITT_ENERGY:  2137.6938
+  BOG_2702_ AFITT_ENERGY:  2145.0459
+  BOG_2704_ AFITT_ENERGY:  2099.0437
+  ACD_701_ AFITT_ENERGY:   136.1296
+  ACD_2701_ AFITT_ENERGY:    99.7701
+</pre>
+<p><em>mmtbx.afitt_fd</em> runs a finite difference test to check that the
+Phenix-AFITT energy and gradients are being properly calculated. This
+is the first test to run if you think something may be wrong with the
+implementation of the refinement algorithm. <em>mmtbx.afitt_fd</em>
+requires a pdb file, cif file, ligand names and atom number on whose
+x-coordinate the finite difference test will be calculated. An
+optional &quot;-v&quot; keyword provides more verbose output about the
+individual terms of the energy function. Example usage:</p>
+<pre class="literal-block">
+[~/work/afitt:]$ mmtbx.afitt_fd 1cvu.pdb 1cvu.cif ACD 9321
+-&gt; 0.134306495
+-&gt; 0.134306174
+TEST PASSES: (analytical - numerical)= -0.000000321
+</pre>
+<p>As always, running an auxiliary program with the &quot;-h&quot; keyword provides
+helpful information about the program.</p>
+<blockquote>
+<img alt="../images/energy_4manual.png" src="../images/energy_4manual.png" />
+</blockquote>
+<p>Example ligand conformational energies after traditional refinement
+and after refinement with Phenix-AFITT. Energies are shown as a
+percentage of the energy of the ligand conformation deposited in the
+PDB.</p>
+</div>
+<div class="section" id="literature">
+<h1><a class="toc-backref" href="afitt.html#toc-entry-5">Literature</a></h1>
+<table class="docutils citation" frame="void" id="wlodek2006" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="afitt.html#citation-reference-1">[Wlodek2006]</a></td><td>Wlodek, S. and Skillman, A. G. and Nicholls, A.:
+<strong>Automated ligand placement and refinement with a combined force field
+and shape potential.</strong>, <em>Acta Crystallographica Section D</em>
+2006, <strong>62</strong>:741-749.</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="halgren1996" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="afitt.html#citation-reference-2">[Halgren1996]</a></td><td>Halgren, Thomas A.:
+<strong>Merck molecular force field. I. Basis, form, scope, parameterization,
+and performance of MMFF94.</strong>,
+<em>Journal of Computational Chemistry</em> 1996,
+<strong>17</strong>:490-519.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+    
+  </body>
+</html>

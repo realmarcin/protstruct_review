@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.21.2: https://docutils.sourceforge.io/" />
+<title>phenix.pdbtools: PDB model manipulations and statistics</title>
+    
+    <link rel="stylesheet" type="text/css" href="../css/html4css1.css" />
+    <link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+    
+  </head>
+  <body>
+    
+    <div id="header">
+      <a href="../index.html">
+        <img src="../icons/phenix-logo-small.jpg" alt="PHENIX" height="20%" width="20%" />
+        <span>
+          <strong>P</strong>ython-based
+          <strong>H</strong>ierarchical
+          <strong>EN</strong>vironment
+          for
+          <strong>I</strong>ntegrated
+          <strong>X</strong>tallography
+        </span>
+      </a>
+    </div>
+    
+    <div class="document" id="phenix-pdbtools-pdb-model-manipulations-and-statistics">
+<h1 class="title">phenix.pdbtools: PDB model manipulations and statistics</h1>
+<div class="contents topic" id="contents">
+<p class="topic-title"><a class="reference internal" href="pdbtools.html#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="pdbtools.html#manipulations-on-a-model-in-a-pdb-file-including" id="toc-entry-1">Manipulations on a model in a PDB file including</a></li>
+<li><a class="reference internal" href="pdbtools.html#video-tutorial" id="toc-entry-2">Video Tutorial</a></li>
+<li><a class="reference internal" href="pdbtools.html#graphical-interface" id="toc-entry-3">Graphical interface</a></li>
+<li><a class="reference internal" href="pdbtools.html#command-line-use" id="toc-entry-4">Command-line use</a></li>
+<li><a class="reference internal" href="pdbtools.html#list-of-all-available-keywords" id="toc-entry-5">List of all available keywords</a></li>
+</ul>
+</div>
+<div class="section" id="manipulations-on-a-model-in-a-pdb-file-including">
+<h1><a class="toc-backref" href="pdbtools.html#toc-entry-1">Manipulations on a model in a PDB file including</a></h1>
+<p>The operations below can be applied to the whole model or selected parts
+(e.g. &quot;modify.selection=chain A and backbone&quot;). See examples below.</p>
+<ul class="simple">
+<li>shaking of coordinates (random coordinate shifts)</li>
+<li>rotation-translation shift of coordinates</li>
+<li>shaking of occupancies</li>
+<li>set occupancies to a value</li>
+<li>shaking of ADP (B-factors)</li>
+<li>shifting of ADP (addition of a constant value)</li>
+<li>scaling of ADP (multiplication by a constant value)</li>
+<li>setting ADP to a given value</li>
+<li>conversion to isotropic or anisotropic ADP</li>
+<li>removal of selected parts of a model</li>
+<li>renumbering of residues</li>
+<li>truncation to poly-ALA</li>
+<li>convert SeMet residues to Met</li>
+<li>adjust segid field in PDB format</li>
+</ul>
+</div>
+<div class="section" id="video-tutorial">
+<h1><a class="toc-backref" href="pdbtools.html#toc-entry-2">Video Tutorial</a></h1>
+<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/uJs6ah27PKE" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" ></iframe></div><p>The <a class="reference external" href="https://youtu.be/uJs6ah27PKE">tutorial video</a> is available on the
+<a class="reference external" href="https://www.youtube.com/channel/UCcdI0hfHngWAZLJWynxPQWg">Phenix YouTube channel</a> and covers the
+following topics:</p>
+<ul class="simple">
+<li>basic overview</li>
+<li>how to run PDBTools via the GUI</li>
+<li>example 1: prepare model file for usage with lower resolution data</li>
+<li>example 2: convert all residues in a model to alanine</li>
+</ul>
+</div>
+<div class="section" id="graphical-interface">
+<h1><a class="toc-backref" href="pdbtools.html#toc-entry-3">Graphical interface</a></h1>
+<p>As input, only a PDB file and appropriate geometry restraints (in
+<a class="reference external" href="../file_formats.html#cif">CIF format</a> are required.  (The geometry restraints
+are actually optional if you uncheck the box &quot;Stop for unknown residues&quot;, but
+they are strongly recommended.)  Crystal symmetry is not essential but also
+recommended, and will be propagated to the output model.</p>
+<img alt="../images/pdbtools_input.png" src="../images/pdbtools_input.png" />
+<p>Many different options are possible, only some of which are shown in the
+main window.  The atom selection controls can be used to specify which part
+of the model will be affected by various changes, or to eliminate parts of
+the model.  The operations on coordinates, B-factors, and occupancies also
+have separate (optional) atom selections.</p>
+<img alt="../images/pdbtools_options.png" src="../images/pdbtools_options.png" />
+<p>(Note: in past versions PDBTools was also responsible for geometry minimization
+and addition of hydrogen atoms using Reduce; these methods have been moved to
+the programs phenix.geometry_minimization and phenix.ready_set, respectively.)</p>
+</div>
+<div class="section" id="command-line-use">
+<h1><a class="toc-backref" href="pdbtools.html#toc-entry-4">Command-line use</a></h1>
+<p>Some specific examples:</p>
+<p><strong>1)</strong> Type <tt class="docutils literal">phenix.pdbtools</tt> from the command line for instructions:</p>
+<pre class="literal-block">
+% phenix.pdbtools
+</pre>
+<p><strong>2)</strong> To see all default parameters:</p>
+<pre class="literal-block">
+% phenix.pdbtools
+</pre>
+<p><strong>3)</strong> Suppose a PDB model consist of three chains A, B and C and some water
+molecules. Remove all atoms in chain C and all waters:</p>
+<pre class="literal-block">
+% phenix.pdbtools model.pdb remove=&quot;chain C or water&quot;
+</pre>
+<p>or one can achieve exactly the same result with equivalent command:</p>
+<pre class="literal-block">
+% phenix.pdbtools model.pdb keep=&quot;chain A or chain B&quot;
+</pre>
+<p>or:</p>
+<pre class="literal-block">
+% phenix.pdbtools model.pdb keep=&quot;not(chain C or water)&quot;
+</pre>
+<p>or finally:</p>
+<pre class="literal-block">
+% phenix.pdbtools model.pdb remove=&quot;not(chain A or chain B)&quot;
+</pre>
+<p>The result of all four equivalent commands above will be a new PDB file
+containing chains A and B only. Important: the commands <tt class="docutils literal">keep</tt> and
+<tt class="docutils literal">remove</tt> cannot be used simultaneously.</p>
+<p><strong>4)</strong> Remove all water and set all b-factors to 25:</p>
+<pre class="literal-block">
+% phenix.pdbtools model.pdb remove=water set_b_iso=25
+</pre>
+<p><strong>5)</strong> Suppose a PDB model consist of three chains A, B and C and some water
+molecules. Remove all but water atoms and set b-factors to 25 for chain C
+atoms:</p>
+<pre class="literal-block">
+% phenix.pdbtools model.pdb keep=water set_b_iso=25 modify.selection=&quot;chain C&quot;
+</pre>
+</div>
+<div class="section" id="list-of-all-available-keywords">
+<h1><a class="toc-backref" href="pdbtools.html#toc-entry-5">List of all available keywords</a></h1>
+<p><ul class="phil"><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">modify</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">remove</span><span class="phil-words"> = None </span><span class="phil-help">Selection for the atoms to be removed</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep</span><span class="phil-words"> = None </span><span class="phil-help">Select atoms to keep</span></li><li class="phil-param" data-expert="0"><span class="phil-name">put_into_box_with_buffer</span><span class="phil-words"> = None </span><span class="phil-help">Move molecule into center of box</span></li><li class="phil-param" data-expert="0"><span class="phil-name">selection</span><span class="phil-words"> = None </span><span class="phil-help">Selection for atoms to be modified</span></li><li class="phil-param" data-expert="0"><span class="phil-name">flip_symmetric_amino_acids</span><span class="phil-words"> = False </span><span class="phil-help">Flip symmetric amino acid side chains</span></li><li class="phil-param" data-expert="0"><span class="phil-name">change_of_basis</span><span class="phil-words"> = None </span><span class="phil-help">Apply change-of-basis operator (e.g. reindexing operator) to the coordinates and symmetry. Example: a,c,b .</span></li><li class="phil-param" data-expert="0"><span class="phil-name">renumber_residues</span><span class="phil-words"> = False </span><span class="phil-help">Re-number residues</span></li><li class="phil-param" data-expert="0"><span class="phil-name">increment_resseq</span><span class="phil-words"> = None </span><span class="phil-help">Increment residue number</span></li><li class="phil-param" data-expert="0"><span class="phil-name">truncate_to_polyala</span><span class="phil-words"> = False </span><span class="phil-help">Truncate a model to poly-Ala.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">truncate_to_polygly</span><span class="phil-words"> = False </span><span class="phil-help">Truncate a model to poly-Gly.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_alt_confs</span><span class="phil-words"> = False </span><span class="phil-help">Deletes atoms whose altloc identifier is not blank or A , and resets the occupancies of the remaining atoms to 1.0.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">always_keep_one_conformer</span><span class="phil-words"> = False </span><span class="phil-help">Modifies behavior of remove_alt_confs so that residues with no conformer labeled blank or A are not deleted. Silent if remove_alt_confs is False.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">keep_occupancy</span><span class="phil-words"> = False </span><span class="phil-help">Do not reset occupancy to 1 after removing altlocs</span></li><li class="phil-param" data-expert="0"><span class="phil-name">altloc_to_keep</span><span class="phil-words"> = None </span><span class="phil-help">Modifies behavior of remove_alt_confs so that the altloc identifier to keep in addition to blank is this one (instead of A ). Silent if remove_alt_confs is False.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">average_alt_confs</span><span class="phil-words"> = False </span><span class="phil-help">Averages the coordinates of altloc atoms with 1.0 angstrom.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">set_chemical_element_simple_if_necessary</span><span class="phil-words"> = None </span><span class="phil-help">Make a simple guess about what the chemical element is (based on atom name and the way how it is formatted) and write it into output file.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">set_seg_id_to_chain_id</span><span class="phil-words"> = False </span><span class="phil-help">Sets the segID field to the chain ID (padded with spaces).</span></li><li class="phil-param" data-expert="0"><span class="phil-name">clear_seg_id</span><span class="phil-words"> = False </span><span class="phil-help">Erases the segID field.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">convert_semet_to_met</span><span class="phil-words"> = False </span></li><li class="phil-param" data-expert="0"><span class="phil-name">convert_met_to_semet</span><span class="phil-words"> = False </span></li><li class="phil-param" data-expert="0"><span class="phil-name">neutralize_scatterers</span><span class="phil-words"> = False </span></li><li class="phil-param" data-expert="0"><span class="phil-name">remove_fraction</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">random_seed</span><span class="phil-words"> = None </span><span class="phil-help">Random seed</span></li><li class="phil-param" data-expert="0"><span class="phil-name">move_waters_last</span><span class="phil-words"> = False </span><span class="phil-help">Transfer waters to the end of the model. Addresses some limitations of water picking in phenix.refine.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">renumber_and_move_waters</span><span class="phil-words"> = False </span><span class="phil-help">Transfer waters to the end of respective chains. Renumber them so that numbering starts at the nearest 100 after the last non-water in the chain.</span></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">adp</span><span class="phil-help">Scope of options to modify ADP of selected atoms</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">atom_selection</span><span class="phil-words"> = None </span><span class="phil-help">Selection for atoms to be modified. Overrides parent-level selection.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">randomize</span><span class="phil-words"> = False </span><span class="phil-help">Randomize ADP within a certain range</span></li><li class="phil-param" data-expert="0"><span class="phil-name">set_b_iso</span><span class="phil-words"> = None </span><span class="phil-help">Set ADP of atoms to set_b_iso</span></li><li class="phil-param" data-expert="0"><span class="phil-name">convert_to_isotropic</span><span class="phil-words"> = False </span><span class="phil-help">Convert atoms to isotropic</span></li><li class="phil-param" data-expert="0"><span class="phil-name">convert_to_anisotropic</span><span class="phil-words"> = False </span><span class="phil-help">Convert atoms to anisotropic</span></li><li class="phil-param" data-expert="0"><span class="phil-name">shift_b_iso</span><span class="phil-words"> = None </span><span class="phil-help">Add shift_b_iso value to ADP</span></li><li class="phil-param" data-expert="0"><span class="phil-name">scale_adp</span><span class="phil-words"> = None </span><span class="phil-help">Multiply ADP by scale_adp</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">sites</span><span class="phil-help">Scope of options to modify coordinates of selected atoms</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">atom_selection</span><span class="phil-words"> = None </span><span class="phil-help">Selection for atoms to be modified. Overrides parent-level selection.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">shake</span><span class="phil-words"> = None </span><span class="phil-help">Randomize coordinates with mean error value equal to shake</span></li><li class="phil-param" data-expert="0"><span class="phil-name">switch_rotamers</span><span class="phil-words"> = max_distant min_distant exact_match fix_outliers </span></li><li class="phil-param" data-expert="0"><span class="phil-name">translate</span><span class="phil-words"> = 0 0 0 </span><span class="phil-help">Translational shift (x,y,z)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">rotate</span><span class="phil-words"> = 0 0 0 </span><span class="phil-help">Rotational shift (x,y,z)</span></li><li class="phil-param" data-expert="0"><span class="phil-name">euler_angle_convention</span><span class="phil-words"> = *xyz zyz </span><span class="phil-help">Euler angles convention to be used for rotation</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">occupancies</span><span class="phil-help">Scope of options to modify occupancies of selected atoms</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">atom_selection</span><span class="phil-words"> = None </span><span class="phil-help">Selection for atoms to be modified. Overrides parent-level selection.</span></li><li class="phil-param" data-expert="0"><span class="phil-name">randomize</span><span class="phil-words"> = False </span><span class="phil-help">Randomize occupancies within a certain range</span></li><li class="phil-param" data-expert="0"><span class="phil-name">set</span><span class="phil-words"> = None </span><span class="phil-help">Set all or selected occupancies to given value</span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">rotate_about_axis</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">axis</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">angle</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">atom_selection</span><span class="phil-words"> = None </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">rename_chain_id</span><span class="phil-help">Rename chains</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">old_id</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">new_id</span><span class="phil-words"> = None </span></li></ul></li><li class="phil-param phil-scope" data-expert="0"><span class="phil-name">set_charge</span><ul><li class="phil-param" data-expert="0"><span class="phil-name">charge_selection</span><span class="phil-words"> = None </span></li><li class="phil-param" data-expert="0"><span class="phil-name">charge</span><span class="phil-words"> = None </span></li></ul></li></ul></li></ul></p>
+</div>
+</div>
+    
+  </body>
+</html>
