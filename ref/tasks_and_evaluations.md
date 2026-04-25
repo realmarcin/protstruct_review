@@ -60,7 +60,7 @@ Local PHENIX docs are mirrored in `ref/phenix_docs/`; doc paths below assume tha
 
 ### T05 — Geometry validation
 
-- **PHENIX tool(s):** `phenix.holton_geometry_validation`, `phenix.validation` (GUI), `phenix.cablam_validation`
+- **PHENIX tool(s):** `phenix.holton_geometry_validation`, `phenix.validation` (GUI), `phenix.cablam`, `mmtbx.validation_summary`
 - **Doc paths:** `reference/holton_geometry_validation.html`, `reference/validation.html`, `reference/cablam_validation.html`
 - **Independent oracle(s):** **MolProbity** (web/standalone — gold standard for geometry), wwPDB validation pipeline, iotbx-independent parsers via gemmi
 - **Typical inputs:** model (PDB/mmCIF)
