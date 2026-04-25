@@ -1,0 +1,34 @@
+catalog_task	metric	stage	agent_claim	oracle_measure	oracle_tool	oracle_family	delta	pass_criterion	pass_status
+T01	CA RMSD start→final (Å)	final	0.438	0.43	phenix.superpose_models	cctbx	-0.008	|Δ| ≤ 0.10 Å vs second tool	pass
+T01	CA RMSD start→final (Å)	final	0.438	0.41	TMalign 20220412 (Zhang lab)	non-cctbx	-0.028	|Δ| ≤ 0.10 Å vs cctbx tool	pass
+T01	TM-score	final	n/a	0.987	TMalign 20220412	non-cctbx	n/a	informational	informational
+T03	R-work	start	0.334	0.3334	phenix.model_vs_data	cctbx	-0.0006	match within 0.005	pass
+T03	R-free	start	0.396	0.3956	phenix.model_vs_data	cctbx	-0.0004	match within 0.005	pass
+T03	R-work	final	0.149	0.1564	phenix.model_vs_data	cctbx	+0.0074	match within 0.005	fail_by_oracle
+T03	R-work	final	0.149	0.1644	gemmi sfcalc + scaled R calc	non-cctbx	+0.0154	match within 0.005	fail_by_oracle
+T03	R-free	final	0.199	0.2114	phenix.model_vs_data	cctbx	+0.0124	match within 0.005	fail_by_oracle
+T03	R-free	final	0.199	0.2170	gemmi sfcalc + scaled R calc	non-cctbx	+0.0180	match within 0.005	fail_by_oracle
+T03	R-work/R-free gap	final	0.050	0.0552	phenix.model_vs_data	cctbx	+0.0052	gap < 0.05	fail_by_oracle
+T03	R-work/R-free gap	final	0.050	0.0526	gemmi sfcalc + scaled R calc	non-cctbx	+0.0026	gap < 0.05	fail_by_oracle
+T03	overall R per-shell weighted	final	n/a	0.184	servalcat sigmaa	non-cctbx	n/a	informational	informational
+T03	ΔR-free start→final	final	-0.197	-0.184	phenix.model_vs_data	cctbx	+0.013	better than start	pass
+T05	clashscore	start	32.59	31.66	mmtbx.validation_summary	cctbx	-0.93	match within 1.0	pass
+T05	clashscore	final	3.12	3.13	mmtbx.validation_summary	cctbx	+0.01	< 5	pass
+T05	clashscore	final	3.12	3.63	probe + reduce (Richardson lab)	non-cctbx	+0.51	< 5	pass
+T05	clashes (unique pairs)	final	n/a	11	probe -CONdense	non-cctbx	n/a	informational	informational
+T05	atoms used in clashscore calc	final	n/a	3027	reduce -build (H-built)	non-cctbx	n/a	informational	informational
+T05	Ramachandran outliers (%)	start	9.04	9.04	mmtbx.validation_summary	cctbx	0	exact	pass
+T05	Ramachandran outliers (%)	final	0.00	0.53	mmtbx.validation_summary	cctbx	+0.53	< 1	pass_criterion_fail_headline
+T05	Ramachandran outliers (count)	final	0	1 (Asn A 39)	phenix.holton_geometry_validation	cctbx	+1	0 outliers	fail_by_oracle_within_cctbx
+T05	Ramachandran favored (%)	final	99.47	98.40	mmtbx.validation_summary	cctbx	-1.07	> 98	pass
+T05	rotamer outliers (%)	final	6.71	4.88	mmtbx.validation_summary	cctbx	-1.83	< 5	pass
+T05	C-beta deviations (count)	final	0	0	mmtbx.validation_summary	cctbx	0	0	pass
+T05	MolProbity score	final	1.73	1.63	mmtbx.validation_summary	cctbx	-0.10	< 2.0	pass
+T05	bond RMSD (Å)	final	0.008	0.0070	mmtbx.validation_summary	cctbx	-0.001	< 0.020	pass
+T05	angle RMSD (°)	final	0.99	0.85	mmtbx.validation_summary	cctbx	-0.14	< 2.0	pass
+T05	Holton geom-energy ratio (σ)	start	n/a	3.32	phenix.holton_geometry_validation	cctbx	n/a	informational	informational
+T05	Holton geom-energy ratio (σ)	final	n/a	1.33	phenix.holton_geometry_validation	cctbx	n/a	improvement	pass
+T06	completeness	all	99.4%	99.38%	phenix.model_vs_data	cctbx	-0.02	match	pass
+T06	resolution range (Å)	all	49.97 → 2.50	49.97 → 2.50	phenix.model_vs_data	cctbx	0	match	pass
+T06	reflections (input MTZ)	start	7217 unique	7248	phenix.mtz.dump	cctbx	+31	informational	informational
+T06	reflections (final MTZ)	final	n/a	7262	phenix.mtz.dump	cctbx	+14 vs input	informational	informational
