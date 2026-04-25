@@ -17,6 +17,19 @@ EVAL_<structure>_<artifact-short-id>_<YYYY-MM-DD>_metrics.tsv
 
 The `_metrics.tsv` suffix marks the machine-loadable companion to the markdown report. They share the same stem so a single glob (`EVAL_1sar_cdba2c07_2026-04-24*`) returns the pair.
 
+### Parallel `_<view>.tsv` companions
+
+A single eval may emit more than one TSV view of the same underlying data. Add a `_<view>` suffix to disambiguate. Two suffixes are reserved:
+
+| Suffix | Content | Row count |
+|---|---|---|
+| `_metrics.tsv` | One row per (catalog_task, metric, oracle_tool, stage) — the granular ground truth. Loadable into a long-format dataframe. | many (10s–100s) |
+| `_headline.tsv` | One row per top-level finding for the eval — the chat-summary / leaderboard view. Each row collapses one or more `_metrics.tsv` rows by picking the strongest oracle per metric. | few (5–10) |
+
+Both share the same date-stamped stem so `EVAL_1sar_cdba2c07_2026-04-24*.tsv` returns both.
+
+If you add a new view (e.g. `_per_round.tsv`, `_per_residue.tsv`), keep the same stem and pick a noun-shaped suffix.
+
 ## Example
 
 ```

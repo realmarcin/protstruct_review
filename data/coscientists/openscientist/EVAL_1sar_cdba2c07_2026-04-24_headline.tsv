@@ -1,0 +1,7 @@
+catalog_task	metric	oracle_measure	oracle_tool	oracle_family	agent_claim	verdict	notes
+T01	CA RMSD start→final (Å)	0.41	TMalign 20220412 (Zhang lab)	non-cctbx	0.438	confirms	PHENIX phenix.superpose_models also reports 0.43 — three-tool agreement within 0.03 Å
+T03/T06	R-work	0.164	gemmi sfcalc + scaled R calc (gemmi_rfactor.py)	non-cctbx	0.149	off_by_0.015	phenix.model_vs_data also reports 0.156 — two-oracle confirmation that the agent figure is too low
+T03/T06	R-free	0.217	gemmi sfcalc + scaled R calc (gemmi_rfactor.py)	non-cctbx	0.199	off_by_0.018	phenix.model_vs_data also reports 0.211 — two-oracle confirmation
+T03/T06	R-free gap	0.053	gemmi sfcalc + scaled R calc (gemmi_rfactor.py)	non-cctbx	0.050	fails_<_0.05_criterion	phenix.model_vs_data reports 0.055 — both independent code bases say criterion fails
+T03	overall R per-shell weighted	0.184	servalcat sigmaa	non-cctbx	n/a	confirms_R_factor_range	Murshudov-group implementation; per-shell composite R averaged over 7217 reflections
+T05	clashscore	3.63	probe + reduce (Richardson lab — standalone MolProbity)	non-cctbx	3.12	confirms_<_5_criterion	11 unique clashes / 3027 atoms × 1000; mmtbx.validation_summary reports 3.13 — Δ within MolProbity method noise
