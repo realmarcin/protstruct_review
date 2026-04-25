@@ -11,6 +11,8 @@ This directory holds offline reference material and the key **task × evaluation
 | `tasks_and_evaluations.md` | **Key doc.** 14-row catalog of rote structural-biology tasks, each paired with PHENIX tool(s), independent-oracle tool(s), inputs, evaluation metrics, gold standard, and an example dataset. |
 | `tasks_and_evaluations.tsv` | Machine-loadable version of the same table (pipe-separated lists within tab-separated columns). |
 | `driving_example.md` | Worked end-to-end example (**compare → refine → RMSD**) that exercises tasks T01 + T04 + T05 + T06 together. Template for future per-task driving examples. |
+| `oracle_tools.md` | Install status of independent (non-cctbx) oracle tools the catalog requires (gemmi, TM-align, probe + reduce, Servalcat); per-task oracle assignment. |
+| `eval_naming.md` | Filename convention for `EVAL_*` evaluation reports (`EVAL_<structure>_<artifact-short-id>_<YYYY-MM-DD>.{md,tsv}`). |
 
 ## Regenerating the PHENIX docs mirror
 
