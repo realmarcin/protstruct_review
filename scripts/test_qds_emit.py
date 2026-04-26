@@ -34,7 +34,7 @@ sys.path.insert(0, str(REPO / "scripts"))
 import qds_emit  # noqa: E402
 
 
-EVAL_1SAR = REPO / "data/examples/eval/EVAL_1sar_cdba2c07_2026-04-24.yaml"
+EVAL_1SAR = REPO / "data/coscientists/openscientist/EVAL_1sar_cdba2c07_2026-04-24.yaml"
 EVAL_SYNTH = REPO / "data/examples/eval/EVAL_synth_active_site_2026-04-26.yaml"
 
 EXPECTED_GEOMETRY_SLOTS_1SAR = {

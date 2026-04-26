@@ -116,6 +116,8 @@ def main() -> int:
     indices = load_catalog_indices()
     targets = [CATALOG, REPO / "ref" / "tool_recommendations.yaml"]
     targets += sorted((REPO / "data" / "examples").rglob("*.yaml"))
+    targets += sorted((REPO / "data" / "coscientists").rglob("EVAL_*.yaml"))
+    targets += sorted((REPO / "data" / "coscientists").rglob("QDS_*.yaml"))
 
     failed = False
     for path in targets:

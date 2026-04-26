@@ -40,11 +40,15 @@ validate_one() {
 validate_one "${REPO_ROOT}/ref/catalog.yaml"
 validate_one "${REPO_ROOT}/ref/tool_recommendations.yaml"
 
-# 2. Every example record
-shopt -s nullglob
+# 2. Every record under data/ — both synthetic test fixtures
+#    (data/examples/) and real per-artefact evals + QDS in
+#    data/<provider>/<system>/.
+shopt -s nullglob globstar
 for f in "${REPO_ROOT}"/data/examples/eval/*.yaml \
          "${REPO_ROOT}"/data/examples/qds/*.yaml \
-         "${REPO_ROOT}"/data/examples/catalog/*.yaml; do
+         "${REPO_ROOT}"/data/examples/catalog/*.yaml \
+         "${REPO_ROOT}"/data/coscientists/**/EVAL_*.yaml \
+         "${REPO_ROOT}"/data/coscientists/**/QDS_*.yaml; do
   validate_one "${f}"
 done
 
