@@ -1,0 +1,197 @@
+# Synthetic eval covering local-quality content (sites, ligands, per-residue,
+# pairwise). Hand-authored to exercise every QDS branch the v3 emitter can
+# populate. Used by scripts/test_qds_emit.py for regression testing.
+
+evaluation_runs:
+- id: EVAL_synth_active_site_2026-04-26
+  eval_filename_stem: EVAL_synth_active_site_2026-04-26
+  structure_ref: synth1
+  artifact_ref: synth-active-site-2026-04-26
+  run_date: '2026-04-26'
+  catalog_tasks_applied:
+    - T01
+    - T05
+    - T10
+  sites:
+    - id: synth1_active_site
+      structure_ref: synth1
+      kind: active_site
+      member_residue_refs:
+        - synth1:A:33
+        - synth1:A:35
+        - synth1:A:38
+      ligand_ref: synth1:A:CA33
+      description: Synthetic Ca-binding active site for regression testing.
+  ligands:
+    - id: synth1:A:CA33
+      structure_ref: synth1
+      pdb_chemical_id: CA
+      chain_id: A
+      residue_number: 33
+      partial_occupancy: true
+  residue_outliers:
+    - id: EVAL_synth_active_site_2026-04-26_outlier_001
+      residue_ref: synth1:A:39
+      outlier_kind: ramachandran
+      severity: moderate
+      tool_ref: MolProbity (gold)
+      details: φ,ψ outside 99.95th percentile region
+    - id: EVAL_synth_active_site_2026-04-26_outlier_002
+      residue_ref: synth1:A:8
+      outlier_kind: rotamer
+      severity: low
+      tool_ref: MolProbity (gold)
+      details: χ1 outside favored region by 14°
+  density_peaks:
+    - id: EVAL_synth_active_site_2026-04-26_peak_001
+      sigma_level: 5.2
+      coordinates_xyz:
+        - 12.34
+        - 8.97
+        - 21.05
+      nearest_atom_residue_ref: synth1:A:33
+      nearest_atom_distance_a: 2.65
+      interpretation: unmodelled water
+      tool_ref: phenix.find_peaks_holes
+  per_residue_values:
+    - id: EVAL_synth_active_site_2026-04-26_lddt_001
+      residue_ref: synth1:A:33
+      value:
+        value_numeric: 0.91
+      metric_definition_ref: T01_per_residue_lddt
+      tool_ref: TM-align
+    - id: EVAL_synth_active_site_2026-04-26_lddt_002
+      residue_ref: synth1:A:34
+      value:
+        value_numeric: 0.88
+      metric_definition_ref: T01_per_residue_lddt
+      tool_ref: TM-align
+    - id: EVAL_synth_active_site_2026-04-26_lddt_003
+      residue_ref: synth1:A:35
+      value:
+        value_numeric: 0.93
+      metric_definition_ref: T01_per_residue_lddt
+      tool_ref: TM-align
+    - id: EVAL_synth_active_site_2026-04-26_lddt_004
+      residue_ref: synth1:A:36
+      value:
+        value_numeric: 0.79
+      metric_definition_ref: T01_per_residue_lddt
+      tool_ref: TM-align
+    - id: EVAL_synth_active_site_2026-04-26_lddt_005
+      residue_ref: synth1:A:38
+      value:
+        value_numeric: 0.95
+      metric_definition_ref: T01_per_residue_lddt
+      tool_ref: TM-align
+  pairwise_comparisons:
+    - id: EVAL_synth_active_site_2026-04-26_pair_001
+      candidate_ref: synth1
+      reference_ref: synth1_starting
+      reference_kind: starting_model
+      alignment_method: TM-align
+      atoms_aligned: Cα
+      residues_aligned: 96
+      tm_score:
+        value_numeric: 0.987
+      ca_rmsd_a:
+        value_numeric: 0.41
+      delta_baseline: starting_model
+      verdict: improved
+  measurements:
+    # Complex-scope: global geometry signal.
+    - id: EVAL_synth_active_site_2026-04-26_M_001
+      catalog_task_ref: T05
+      stage: final
+      scope: complex
+      metric_definition_ref: T05_clashscore
+      oracle_tool_ref: MolProbity (gold)
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 3.0
+      pass_criterion: < 5
+      pass_status: pass
+
+    # Site-scoped: clashscore restricted to active-site residues.
+    - id: EVAL_synth_active_site_2026-04-26_M_002
+      catalog_task_ref: T05
+      stage: final
+      scope: site
+      scope_selector: synth1_active_site
+      metric_definition_ref: T05_clashscore
+      oracle_tool_ref: MolProbity (gold)
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 7.2
+      pass_criterion: < 5
+      pass_status: fail_by_oracle
+      notes: >-
+        Site clashscore exceeds the global 3.0 — exactly the local
+        regression a global summary would hide.
+
+    # Site-scoped: site RMSD vs reference.
+    - id: EVAL_synth_active_site_2026-04-26_M_003
+      catalog_task_ref: T01
+      stage: final
+      scope: site
+      scope_selector: synth1_active_site
+      metric_definition_ref: T01_ca_rmsd_å
+      oracle_tool_ref: TM-align
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.62
+      pass_criterion: '|Δ| ≤ 0.5 Å'
+      pass_status: fail_by_oracle
+
+    # Ligand-scoped: RSCC.
+    - id: EVAL_synth_active_site_2026-04-26_M_004
+      catalog_task_ref: T10
+      stage: final
+      scope: ligand
+      scope_selector: synth1:A:CA33
+      metric_definition_ref: T10_ligand_rscc
+      oracle_tool_ref: MolProbity (gold)
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.78
+      pass_criterion: '> 0.85'
+      pass_status: fail_by_oracle
+      notes: Marginal ligand fit; investigate.
+
+    # Ligand-scoped: H-bond count.
+    - id: EVAL_synth_active_site_2026-04-26_M_005
+      catalog_task_ref: T10
+      stage: final
+      scope: ligand
+      scope_selector: synth1:A:CA33
+      metric_definition_ref: T10_protein-ligand_hbond_count
+      oracle_tool_ref: gemmi sfcalc
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 2.0
+      pass_status: informational
+
+    # Residue-scoped: per-residue lDDT mean (also per_residue_values populates the array).
+    - id: EVAL_synth_active_site_2026-04-26_M_006
+      catalog_task_ref: T01
+      stage: final
+      scope: residue
+      scope_selector: synth1:A:33-38
+      metric_definition_ref: T01_ca_rmsd_å
+      oracle_tool_ref: TM-align
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.892
+        mean: 0.892
+        std_dev: 0.062
+        min_value: 0.79
+        max_value: 0.95
+        count: 5
+      pass_criterion: mean lDDT > 0.85
+      pass_status: pass
+      notes: Summary across 5 active-site residues; full array under per_residue_values.
+  headline_verdict: >-
+    Synthetic eval — all branches exercised. Global geometry is fine
+    (clashscore 3.0) but site clashscore is 7.2 and ligand RSCC is 0.78,
+    both below criterion. This is exactly the local regression that
+    would be hidden by a global-only QDS summary.

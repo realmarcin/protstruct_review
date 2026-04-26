@@ -171,6 +171,19 @@ What's load-bearing per modality is documented with citations in `ref/quality_re
 
 Filename: `QDS_<structure>_<artifact-short-id>_<YYYY-MM-DD>.yaml`. Same convention as `EVAL_*` per `ref/eval_naming.md`.
 
+## QDS emitter contract (v3)
+
+`scripts/qds_emit.py` follows two hard rules:
+
+1. **Routing is by canonical metric id, not substring.** A single `METRIC_TO_QDS_SLOT` table at the top of the file maps every metric id to a `(block, slot)` pair. The table is validated against `ref/catalog.yaml` at startup; a typo is a hard error. Adding a new metric → add a new row in the table. Do NOT extend with substring matching.
+2. **Fail-hard on implied content.** If the source eval has any of these, the QDS MUST surface the corresponding block or the emitter exits non-zero with a specific error:
+   - `scope=site` measurement → `SiteQuality` block required (declare a `Site` on the eval)
+   - `scope=ligand` measurement → `LigandQuality` nested in a `SiteQuality` required
+   - `scope=residue` measurement OR any `residue_outliers[]` / `density_peaks[]` / `flagged_regions[]` / `per_residue_values[]` on the eval → `PerResidueQuality` block required
+   - `pairwise_comparisons[]` on the eval → must surface in QDS
+
+Regression tests at `scripts/test_qds_emit.py` enforce that the 1SAR example has every expected geometry slot populated, the synthetic active-site eval (`data/examples/eval/EVAL_synth_active_site_*.yaml`) populates per_residue_quality / site_qualities / ligand_quality / pairwise_comparisons / tool_recommendations_applied, and the negative test confirms the fail-hard behaviour. `scripts/validate.sh` runs all of this in sequence.
+
 ## Common pitfalls
 
 - **Inverting the trust model.** MolProbity is the geometry oracle; it is not a PHENIX tool. `phenix.holton_geometry_validation` and MolProbity are *both* run, and the harness compares them.

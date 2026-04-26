@@ -663,6 +663,55 @@ classes:
         range: HeadlineFinding
         multivalued: true
         inlined_as_list: true
+      residue_outliers:
+        range: ResidueOutlier
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Per-residue outlier rows for this eval. The QDS emitter
+          aggregates these into PerResidueQuality.outliers[]. When
+          this list is non-empty, the QDS MUST surface a
+          PerResidueQuality block.
+      density_peaks:
+        range: DensityPeak
+        multivalued: true
+        inlined_as_list: true
+      flagged_regions:
+        range: FlaggedRegion
+        multivalued: true
+        inlined_as_list: true
+      per_residue_values:
+        range: PerResidueValue
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Per-residue scalars (lDDT, displacement, RSRZ, ...). The
+          metric_definition_ref attached to the underlying value
+          determines which PerResidueQuality slot they feed.
+      sites:
+        range: Site
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Functional sites declared on this eval's structure. Site-
+          scoped measurements (scope=site) reference these via
+          scope_selector. When the eval has scope=site measurements
+          but no Site declared here, the emitter fails-hard.
+      ligands:
+        range: Ligand
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Ligands referenced by sites. Same fail-hard contract as
+          sites: scope=ligand measurement implies a Ligand row.
+      pairwise_comparisons:
+        range: PairwiseComparison
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Pair comparisons against reference structures (deposited /
+          starting / AlphaFold / truth). The QDS surfaces these
+          unchanged via QualityDataSheet.pairwise_comparisons.
       criteria_met_count:
         range: integer
       criteria_total:
@@ -794,6 +843,24 @@ classes:
       angle_rmsd_deg:
         range: TypedMeasurementValue
         inlined: true
+      bond_rmsz:
+        range: TypedMeasurementValue
+        inlined: true
+        description: >-
+          Bond-length RMSZ (Z-score against restraint targets). Over-
+          refinement diagnostic — a model with small absolute RMSD can
+          still be a high-Z outlier relative to its restraints.
+          See ref/quality_reporting.md §1.2.
+      angle_rmsz:
+        range: TypedMeasurementValue
+        inlined: true
+        description: >-
+          Bond-angle RMSZ (Z-score against restraint targets). Same
+          over-refinement diagnostic as bond_rmsz.
+      cbeta_deviations_count:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Number of Cβ-deviation outliers (> 0.25 Å from ideal).
 
   RefinementSummary:
     description: Headline R-factors as of QDS issue date (X-ray refinement only).
@@ -812,7 +879,13 @@ classes:
         inlined: true
 
   MapSummary:
-    description: Headline map quality numbers as of QDS issue date (cryo-EM only).
+    description: >-
+      Headline map quality numbers as of QDS issue date (cryo-EM only).
+      Tracks the metrics ref/quality_reporting.md §1.4 calls out as
+      load-bearing: CC family, model-map FSC, EMRinger / Q-score, and
+      local-resolution spread. Per the EMDataResource 2019 challenge
+      consensus, ≥ 3 metrics from different families should be
+      reported (e.g. CC_mask + EMRinger + d_FSC_model).
     attributes:
       id:
         identifier: true
@@ -820,9 +893,48 @@ classes:
       cc_mask:
         range: TypedMeasurementValue
         inlined: true
+      cc_box:
+        range: TypedMeasurementValue
+        inlined: true
+        description: >-
+          Map-model correlation in the full box. If much lower than
+          cc_mask, suspect over-sharpening or artifacts outside the
+          molecule.
+      cc_volume:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Map-model correlation in the high-density volume envelope.
+      emringer_score:
+        range: TypedMeasurementValue
+        inlined: true
+        description: >-
+          Side-chain–density agreement metric (Barad et al. 2015).
+          Resolution-sensitive; > 1.5 is good at high resolution.
+      mean_q_score:
+        range: TypedMeasurementValue
+        inlined: true
+        description: >-
+          Mean atom-resolvability Q-score (Pintilie 2020). Per-atom by
+          construction; surface the mean here and the per-residue array
+          via PerResidueQuality.q_score_per_residue when available.
       d_fsc_model_a:
         range: TypedMeasurementValue
         inlined: true
+        description: Resolution at which model-map FSC = 0.5.
+      global_fsc_0143_a:
+        range: TypedMeasurementValue
+        inlined: true
+        description: >-
+          Global FSC resolution at 0.143 (gold-standard half-map FSC).
+          Compare to d_fsc_model_a — if d_fsc_model >> global_fsc the
+          model is under-fitting; if << it's noise-fitting.
+      local_resolution_mean_a:
+        range: TypedMeasurementValue
+        inlined: true
+      local_resolution_std_a:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Standard deviation of local-resolution distribution.
 
   CrossToolCoverage:
     description: >-
@@ -1145,7 +1257,11 @@ classes:
         description: One-line human description of why the region is flagged.
 
   PerResidueValue:
-    description: A scalar paired with a residue ref. Used by PerResidueQuality.
+    description: >-
+      A scalar paired with a residue ref. Used by PerResidueQuality.
+      `metric_definition_ref` is required so the QDS emitter can route
+      each value to the correct per-residue array (lDDT vs displacement
+      vs RSRZ vs Ramachandran-Z) without substring heuristics.
     attributes:
       id:
         identifier: true
@@ -1153,6 +1269,13 @@ classes:
       residue_ref:
         range: ResidueRef
         required: true
+      metric_definition_ref:
+        range: MetricDefinition
+        required: true
+        description: >-
+          Catalog metric this value measures. Routing in the QDS emitter
+          uses this id (not a name or substring) to pick the per-residue
+          slot (lddt_per_residue, displacement_per_residue_a, ...).
       value:
         range: TypedMeasurementValue
         inlined: true

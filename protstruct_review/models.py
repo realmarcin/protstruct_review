@@ -438,10 +438,10 @@ class Container(ConfiguredBaseModel):
     evaluation_runs: Optional[list[EvaluationRun]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container']} })
     quality_data_sheets: Optional[list[QualityDataSheet]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container']} })
     tool_recommendations: Optional[list[ToolRecommendation]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container']} })
-    pairwise_comparisons: Optional[list[PairwiseComparison]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'QualityDataSheet']} })
+    pairwise_comparisons: Optional[list[PairwiseComparison]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'EvaluationRun', 'QualityDataSheet']} })
     residues: Optional[list[ResidueRef]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container']} })
-    sites: Optional[list[Site]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container']} })
-    ligands: Optional[list[Ligand]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container']} })
+    sites: Optional[list[Site]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'EvaluationRun']} })
+    ligands: Optional[list[Ligand]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'EvaluationRun']} })
 
 
 class Finding(ConfiguredBaseModel):
@@ -453,7 +453,8 @@ class Finding(ConfiguredBaseModel):
     metric_definition_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
                        'MeasurementValue',
                        'HeadlineFinding',
-                       'ToolRecommendation']} })
+                       'ToolRecommendation',
+                       'PerResidueValue']} })
     oracle_tool_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     oracle_family: ToolFamily = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     notes: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
@@ -872,7 +873,8 @@ class MeasurementValue(Finding):
     metric_definition_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
                        'MeasurementValue',
                        'HeadlineFinding',
-                       'ToolRecommendation']} })
+                       'ToolRecommendation',
+                       'PerResidueValue']} })
     oracle_tool_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     oracle_family: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     agent_claim: Optional[TypedMeasurementValue] = Field(default=None, description="""Value reported by the agent.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'HeadlineFinding']} })
@@ -948,7 +950,8 @@ class HeadlineFinding(Finding):
     metric_definition_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
                        'MeasurementValue',
                        'HeadlineFinding',
-                       'ToolRecommendation']} })
+                       'ToolRecommendation',
+                       'PerResidueValue']} })
     oracle_tool_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     oracle_family: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     agent_claim: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'HeadlineFinding']} })
@@ -1012,6 +1015,13 @@ class EvaluationRun(ConfiguredBaseModel):
     catalog_tasks_applied: list[CatalogTaskId] = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
     measurements: Optional[list[MeasurementValue]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
     headline_findings: Optional[list[HeadlineFinding]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
+    residue_outliers: Optional[list[ResidueOutlier]] = Field(default=[], description="""Per-residue outlier rows for this eval. The QDS emitter aggregates these into PerResidueQuality.outliers[]. When this list is non-empty, the QDS MUST surface a PerResidueQuality block.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
+    density_peaks: Optional[list[DensityPeak]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun', 'PerResidueQuality']} })
+    flagged_regions: Optional[list[FlaggedRegion]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun', 'PerResidueQuality']} })
+    per_residue_values: Optional[list[PerResidueValue]] = Field(default=[], description="""Per-residue scalars (lDDT, displacement, RSRZ, ...). The metric_definition_ref attached to the underlying value determines which PerResidueQuality slot they feed.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
+    sites: Optional[list[Site]] = Field(default=[], description="""Functional sites declared on this eval's structure. Site- scoped measurements (scope=site) reference these via scope_selector. When the eval has scope=site measurements but no Site declared here, the emitter fails-hard.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'EvaluationRun']} })
+    ligands: Optional[list[Ligand]] = Field(default=[], description="""Ligands referenced by sites. Same fail-hard contract as sites: scope=ligand measurement implies a Ligand row.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'EvaluationRun']} })
+    pairwise_comparisons: Optional[list[PairwiseComparison]] = Field(default=[], description="""Pair comparisons against reference structures (deposited / starting / AlphaFold / truth). The QDS surfaces these unchanged via QualityDataSheet.pairwise_comparisons.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'EvaluationRun', 'QualityDataSheet']} })
     criteria_met_count: Optional[int] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
     criteria_total: Optional[int] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
     headline_verdict: Optional[str] = Field(default=None, description="""One-paragraph human summary of the eval outcome.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun', 'QualityDataSheet']} })
@@ -1070,7 +1080,7 @@ class QualityDataSheet(ConfiguredBaseModel):
     map_summary: Optional[MapSummary] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
     data_quality_summary: Optional[DataQualitySummary] = Field(default=None, description="""X-ray data quality (completeness, ⟨I/σ⟩, CC½). Optional; omit for cryo-EM and predicted models.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
     predicted_confidence_summary: Optional[PredictedConfidenceSummary] = Field(default=None, description="""AlphaFold/RoseTTAFold confidence (pLDDT distribution, PAE). Optional; only for predicted models.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
-    pairwise_comparisons: Optional[list[PairwiseComparison]] = Field(default=[], description="""One per relevant reference (deposited / starting / AlphaFold / truth). Empty when no reference comparison applies.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'QualityDataSheet']} })
+    pairwise_comparisons: Optional[list[PairwiseComparison]] = Field(default=[], description="""One per relevant reference (deposited / starting / AlphaFold / truth). Empty when no reference comparison applies.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'EvaluationRun', 'QualityDataSheet']} })
     per_residue_quality: Optional[PerResidueQuality] = Field(default=None, description="""Residue-scoped local quality (per-residue lDDT/displacement, outlier residues, density-difference peaks, flagged regions). Required when the trust model needs evidence that local regions — especially active sites and interfaces — are not worse than the global average.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
     site_qualities: Optional[list[SiteQuality]] = Field(default=[], description="""One per active site / binding site / interface / metal site on this structure. Each carries the site-scoped metrics (site RMSD to reference, mean per-residue lDDT, ligand quality if a ligand is bound). Empty when the structure has no functional site of record.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
     cross_tool_coverage: Optional[CrossToolCoverage] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
@@ -1170,6 +1180,9 @@ class GeometrySummary(ConfiguredBaseModel):
     molprobity_score: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['GeometrySummary']} })
     bond_rmsd_a: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['GeometrySummary']} })
     angle_rmsd_deg: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['GeometrySummary']} })
+    bond_rmsz: Optional[TypedMeasurementValue] = Field(default=None, description="""Bond-length RMSZ (Z-score against restraint targets). Over- refinement diagnostic — a model with small absolute RMSD can still be a high-Z outlier relative to its restraints. See ref/quality_reporting.md §1.2.""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeometrySummary']} })
+    angle_rmsz: Optional[TypedMeasurementValue] = Field(default=None, description="""Bond-angle RMSZ (Z-score against restraint targets). Same over-refinement diagnostic as bond_rmsz.""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeometrySummary']} })
+    cbeta_deviations_count: Optional[TypedMeasurementValue] = Field(default=None, description="""Number of Cβ-deviation outliers (> 0.25 Å from ideal).""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeometrySummary']} })
 
 
 class RefinementSummary(ConfiguredBaseModel):
@@ -1217,7 +1230,7 @@ class RefinementSummary(ConfiguredBaseModel):
 
 class MapSummary(ConfiguredBaseModel):
     """
-    Headline map quality numbers as of QDS issue date (cryo-EM only).
+    Headline map quality numbers as of QDS issue date (cryo-EM only). Tracks the metrics ref/quality_reporting.md §1.4 calls out as load-bearing: CC family, model-map FSC, EMRinger / Q-score, and local-resolution spread. Per the EMDataResource 2019 challenge consensus, ≥ 3 metrics from different families should be reported (e.g. CC_mask + EMRinger + d_FSC_model).
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/protstruct-review/schema'})
 
@@ -1254,7 +1267,14 @@ class MapSummary(ConfiguredBaseModel):
                        'Site',
                        'SiteQuality']} })
     cc_mask: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
-    d_fsc_model_a: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
+    cc_box: Optional[TypedMeasurementValue] = Field(default=None, description="""Map-model correlation in the full box. If much lower than cc_mask, suspect over-sharpening or artifacts outside the molecule.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
+    cc_volume: Optional[TypedMeasurementValue] = Field(default=None, description="""Map-model correlation in the high-density volume envelope.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
+    emringer_score: Optional[TypedMeasurementValue] = Field(default=None, description="""Side-chain–density agreement metric (Barad et al. 2015). Resolution-sensitive; > 1.5 is good at high resolution.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
+    mean_q_score: Optional[TypedMeasurementValue] = Field(default=None, description="""Mean atom-resolvability Q-score (Pintilie 2020). Per-atom by construction; surface the mean here and the per-residue array via PerResidueQuality.q_score_per_residue when available.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
+    d_fsc_model_a: Optional[TypedMeasurementValue] = Field(default=None, description="""Resolution at which model-map FSC = 0.5.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
+    global_fsc_0143_a: Optional[TypedMeasurementValue] = Field(default=None, description="""Global FSC resolution at 0.143 (gold-standard half-map FSC). Compare to d_fsc_model_a — if d_fsc_model >> global_fsc the model is under-fitting; if << it's noise-fitting.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
+    local_resolution_mean_a: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
+    local_resolution_std_a: Optional[TypedMeasurementValue] = Field(default=None, description="""Standard deviation of local-resolution distribution.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
 
 
 class CrossToolCoverage(ConfiguredBaseModel):
@@ -1532,7 +1552,8 @@ class ToolRecommendation(ConfiguredBaseModel):
     metric_definition_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
                        'MeasurementValue',
                        'HeadlineFinding',
-                       'ToolRecommendation']} })
+                       'ToolRecommendation',
+                       'PerResidueValue']} })
     tool_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation',
                        'ResidueOutlier',
                        'DensityPeak',
@@ -1752,7 +1773,7 @@ class FlaggedRegion(ConfiguredBaseModel):
 
 class PerResidueValue(ConfiguredBaseModel):
     """
-    A scalar paired with a residue ref. Used by PerResidueQuality.
+    A scalar paired with a residue ref. Used by PerResidueQuality. `metric_definition_ref` is required so the QDS emitter can route each value to the correct per-residue array (lDDT vs displacement vs RSRZ vs Ramachandran-Z) without substring heuristics.
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/protstruct-review/schema'})
 
@@ -1789,6 +1810,11 @@ class PerResidueValue(ConfiguredBaseModel):
                        'Site',
                        'SiteQuality']} })
     residue_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['ResidueOutlier', 'PerResidueValue']} })
+    metric_definition_ref: str = Field(default=..., description="""Catalog metric this value measures. Routing in the QDS emitter uses this id (not a name or substring) to pick the per-residue slot (lddt_per_residue, displacement_per_residue_a, ...).""", json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'ToolRecommendation',
+                       'PerResidueValue']} })
     value: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PerResidueValue']} })
     tool_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation',
                        'ResidueOutlier',
@@ -1839,8 +1865,8 @@ class PerResidueQuality(ConfiguredBaseModel):
     ramachandran_z_per_residue: Optional[list[PerResidueValue]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['PerResidueQuality']} })
     rsrz_per_residue: Optional[list[PerResidueValue]] = Field(default=[], description="""Real-space R-factor Z-score per residue (wwPDB validation). RSRZ > 2 flags poor real-space density agreement for that residue.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PerResidueQuality']} })
     outliers: Optional[list[ResidueOutlier]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['PerResidueQuality']} })
-    density_peaks: Optional[list[DensityPeak]] = Field(default=[], description="""Δρ peaks above the configured σ threshold (typically > 4σ).""", json_schema_extra = { "linkml_meta": {'domain_of': ['PerResidueQuality']} })
-    flagged_regions: Optional[list[FlaggedRegion]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['PerResidueQuality']} })
+    density_peaks: Optional[list[DensityPeak]] = Field(default=[], description="""Δρ peaks above the configured σ threshold (typically > 4σ).""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun', 'PerResidueQuality']} })
+    flagged_regions: Optional[list[FlaggedRegion]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun', 'PerResidueQuality']} })
 
 
 class Ligand(ConfiguredBaseModel):

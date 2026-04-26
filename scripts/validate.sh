@@ -57,3 +57,9 @@ fi
 if ! python3 "${REPO_ROOT}/scripts/check_referential_integrity.py"; then
   fail "referential integrity"
 fi
+
+# 4. QDS emitter regression tests (geometry-slot completeness, site/ligand/
+#    per-residue/pairwise/tool-recs builder coverage, fail-hard negative test)
+if ! python3 "${REPO_ROOT}/scripts/test_qds_emit.py"; then
+  fail "qds_emit regression"
+fi

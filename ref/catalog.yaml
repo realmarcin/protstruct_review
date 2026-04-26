@@ -376,6 +376,15 @@ catalog_tasks:
   gold_standard: standalone reduce; neutron structure if available
   example_dataset: PDB 1HQ1; PDB 5E5V (neutron pair)
 tools:
+- id: phenix.emringer
+  family: cctbx
+  catalog_tasks_served:
+  - T12
+- id: phenix.find_peaks_holes
+  family: cctbx
+  catalog_tasks_served:
+  - T05
+  - T06
 - id: phenix.mtz.dump
   family: cctbx
   catalog_tasks_served:
@@ -1217,4 +1226,97 @@ metric_definitions:
   name: reflections (final MTZ)
   description: Reflection count in the agent's final MTZ.
   applicable_task_refs:
+  - T06
+
+# --- Geometry RMSZ (T05) — over-refinement detector. RMSZ is the Z-score
+# --- against restraint targets; not interchangeable with raw RMSD.
+
+- id: T05_bond-length_rmsz
+  name: bond-length RMSZ
+  description: >-
+    Z-score of bond-length deviations against restraint targets. A
+    model can have small absolute RMSD but high RMSZ when the restraint
+    library is tighter than the modelled deviations — flag for
+    over-restraint or broken refinement.
+  applicable_task_refs:
+  - T05
+
+- id: T05_bond-angle_rmsz
+  name: bond-angle RMSZ
+  description: Z-score of bond-angle deviations against restraint targets.
+  applicable_task_refs:
+  - T05
+
+# --- Cryo-EM map quality additions (T12) — load-bearing per the
+# --- EMDataResource 2019 challenge consensus.
+
+- id: T12_cc_box
+  name: CC_box
+  description: Map-model correlation in the full box. Compare to CC_mask.
+  applicable_task_refs:
+  - T12
+  - T06
+
+- id: T12_cc_volume
+  name: CC_volume
+  description: Map-model correlation in the high-density volume envelope.
+  applicable_task_refs:
+  - T12
+  - T06
+
+- id: T12_emringer
+  name: EMRinger score
+  description: Side-chain–density agreement (Barad et al. 2015).
+  applicable_task_refs:
+  - T12
+  - T06
+
+- id: T12_q_score
+  name: mean Q-score
+  description: Mean atom-resolvability (Pintilie et al. 2020).
+  applicable_task_refs:
+  - T12
+  - T06
+
+- id: T12_global_fsc_0143
+  name: global FSC at 0.143 (Å)
+  description: Gold-standard half-map FSC resolution.
+  applicable_task_refs:
+  - T12
+
+- id: T12_local_resolution_mean
+  name: local resolution mean (Å)
+  applicable_task_refs:
+  - T12
+
+- id: T12_local_resolution_std
+  name: local resolution std (Å)
+  applicable_task_refs:
+  - T12
+
+# --- Per-residue metrics (scope=residue) — feed PerResidueQuality arrays
+# --- in the QDS via PerResidueValue.metric_definition_ref.
+
+- id: T01_per_residue_lddt
+  name: per-residue lDDT
+  description: >-
+    Per-residue local distance difference test score. Stored as one
+    PerResidueValue per residue; QDS surfaces summary stats and the
+    full array on QualityDataSheet.per_residue_quality.lddt_per_residue.
+  applicable_task_refs:
+  - T01
+
+- id: T01_per_residue_displacement
+  name: per-residue Cα displacement (Å)
+  description: Distance from candidate Cα to reference Cα after global alignment.
+  applicable_task_refs:
+  - T01
+
+- id: T05_per_residue_rsrz
+  name: per-residue RSRZ
+  description: >-
+    Per-residue real-space R-factor Z-score. RSRZ > 2 flags poor
+    real-space density agreement at that residue (wwPDB validation).
+  applicable_task_refs:
+  - T05
   - T06

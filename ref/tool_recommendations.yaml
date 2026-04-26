@@ -296,3 +296,86 @@ tool_recommendations:
     evidence_refs:
       - EvansMurshudov2013
     as_of_date: '2026-04-26'
+
+  # ----- Geometry RMSZ (over-refinement detector) ----------------------
+
+  - id: REC_T05_bond_length_rmsz_top_considered
+    metric_definition_ref: T05_bond-length_rmsz
+    tool_ref: phenix.holton_geometry_validation
+    role: top_considered
+    rank: 1
+    justification: >-
+      Holton geometry validation reports per-class Z-scores. CCP4
+      REFMAC also reports geometry RMSZ; until REFMAC is installed,
+      Holton is the available oracle.
+    as_of_date: '2026-04-26'
+
+  - id: REC_T05_bond_angle_rmsz_top_considered
+    metric_definition_ref: T05_bond-angle_rmsz
+    tool_ref: phenix.holton_geometry_validation
+    role: top_considered
+    rank: 1
+    justification: Same as bond-length RMSZ.
+    as_of_date: '2026-04-26'
+
+  # ----- Cryo-EM map quality additions ---------------------------------
+
+  - id: REC_T12_cc_box_top_considered
+    metric_definition_ref: T12_cc_box
+    tool_ref: phenix.map_correlations
+    role: top_considered
+    rank: 1
+    justification: >-
+      Catalog cryo-EM CC family. Servalcat is acceptable as a
+      non-cctbx alternative.
+    evidence_refs:
+      - Afonine2018
+    as_of_date: '2026-04-26'
+
+  - id: REC_T12_cc_volume_top_considered
+    metric_definition_ref: T12_cc_volume
+    tool_ref: phenix.map_correlations
+    role: top_considered
+    rank: 1
+    justification: Same as CC_box. Cross-check with Servalcat fsc.
+    evidence_refs:
+      - Afonine2018
+    as_of_date: '2026-04-26'
+
+  - id: REC_T12_emringer_top_considered
+    metric_definition_ref: T12_emringer
+    tool_ref: phenix.emringer
+    role: top_considered
+    rank: 1
+    justification: >-
+      Reference implementation of EMRinger; reports side-chain–density
+      agreement (Barad et al. 2015). Resolution-sensitive; informative
+      above ~3 Å.
+    evidence_refs:
+      - Barad2015
+    as_of_date: '2026-04-26'
+
+  - id: REC_T12_q_score_top_considered
+    metric_definition_ref: T12_q_score
+    tool_ref: ChimeraX matchmaker
+    role: top_considered
+    rank: 1
+    justification: >-
+      MapQ ChimeraX plugin computes per-atom Q-scores (Pintilie 2020).
+      Robust to over-sharpening; complementary to CC.
+    evidence_refs:
+      - Pintilie2020
+    as_of_date: '2026-04-26'
+
+  - id: REC_T12_global_fsc_top_considered
+    metric_definition_ref: T12_global_fsc_0143
+    tool_ref: Servalcat
+    role: top_considered
+    rank: 1
+    justification: >-
+      Non-cctbx FSC implementation by the Murshudov group. RELION
+      postprocess is also acceptable when available.
+    evidence_refs:
+      - Yamashita2021
+      - Brink2021
+    as_of_date: '2026-04-26'

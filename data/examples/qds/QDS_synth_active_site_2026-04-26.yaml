@@ -1,0 +1,184 @@
+quality_data_sheets:
+- id: QDS_synth_active_site_2026-04-26
+  structure_ref: synth1
+  derived_from_evaluation_run_refs:
+  - EVAL_synth_active_site_2026-04-26
+  issued_at: '2026-04-26T08:50:58+00:00'
+  identity_block:
+    id: QDS_synth_active_site_2026-04-26_identity
+    pdb_id: synth1
+  geometry_summary:
+    id: QDS_synth_active_site_2026-04-26_geometry
+    clashscore:
+      value_numeric: 3.0
+  pairwise_comparisons:
+  - id: EVAL_synth_active_site_2026-04-26_pair_001
+    candidate_ref: synth1
+    reference_ref: synth1_starting
+    reference_kind: starting_model
+    alignment_method: TM-align
+    atoms_aligned: Cα
+    residues_aligned: 96
+    tm_score:
+      value_numeric: 0.987
+    ca_rmsd_a:
+      value_numeric: 0.41
+    delta_baseline: starting_model
+    verdict: improved
+  per_residue_quality:
+    id: QDS_synth_active_site_2026-04-26_per_residue
+    lddt_per_residue:
+    - id: EVAL_synth_active_site_2026-04-26_lddt_001
+      residue_ref: synth1:A:33
+      value:
+        value_numeric: 0.91
+      metric_definition_ref: T01_per_residue_lddt
+      tool_ref: TM-align
+    - id: EVAL_synth_active_site_2026-04-26_lddt_002
+      residue_ref: synth1:A:34
+      value:
+        value_numeric: 0.88
+      metric_definition_ref: T01_per_residue_lddt
+      tool_ref: TM-align
+    - id: EVAL_synth_active_site_2026-04-26_lddt_003
+      residue_ref: synth1:A:35
+      value:
+        value_numeric: 0.93
+      metric_definition_ref: T01_per_residue_lddt
+      tool_ref: TM-align
+    - id: EVAL_synth_active_site_2026-04-26_lddt_004
+      residue_ref: synth1:A:36
+      value:
+        value_numeric: 0.79
+      metric_definition_ref: T01_per_residue_lddt
+      tool_ref: TM-align
+    - id: EVAL_synth_active_site_2026-04-26_lddt_005
+      residue_ref: synth1:A:38
+      value:
+        value_numeric: 0.95
+      metric_definition_ref: T01_per_residue_lddt
+      tool_ref: TM-align
+    outliers:
+    - id: EVAL_synth_active_site_2026-04-26_outlier_001
+      residue_ref: synth1:A:39
+      outlier_kind: ramachandran
+      severity: moderate
+      tool_ref: MolProbity (gold)
+      details: φ,ψ outside 99.95th percentile region
+    - id: EVAL_synth_active_site_2026-04-26_outlier_002
+      residue_ref: synth1:A:8
+      outlier_kind: rotamer
+      severity: low
+      tool_ref: MolProbity (gold)
+      details: χ1 outside favored region by 14°
+    density_peaks:
+    - id: EVAL_synth_active_site_2026-04-26_peak_001
+      sigma_level: 5.2
+      coordinates_xyz:
+      - 12.34
+      - 8.97
+      - 21.05
+      nearest_atom_residue_ref: synth1:A:33
+      nearest_atom_distance_a: 2.65
+      interpretation: unmodelled water
+      tool_ref: phenix.find_peaks_holes
+  site_qualities:
+  - id: QDS_synth_active_site_2026-04-26_site_quality_synth1_active_site
+    site_ref: synth1_active_site
+    site_clashscore:
+      value_numeric: 7.2
+    site_rmsd_to_reference_a:
+      value_numeric: 0.62
+    ligand_quality:
+      id: QDS_synth_active_site_2026-04-26_ligand_quality_synth1:A:CA33
+      ligand_ref: synth1:A:CA33
+      rscc:
+        value_numeric: 0.78
+      protein_ligand_hbond_count:
+        value_numeric: 2.0
+  cross_tool_coverage:
+    id: QDS_synth_active_site_2026-04-26_coverage
+    task_coverage:
+    - id: QDS_synth_active_site_2026-04-26_coverage_T01
+      catalog_task_ref: T01
+      cctbx_oracles: []
+      non_cctbx_oracles:
+      - TM-align
+      gap_status: non-cctbx only
+    - id: QDS_synth_active_site_2026-04-26_coverage_T05
+      catalog_task_ref: T05
+      cctbx_oracles: []
+      non_cctbx_oracles:
+      - MolProbity (gold)
+      gap_status: non-cctbx only
+    - id: QDS_synth_active_site_2026-04-26_coverage_T10
+      catalog_task_ref: T10
+      cctbx_oracles: []
+      non_cctbx_oracles:
+      - MolProbity (gold)
+      - gemmi sfcalc
+      gap_status: non-cctbx only
+  tool_recommendations_applied:
+  - id: REC_T01_ca_rmsd_top_considered
+    metric_definition_ref: T01_ca_rmsd_å
+    tool_ref: TM-align
+    role: top_considered
+    rank: 1
+    justification: Sequence-independent superposition; CASP/community gold-standard
+      for pair-of-structures RMSD when alignment quality matters.
+    evidence_refs:
+    - Zhang2004
+    as_of_date: '2026-04-25'
+  - id: REC_T01_ca_rmsd_top_performing
+    metric_definition_ref: T01_ca_rmsd_å
+    tool_ref: TM-align
+    role: top_performing
+    rank: 1
+    justification: Matched phenix.superpose_models within 0.03 Å on the 1SAR eval
+      (TM-align 0.41 Å vs PHENIX 0.43 Å vs agent-reported 0.438 Å).
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-25'
+  - id: REC_T01_ca_rmsd_alternative
+    metric_definition_ref: T01_ca_rmsd_å
+    tool_ref: gemmi align
+    role: alternative
+    rank: 2
+    justification: Lightweight, scriptable second oracle. Use when TM-align is unavailable
+      or when a non-Zhang-lab implementation is needed.
+    as_of_date: '2026-04-25'
+  - id: REC_T05_clashscore_top_considered
+    metric_definition_ref: T05_clashscore
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: Standalone Richardson-lab pipeline (probe + reduce) is the catalog
+      gold standard. Same code that powers the wwPDB validation report.
+    evidence_refs:
+    - Davis2007
+    - Williams2018
+    as_of_date: '2026-04-25'
+  - id: REC_T05_clashscore_top_performing
+    metric_definition_ref: T05_clashscore
+    tool_ref: MolProbity (gold)
+    role: top_performing
+    rank: 1
+    justification: 11 unique clashes / 3027 atoms = 3.63 on 1SAR eval, in line with
+      mmtbx.validation_summary's 3.13 (Δ = 0.5, within MolProbity method noise — different
+      H-build / water handling).
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-25'
+  - id: REC_T05_clashscore_alternative_phenix
+    metric_definition_ref: T05_clashscore
+    tool_ref: mmtbx.validation_summary
+    role: alternative
+    rank: 2
+    justification: cctbx wrapper. Acceptable as a second opinion but does not satisfy
+      the trust model on its own (PHENIX-grading-PHENIX). Use with the Richardson-lab
+      standalone pipeline alongside.
+    as_of_date: '2026-04-25'
+  headline_verdict: Synthetic eval — all branches exercised. Global geometry is fine
+    (clashscore 3.0) but site clashscore is 7.2 and ligand RSCC is 0.78, both below
+    criterion. This is exactly the local regression that would be hidden by a global-only
+    QDS summary.
