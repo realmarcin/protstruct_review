@@ -180,6 +180,20 @@ enums:
       moderate:
       severe:
 
+  ContactKind:
+    description: >-
+      Kind of atom-atom contact recorded by a CoordinationContact row.
+    permissible_values:
+      inner_sphere:
+        description: Direct (first-shell) coordination contact for a metal ion.
+      outer_sphere:
+        description: Second-shell contact (water-bridged or longer).
+      hydrogen_bond:
+      hydrophobic:
+      pi_stack:
+      salt_bridge:
+      van_der_waals:
+
   SiteKind:
     description: Type of functional / structural site of interest.
     permissible_values:
@@ -463,7 +477,12 @@ classes:
         multivalued: true
 
   Refinement:
-    description: One round of model improvement. Optional at v0 — fill in for multi-round T03 work.
+    description: >-
+      One round of model improvement. Carries the per-round metrics
+      (R-work/R-free/gap/clashscore/Rama outliers/waters/mean B) that
+      a multi-round refinement campaign produces. The QDS does not
+      surface every round directly; it surfaces the trajectory and
+      the final-round numbers via the geometry / refinement summaries.
     attributes:
       id:
         identifier: true
@@ -471,10 +490,50 @@ classes:
       round_number:
         range: integer
         required: true
+      stage_label:
+        description: >-
+          Optional human label for this round ("start", "round_2",
+          "round_3_clean", "final") — useful when round_number is not
+          contiguous.
       model_file:
       mtz_file:
       evaluation_run_ref:
         range: EvaluationRun
+      r_work:
+        range: TypedMeasurementValue
+        inlined: true
+      r_free:
+        range: TypedMeasurementValue
+        inlined: true
+      r_free_gap:
+        range: TypedMeasurementValue
+        inlined: true
+      clashscore:
+        range: TypedMeasurementValue
+        inlined: true
+      ramachandran_outliers_pct:
+        range: TypedMeasurementValue
+        inlined: true
+      ramachandran_favored_pct:
+        range: TypedMeasurementValue
+        inlined: true
+      rotamer_outliers_pct:
+        range: TypedMeasurementValue
+        inlined: true
+      molprobity_score:
+        range: TypedMeasurementValue
+        inlined: true
+      waters_count:
+        range: TypedMeasurementValue
+        inlined: true
+      mean_b_factor:
+        range: TypedMeasurementValue
+        inlined: true
+      total_atoms:
+        range: TypedMeasurementValue
+        inlined: true
+      key_change:
+        description: One-line summary of what changed in this round (e.g. "+ Ca²⁺", "NQH flips").
 
   MeasurementProvenance:
     description: Audit trail for a measurement (optional at v0).
@@ -712,6 +771,16 @@ classes:
           Pair comparisons against reference structures (deposited /
           starting / AlphaFold / truth). The QDS surfaces these
           unchanged via QualityDataSheet.pairwise_comparisons.
+      refinements:
+        range: Refinement
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Per-round refinement trajectory. One Refinement record per
+          round (start / round_1 / round_2 / ... / final). Carries the
+          per-round R-factors, geometry, water count, mean B etc. so
+          the agent's per-round table can be independently re-measured
+          and stored in canonical form.
       criteria_met_count:
         range: integer
       criteria_total:
@@ -1329,7 +1398,9 @@ classes:
     description: >-
       A non-protein component of the structure: small-molecule ligand,
       ion, cofactor, or covalent modification. Identified by chemical
-      component dictionary (CCD) code where possible.
+      component dictionary (CCD) code where possible. Coordinates and
+      B-factor make every claim about a specific ion / ligand position
+      independently verifiable.
     attributes:
       id:
         identifier: true
@@ -1347,6 +1418,30 @@ classes:
       partial_occupancy:
         range: boolean
         description: True when the ligand is modelled at occupancy < 1.
+      coordinates_xyz:
+        range: float
+        multivalued: true
+        description: >-
+          Cartesian coordinates of the ligand centre (or the metal-ion
+          atom for ions) in Å. A list of three floats [x, y, z]. Lets
+          a downstream consumer cross-check the agent's stated position
+          against the deposited PDB coordinates.
+      b_factor:
+        range: TypedMeasurementValue
+        inlined: true
+        description: >-
+          Atomic B-factor (Å²) of the ligand or its central atom.
+          For ions this is the single-atom B; for molecules it is the
+          mean over the ligand atoms.
+      coordination_contacts:
+        range: CoordinationContact
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Inner-sphere / outer-sphere atom-atom contacts that define
+          the coordination geometry for ions and the H-bond network
+          for organic ligands. Each row is one atom-atom distance
+          measurement.
 
   LigandQuality:
     description: >-
@@ -1386,6 +1481,35 @@ classes:
         range: TypedMeasurementValue
         inlined: true
         description: RMSD of the ligand pose to a deposited reference complex.
+
+  CoordinationContact:
+    description: >-
+      One atom-atom distance recorded at a coordination / contact site.
+      Ions carry these as Ligand.coordination_contacts[]; the list of
+      contacts plus their distances is exactly what defines the metal
+      coordination geometry.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      atom1_residue_ref:
+        range: ResidueRef
+        description: Residue containing the first atom (None for ligand-side).
+      atom1_atom_name:
+        description: PDB atom name (e.g. "OD2", "CA", "O", "ZN").
+      atom2_residue_ref:
+        range: ResidueRef
+      atom2_atom_name:
+      ligand_ref:
+        range: Ligand
+        description: Set when one side of the contact is the ion / ligand itself.
+      distance_a:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Distance in Å.
+      kind:
+        range: ContactKind
+      notes:
 
   Site:
     description: >-

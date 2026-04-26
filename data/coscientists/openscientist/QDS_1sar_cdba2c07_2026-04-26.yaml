@@ -3,7 +3,7 @@ quality_data_sheets:
   structure_ref: 1sar
   derived_from_evaluation_run_refs:
   - EVAL_1sar_cdba2c07_2026-04-24
-  issued_at: '2026-04-26T08:57:19+00:00'
+  issued_at: '2026-04-26T09:12:19+00:00'
   identity_block:
     id: QDS_1sar_cdba2c07_2026-04-26_identity
     pdb_id: 1sar
@@ -38,6 +38,160 @@ quality_data_sheets:
     completeness_overall_pct:
       value_numeric: 99.38
       unit: '%'
+  per_residue_quality:
+    id: QDS_1sar_cdba2c07_2026-04-26_per_residue
+    displacement_per_residue_a:
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_001
+      residue_ref: 1sar:A:34
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.955
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_002
+      residue_ref: 1sar:B:83
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.92
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_003
+      residue_ref: 1sar:B:84
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.868
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_004
+      residue_ref: 1sar:B:20
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.791
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_005
+      residue_ref: 1sar:A:68
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.763
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_006
+      residue_ref: 1sar:A:32
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.745
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_007
+      residue_ref: 1sar:A:33
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.73
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_008
+      residue_ref: 1sar:B:19
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.72
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_009
+      residue_ref: 1sar:A:67
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.715
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_010
+      residue_ref: 1sar:A:35
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.708
+        unit: Å
+      tool_ref: gemmi sfcalc
+    outliers:
+    - id: EVAL_1sar_cdba2c07_2026-04-24_outlier_asn_a39
+      residue_ref: 1sar:A:39
+      outlier_kind: ramachandran
+      severity: moderate
+      tool_ref: MolProbity (gold)
+      details: phi,psi outside 99.95th percentile; both phenix.holton_geometry_validation
+        and mmtbx.validation_summary flag this residue. Agent's claim of 0.00% Rama
+        outliers does not reproduce.
+    density_peaks:
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_01
+      sigma_level: 6.177
+      nearest_atom_residue_ref: 1sar:A:54
+      nearest_atom_distance_a: 1.906
+      interpretation: Glu A 54 CD — unmodelled side-chain density; agent did not surface
+        this peak
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_02
+      sigma_level: 5.936
+      nearest_atom_residue_ref: 1sar:S:34
+      nearest_atom_distance_a: 2.437
+      interpretation: near HOH S 34 — possible alt-conf or unmodelled water
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_03
+      sigma_level: 5.83
+      nearest_atom_residue_ref: 1sar:A:67
+      nearest_atom_distance_a: 2.386
+      interpretation: Thr A 67 CG2 — side-chain disorder
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_04
+      sigma_level: 5.608
+      nearest_atom_residue_ref: 1sar:A:39
+      nearest_atom_distance_a: 1.983
+      interpretation: Asn A 39 CB — active-site flexibility (matches agent's 4.82σ
+        flag at OD1)
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_05
+      sigma_level: 4.964
+      nearest_atom_residue_ref: 1sar:B:42
+      nearest_atom_distance_a: 2.124
+      interpretation: Ser B 42 OG
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_06
+      sigma_level: 4.963
+      nearest_atom_residue_ref: 1sar:S:736
+      nearest_atom_distance_a: 2.513
+      interpretation: HOH S 736 — water adjustment (matches agent's 4.98σ peak)
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_07
+      sigma_level: 4.716
+      nearest_atom_residue_ref: 1sar:B:72
+      nearest_atom_distance_a: 2.46
+      interpretation: Cys B 72 SG
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_08
+      sigma_level: 4.342
+      nearest_atom_residue_ref: 1sar:A:48
+      nearest_atom_distance_a: 2.615
+      interpretation: Ser A 48 CB
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_09
+      sigma_level: 4.234
+      nearest_atom_residue_ref: 1sar:A:95
+      nearest_atom_distance_a: 2.28
+      interpretation: Thr A 95 OG1
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_10
+      sigma_level: 4.133
+      nearest_atom_residue_ref: 1sar:S:103
+      nearest_atom_distance_a: 1.89
+      interpretation: HOH S 103 — water adjustment
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_11
+      sigma_level: -4.108
+      nearest_atom_residue_ref: 1sar:S:401
+      nearest_atom_distance_a: 2.597
+      interpretation: HOH S 401 — modelled water with no density support
+      tool_ref: phenix.find_peaks_holes
+  site_qualities:
+  - id: QDS_1sar_cdba2c07_2026-04-26_site_quality_1sar_ca_active_site
+    site_ref: 1sar_ca_active_site
   cross_tool_coverage:
     id: QDS_1sar_cdba2c07_2026-04-26_coverage
     task_coverage:
@@ -47,6 +201,7 @@ quality_data_sheets:
       - phenix.superpose_models
       non_cctbx_oracles:
       - TM-align
+      - gemmi sfcalc
       gap_status: closed
     - id: QDS_1sar_cdba2c07_2026-04-26_coverage_T03
       catalog_task_ref: T03
@@ -63,6 +218,7 @@ quality_data_sheets:
       - phenix.holton_geometry_validation
       non_cctbx_oracles:
       - MolProbity (gold)
+      - gemmi sfcalc
       - reduce (standalone, Richardson)
       gap_status: closed
     - id: QDS_1sar_cdba2c07_2026-04-26_coverage_T06

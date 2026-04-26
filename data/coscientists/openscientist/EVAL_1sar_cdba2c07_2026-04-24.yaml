@@ -9,6 +9,7 @@ evaluation_runs:
   - T03
   - T05
   - T06
+  - T10
   - T13
   measurements:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_001
@@ -475,6 +476,215 @@ evaluation_runs:
       value_text: +14 vs input
     pass_criterion: informational
     pass_status: informational
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_water_count
+    catalog_task_ref: T05
+    stage: final
+    scope: complex
+    metric_definition_ref: T05_waters_count
+    oracle_tool_ref: gemmi sfcalc
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 159
+    oracle_measure:
+      value_numeric: 146
+    delta:
+      value_numeric: -13
+    pass_criterion: match agent claim within ±2
+    pass_status: fail_by_oracle
+    notes: Agent claim of 159 ordered waters not reproducible — oracle counts 146
+      waters in 1sar_final.pdb.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_total_atoms
+    catalog_task_ref: T05
+    stage: final
+    scope: complex
+    metric_definition_ref: T05_total_atoms
+    oracle_tool_ref: gemmi sfcalc
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 1654
+    oracle_measure:
+      value_numeric: 1641
+    delta:
+      value_numeric: -13
+    pass_criterion: exact match
+    pass_status: fail_by_oracle
+    notes: Atom count discrepancy of 13 = exactly the water-count discrepancy — agent
+      overcounted waters.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_mean_b
+    catalog_task_ref: T05
+    stage: final
+    scope: complex
+    metric_definition_ref: T05_overall_b_mean
+    oracle_tool_ref: gemmi sfcalc
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 14.6
+      unit: Å²
+    oracle_measure:
+      value_numeric: 15.98
+      unit: Å²
+    delta:
+      value_numeric: 1.38
+    pass_criterion: match within ±0.5 Å²
+    pass_status: fail_by_oracle
+    notes: 'Mean heavy-atom B from gemmi = 15.98 Å²; agent reported 14.6 Å². Distribution:
+      min 3.83, median 13.64, max 80.68.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_per_residue_displacement_summary
+    catalog_task_ref: T01
+    stage: final
+    scope: residue
+    scope_selector: all 192 residues, both chains
+    metric_definition_ref: T01_per_residue_displacement
+    oracle_tool_ref: gemmi sfcalc
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.438
+      unit: Å
+    oracle_measure:
+      value_numeric: 0.379
+      mean: 0.379
+      std_dev: 0.187
+      min_value: 0.029
+      max_value: 0.955
+      count: 192
+      unit: Å
+    pass_criterion: RMSD agreement within 0.05 Å
+    pass_status: pass
+    notes: Mean displacement 0.379 Å; RMSD 0.423 Å (agent 0.438); max 0.955 Å at Gly
+      A 34 (agent 0.98 Å) — all confirmed within method noise. Top hot-spots stored
+      in per_residue_values[].
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round0_rwork
+    catalog_task_ref: T03
+    stage: start
+    scope: complex
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.3334
+    pass_status: informational
+    notes: start R-work re-measured by phenix.model_vs_data.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round0_rfree
+    catalog_task_ref: T03
+    stage: start
+    scope: complex
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.3956
+    pass_status: informational
+    notes: start R-free re-measured by phenix.model_vs_data.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round2_rwork
+    catalog_task_ref: T03
+    stage: intermediate
+    scope: complex
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.1686
+    pass_status: informational
+    notes: round_2 R-work re-measured by phenix.model_vs_data.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round2_rfree
+    catalog_task_ref: T03
+    stage: intermediate
+    scope: complex
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.2301
+    pass_status: informational
+    notes: round_2 R-free re-measured by phenix.model_vs_data.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round3_rwork
+    catalog_task_ref: T03
+    stage: intermediate
+    scope: complex
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.1589
+    pass_status: informational
+    notes: round_3 R-work re-measured by phenix.model_vs_data.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round3_rfree
+    catalog_task_ref: T03
+    stage: intermediate
+    scope: complex
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.2164
+    pass_status: informational
+    notes: round_3 R-free re-measured by phenix.model_vs_data.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round5_rwork
+    catalog_task_ref: T03
+    stage: intermediate
+    scope: complex
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.1555
+    pass_status: informational
+    notes: round_5 R-work re-measured by phenix.model_vs_data.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round5_rfree
+    catalog_task_ref: T03
+    stage: intermediate
+    scope: complex
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.2104
+    pass_status: informational
+    notes: round_5 R-free re-measured by phenix.model_vs_data.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round6_rwork
+    catalog_task_ref: T03
+    stage: intermediate
+    scope: complex
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.1539
+    pass_status: informational
+    notes: round_6 R-work re-measured by phenix.model_vs_data.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round6_rfree
+    catalog_task_ref: T03
+    stage: intermediate
+    scope: complex
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.2068
+    pass_status: informational
+    notes: round_6 R-free re-measured by phenix.model_vs_data.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round7_rwork
+    catalog_task_ref: T03
+    stage: final
+    scope: complex
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.1564
+    pass_status: informational
+    notes: round_7 R-work re-measured by phenix.model_vs_data.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_round7_rfree
+    catalog_task_ref: T03
+    stage: final
+    scope: complex
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    oracle_measure:
+      value_numeric: 0.2116
+    pass_status: informational
+    notes: round_7 R-free re-measured by phenix.model_vs_data.
   headline_findings:
   - id: EVAL_1sar_cdba2c07_2026-04-24_H_001
     catalog_task_refs:
@@ -556,3 +766,388 @@ evaluation_runs:
     verdict_label: confirms_<_5_criterion
     notes: 11 unique clashes / 3027 atoms × 1000; mmtbx.validation_summary reports
       3.13 — Δ within MolProbity method noise
+  refinements:
+  - id: EVAL_1sar_cdba2c07_2026-04-24_R_start
+    round_number: 0
+    stage_label: start
+    key_change: deposited model — pre-refinement
+    evaluation_run_ref: EVAL_1sar_cdba2c07_2026-04-24
+    r_work:
+      value_numeric: 0.3334
+    r_free:
+      value_numeric: 0.3956
+    r_free_gap:
+      value_numeric: 0.0622
+    clashscore:
+      value_numeric: 31.66
+    ramachandran_outliers_pct:
+      value_numeric: 9.04
+      unit: '%'
+    rotamer_outliers_pct:
+      value_numeric: 28.05
+      unit: '%'
+    molprobity_score:
+      value_numeric: 3.83
+  - id: EVAL_1sar_cdba2c07_2026-04-24_R_round_2
+    round_number: 2
+    stage_label: round_2
+    key_change: NQH flips applied
+    evaluation_run_ref: EVAL_1sar_cdba2c07_2026-04-24
+    r_work:
+      value_numeric: 0.1686
+    r_free:
+      value_numeric: 0.2301
+    r_free_gap:
+      value_numeric: 0.0615
+    clashscore:
+      value_numeric: 3.13
+    ramachandran_outliers_pct:
+      value_numeric: 0.53
+      unit: '%'
+    rotamer_outliers_pct:
+      value_numeric: 6.1
+      unit: '%'
+    molprobity_score:
+      value_numeric: 1.73
+  - id: EVAL_1sar_cdba2c07_2026-04-24_R_round_3
+    round_number: 3
+    stage_label: round_3
+    key_change: + Ca²⁺, − chain B SO₄
+    evaluation_run_ref: EVAL_1sar_cdba2c07_2026-04-24
+    r_work:
+      value_numeric: 0.1589
+    r_free:
+      value_numeric: 0.2164
+    r_free_gap:
+      value_numeric: 0.0575
+    clashscore:
+      value_numeric: 3.83
+    ramachandran_outliers_pct:
+      value_numeric: 0.53
+      unit: '%'
+    rotamer_outliers_pct:
+      value_numeric: 4.27
+      unit: '%'
+    molprobity_score:
+      value_numeric: 1.65
+  - id: EVAL_1sar_cdba2c07_2026-04-24_R_round_5
+    round_number: 5
+    stage_label: round_5
+    key_change: water optimisation
+    evaluation_run_ref: EVAL_1sar_cdba2c07_2026-04-24
+    r_work:
+      value_numeric: 0.1555
+    r_free:
+      value_numeric: 0.2104
+    r_free_gap:
+      value_numeric: 0.0549
+    clashscore:
+      value_numeric: 2.78
+    ramachandran_outliers_pct:
+      value_numeric: 0.53
+      unit: '%'
+    rotamer_outliers_pct:
+      value_numeric: 4.27
+      unit: '%'
+    molprobity_score:
+      value_numeric: 1.55
+  - id: EVAL_1sar_cdba2c07_2026-04-24_R_round_6
+    round_number: 6
+    stage_label: round_6
+    key_change: water optimisation continued
+    evaluation_run_ref: EVAL_1sar_cdba2c07_2026-04-24
+    r_work:
+      value_numeric: 0.1539
+    r_free:
+      value_numeric: 0.2068
+    r_free_gap:
+      value_numeric: 0.0529
+    clashscore:
+      value_numeric: 2.44
+    ramachandran_outliers_pct:
+      value_numeric: 0.53
+      unit: '%'
+    rotamer_outliers_pct:
+      value_numeric: 6.1
+      unit: '%'
+    molprobity_score:
+      value_numeric: 1.62
+  - id: EVAL_1sar_cdba2c07_2026-04-24_R_round_7
+    round_number: 7
+    stage_label: round_7
+    key_change: NCS torsion restraints applied (final)
+    evaluation_run_ref: EVAL_1sar_cdba2c07_2026-04-24
+    r_work:
+      value_numeric: 0.1564
+    r_free:
+      value_numeric: 0.2116
+    r_free_gap:
+      value_numeric: 0.0552
+    clashscore:
+      value_numeric: 3.13
+    ramachandran_outliers_pct:
+      value_numeric: 0.53
+      unit: '%'
+    rotamer_outliers_pct:
+      value_numeric: 4.88
+      unit: '%'
+    molprobity_score:
+      value_numeric: 1.63
+  ligands:
+  - id: 1sar:A:CA98
+    structure_ref: 1sar
+    pdb_chemical_id: CA
+    chain_id: A
+    residue_number: 98
+    partial_occupancy: false
+    coordinates_xyz:
+    - 66.752
+    - 3.733
+    - 13.397
+    b_factor:
+      value_numeric: 42.73
+      unit: Å²
+    coordination_contacts:
+    - id: EVAL_1sar_cdba2c07_2026-04-24_contact_ca_asp33od2
+      atom1_residue_ref: 1sar:A:33
+      atom1_atom_name: OD2
+      atom2_atom_name: CA
+      ligand_ref: 1sar:A:CA98
+      distance_a:
+        value_numeric: 2.758
+        unit: Å
+      kind: inner_sphere
+      notes: Agent claim 2.76 Å — match within 0.002 Å.
+    - id: EVAL_1sar_cdba2c07_2026-04-24_contact_ca_thr56o
+      atom1_residue_ref: 1sar:A:56
+      atom1_atom_name: O
+      atom2_atom_name: CA
+      ligand_ref: 1sar:A:CA98
+      distance_a:
+        value_numeric: 3.124
+        unit: Å
+      kind: outer_sphere
+      notes: Agent claim 3.14 Å — match within 0.02 Å.
+    - id: EVAL_1sar_cdba2c07_2026-04-24_contact_ca_hoh537
+      atom1_residue_ref: 1sar:S:537
+      atom1_atom_name: O
+      atom2_atom_name: CA
+      ligand_ref: 1sar:A:CA98
+      distance_a:
+        value_numeric: 2.781
+        unit: Å
+      kind: inner_sphere
+      notes: Agent claim 2.75 Å — Δ = 0.031 Å.
+  - id: 1sar:B:NA98
+    structure_ref: 1sar
+    pdb_chemical_id: NA
+    chain_id: B
+    residue_number: 98
+    partial_occupancy: false
+    coordinates_xyz:
+    - 37.743
+    - 11.865
+    - 11.598
+    b_factor:
+      value_numeric: 22.85
+      unit: Å²
+    coordination_contacts:
+    - id: EVAL_1sar_cdba2c07_2026-04-24_contact_na_asp17bod2
+      atom1_residue_ref: 1sar:B:17
+      atom1_atom_name: OD2
+      atom2_atom_name: NA
+      ligand_ref: 1sar:B:NA98
+      distance_a:
+        value_numeric: 2.873
+        unit: Å
+      kind: inner_sphere
+      notes: Agent claim 2.80 Å — Δ = 0.073 Å.
+    - id: EVAL_1sar_cdba2c07_2026-04-24_contact_na_hoh93
+      atom1_residue_ref: 1sar:S:93
+      atom1_atom_name: O
+      atom2_atom_name: NA
+      ligand_ref: 1sar:B:NA98
+      distance_a:
+        value_numeric: 2.67
+        unit: Å
+      kind: inner_sphere
+      notes: Agent claim 2.68 Å — match.
+    - id: EVAL_1sar_cdba2c07_2026-04-24_contact_na_hoh605
+      atom1_residue_ref: 1sar:S:605
+      atom1_atom_name: O
+      atom2_atom_name: NA
+      ligand_ref: 1sar:B:NA98
+      distance_a:
+        value_numeric: 2.777
+        unit: Å
+      kind: inner_sphere
+      notes: Agent claim 2.90 Å — Δ = 0.123 Å.
+    - id: EVAL_1sar_cdba2c07_2026-04-24_contact_na_hoh618
+      atom1_residue_ref: 1sar:S:618
+      atom1_atom_name: O
+      atom2_atom_name: NA
+      ligand_ref: 1sar:B:NA98
+      distance_a:
+        value_numeric: 3.295
+        unit: Å
+      kind: outer_sphere
+      notes: Agent claim 3.45 Å — Δ = 0.155 Å.
+  sites:
+  - id: 1sar_ca_active_site
+    structure_ref: 1sar
+    kind: metal_coordination
+    member_residue_refs:
+    - 1sar:A:33
+    - 1sar:A:56
+    - 1sar:S:537
+    ligand_ref: 1sar:A:CA98
+    description: Canonical SNase Ca²⁺-binding site (Asp33 + Thr56 + ordered water).
+  density_peaks:
+  - id: EVAL_1sar_cdba2c07_2026-04-24_peak_01
+    sigma_level: 6.177
+    nearest_atom_residue_ref: 1sar:A:54
+    nearest_atom_distance_a: 1.906
+    interpretation: Glu A 54 CD — unmodelled side-chain density; agent did not surface
+      this peak
+    tool_ref: phenix.find_peaks_holes
+  - id: EVAL_1sar_cdba2c07_2026-04-24_peak_02
+    sigma_level: 5.936
+    nearest_atom_residue_ref: 1sar:S:34
+    nearest_atom_distance_a: 2.437
+    interpretation: near HOH S 34 — possible alt-conf or unmodelled water
+    tool_ref: phenix.find_peaks_holes
+  - id: EVAL_1sar_cdba2c07_2026-04-24_peak_03
+    sigma_level: 5.83
+    nearest_atom_residue_ref: 1sar:A:67
+    nearest_atom_distance_a: 2.386
+    interpretation: Thr A 67 CG2 — side-chain disorder
+    tool_ref: phenix.find_peaks_holes
+  - id: EVAL_1sar_cdba2c07_2026-04-24_peak_04
+    sigma_level: 5.608
+    nearest_atom_residue_ref: 1sar:A:39
+    nearest_atom_distance_a: 1.983
+    interpretation: Asn A 39 CB — active-site flexibility (matches agent's 4.82σ flag
+      at OD1)
+    tool_ref: phenix.find_peaks_holes
+  - id: EVAL_1sar_cdba2c07_2026-04-24_peak_05
+    sigma_level: 4.964
+    nearest_atom_residue_ref: 1sar:B:42
+    nearest_atom_distance_a: 2.124
+    interpretation: Ser B 42 OG
+    tool_ref: phenix.find_peaks_holes
+  - id: EVAL_1sar_cdba2c07_2026-04-24_peak_06
+    sigma_level: 4.963
+    nearest_atom_residue_ref: 1sar:S:736
+    nearest_atom_distance_a: 2.513
+    interpretation: HOH S 736 — water adjustment (matches agent's 4.98σ peak)
+    tool_ref: phenix.find_peaks_holes
+  - id: EVAL_1sar_cdba2c07_2026-04-24_peak_07
+    sigma_level: 4.716
+    nearest_atom_residue_ref: 1sar:B:72
+    nearest_atom_distance_a: 2.46
+    interpretation: Cys B 72 SG
+    tool_ref: phenix.find_peaks_holes
+  - id: EVAL_1sar_cdba2c07_2026-04-24_peak_08
+    sigma_level: 4.342
+    nearest_atom_residue_ref: 1sar:A:48
+    nearest_atom_distance_a: 2.615
+    interpretation: Ser A 48 CB
+    tool_ref: phenix.find_peaks_holes
+  - id: EVAL_1sar_cdba2c07_2026-04-24_peak_09
+    sigma_level: 4.234
+    nearest_atom_residue_ref: 1sar:A:95
+    nearest_atom_distance_a: 2.28
+    interpretation: Thr A 95 OG1
+    tool_ref: phenix.find_peaks_holes
+  - id: EVAL_1sar_cdba2c07_2026-04-24_peak_10
+    sigma_level: 4.133
+    nearest_atom_residue_ref: 1sar:S:103
+    nearest_atom_distance_a: 1.89
+    interpretation: HOH S 103 — water adjustment
+    tool_ref: phenix.find_peaks_holes
+  - id: EVAL_1sar_cdba2c07_2026-04-24_peak_11
+    sigma_level: -4.108
+    nearest_atom_residue_ref: 1sar:S:401
+    nearest_atom_distance_a: 2.597
+    interpretation: HOH S 401 — modelled water with no density support
+    tool_ref: phenix.find_peaks_holes
+  residue_outliers:
+  - id: EVAL_1sar_cdba2c07_2026-04-24_outlier_asn_a39
+    residue_ref: 1sar:A:39
+    outlier_kind: ramachandran
+    severity: moderate
+    tool_ref: MolProbity (gold)
+    details: phi,psi outside 99.95th percentile; both phenix.holton_geometry_validation
+      and mmtbx.validation_summary flag this residue. Agent's claim of 0.00% Rama
+      outliers does not reproduce.
+  per_residue_values:
+  - id: EVAL_1sar_cdba2c07_2026-04-24_disp_001
+    residue_ref: 1sar:A:34
+    metric_definition_ref: T01_per_residue_displacement
+    value:
+      value_numeric: 0.955
+      unit: Å
+    tool_ref: gemmi sfcalc
+  - id: EVAL_1sar_cdba2c07_2026-04-24_disp_002
+    residue_ref: 1sar:B:83
+    metric_definition_ref: T01_per_residue_displacement
+    value:
+      value_numeric: 0.92
+      unit: Å
+    tool_ref: gemmi sfcalc
+  - id: EVAL_1sar_cdba2c07_2026-04-24_disp_003
+    residue_ref: 1sar:B:84
+    metric_definition_ref: T01_per_residue_displacement
+    value:
+      value_numeric: 0.868
+      unit: Å
+    tool_ref: gemmi sfcalc
+  - id: EVAL_1sar_cdba2c07_2026-04-24_disp_004
+    residue_ref: 1sar:B:20
+    metric_definition_ref: T01_per_residue_displacement
+    value:
+      value_numeric: 0.791
+      unit: Å
+    tool_ref: gemmi sfcalc
+  - id: EVAL_1sar_cdba2c07_2026-04-24_disp_005
+    residue_ref: 1sar:A:68
+    metric_definition_ref: T01_per_residue_displacement
+    value:
+      value_numeric: 0.763
+      unit: Å
+    tool_ref: gemmi sfcalc
+  - id: EVAL_1sar_cdba2c07_2026-04-24_disp_006
+    residue_ref: 1sar:A:32
+    metric_definition_ref: T01_per_residue_displacement
+    value:
+      value_numeric: 0.745
+      unit: Å
+    tool_ref: gemmi sfcalc
+  - id: EVAL_1sar_cdba2c07_2026-04-24_disp_007
+    residue_ref: 1sar:A:33
+    metric_definition_ref: T01_per_residue_displacement
+    value:
+      value_numeric: 0.73
+      unit: Å
+    tool_ref: gemmi sfcalc
+  - id: EVAL_1sar_cdba2c07_2026-04-24_disp_008
+    residue_ref: 1sar:B:19
+    metric_definition_ref: T01_per_residue_displacement
+    value:
+      value_numeric: 0.72
+      unit: Å
+    tool_ref: gemmi sfcalc
+  - id: EVAL_1sar_cdba2c07_2026-04-24_disp_009
+    residue_ref: 1sar:A:67
+    metric_definition_ref: T01_per_residue_displacement
+    value:
+      value_numeric: 0.715
+      unit: Å
+    tool_ref: gemmi sfcalc
+  - id: EVAL_1sar_cdba2c07_2026-04-24_disp_010
+    residue_ref: 1sar:A:35
+    metric_definition_ref: T01_per_residue_displacement
+    value:
+      value_numeric: 0.708
+      unit: Å
+    tool_ref: gemmi sfcalc

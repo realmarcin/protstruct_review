@@ -1320,3 +1320,73 @@ metric_definitions:
   applicable_task_refs:
   - T05
   - T06
+
+# --- Trajectory / process metrics (typically captured per refinement round
+# --- on the Refinement record but also reportable as scope=complex
+# --- MeasurementValues).
+
+- id: T05_overall_b_mean
+  name: overall mean B-factor (Å²)
+  description: >-
+    Mean atomic B-factor across the model. Useful as a cross-round
+    trajectory signal and for sanity-checking B-factor scaling.
+  applicable_task_refs:
+  - T05
+  - T03
+
+- id: T05_overall_b_factor_distribution_min
+  name: overall B-factor min (Å²)
+  applicable_task_refs:
+  - T05
+
+- id: T05_overall_b_factor_distribution_max
+  name: overall B-factor max (Å²)
+  applicable_task_refs:
+  - T05
+
+- id: T03_coordinate_error_ml
+  name: coordinate error (ML, Å)
+  description: Maximum-likelihood estimate of coordinate error from refinement.
+  applicable_task_refs:
+  - T03
+
+- id: T03_data_to_parameter_ratio_nominal
+  name: data-to-parameter ratio (nominal)
+  applicable_task_refs:
+  - T03
+
+- id: T03_data_to_parameter_ratio_effective
+  name: data-to-parameter ratio (effective with NCS / restraints)
+  applicable_task_refs:
+  - T03
+
+- id: T03_ncs_torsion_restraints_count
+  name: NCS torsion restraints (count)
+  applicable_task_refs:
+  - T03
+
+- id: T05_total_atoms
+  name: total atoms in model
+  applicable_task_refs:
+  - T05
+  - T03
+
+- id: T05_waters_count
+  name: ordered water count
+  applicable_task_refs:
+  - T05
+  - T03
+
+- id: T05_rama_z_score
+  name: Ramachandran-Z score
+  description: >-
+    Z-score of the Ramachandran distribution against a high-res
+    reference. Negative scores flag systematically distorted backbone.
+  applicable_task_refs:
+  - T05
+
+- id: T10_ligand_b_factor_mean
+  name: ligand mean B-factor (Å²)
+  description: Mean B-factor over ligand atoms.
+  applicable_task_refs:
+  - T10
