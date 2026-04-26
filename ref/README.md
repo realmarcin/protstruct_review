@@ -13,6 +13,7 @@ This directory holds offline reference material and the key **task × evaluation
 | `driving_example.md` | Worked end-to-end example (**compare → refine → RMSD**) that exercises tasks T01 + T04 + T05 + T06 together. Template for future per-task driving examples. |
 | `oracle_tools.md` | Install status of independent (non-cctbx) oracle tools the catalog requires (gemmi, TM-align, probe + reduce, Servalcat); per-task oracle assignment. |
 | `eval_naming.md` | Filename convention for `EVAL_*` evaluation reports (`EVAL_<structure>_<artifact-short-id>_<YYYY-MM-DD>.{md,tsv}`). |
+| `catalog.yaml` | Canonical machine-readable catalog (LinkML-validated). The `tasks_and_evaluations.tsv` above is regenerated from this YAML by `scripts/records_to_tsv.py`. Schema lives at `schemas/protstruct_review.yaml`. |
 
 ## Regenerating the PHENIX docs mirror
 

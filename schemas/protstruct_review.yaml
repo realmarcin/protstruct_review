@@ -1,0 +1,613 @@
+id: https://w3id.org/protstruct-review/schema
+name: protstruct_review
+title: Protein Structure Review — oracles, measurements, evaluations, quality data sheets
+description: >-
+  LinkML schema for the protstruct_review harness. Models the cross-tool oracle
+  trust framework used to evaluate agentically refined or generated protein
+  structures: a static catalog of routine structural-biology tasks (T01..T14),
+  the tools that perform them, the metrics those tools report, the per-artifact
+  evaluation runs that record each tool's reading, and the per-structure
+  Quality Data Sheet that snapshots the cross-tool findings as a citable record.
+license: CC-BY-4.0
+prefixes:
+  protstruct: https://w3id.org/protstruct-review/schema/
+  linkml: https://w3id.org/linkml/
+  schema: http://schema.org/
+default_prefix: protstruct
+default_range: string
+
+imports:
+  - linkml:types
+
+# ----------------------------------------------------------------------------
+# Enums
+# ----------------------------------------------------------------------------
+enums:
+
+  CatalogTaskId:
+    description: Stable identifier for a row in the task catalog.
+    permissible_values:
+      T01: { description: Structure superposition + RMSD }
+      T02: { description: Per-residue structural comparison }
+      T03: { description: Reciprocal-space refinement (X-ray) }
+      T04: { description: Real-space refinement (map-based) }
+      T05: { description: Geometry validation }
+      T06: { description: Model-vs-data statistics }
+      T07: { description: Predicted-model processing }
+      T08: { description: Docking predicted/homology model into a map }
+      T09: { description: Molecular replacement }
+      T10: { description: Ligand fitting }
+      T11: { description: Loop / missing-region fitting }
+      T12: { description: Map quality assessment (cryo-EM) }
+      T13: { description: X-ray data quality assessment }
+      T14: { description: Hydrogen placement / protonation }
+
+  ToolFamily:
+    description: >-
+      Source code lineage of a tool. The trust model treats `non_cctbx` as
+      genuinely independent from PHENIX; `cctbx` includes any tool that
+      shares the cctbx/iotbx/mmtbx libraries (PHENIX, mmtbx.* CLI tools).
+    permissible_values:
+      cctbx:
+      non_cctbx:
+
+  Stage:
+    description: Which stage of an artifact a measurement applies to.
+    permissible_values:
+      start: { description: Pre-refinement / starting model }
+      intermediate: { description: Mid-refinement (round_N) }
+      final: { description: Post-refinement / converged model }
+      all:
+        description: Applies to the whole dataset (e.g. completeness across all reflections).
+
+  PassStatus:
+    description: Outcome of a measurement against its declared pass criterion.
+    permissible_values:
+      pass: { description: Meets the criterion }
+      fail_by_oracle: { description: Independent oracle disagrees with agent claim and criterion fails }
+      pass_with_caveat: { description: Criterion passes but a related claim is wrong }
+      pass_criterion_fail_headline: { description: Criterion passes but headline number is inaccurate }
+      fail_by_oracle_within_cctbx: { description: Two cctbx tools disagree with agent claim — needs a non-cctbx confirmation to harden }
+      informational: { description: Reported without a declared criterion }
+
+  RefinementMethod:
+    description: Experimental / computational method category for a structure.
+    permissible_values:
+      xray:
+      cryo_em:
+      predicted_model:
+      nmr:
+
+  StructureIdKind:
+    description: Which database scheme the structure id follows.
+    permissible_values:
+      pdb:
+      emdb:
+      alphafold:
+
+# ----------------------------------------------------------------------------
+# Slots — defined once, reused across classes
+# ----------------------------------------------------------------------------
+slots:
+
+  id:
+    identifier: true
+    range: string
+
+  description:
+    range: string
+
+  notes:
+    description: Free-text annotation (deltas, reconciliation comments, caveats).
+    range: string
+
+  # MeasurementResult mixin slots — the typed measurement value
+  value_numeric:
+    description: Numeric value. Exactly one of {value_numeric, value_text, is_not_applicable=true} must be set.
+    range: float
+  value_text:
+    description: >-
+      Non-numeric textual value (e.g. ranges like "49.97 → 2.50",
+      counts with annotation like "1 (Asn A 39)", percentages, or any
+      cell that is not a clean number).
+    range: string
+  unit:
+    description: Unit string (Å, °, %, σ, count). Optional.
+    range: string
+  is_not_applicable:
+    description: True when the cell is "n/a" or otherwise has no measurement.
+    range: boolean
+
+# ----------------------------------------------------------------------------
+# Classes
+# ----------------------------------------------------------------------------
+classes:
+
+  Container:
+    description: >-
+      Tree root. A single YAML document can carry any subset of the catalog
+      and per-run records. Nothing is required at this level — pass the
+      sub-collections you have.
+    tree_root: true
+    attributes:
+      catalog_tasks:
+        range: CatalogTask
+        multivalued: true
+        inlined_as_list: true
+      tools:
+        range: Tool
+        multivalued: true
+        inlined_as_list: true
+      metric_definitions:
+        range: MetricDefinition
+        multivalued: true
+        inlined_as_list: true
+      structures:
+        range: Structure
+        multivalued: true
+        inlined_as_list: true
+      experimental_data:
+        range: ExperimentalData
+        multivalued: true
+        inlined_as_list: true
+      agent_artifacts:
+        range: AgentArtifact
+        multivalued: true
+        inlined_as_list: true
+      evaluation_runs:
+        range: EvaluationRun
+        multivalued: true
+        inlined_as_list: true
+      quality_data_sheets:
+        range: QualityDataSheet
+        multivalued: true
+        inlined_as_list: true
+
+  # ------------------------------------------------------------------ mixins
+
+  Finding:
+    mixin: true
+    description: >-
+      Shared shape between per-row measurements and headline collapses —
+      both ultimately tie a (catalog_task, metric, oracle_tool) tuple to a
+      number plus optional notes.
+    attributes:
+      metric_definition_ref:
+        range: MetricDefinition
+        required: true
+      oracle_tool_ref:
+        range: Tool
+        required: true
+      oracle_family:
+        range: ToolFamily
+        required: true
+      notes:
+
+  # -------------------------------------------------------------- catalog
+
+  CatalogTask:
+    description: One row in the T01..T14 task catalog.
+    attributes:
+      id:
+        identifier: true
+        range: CatalogTaskId
+        required: true
+      task_name:
+        required: true
+      phenix_tool_refs:
+        description: PHENIX tools that primarily implement this task.
+        range: Tool
+        multivalued: true
+      phenix_doc_paths:
+        description: Doc paths under ref/phenix_docs/phenix-online.org/documentation/.
+        range: string
+        multivalued: true
+      oracle_tool_refs:
+        description: Independent (typically non-cctbx) oracles the harness uses to grade this task.
+        range: Tool
+        multivalued: true
+      metric_definition_refs:
+        description: Metrics this task is expected to produce.
+        range: MetricDefinition
+        multivalued: true
+      inputs_description:
+        description: Human prose describing typical inputs (file types, optional flags).
+      gold_standard:
+        description: Source of truth (deposition, paper, cross-tool consensus).
+      example_dataset:
+        description: A concrete dataset id (PDB/EMDB/MTZ) so a run is reproducible.
+
+  Tool:
+    description: A program executable — PHENIX entry point or external oracle.
+    attributes:
+      id:
+        identifier: true
+        required: true
+        description: Canonical tool name (e.g. phenix.superpose_models, TMalign, gemmi, probe, reduce, servalcat).
+      version:
+      install_path:
+      family:
+        range: ToolFamily
+        required: true
+      catalog_tasks_served:
+        range: CatalogTaskId
+        multivalued: true
+
+  MetricDefinition:
+    description: A named numeric deliverable that one or more tools can produce.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      name:
+        required: true
+      unit:
+      description:
+      applicable_task_refs:
+        range: CatalogTaskId
+        multivalued: true
+
+  # ------------------------------------------------------------- structures
+
+  Structure:
+    description: A protein structure target (model only — see ExperimentalData for the data side).
+    attributes:
+      id:
+        identifier: true
+        required: true
+        description: PDB id (e.g. 1sar), EMDB id (EMDB-11668), or AlphaFold accession (af-p00698-f1).
+      id_kind:
+        range: StructureIdKind
+      method:
+        range: RefinementMethod
+      resolution_a:
+        range: float
+        description: Best resolution in Ångström, where applicable.
+      space_group:
+      description:
+
+  ExperimentalData:
+    description: Reflection data, half-maps, or similar — the data side of an experiment.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      kind:
+        range: string
+        description: One of mtz, half_maps, map.
+      attached_to_structure_ref:
+        range: Structure
+      file_paths:
+        range: string
+        multivalued: true
+
+  AgentArtifact:
+    description: A bundle of files an agent produced for one structure.
+    attributes:
+      id:
+        identifier: true
+        required: true
+        description: Full UUID of the agent run, or any other stable id.
+      short_id:
+        description: First 8 hex chars of the UUID (matches eval-naming convention).
+      structure_ref:
+        range: Structure
+      agent_provider:
+        description: e.g. coscientists.
+      agent_system:
+        description: e.g. openscientist.
+      output_files:
+        range: string
+        multivalued: true
+
+  Refinement:
+    description: One round of model improvement. Optional at v0 — fill in for multi-round T03 work.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      round_number:
+        range: integer
+        required: true
+      model_file:
+      mtz_file:
+      evaluation_run_ref:
+        range: EvaluationRun
+
+  MeasurementProvenance:
+    description: Audit trail for a measurement (optional at v0).
+    attributes:
+      id:
+        identifier: true
+        required: true
+      command:
+        description: Exact CLI invocation (excluding interactive arguments).
+      tool_version:
+      input_sha256:
+        range: string
+        multivalued: true
+        description: SHA-256 of each input file, in invocation order.
+      run_at:
+        range: datetime
+
+  # ----------------------------------------------------------- measurements
+
+  MeasurementValue:
+    description: One oracle's reading of one metric at one stage on one artifact.
+    mixins:
+      - Finding
+    attributes:
+      id:
+        identifier: true
+        required: true
+      catalog_task_ref:
+        range: CatalogTaskId
+        required: true
+      stage:
+        range: Stage
+        required: true
+      metric_definition_ref:
+      oracle_tool_ref:
+      oracle_family:
+      agent_claim:
+        range: TypedMeasurementValue
+        description: Value reported by the agent.
+      oracle_measure:
+        range: TypedMeasurementValue
+        description: Value the independent oracle returned.
+      delta:
+        range: TypedMeasurementValue
+        description: Optional pre-computed difference (oracle − agent or post − pre).
+      pass_criterion:
+        description: Free-text pass criterion (e.g. "< 0.05", "match within 0.005").
+      pass_status:
+        range: PassStatus
+      notes:
+      provenance_ref:
+        range: MeasurementProvenance
+
+  TypedMeasurementValue:
+    description: >-
+      A typed carrier for one measurement value. Exactly one of
+      {value_numeric, value_text, is_not_applicable=true} should be set —
+      enforced semantically by the loader, not by a LinkML rule (LinkML
+      `rules:` for cross-slot constraints are not honoured by all
+      validators in 1.9; see scripts/tsv_to_records.py for the canonical
+      cell parser that always produces a valid combination).
+    attributes:
+      value_numeric:
+        range: float
+        description: Numeric value when the cell is a clean number.
+      value_text:
+        range: string
+        description: >-
+          Non-numeric textual value (ranges like "49.97 → 2.50",
+          counts with annotation like "1 (Asn A 39)", percentages,
+          or any cell that is not a clean number).
+      unit:
+        range: string
+        description: Unit string (Å, °, %, σ, count). Optional.
+      is_not_applicable:
+        range: boolean
+        description: True when the source cell is "n/a" or otherwise has no measurement.
+
+  HeadlineFinding:
+    description: >-
+      A collapsed top-level finding for one EvaluationRun — typically one row
+      per major metric, picking the strongest oracle (most independent) and
+      pointing back at the supporting per-row MeasurementValues.
+    mixins:
+      - Finding
+    attributes:
+      id:
+        identifier: true
+        required: true
+      catalog_task_refs:
+        range: CatalogTaskId
+        multivalued: true
+        required: true
+        description: One or more catalog tasks this finding spans (e.g. T03 + T06 for R-factor).
+      metric_definition_ref:
+      oracle_tool_ref:
+      oracle_family:
+      agent_claim:
+        range: TypedMeasurementValue
+      oracle_measure:
+        range: TypedMeasurementValue
+      verdict_label:
+        description: >-
+          Free-text label such as "confirms", "off_by_0.015", "fails_<_0.05_criterion".
+          Not an enum at v0 — the label space is still settling.
+      notes:
+      supporting_measurement_refs:
+        range: MeasurementValue
+        multivalued: true
+
+  # -------------------------------------------------------- evaluation run
+
+  EvaluationRun:
+    description: One full evaluation pass over one AgentArtifact.
+    attributes:
+      id:
+        identifier: true
+        required: true
+        description: >-
+          Unconstrained string. The eval_naming.md filename convention
+          (EVAL_<structure>_<artifact-short-id>_<YYYY-MM-DD>) lives on
+          eval_filename_stem, not here.
+      eval_filename_stem:
+        description: Filename stem matching ref/eval_naming.md.
+      structure_ref:
+        range: Structure
+        required: true
+      artifact_ref:
+        range: AgentArtifact
+      run_date:
+        range: date
+        required: true
+      catalog_tasks_applied:
+        range: CatalogTaskId
+        multivalued: true
+        required: true
+      measurements:
+        range: MeasurementValue
+        multivalued: true
+        inlined_as_list: true
+      headline_findings:
+        range: HeadlineFinding
+        multivalued: true
+        inlined_as_list: true
+      criteria_met_count:
+        range: integer
+      criteria_total:
+        range: integer
+      headline_verdict:
+        description: One-paragraph human summary of the eval outcome.
+
+  # ---------------------------------------------------- quality data sheet
+
+  QualityDataSheet:
+    description: >-
+      Per-structure citable snapshot of cross-tool findings. Generated from
+      one or more EvaluationRun records by scripts/qds_emit.py and treated
+      as immutable: when oracles change or new measurements arrive, emit a
+      new QDS (different id / issued_at), don't mutate the old one.
+    attributes:
+      id:
+        identifier: true
+        required: true
+        description: e.g. QDS_1sar_cdba2c07_2026-04-24
+      structure_ref:
+        range: Structure
+        required: true
+      derived_from_evaluation_run_refs:
+        range: EvaluationRun
+        multivalued: true
+        required: true
+      issued_at:
+        range: datetime
+        required: true
+      identity_block:
+        range: IdentityBlock
+        inlined: true
+      geometry_summary:
+        range: GeometrySummary
+        inlined: true
+      refinement_summary:
+        range: RefinementSummary
+        inlined: true
+      map_summary:
+        range: MapSummary
+        inlined: true
+      cross_tool_coverage:
+        range: CrossToolCoverage
+        inlined: true
+      headline_verdict:
+        description: One-paragraph pinned summary as of issued_at.
+
+  IdentityBlock:
+    description: Identity facts about the structure being evaluated.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      pdb_id:
+      emdb_id:
+      alphafold_id:
+      method:
+        range: RefinementMethod
+      resolution_a:
+        range: float
+      space_group:
+      description:
+
+  GeometrySummary:
+    description: Headline geometry numbers as of QDS issue date.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      clashscore:
+        range: TypedMeasurementValue
+        inlined: true
+      ramachandran_outliers_pct:
+        range: TypedMeasurementValue
+        inlined: true
+      ramachandran_favored_pct:
+        range: TypedMeasurementValue
+        inlined: true
+      rotamer_outliers_pct:
+        range: TypedMeasurementValue
+        inlined: true
+      molprobity_score:
+        range: TypedMeasurementValue
+        inlined: true
+      bond_rmsd_a:
+        range: TypedMeasurementValue
+        inlined: true
+      angle_rmsd_deg:
+        range: TypedMeasurementValue
+        inlined: true
+
+  RefinementSummary:
+    description: Headline R-factors as of QDS issue date (X-ray refinement only).
+    attributes:
+      id:
+        identifier: true
+        required: true
+      r_work:
+        range: TypedMeasurementValue
+        inlined: true
+      r_free:
+        range: TypedMeasurementValue
+        inlined: true
+      r_free_gap:
+        range: TypedMeasurementValue
+        inlined: true
+
+  MapSummary:
+    description: Headline map quality numbers as of QDS issue date (cryo-EM only).
+    attributes:
+      id:
+        identifier: true
+        required: true
+      cc_mask:
+        range: TypedMeasurementValue
+        inlined: true
+      d_fsc_model_a:
+        range: TypedMeasurementValue
+        inlined: true
+
+  CrossToolCoverage:
+    description: >-
+      Per-task summary of which tool families confirmed each measurement.
+      The point of the QDS is to make it obvious where the trust model is
+      strong (cctbx + non-cctbx agree) vs weak (cctbx only).
+    attributes:
+      id:
+        identifier: true
+        required: true
+      task_coverage:
+        range: TaskCoverage
+        multivalued: true
+        inlined_as_list: true
+
+  TaskCoverage:
+    description: One row in CrossToolCoverage — which oracles ran for this catalog task.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      catalog_task_ref:
+        range: CatalogTaskId
+        required: true
+      cctbx_oracles:
+        range: Tool
+        multivalued: true
+      non_cctbx_oracles:
+        range: Tool
+        multivalued: true
+      gap_status:
+        description: >-
+          Free-text (e.g. "closed", "closed at clashscore", "open — needs
+          standalone Rama-Z"). Settling into an enum once we see more data.

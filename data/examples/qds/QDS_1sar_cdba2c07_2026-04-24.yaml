@@ -1,0 +1,68 @@
+quality_data_sheets:
+- id: QDS_1sar_cdba2c07_2026-04-24
+  structure_ref: 1sar
+  derived_from_evaluation_run_refs:
+  - EVAL_1sar_cdba2c07_2026-04-24
+  issued_at: '2026-04-26T04:41:16+00:00'
+  identity_block:
+    id: QDS_1sar_cdba2c07_2026-04-24_identity
+    pdb_id: 1sar
+  geometry_summary:
+    id: QDS_1sar_cdba2c07_2026-04-24_geometry
+    clashscore:
+      value_numeric: 3.63
+    ramachandran_outliers_pct:
+      value_numeric: 0.53
+    ramachandran_favored_pct:
+      value_numeric: 98.4
+    rotamer_outliers_pct:
+      value_numeric: 4.88
+    molprobity_score:
+      value_numeric: 1.63
+    bond_rmsd_a:
+      value_numeric: 0.007
+    angle_rmsd_deg:
+      value_numeric: 0.85
+  refinement_summary:
+    id: QDS_1sar_cdba2c07_2026-04-24_refinement
+    r_work:
+      value_numeric: 0.1644
+    r_free:
+      value_numeric: 0.217
+    r_free_gap:
+      value_numeric: 0.0526
+  cross_tool_coverage:
+    id: QDS_1sar_cdba2c07_2026-04-24_coverage
+    task_coverage:
+    - id: QDS_1sar_cdba2c07_2026-04-24_coverage_T01
+      catalog_task_ref: T01
+      cctbx_oracles:
+      - phenix.superpose_models
+      non_cctbx_oracles:
+      - TMalign 20220412
+      - TMalign 20220412 (Zhang lab)
+      gap_status: closed
+    - id: QDS_1sar_cdba2c07_2026-04-24_coverage_T03
+      catalog_task_ref: T03
+      cctbx_oracles:
+      - phenix.model_vs_data
+      non_cctbx_oracles:
+      - gemmi sfcalc + scaled R calc
+      - servalcat sigmaa
+      gap_status: closed
+    - id: QDS_1sar_cdba2c07_2026-04-24_coverage_T05
+      catalog_task_ref: T05
+      cctbx_oracles:
+      - mmtbx.validation_summary
+      - phenix.holton_geometry_validation
+      non_cctbx_oracles:
+      - probe + reduce (Richardson lab)
+      - probe -CONdense
+      - reduce -build (H-built)
+      gap_status: closed
+    - id: QDS_1sar_cdba2c07_2026-04-24_coverage_T06
+      catalog_task_ref: T06
+      cctbx_oracles:
+      - phenix.mtz.dump
+      non_cctbx_oracles: []
+      gap_status: open — cctbx only

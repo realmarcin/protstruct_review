@@ -1,0 +1,1150 @@
+catalog_tasks:
+- id: T01
+  task_name: Structure superposition + RMSD
+  phenix_tool_refs:
+  - phenix.superpose_models
+  - phenix.chain_comparison
+  phenix_doc_paths:
+  - reference/superpose_models.html
+  - reference/chain_comparison.html
+  oracle_tool_refs:
+  - ChimeraX matchmaker
+  - PyMOL align/super/cealign
+  - TM-align
+  - gemmi align
+  - US-align
+  metric_definition_refs:
+  - T01_ca_rmsd_å
+  - T01_all-atom_rmsd_å
+  - T01_aligned_residues
+  - T01_tm-score
+  - T01_gdt-ts
+  - T01_per-residue_δca
+  inputs_description: fixed PDB|moving PDB|optional chain/atom selection
+  gold_standard: cross-tool RMSD agreement within 0.1 Å; or deposited reference pose
+  example_dataset: 1UBQ vs 1UBI; or deposited structure vs its AlphaFold model
+- id: T02
+  task_name: Per-residue structural comparison
+  phenix_tool_refs:
+  - phenix.structure_comparison
+  phenix_doc_paths:
+  - reference/structure_comparison.html
+  oracle_tool_refs:
+  - ProSMART
+  - LSQMAN
+  - PyMOL rms_cur per-residue
+  - gemmi script
+  metric_definition_refs:
+  - T02_per-residue_ramachandran_rotamer_outlier_diffs
+  - T02_ss_agreement
+  - T02_b-factor_deltas
+  - T02_ligand_com_distance
+  - T02_omega_cis_trans_flips
+  - T02_his_protonation_diffs
+  inputs_description: 2+ near-identical PDBs|optional sequence file|optional maps
+  gold_standard: cross-tool per-residue agreement; Coot inspection on hotspots
+  example_dataset: paired lysozyme mutants; NCS copies from one ASU
+- id: T03
+  task_name: Reciprocal-space refinement (X-ray)
+  phenix_tool_refs:
+  - phenix.refine
+  - phenix.den_refine
+  - phenix.rosetta_refine
+  - phenix.amber
+  phenix_doc_paths:
+  - reference/refinement.html
+  - reference/den_refine.html
+  - reference/rosetta_refine.html
+  - reference/amber.html
+  oracle_tool_refs:
+  - REFMAC5 (CCP4)
+  - BUSTER
+  - Servalcat
+  metric_definition_refs:
+  - T03_r-work
+  - T03_r-free
+  - T03_r-free_r-work_gap
+  - T03_δr-free_vs_input
+  - T03_bond_angle_rmsd
+  - T03_molprobity_score
+  - T03_clashscore
+  - T03_ramachandran_favored
+  inputs_description: starting model (PDB)|reflection data MTZ w/ F/SIGF + R-free
+    flags|optional ligand CIFs
+  gold_standard: deposited R-values; REFMAC re-refinement within 0.01–0.02
+  example_dataset: PDB 1YQV + deposited MTZ; PDB-REDO entries
+- id: T04
+  task_name: Real-space refinement (map-based)
+  phenix_tool_refs:
+  - phenix.real_space_refine
+  - phenix.varref
+  phenix_doc_paths:
+  - reference/real_space_refine.html
+  - reference/varref.html
+  oracle_tool_refs:
+  - Servalcat
+  - ISOLDE (ChimeraX)
+  - REFMAC real-space
+  - Rosetta cryo_em_refinement
+  metric_definition_refs:
+  - T04_cc_mask
+  - T04_cc_box
+  - T04_cc_peaks
+  - T04_cc_volume
+  - T04_d_fsc_model
+  - T04_δcc_vs_input
+  - T04_clashscore
+  - T04_ramachandran_favored
+  inputs_description: starting model (PDB)|map (MRC/CCP4)|resolution estimate
+  gold_standard: deposited refined model; Servalcat CC/FSC second opinion
+  example_dataset: EMDB-11668 / PDB 7a4m (apoferritin); EMDB-20646 / PDB 6u42
+- id: T05
+  task_name: Geometry validation
+  phenix_tool_refs:
+  - phenix.holton_geometry_validation
+  - phenix.validation
+  - phenix.cablam
+  - mmtbx.validation_summary
+  phenix_doc_paths:
+  - reference/holton_geometry_validation.html
+  - reference/validation.html
+  - reference/cablam_validation.html
+  oracle_tool_refs:
+  - MolProbity (gold)
+  - wwPDB validation pipeline
+  - gemmi validators
+  metric_definition_refs:
+  - T05_clashscore
+  - T05_ramachandran_favored
+  - T05_ramachandran_outlier
+  - T05_rotamer_outlier
+  - T05_cbeta_outliers
+  - T05_bond-length_rmsd
+  - T05_bond-angle_rmsd
+  - T05_planarity_rmsd
+  - T05_chirality_outliers
+  - T05_molprobity_composite
+  - T05_cablam_outliers
+  inputs_description: model (PDB/mmCIF)
+  gold_standard: MolProbity report; wwPDB validation for deposited comparator
+  example_dataset: any PDB; 3NIR as clean ultra-high-res baseline
+- id: T06
+  task_name: Model-vs-data statistics
+  phenix_tool_refs:
+  - phenix.model_vs_data
+  - phenix.mtriage
+  - phenix.fmodel
+  - phenix.map_correlations
+  phenix_doc_paths:
+  - reference/model_vs_data.html
+  - reference/mtriage.html
+  - reference/map_correlations.html
+  oracle_tool_refs:
+  - CCP4 sfcheck
+  - refmac -hklin
+  - Servalcat
+  - gemmi sfcalc
+  - gemmi validate
+  metric_definition_refs:
+  - T06_r-work
+  - T06_r-free
+  - T06_cc_work
+  - T06_cc_free
+  - T06_cc
+  - T06_map-model_fsc_global_per-shell
+  - T06_d_fsc_model
+  - T06_overall_b
+  - T06_wilson_b
+  inputs_description: model + MTZ (X-ray) or map(s) (cryo-EM)
+  gold_standard: PDB/EMDB header-reported values
+  example_dataset: PDB 1YQV + MTZ; PDB 7a4m + EMDB-11668 half-maps
+- id: T07
+  task_name: Predicted-model processing
+  phenix_tool_refs:
+  - phenix.process_predicted_model
+  - phenix.predict_model
+  - phenix.predict_and_build
+  phenix_doc_paths:
+  - reference/process_predicted_model.html
+  - reference/predict_model.html
+  - reference/predict_and_build.html
+  - overviews/predicted_models_index.html
+  oracle_tool_refs:
+  - pae_to_domains.py (Croll/Tronrud)
+  - biotite AF parsers
+  - colabfold domain-splitter
+  - ChimeraX alphafold
+  metric_definition_refs:
+  - T07_fraction_residues_retained_after_trim
+  - T07_mean_plddt_pre_post
+  - T07_b-factor_1_plddt²_correlation
+  - T07_domain_count_vs_pae_oracle
+  - T07_rmsd_of_processed_model_vs_reference_experimental
+  inputs_description: AlphaFold/RoseTTAFold prediction (PDB/mmCIF) w/ pLDDT|optional
+    PAE JSON
+  gold_standard: AlphaFold-DB pLDDT; experimental structure for same UniProt
+  example_dataset: AF-P00698-F1 vs PDB 2LYZ; AF-P0DTC2-F1 vs 6VXX
+- id: T08
+  task_name: Docking predicted/homology model into a map
+  phenix_tool_refs:
+  - phenix.dock_predicted_model
+  - phenix.dock_in_map
+  - phenix.em_placement
+  - phenix.dock_and_rebuild
+  phenix_doc_paths:
+  - reference/dock_predicted_model.html
+  - reference/dock_in_map.html
+  - reference/em_placement.html
+  - reference/dock_and_rebuild.html
+  oracle_tool_refs:
+  - ChimeraX fitmap
+  - Situs colores/collage
+  - gmfit
+  - cryoSPARC flex-refine rigid body
+  metric_definition_refs:
+  - T08_placement_cc
+  - T08_δcc_vs_random
+  - T08_rmsd_to_deposited_position
+  - T08_translation_rotation_error
+  - T08_em_placement_llg
+  inputs_description: predicted/homology model|cryo-EM map|optional mask / centre
+    guess
+  gold_standard: deposited EMDB-PDB pair
+  example_dataset: EMDB-20646 / PDB 6u42
+- id: T09
+  task_name: Molecular replacement
+  phenix_tool_refs:
+  - phenix.phaser
+  - phenix.MRage
+  - phenix.mr_rosetta
+  - phenix.morph_model
+  - phenix.sculptor
+  - phenix.ensembler
+  phenix_doc_paths:
+  - reference/phaser_mr.html
+  - reference/MRage.html
+  - reference/mr_rosetta.html
+  - reference/morph_model.html
+  - reference/sculptor.html
+  - reference/ensembler.html
+  - reference/phaser.html
+  oracle_tool_refs:
+  - MoRDa
+  - CCP4 Phaser standalone
+  - ARCIMBOLDO
+  - MOLREP
+  metric_definition_refs:
+  - T09_phaser_tfz
+  - T09_llg
+  - T09_translation_rotation
+  - T09_post-mr_r-free
+  - T09_time-to-solution
+  inputs_description: search model (trimmed AlphaFold often)|reflection MTZ|target
+    sequence|#copies per ASU
+  gold_standard: deposited structure — MR superposes within a few Å CA RMSD
+  example_dataset: PDB 1YQV Phaser tutorial data; AF-guided MR targets
+- id: T10
+  task_name: Ligand fitting
+  phenix_tool_refs:
+  - phenix.ligandfit
+  - phenix.ligand_pipeline
+  - phenix.find_all_ligands
+  - phenix.eLBOW
+  - phenix.REEL
+  - phenix.guided_ligand_replacement
+  phenix_doc_paths:
+  - reference/ligandfit.html
+  - reference/ligand_pipeline.html
+  - reference/find_all_ligands.html
+  - reference/elbow.html
+  - reference/reel.html
+  - reference/guided_ligand_replacement.html
+  oracle_tool_refs:
+  - Coot Find Ligand
+  - AFITT (OpenEye)
+  - rhofit (Global Phasing)
+  - CCP4 libcheck/acedrg
+  metric_definition_refs:
+  - T10_ligand_rscc
+  - T10_ligand_rsr
+  - T10_ligand_b_vs_surroundings
+  - T10_protein-ligand_hbond_count
+  - T10_rmsd_to_deposited_ligand_pose
+  inputs_description: apo model|map/MTZ|ligand SMILES or coordinates
+  gold_standard: deposited holo co-crystal structure
+  example_dataset: PDB 1OYT (factor Xa + inhibitor); PHENIX ligandfit tutorial
+- id: T11
+  task_name: Loop / missing-region fitting
+  phenix_tool_refs:
+  - phenix.fit_loops
+  - phenix.fix_insertions_deletions
+  - phenix.rebuild_model
+  phenix_doc_paths:
+  - reference/fit_loops.html
+  - reference/fix_insertions_deletions.html
+  - reference/rebuild_model.html
+  oracle_tool_refs:
+  - Coot Fit Loop (DB/Rama-search)
+  - ModLoop
+  - Rosetta loopmodel
+  - RosettaCM
+  metric_definition_refs:
+  - T11_loop_rscc
+  - T11_ramachandran_favored_within_loop
+  - T11_rmsd_rebuilt_vs_reference_loop
+  - T11_new_outliers
+  inputs_description: model with gap|sequence of missing segment|map/density (for
+    real-space)
+  gold_standard: deposited full model (held-out loop)
+  example_dataset: PDB 3KEE (HIV-1 protease flap); held-out loop in 3NIR
+- id: T12
+  task_name: Map quality assessment (cryo-EM)
+  phenix_tool_refs:
+  - phenix.mtriage
+  - phenix.local_resolution
+  - phenix.map_sharpening
+  - phenix.resolve_cryo_em
+  phenix_doc_paths:
+  - reference/mtriage.html
+  - reference/local_resolution.html
+  - reference/map_sharpening.html
+  - reference/resolve_cryo_em.html
+  - overviews/cryo-em_index.html
+  oracle_tool_refs:
+  - RELION postprocess
+  - cryoSPARC 3DFSC
+  - ResMap
+  - e2proc3d.py (EMAN2)
+  metric_definition_refs:
+  - T12_global_fsc_resolution_at_0.143_masked_unmasked
+  - T12_local_resolution_distribution_mean_stdev_10th_90th
+  - T12_d_fsc_model_if_model
+  - T12_b-factor_sharpening_estimate
+  inputs_description: two half-maps|optional mask|optional model
+  gold_standard: EMDB-deposited resolution; RELION postprocess report
+  example_dataset: EMDB-11668 half-maps; EMDB-20646 half-maps
+- id: T13
+  task_name: X-ray data quality assessment
+  phenix_tool_refs:
+  - phenix.xtriage
+  - phenix.reflection_statistics
+  - phenix.anomalous_signal
+  - phenix.explore_metric_symmetry
+  phenix_doc_paths:
+  - reference/xtriage.html
+  - reference/reflection_statistics.html
+  - reference/anomalous_signal.html
+  - reference/explore_metric_symmetry.html
+  oracle_tool_refs:
+  - CCP4 aimless
+  - pointless
+  - ctruncate
+  - phaser anisotropy
+  metric_definition_refs:
+  - T13_completeness_overall_outer
+  - T13_i_σ_i
+  - T13_r-merge_r-meas
+  - T13_cc½
+  - T13_l-test_twinning
+  - T13_anisotropy_δb_aniso
+  - T13_wilson_b
+  - T13_tncs_flag
+  - T13_ice-ring_flags
+  inputs_description: merged or unmerged reflection data (MTZ/SCA/CIF)
+  gold_standard: publication Table 1; aimless log on same reflections
+  example_dataset: PHENIX xtriage tutorial MTZ; PDB-REDO MTZs
+- id: T14
+  task_name: Hydrogen placement / protonation
+  phenix_tool_refs:
+  - phenix.reduce
+  - phenix.ready_set
+  phenix_doc_paths:
+  - reference/hydrogens.html
+  - reference/ready_set.html
+  oracle_tool_refs:
+  - reduce (standalone, Richardson)
+  - propka3
+  - OpenBabel --addh
+  - pdb2pqr
+  - Schrödinger PrepWizard
+  metric_definition_refs:
+  - T14_h_added
+  - T14_asn_gln_his_flips_proposed
+  - T14_clashscore_delta_pre_vs_post
+  - T14_hbond-network_consistency_vs_standalone_reduce
+  inputs_description: model without hydrogens (or partial)
+  gold_standard: standalone reduce; neutron structure if available
+  example_dataset: PDB 1HQ1; PDB 5E5V (neutron pair)
+tools:
+- id: phenix.superpose_models
+  family: cctbx
+  catalog_tasks_served:
+  - T01
+- id: phenix.chain_comparison
+  family: cctbx
+  catalog_tasks_served:
+  - T01
+- id: ChimeraX matchmaker
+  family: non_cctbx
+  catalog_tasks_served:
+  - T01
+- id: PyMOL align/super/cealign
+  family: non_cctbx
+  catalog_tasks_served:
+  - T01
+- id: TM-align
+  family: non_cctbx
+  catalog_tasks_served:
+  - T01
+- id: gemmi align
+  family: non_cctbx
+  catalog_tasks_served:
+  - T01
+- id: US-align
+  family: non_cctbx
+  catalog_tasks_served:
+  - T01
+- id: phenix.structure_comparison
+  family: cctbx
+  catalog_tasks_served:
+  - T02
+- id: ProSMART
+  family: non_cctbx
+  catalog_tasks_served:
+  - T02
+- id: LSQMAN
+  family: non_cctbx
+  catalog_tasks_served:
+  - T02
+- id: PyMOL rms_cur per-residue
+  family: non_cctbx
+  catalog_tasks_served:
+  - T02
+- id: gemmi script
+  family: non_cctbx
+  catalog_tasks_served:
+  - T02
+- id: phenix.refine
+  family: cctbx
+  catalog_tasks_served:
+  - T03
+- id: phenix.den_refine
+  family: cctbx
+  catalog_tasks_served:
+  - T03
+- id: phenix.rosetta_refine
+  family: cctbx
+  catalog_tasks_served:
+  - T03
+- id: phenix.amber
+  family: cctbx
+  catalog_tasks_served:
+  - T03
+- id: REFMAC5 (CCP4)
+  family: non_cctbx
+  catalog_tasks_served:
+  - T03
+- id: BUSTER
+  family: non_cctbx
+  catalog_tasks_served:
+  - T03
+- id: Servalcat
+  family: non_cctbx
+  catalog_tasks_served:
+  - T03
+  - T04
+  - T06
+- id: phenix.real_space_refine
+  family: cctbx
+  catalog_tasks_served:
+  - T04
+- id: phenix.varref
+  family: cctbx
+  catalog_tasks_served:
+  - T04
+- id: ISOLDE (ChimeraX)
+  family: non_cctbx
+  catalog_tasks_served:
+  - T04
+- id: REFMAC real-space
+  family: non_cctbx
+  catalog_tasks_served:
+  - T04
+- id: Rosetta cryo_em_refinement
+  family: non_cctbx
+  catalog_tasks_served:
+  - T04
+- id: phenix.holton_geometry_validation
+  family: cctbx
+  catalog_tasks_served:
+  - T05
+- id: phenix.validation
+  family: cctbx
+  catalog_tasks_served:
+  - T05
+- id: phenix.cablam
+  family: cctbx
+  catalog_tasks_served:
+  - T05
+- id: mmtbx.validation_summary
+  family: cctbx
+  catalog_tasks_served:
+  - T05
+- id: MolProbity (gold)
+  family: non_cctbx
+  catalog_tasks_served:
+  - T05
+- id: wwPDB validation pipeline
+  family: non_cctbx
+  catalog_tasks_served:
+  - T05
+- id: gemmi validators
+  family: non_cctbx
+  catalog_tasks_served:
+  - T05
+- id: phenix.model_vs_data
+  family: cctbx
+  catalog_tasks_served:
+  - T06
+- id: phenix.mtriage
+  family: cctbx
+  catalog_tasks_served:
+  - T06
+  - T12
+- id: phenix.fmodel
+  family: cctbx
+  catalog_tasks_served:
+  - T06
+- id: phenix.map_correlations
+  family: cctbx
+  catalog_tasks_served:
+  - T06
+- id: CCP4 sfcheck
+  family: non_cctbx
+  catalog_tasks_served:
+  - T06
+- id: refmac -hklin
+  family: non_cctbx
+  catalog_tasks_served:
+  - T06
+- id: gemmi sfcalc
+  family: non_cctbx
+  catalog_tasks_served:
+  - T06
+- id: gemmi validate
+  family: non_cctbx
+  catalog_tasks_served:
+  - T06
+- id: phenix.process_predicted_model
+  family: cctbx
+  catalog_tasks_served:
+  - T07
+- id: phenix.predict_model
+  family: cctbx
+  catalog_tasks_served:
+  - T07
+- id: phenix.predict_and_build
+  family: cctbx
+  catalog_tasks_served:
+  - T07
+- id: pae_to_domains.py (Croll/Tronrud)
+  family: non_cctbx
+  catalog_tasks_served:
+  - T07
+- id: biotite AF parsers
+  family: non_cctbx
+  catalog_tasks_served:
+  - T07
+- id: colabfold domain-splitter
+  family: non_cctbx
+  catalog_tasks_served:
+  - T07
+- id: ChimeraX alphafold
+  family: non_cctbx
+  catalog_tasks_served:
+  - T07
+- id: phenix.dock_predicted_model
+  family: cctbx
+  catalog_tasks_served:
+  - T08
+- id: phenix.dock_in_map
+  family: cctbx
+  catalog_tasks_served:
+  - T08
+- id: phenix.em_placement
+  family: cctbx
+  catalog_tasks_served:
+  - T08
+- id: phenix.dock_and_rebuild
+  family: cctbx
+  catalog_tasks_served:
+  - T08
+- id: ChimeraX fitmap
+  family: non_cctbx
+  catalog_tasks_served:
+  - T08
+- id: Situs colores/collage
+  family: non_cctbx
+  catalog_tasks_served:
+  - T08
+- id: gmfit
+  family: non_cctbx
+  catalog_tasks_served:
+  - T08
+- id: cryoSPARC flex-refine rigid body
+  family: non_cctbx
+  catalog_tasks_served:
+  - T08
+- id: phenix.phaser
+  family: cctbx
+  catalog_tasks_served:
+  - T09
+- id: phenix.MRage
+  family: cctbx
+  catalog_tasks_served:
+  - T09
+- id: phenix.mr_rosetta
+  family: cctbx
+  catalog_tasks_served:
+  - T09
+- id: phenix.morph_model
+  family: cctbx
+  catalog_tasks_served:
+  - T09
+- id: phenix.sculptor
+  family: cctbx
+  catalog_tasks_served:
+  - T09
+- id: phenix.ensembler
+  family: cctbx
+  catalog_tasks_served:
+  - T09
+- id: MoRDa
+  family: non_cctbx
+  catalog_tasks_served:
+  - T09
+- id: CCP4 Phaser standalone
+  family: non_cctbx
+  catalog_tasks_served:
+  - T09
+- id: ARCIMBOLDO
+  family: non_cctbx
+  catalog_tasks_served:
+  - T09
+- id: MOLREP
+  family: non_cctbx
+  catalog_tasks_served:
+  - T09
+- id: phenix.ligandfit
+  family: cctbx
+  catalog_tasks_served:
+  - T10
+- id: phenix.ligand_pipeline
+  family: cctbx
+  catalog_tasks_served:
+  - T10
+- id: phenix.find_all_ligands
+  family: cctbx
+  catalog_tasks_served:
+  - T10
+- id: phenix.eLBOW
+  family: cctbx
+  catalog_tasks_served:
+  - T10
+- id: phenix.REEL
+  family: cctbx
+  catalog_tasks_served:
+  - T10
+- id: phenix.guided_ligand_replacement
+  family: cctbx
+  catalog_tasks_served:
+  - T10
+- id: Coot Find Ligand
+  family: non_cctbx
+  catalog_tasks_served:
+  - T10
+- id: AFITT (OpenEye)
+  family: non_cctbx
+  catalog_tasks_served:
+  - T10
+- id: rhofit (Global Phasing)
+  family: non_cctbx
+  catalog_tasks_served:
+  - T10
+- id: CCP4 libcheck/acedrg
+  family: non_cctbx
+  catalog_tasks_served:
+  - T10
+- id: phenix.fit_loops
+  family: cctbx
+  catalog_tasks_served:
+  - T11
+- id: phenix.fix_insertions_deletions
+  family: cctbx
+  catalog_tasks_served:
+  - T11
+- id: phenix.rebuild_model
+  family: cctbx
+  catalog_tasks_served:
+  - T11
+- id: Coot Fit Loop (DB/Rama-search)
+  family: non_cctbx
+  catalog_tasks_served:
+  - T11
+- id: ModLoop
+  family: non_cctbx
+  catalog_tasks_served:
+  - T11
+- id: Rosetta loopmodel
+  family: non_cctbx
+  catalog_tasks_served:
+  - T11
+- id: RosettaCM
+  family: non_cctbx
+  catalog_tasks_served:
+  - T11
+- id: phenix.local_resolution
+  family: cctbx
+  catalog_tasks_served:
+  - T12
+- id: phenix.map_sharpening
+  family: cctbx
+  catalog_tasks_served:
+  - T12
+- id: phenix.resolve_cryo_em
+  family: cctbx
+  catalog_tasks_served:
+  - T12
+- id: RELION postprocess
+  family: non_cctbx
+  catalog_tasks_served:
+  - T12
+- id: cryoSPARC 3DFSC
+  family: non_cctbx
+  catalog_tasks_served:
+  - T12
+- id: ResMap
+  family: non_cctbx
+  catalog_tasks_served:
+  - T12
+- id: e2proc3d.py (EMAN2)
+  family: non_cctbx
+  catalog_tasks_served:
+  - T12
+- id: phenix.xtriage
+  family: cctbx
+  catalog_tasks_served:
+  - T13
+- id: phenix.reflection_statistics
+  family: cctbx
+  catalog_tasks_served:
+  - T13
+- id: phenix.anomalous_signal
+  family: cctbx
+  catalog_tasks_served:
+  - T13
+- id: phenix.explore_metric_symmetry
+  family: cctbx
+  catalog_tasks_served:
+  - T13
+- id: CCP4 aimless
+  family: non_cctbx
+  catalog_tasks_served:
+  - T13
+- id: pointless
+  family: non_cctbx
+  catalog_tasks_served:
+  - T13
+- id: ctruncate
+  family: non_cctbx
+  catalog_tasks_served:
+  - T13
+- id: phaser anisotropy
+  family: non_cctbx
+  catalog_tasks_served:
+  - T13
+- id: phenix.reduce
+  family: cctbx
+  catalog_tasks_served:
+  - T14
+- id: phenix.ready_set
+  family: cctbx
+  catalog_tasks_served:
+  - T14
+- id: reduce (standalone, Richardson)
+  family: non_cctbx
+  catalog_tasks_served:
+  - T14
+- id: propka3
+  family: non_cctbx
+  catalog_tasks_served:
+  - T14
+- id: OpenBabel --addh
+  family: non_cctbx
+  catalog_tasks_served:
+  - T14
+- id: pdb2pqr
+  family: non_cctbx
+  catalog_tasks_served:
+  - T14
+- id: Schrödinger PrepWizard
+  family: non_cctbx
+  catalog_tasks_served:
+  - T14
+metric_definitions:
+- id: T01_ca_rmsd_å
+  name: CA RMSD (Å)
+  applicable_task_refs:
+  - T01
+- id: T01_all-atom_rmsd_å
+  name: all-atom RMSD (Å)
+  applicable_task_refs:
+  - T01
+- id: T01_aligned_residues
+  name: '#aligned residues'
+  applicable_task_refs:
+  - T01
+- id: T01_tm-score
+  name: TM-score
+  applicable_task_refs:
+  - T01
+- id: T01_gdt-ts
+  name: GDT-TS
+  applicable_task_refs:
+  - T01
+- id: T01_per-residue_δca
+  name: per-residue ΔCA
+  applicable_task_refs:
+  - T01
+- id: T02_per-residue_ramachandran_rotamer_outlier_diffs
+  name: per-residue Ramachandran/rotamer outlier diffs
+  applicable_task_refs:
+  - T02
+- id: T02_ss_agreement
+  name: SS agreement
+  applicable_task_refs:
+  - T02
+- id: T02_b-factor_deltas
+  name: B-factor deltas
+  applicable_task_refs:
+  - T02
+- id: T02_ligand_com_distance
+  name: ligand COM distance
+  applicable_task_refs:
+  - T02
+- id: T02_omega_cis_trans_flips
+  name: omega cis/trans flips
+  applicable_task_refs:
+  - T02
+- id: T02_his_protonation_diffs
+  name: His protonation diffs
+  applicable_task_refs:
+  - T02
+- id: T03_r-work
+  name: R-work
+  applicable_task_refs:
+  - T03
+- id: T03_r-free
+  name: R-free
+  applicable_task_refs:
+  - T03
+- id: T03_r-free_r-work_gap
+  name: R-free−R-work gap
+  applicable_task_refs:
+  - T03
+- id: T03_δr-free_vs_input
+  name: ΔR-free vs input
+  applicable_task_refs:
+  - T03
+- id: T03_bond_angle_rmsd
+  name: bond/angle RMSD
+  applicable_task_refs:
+  - T03
+- id: T03_molprobity_score
+  name: MolProbity score
+  applicable_task_refs:
+  - T03
+- id: T03_clashscore
+  name: clashscore
+  applicable_task_refs:
+  - T03
+- id: T03_ramachandran_favored
+  name: Ramachandran favored %
+  applicable_task_refs:
+  - T03
+- id: T04_cc_mask
+  name: CC_mask
+  applicable_task_refs:
+  - T04
+- id: T04_cc_box
+  name: CC_box
+  applicable_task_refs:
+  - T04
+- id: T04_cc_peaks
+  name: CC_peaks
+  applicable_task_refs:
+  - T04
+- id: T04_cc_volume
+  name: CC_volume
+  applicable_task_refs:
+  - T04
+- id: T04_d_fsc_model
+  name: d_FSC_model
+  applicable_task_refs:
+  - T04
+- id: T04_δcc_vs_input
+  name: ΔCC vs input
+  applicable_task_refs:
+  - T04
+- id: T04_clashscore
+  name: clashscore
+  applicable_task_refs:
+  - T04
+- id: T04_ramachandran_favored
+  name: Ramachandran favored %
+  applicable_task_refs:
+  - T04
+- id: T05_clashscore
+  name: clashscore
+  applicable_task_refs:
+  - T05
+- id: T05_ramachandran_favored
+  name: Ramachandran favored %
+  applicable_task_refs:
+  - T05
+- id: T05_ramachandran_outlier
+  name: Ramachandran outlier %
+  applicable_task_refs:
+  - T05
+- id: T05_rotamer_outlier
+  name: rotamer outlier %
+  applicable_task_refs:
+  - T05
+- id: T05_cbeta_outliers
+  name: CBeta outliers
+  applicable_task_refs:
+  - T05
+- id: T05_bond-length_rmsd
+  name: bond-length RMSD
+  applicable_task_refs:
+  - T05
+- id: T05_bond-angle_rmsd
+  name: bond-angle RMSD
+  applicable_task_refs:
+  - T05
+- id: T05_planarity_rmsd
+  name: planarity RMSD
+  applicable_task_refs:
+  - T05
+- id: T05_chirality_outliers
+  name: chirality outliers
+  applicable_task_refs:
+  - T05
+- id: T05_molprobity_composite
+  name: MolProbity composite
+  applicable_task_refs:
+  - T05
+- id: T05_cablam_outliers
+  name: CaBLAM outliers
+  applicable_task_refs:
+  - T05
+- id: T06_r-work
+  name: R-work
+  applicable_task_refs:
+  - T06
+- id: T06_r-free
+  name: R-free
+  applicable_task_refs:
+  - T06
+- id: T06_cc_work
+  name: CC_work
+  applicable_task_refs:
+  - T06
+- id: T06_cc_free
+  name: CC_free
+  applicable_task_refs:
+  - T06
+- id: T06_cc
+  name: CC*
+  applicable_task_refs:
+  - T06
+- id: T06_map-model_fsc_global_per-shell
+  name: map-model FSC (global + per-shell)
+  applicable_task_refs:
+  - T06
+- id: T06_d_fsc_model
+  name: d_FSC_model
+  applicable_task_refs:
+  - T06
+- id: T06_overall_b
+  name: overall B
+  applicable_task_refs:
+  - T06
+- id: T06_wilson_b
+  name: Wilson B
+  applicable_task_refs:
+  - T06
+- id: T07_fraction_residues_retained_after_trim
+  name: fraction residues retained after trim
+  applicable_task_refs:
+  - T07
+- id: T07_mean_plddt_pre_post
+  name: mean pLDDT pre/post
+  applicable_task_refs:
+  - T07
+- id: T07_b-factor_1_plddt²_correlation
+  name: B-factor ↔ (1/pLDDT²) correlation
+  applicable_task_refs:
+  - T07
+- id: T07_domain_count_vs_pae_oracle
+  name: domain count vs PAE oracle
+  applicable_task_refs:
+  - T07
+- id: T07_rmsd_of_processed_model_vs_reference_experimental
+  name: RMSD of processed model vs reference experimental
+  applicable_task_refs:
+  - T07
+- id: T08_placement_cc
+  name: placement CC
+  applicable_task_refs:
+  - T08
+- id: T08_δcc_vs_random
+  name: ΔCC vs random
+  applicable_task_refs:
+  - T08
+- id: T08_rmsd_to_deposited_position
+  name: RMSD to deposited position
+  applicable_task_refs:
+  - T08
+- id: T08_translation_rotation_error
+  name: translation/rotation error
+  applicable_task_refs:
+  - T08
+- id: T08_em_placement_llg
+  name: em_placement LLG
+  applicable_task_refs:
+  - T08
+- id: T09_phaser_tfz
+  name: Phaser TFZ
+  applicable_task_refs:
+  - T09
+- id: T09_llg
+  name: LLG
+  applicable_task_refs:
+  - T09
+- id: T09_translation_rotation
+  name: translation/rotation
+  applicable_task_refs:
+  - T09
+- id: T09_post-mr_r-free
+  name: post-MR R-free
+  applicable_task_refs:
+  - T09
+- id: T09_time-to-solution
+  name: time-to-solution
+  applicable_task_refs:
+  - T09
+- id: T10_ligand_rscc
+  name: ligand RSCC
+  applicable_task_refs:
+  - T10
+- id: T10_ligand_rsr
+  name: ligand RSR
+  applicable_task_refs:
+  - T10
+- id: T10_ligand_b_vs_surroundings
+  name: ligand B vs surroundings
+  applicable_task_refs:
+  - T10
+- id: T10_protein-ligand_hbond_count
+  name: protein-ligand hbond count
+  applicable_task_refs:
+  - T10
+- id: T10_rmsd_to_deposited_ligand_pose
+  name: RMSD to deposited ligand pose
+  applicable_task_refs:
+  - T10
+- id: T11_loop_rscc
+  name: loop RSCC
+  applicable_task_refs:
+  - T11
+- id: T11_ramachandran_favored_within_loop
+  name: Ramachandran favored % within loop
+  applicable_task_refs:
+  - T11
+- id: T11_rmsd_rebuilt_vs_reference_loop
+  name: RMSD rebuilt vs reference loop
+  applicable_task_refs:
+  - T11
+- id: T11_new_outliers
+  name: '#new outliers'
+  applicable_task_refs:
+  - T11
+- id: T12_global_fsc_resolution_at_0.143_masked_unmasked
+  name: global FSC resolution at 0.143 (masked+unmasked)
+  applicable_task_refs:
+  - T12
+- id: T12_local_resolution_distribution_mean_stdev_10th_90th
+  name: local resolution distribution (mean/stdev/10th/90th)
+  applicable_task_refs:
+  - T12
+- id: T12_d_fsc_model_if_model
+  name: d_FSC_model (if model)
+  applicable_task_refs:
+  - T12
+- id: T12_b-factor_sharpening_estimate
+  name: B-factor sharpening estimate
+  applicable_task_refs:
+  - T12
+- id: T13_completeness_overall_outer
+  name: completeness (overall+outer)
+  applicable_task_refs:
+  - T13
+- id: T13_i_σ_i
+  name: ⟨I/σ(I)⟩
+  applicable_task_refs:
+  - T13
+- id: T13_r-merge_r-meas
+  name: R-merge/R-meas
+  applicable_task_refs:
+  - T13
+- id: T13_cc½
+  name: CC½
+  applicable_task_refs:
+  - T13
+- id: T13_l-test_twinning
+  name: L-test (twinning)
+  applicable_task_refs:
+  - T13
+- id: T13_anisotropy_δb_aniso
+  name: anisotropy ΔB_aniso
+  applicable_task_refs:
+  - T13
+- id: T13_wilson_b
+  name: Wilson B
+  applicable_task_refs:
+  - T13
+- id: T13_tncs_flag
+  name: tNCS flag
+  applicable_task_refs:
+  - T13
+- id: T13_ice-ring_flags
+  name: ice-ring flags
+  applicable_task_refs:
+  - T13
+- id: T14_h_added
+  name: '#H added'
+  applicable_task_refs:
+  - T14
+- id: T14_asn_gln_his_flips_proposed
+  name: Asn/Gln/His flips proposed
+  applicable_task_refs:
+  - T14
+- id: T14_clashscore_delta_pre_vs_post
+  name: clashscore delta (pre vs post)
+  applicable_task_refs:
+  - T14
+- id: T14_hbond-network_consistency_vs_standalone_reduce
+  name: hbond-network consistency vs standalone reduce
+  applicable_task_refs:
+  - T14

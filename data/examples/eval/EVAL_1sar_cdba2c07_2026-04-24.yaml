@@ -1,0 +1,557 @@
+evaluation_runs:
+- id: EVAL_1sar_cdba2c07_2026-04-24
+  eval_filename_stem: EVAL_1sar_cdba2c07_2026-04-24
+  structure_ref: 1sar
+  artifact_ref: cdba2c07-daff-4f60-ae96-12452b3a5fbb
+  run_date: '2026-04-24'
+  catalog_tasks_applied:
+  - T01
+  - T03
+  - T05
+  - T06
+  measurements:
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_001
+    catalog_task_ref: T01
+    stage: final
+    metric_definition_ref: T01_ca_rmsd_start_final_å
+    oracle_tool_ref: phenix.superpose_models
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 0.438
+    oracle_measure:
+      value_numeric: 0.43
+    delta:
+      value_numeric: -0.008
+    pass_criterion: '|Δ| ≤ 0.10 Å vs second tool'
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_002
+    catalog_task_ref: T01
+    stage: final
+    metric_definition_ref: T01_ca_rmsd_start_final_å
+    oracle_tool_ref: TMalign 20220412 (Zhang lab)
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.438
+    oracle_measure:
+      value_numeric: 0.41
+    delta:
+      value_numeric: -0.028
+    pass_criterion: '|Δ| ≤ 0.10 Å vs cctbx tool'
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_003
+    catalog_task_ref: T01
+    stage: final
+    metric_definition_ref: T01_tm-score
+    oracle_tool_ref: TMalign 20220412
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.987
+    delta:
+      is_not_applicable: true
+    pass_criterion: informational
+    pass_status: informational
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_004
+    catalog_task_ref: T03
+    stage: start
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 0.334
+    oracle_measure:
+      value_numeric: 0.3334
+    delta:
+      value_numeric: -0.0006
+    pass_criterion: match within 0.005
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_005
+    catalog_task_ref: T03
+    stage: start
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 0.396
+    oracle_measure:
+      value_numeric: 0.3956
+    delta:
+      value_numeric: -0.0004
+    pass_criterion: match within 0.005
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_006
+    catalog_task_ref: T03
+    stage: final
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 0.149
+    oracle_measure:
+      value_numeric: 0.1564
+    delta:
+      value_numeric: 0.0074
+    pass_criterion: match within 0.005
+    pass_status: fail_by_oracle
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_007
+    catalog_task_ref: T03
+    stage: final
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: gemmi sfcalc + scaled R calc
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.149
+    oracle_measure:
+      value_numeric: 0.1644
+    delta:
+      value_numeric: 0.0154
+    pass_criterion: match within 0.005
+    pass_status: fail_by_oracle
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_008
+    catalog_task_ref: T03
+    stage: final
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 0.199
+    oracle_measure:
+      value_numeric: 0.2114
+    delta:
+      value_numeric: 0.0124
+    pass_criterion: match within 0.005
+    pass_status: fail_by_oracle
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_009
+    catalog_task_ref: T03
+    stage: final
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: gemmi sfcalc + scaled R calc
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.199
+    oracle_measure:
+      value_numeric: 0.217
+    delta:
+      value_numeric: 0.018
+    pass_criterion: match within 0.005
+    pass_status: fail_by_oracle
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_010
+    catalog_task_ref: T03
+    stage: final
+    metric_definition_ref: T03_r-work_r-free_gap
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 0.05
+    oracle_measure:
+      value_numeric: 0.0552
+    delta:
+      value_numeric: 0.0052
+    pass_criterion: gap < 0.05
+    pass_status: fail_by_oracle
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_011
+    catalog_task_ref: T03
+    stage: final
+    metric_definition_ref: T03_r-work_r-free_gap
+    oracle_tool_ref: gemmi sfcalc + scaled R calc
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.05
+    oracle_measure:
+      value_numeric: 0.0526
+    delta:
+      value_numeric: 0.0026
+    pass_criterion: gap < 0.05
+    pass_status: fail_by_oracle
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_012
+    catalog_task_ref: T03
+    stage: final
+    metric_definition_ref: T03_overall_r_per-shell_weighted
+    oracle_tool_ref: servalcat sigmaa
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.184
+    delta:
+      is_not_applicable: true
+    pass_criterion: informational
+    pass_status: informational
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_013
+    catalog_task_ref: T03
+    stage: final
+    metric_definition_ref: T03_δr-free_start_final
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: -0.197
+    oracle_measure:
+      value_numeric: -0.184
+    delta:
+      value_numeric: 0.013
+    pass_criterion: better than start
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_014
+    catalog_task_ref: T05
+    stage: start
+    metric_definition_ref: T05_clashscore
+    oracle_tool_ref: mmtbx.validation_summary
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 32.59
+    oracle_measure:
+      value_numeric: 31.66
+    delta:
+      value_numeric: -0.93
+    pass_criterion: match within 1.0
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_015
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_clashscore
+    oracle_tool_ref: mmtbx.validation_summary
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 3.12
+    oracle_measure:
+      value_numeric: 3.13
+    delta:
+      value_numeric: 0.01
+    pass_criterion: < 5
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_016
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_clashscore
+    oracle_tool_ref: probe + reduce (Richardson lab)
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 3.12
+    oracle_measure:
+      value_numeric: 3.63
+    delta:
+      value_numeric: 0.51
+    pass_criterion: < 5
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_017
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_clashes_unique_pairs
+    oracle_tool_ref: probe -CONdense
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 11.0
+    delta:
+      is_not_applicable: true
+    pass_criterion: informational
+    pass_status: informational
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_018
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_atoms_used_in_clashscore_calc
+    oracle_tool_ref: reduce -build (H-built)
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 3027.0
+    delta:
+      is_not_applicable: true
+    pass_criterion: informational
+    pass_status: informational
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_019
+    catalog_task_ref: T05
+    stage: start
+    metric_definition_ref: T05_ramachandran_outliers
+    oracle_tool_ref: mmtbx.validation_summary
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 9.04
+    oracle_measure:
+      value_numeric: 9.04
+    delta:
+      value_numeric: 0.0
+    pass_criterion: exact
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_020
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_ramachandran_outliers
+    oracle_tool_ref: mmtbx.validation_summary
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 0.0
+    oracle_measure:
+      value_numeric: 0.53
+    delta:
+      value_numeric: 0.53
+    pass_criterion: < 1
+    pass_status: pass_criterion_fail_headline
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_021
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_ramachandran_outliers_count
+    oracle_tool_ref: phenix.holton_geometry_validation
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 0.0
+    oracle_measure:
+      value_text: 1 (Asn A 39)
+    delta:
+      value_numeric: 1.0
+    pass_criterion: 0 outliers
+    pass_status: fail_by_oracle_within_cctbx
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_022
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_ramachandran_favored
+    oracle_tool_ref: mmtbx.validation_summary
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 99.47
+    oracle_measure:
+      value_numeric: 98.4
+    delta:
+      value_numeric: -1.07
+    pass_criterion: '> 98'
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_023
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_rotamer_outliers
+    oracle_tool_ref: mmtbx.validation_summary
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 6.71
+    oracle_measure:
+      value_numeric: 4.88
+    delta:
+      value_numeric: -1.83
+    pass_criterion: < 5
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_024
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_c-beta_deviations_count
+    oracle_tool_ref: mmtbx.validation_summary
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 0.0
+    oracle_measure:
+      value_numeric: 0.0
+    delta:
+      value_numeric: 0.0
+    pass_criterion: '0'
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_025
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_molprobity_score
+    oracle_tool_ref: mmtbx.validation_summary
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 1.73
+    oracle_measure:
+      value_numeric: 1.63
+    delta:
+      value_numeric: -0.1
+    pass_criterion: < 2.0
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_026
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_bond_rmsd_å
+    oracle_tool_ref: mmtbx.validation_summary
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 0.008
+    oracle_measure:
+      value_numeric: 0.007
+    delta:
+      value_numeric: -0.001
+    pass_criterion: < 0.020
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_027
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_angle_rmsd
+    oracle_tool_ref: mmtbx.validation_summary
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 0.99
+    oracle_measure:
+      value_numeric: 0.85
+    delta:
+      value_numeric: -0.14
+    pass_criterion: < 2.0
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_028
+    catalog_task_ref: T05
+    stage: start
+    metric_definition_ref: T05_holton_geom-energy_ratio_σ
+    oracle_tool_ref: phenix.holton_geometry_validation
+    oracle_family: cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 3.32
+    delta:
+      is_not_applicable: true
+    pass_criterion: informational
+    pass_status: informational
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_029
+    catalog_task_ref: T05
+    stage: final
+    metric_definition_ref: T05_holton_geom-energy_ratio_σ
+    oracle_tool_ref: phenix.holton_geometry_validation
+    oracle_family: cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 1.33
+    delta:
+      is_not_applicable: true
+    pass_criterion: improvement
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_030
+    catalog_task_ref: T06
+    stage: all
+    metric_definition_ref: T06_completeness
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    agent_claim:
+      value_numeric: 99.4
+      unit: '%'
+    oracle_measure:
+      value_numeric: 99.38
+      unit: '%'
+    delta:
+      value_numeric: -0.02
+    pass_criterion: match
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_031
+    catalog_task_ref: T06
+    stage: all
+    metric_definition_ref: T06_resolution_range_å
+    oracle_tool_ref: phenix.model_vs_data
+    oracle_family: cctbx
+    agent_claim:
+      value_text: 49.97 → 2.50
+    oracle_measure:
+      value_text: 49.97 → 2.50
+    delta:
+      value_numeric: 0.0
+    pass_criterion: match
+    pass_status: pass
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_032
+    catalog_task_ref: T06
+    stage: start
+    metric_definition_ref: T06_reflections_input_mtz
+    oracle_tool_ref: phenix.mtz.dump
+    oracle_family: cctbx
+    agent_claim:
+      value_text: 7217 unique
+    oracle_measure:
+      value_numeric: 7248.0
+    delta:
+      value_numeric: 31.0
+    pass_criterion: informational
+    pass_status: informational
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_033
+    catalog_task_ref: T06
+    stage: final
+    metric_definition_ref: T06_reflections_final_mtz
+    oracle_tool_ref: phenix.mtz.dump
+    oracle_family: cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 7262.0
+    delta:
+      value_text: +14 vs input
+    pass_criterion: informational
+    pass_status: informational
+  headline_findings:
+  - id: EVAL_1sar_cdba2c07_2026-04-24_H_001
+    catalog_task_refs:
+    - T01
+    metric_definition_ref: T01_ca_rmsd_start_final_å
+    oracle_tool_ref: TMalign 20220412 (Zhang lab)
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.438
+    oracle_measure:
+      value_numeric: 0.41
+    verdict_label: confirms
+    notes: PHENIX phenix.superpose_models also reports 0.43 — three-tool agreement
+      within 0.03 Å
+  - id: EVAL_1sar_cdba2c07_2026-04-24_H_002
+    catalog_task_refs:
+    - T03
+    - T06
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: gemmi sfcalc + scaled R calc (gemmi_rfactor.py)
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.149
+    oracle_measure:
+      value_numeric: 0.164
+    verdict_label: off_by_0.015
+    notes: phenix.model_vs_data also reports 0.156 — two-oracle confirmation that
+      the agent figure is too low
+  - id: EVAL_1sar_cdba2c07_2026-04-24_H_003
+    catalog_task_refs:
+    - T03
+    - T06
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: gemmi sfcalc + scaled R calc (gemmi_rfactor.py)
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.199
+    oracle_measure:
+      value_numeric: 0.217
+    verdict_label: off_by_0.018
+    notes: phenix.model_vs_data also reports 0.211 — two-oracle confirmation
+  - id: EVAL_1sar_cdba2c07_2026-04-24_H_004
+    catalog_task_refs:
+    - T03
+    - T06
+    metric_definition_ref: T03_r-free_gap
+    oracle_tool_ref: gemmi sfcalc + scaled R calc (gemmi_rfactor.py)
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.05
+    oracle_measure:
+      value_numeric: 0.053
+    verdict_label: fails_<_0.05_criterion
+    notes: phenix.model_vs_data reports 0.055 — both independent code bases say criterion
+      fails
+  - id: EVAL_1sar_cdba2c07_2026-04-24_H_005
+    catalog_task_refs:
+    - T03
+    metric_definition_ref: T03_overall_r_per-shell_weighted
+    oracle_tool_ref: servalcat sigmaa
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.184
+    verdict_label: confirms_R_factor_range
+    notes: Murshudov-group implementation; per-shell composite R averaged over 7217
+      reflections
+  - id: EVAL_1sar_cdba2c07_2026-04-24_H_006
+    catalog_task_refs:
+    - T05
+    metric_definition_ref: T05_clashscore
+    oracle_tool_ref: probe + reduce (Richardson lab — standalone MolProbity)
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 3.12
+    oracle_measure:
+      value_numeric: 3.63
+    verdict_label: confirms_<_5_criterion
+    notes: 11 unique clashes / 3027 atoms × 1000; mmtbx.validation_summary reports
+      3.13 — Δ within MolProbity method noise
