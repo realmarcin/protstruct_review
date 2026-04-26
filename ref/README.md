@@ -14,6 +14,7 @@ This directory holds offline reference material and the key **task × evaluation
 | `oracle_tools.md` | Install status of independent (non-cctbx) oracle tools the catalog requires (gemmi, TM-align, probe + reduce, Servalcat); per-task oracle assignment. |
 | `eval_naming.md` | Filename convention for `EVAL_*` evaluation reports (`EVAL_<structure>_<artifact-short-id>_<YYYY-MM-DD>.{md,tsv}`). |
 | `catalog.yaml` | Canonical machine-readable catalog (LinkML-validated). The `tasks_and_evaluations.tsv` above is regenerated from this YAML by `scripts/records_to_tsv.py`. Schema lives at `schemas/protstruct_review.yaml`. |
+| `quality_reporting.md` | Synthesis of community consensus on the smallest defensible quality report (single-structure, X-ray / cryo-EM / predicted) and pair-of-structures (TM-score, lDDT, GDT-TS, RMSD, Δ model-vs-data). Evidence base for the QualityDataSheet schema. ~18 citations. |
 
 ## Regenerating the PHENIX docs mirror
 

@@ -85,6 +85,59 @@ enums:
       emdb:
       alphafold:
 
+  RecommendationRole:
+    description: >-
+      Role a tool fills for a given metric. `top_considered` reflects
+      community / literature consensus on the best canonical tool;
+      `top_performing` reflects empirical results within this harness
+      (often the same tool, sometimes not). `alternative` is an
+      acceptable second-line oracle; `deprecated` is kept only for
+      historical reference.
+    permissible_values:
+      top_considered:
+      top_performing:
+      alternative:
+      deprecated:
+
+  PlddtDistributionShape:
+    description: >-
+      Coarse classification of the per-residue pLDDT distribution shape.
+      Mean pLDDT alone is insufficient — distribution tells you whether
+      a model is uniformly confident or hides disordered regions.
+    permissible_values:
+      bimodal_sharp:
+        description: Confident core + disordered tails.
+      broad:
+        description: Uncertain throughout (broad spread centred on mid-range).
+      narrow_high:
+        description: Uniformly confident.
+      narrow_low:
+        description: Uniformly uncertain (suspicious).
+
+  ReferenceKind:
+    description: What kind of reference the candidate is being compared against.
+    permissible_values:
+      deposited:
+        description: A PDB/EMDB deposited entry treated as the gold standard.
+      alphafold:
+        description: An AlphaFold/RoseTTAFold prediction used as reference.
+      starting_model:
+        description: The model the agent was given to refine.
+      ground_truth:
+        description: A benchmark "truth" (e.g., ultra-high-res reference).
+      consensus:
+        description: A multi-tool consensus or PDB-REDO style re-refinement.
+
+  DeltaBaseline:
+    description: Which baseline a Δ-metric is measured against.
+    permissible_values:
+      starting_model:
+        description: Δ measured against the input / starting model.
+      reference_truth:
+        description: Δ measured against an independent gold standard.
+      same_data_reference:
+        description: Δ measured against another model refined against the same data.
+
 # ----------------------------------------------------------------------------
 # Slots — defined once, reused across classes
 # ----------------------------------------------------------------------------
@@ -160,6 +213,14 @@ classes:
         inlined_as_list: true
       quality_data_sheets:
         range: QualityDataSheet
+        multivalued: true
+        inlined_as_list: true
+      tool_recommendations:
+        range: ToolRecommendation
+        multivalued: true
+        inlined_as_list: true
+      pairwise_comparisons:
+        range: PairwiseComparison
         multivalued: true
         inlined_as_list: true
 
@@ -390,6 +451,13 @@ classes:
       is_not_applicable:
         range: boolean
         description: True when the source cell is "n/a" or otherwise has no measurement.
+      percentile:
+        range: float
+        description: >-
+          Optional rank against a reference distribution (e.g., wwPDB
+          archive percentile for clashscore at this resolution; CASP
+          ranking for TM-score). Range 0-100. Cite the source dataset
+          in `notes` on the parent measurement.
 
   HeadlineFinding:
     description: >-
@@ -499,9 +567,30 @@ classes:
       map_summary:
         range: MapSummary
         inlined: true
+      data_quality_summary:
+        range: DataQualitySummary
+        inlined: true
+        description: X-ray data quality (completeness, ⟨I/σ⟩, CC½). Optional; omit for cryo-EM and predicted models.
+      predicted_confidence_summary:
+        range: PredictedConfidenceSummary
+        inlined: true
+        description: AlphaFold/RoseTTAFold confidence (pLDDT distribution, PAE). Optional; only for predicted models.
+      pairwise_comparisons:
+        range: PairwiseComparison
+        multivalued: true
+        inlined_as_list: true
+        description: One per relevant reference (deposited / starting / AlphaFold / truth). Empty when no reference comparison applies.
       cross_tool_coverage:
         range: CrossToolCoverage
         inlined: true
+      tool_recommendations_applied:
+        range: ToolRecommendation
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Snapshot of which recommendations were active at issue time.
+          The QDS is immutable; recommendations evolve, so this captures
+          the recommendations as-of issued_at.
       headline_verdict:
         description: One-paragraph pinned summary as of issued_at.
 
@@ -611,3 +700,173 @@ classes:
         description: >-
           Free-text (e.g. "closed", "closed at clashscore", "open — needs
           standalone Rama-Z"). Settling into an enum once we see more data.
+
+  # ---------------------------------------------- new summary sub-blocks
+
+  DataQualitySummary:
+    description: >-
+      X-ray data-quality numbers — bound the model quality from below.
+      Live in the QDS for X-ray structures; absent for cryo-EM and
+      predicted. Sources: data-processing log, phenix.xtriage,
+      CCP4 aimless, gemmi.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      completeness_overall_pct:
+        range: TypedMeasurementValue
+        inlined: true
+      completeness_outer_shell_pct:
+        range: TypedMeasurementValue
+        inlined: true
+      mean_i_over_sigma_outer:
+        range: TypedMeasurementValue
+        inlined: true
+      cc_half_outer:
+        range: TypedMeasurementValue
+        inlined: true
+      r_merge:
+        range: TypedMeasurementValue
+        inlined: true
+      r_meas:
+        range: TypedMeasurementValue
+        inlined: true
+      wilson_b:
+        range: TypedMeasurementValue
+        inlined: true
+
+  PredictedConfidenceSummary:
+    description: >-
+      AlphaFold/RoseTTAFold confidence summary. Mean pLDDT alone is
+      insufficient — distribution shape is what tells you whether a
+      model is uniformly confident or hides disordered regions.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      predictor:
+        description: e.g. AlphaFold2, AlphaFold3, RoseTTAFold, ESMFold.
+      predictor_version:
+      mean_plddt:
+        range: TypedMeasurementValue
+        inlined: true
+      plddt_distribution_shape:
+        range: PlddtDistributionShape
+      pae_max_a:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Maximum PAE in Å across the matrix.
+      pae_multimer_block_min_a:
+        range: TypedMeasurementValue
+        inlined: true
+        description: >-
+          For multimers — the minimum PAE in the off-diagonal block
+          between subunits. Low values indicate confident inter-subunit
+          placement; > 15 Å typically unreliable.
+
+  PairwiseComparison:
+    description: >-
+      Candidate vs reference structure comparison. Modern default per
+      ref/quality_reporting.md is to report TM-score AND lDDT as a
+      mandatory pair (CASP15+ consensus, Mariani et al. 2013); CA RMSD
+      is reported additionally for legibility but is not the basis of
+      the verdict on its own.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      candidate_ref:
+        range: Structure
+        required: true
+      reference_ref:
+        range: Structure
+        required: true
+      reference_kind:
+        range: ReferenceKind
+        required: true
+      alignment_method:
+        required: true
+        description: >-
+          Tool used for the alignment that backs every metric in this
+          row (e.g. "TMalign", "phenix.superpose_models", "gemmi align",
+          "ChimeraX matchmaker"). State exactly one — different tools
+          give subtly different alignments.
+      atoms_aligned:
+        description: e.g. "Cα", "all-atom", "main-chain".
+      residues_aligned:
+        range: integer
+      tm_score:
+        range: TypedMeasurementValue
+        inlined: true
+      lddt:
+        range: TypedMeasurementValue
+        inlined: true
+      gdt_ts:
+        range: TypedMeasurementValue
+        inlined: true
+      gdt_ha:
+        range: TypedMeasurementValue
+        inlined: true
+      ca_rmsd_a:
+        range: TypedMeasurementValue
+        inlined: true
+      per_residue_max_displacement_a:
+        range: TypedMeasurementValue
+        inlined: true
+      delta_r_free:
+        range: TypedMeasurementValue
+        inlined: true
+        description: ΔR-free (candidate − baseline). Always quote `delta_baseline`.
+      delta_cc_mask:
+        range: TypedMeasurementValue
+        inlined: true
+        description: ΔCC_mask for cryo-EM, same baseline rules as delta_r_free.
+      delta_baseline:
+        range: DeltaBaseline
+        description: Required when any delta_* slot is populated.
+      verdict:
+        description: improved / equivalent / worse / incomparable, with rationale.
+
+  # ----------------------------------------------- tool recommendations
+
+  ToolRecommendation:
+    description: >-
+      A ranked recommendation tying a Tool to a (MetricDefinition, role)
+      pair. `top_considered` reflects literature/community consensus
+      ("the canonical tool for this metric"); `top_performing` reflects
+      empirical results within this harness ("the tool that has done
+      best on this metric in our evaluations"). Often the same tool
+      fills both roles; when they differ, both rows exist and a
+      downstream consumer can compare. Stable across evaluations until
+      the recommendation is consciously updated; bump `as_of_date` when
+      that happens, don't mutate in place.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      metric_definition_ref:
+        range: MetricDefinition
+        required: true
+      tool_ref:
+        range: Tool
+        required: true
+      role:
+        range: RecommendationRole
+        required: true
+      rank:
+        range: integer
+        description: 1 = primary recommendation, 2+ = alternatives in order.
+      justification:
+        description: >-
+          One-line rationale ("CASP gold standard for fold similarity";
+          "matches PHENIX within 0.03 Å on 1SAR eval"). Cite the source
+          paper or the EvaluationRun id that supplies the evidence.
+      evidence_refs:
+        range: string
+        multivalued: true
+        description: >-
+          Citation keys (e.g. "Zhang2004", "Williams2018") and/or
+          EvaluationRun ids that support this recommendation.
+      as_of_date:
+        range: date
+      notes:

@@ -243,6 +243,82 @@ class StructureIdKind(str, Enum):
     alphafold = "alphafold"
 
 
+class RecommendationRole(str, Enum):
+    """
+    Role a tool fills for a given metric. `top_considered` reflects community / literature consensus on the best canonical tool; `top_performing` reflects empirical results within this harness (often the same tool, sometimes not). `alternative` is an acceptable second-line oracle; `deprecated` is kept only for historical reference.
+    """
+    top_considered = "top_considered"
+    top_performing = "top_performing"
+    alternative = "alternative"
+    deprecated = "deprecated"
+
+
+class PlddtDistributionShape(str, Enum):
+    """
+    Coarse classification of the per-residue pLDDT distribution shape. Mean pLDDT alone is insufficient — distribution tells you whether a model is uniformly confident or hides disordered regions.
+    """
+    bimodal_sharp = "bimodal_sharp"
+    """
+    Confident core + disordered tails.
+    """
+    broad = "broad"
+    """
+    Uncertain throughout (broad spread centred on mid-range).
+    """
+    narrow_high = "narrow_high"
+    """
+    Uniformly confident.
+    """
+    narrow_low = "narrow_low"
+    """
+    Uniformly uncertain (suspicious).
+    """
+
+
+class ReferenceKind(str, Enum):
+    """
+    What kind of reference the candidate is being compared against.
+    """
+    deposited = "deposited"
+    """
+    A PDB/EMDB deposited entry treated as the gold standard.
+    """
+    alphafold = "alphafold"
+    """
+    An AlphaFold/RoseTTAFold prediction used as reference.
+    """
+    starting_model = "starting_model"
+    """
+    The model the agent was given to refine.
+    """
+    ground_truth = "ground_truth"
+    """
+    A benchmark "truth" (e.g., ultra-high-res reference).
+    """
+    consensus = "consensus"
+    """
+    A multi-tool consensus or PDB-REDO style re-refinement.
+    """
+
+
+class DeltaBaseline(str, Enum):
+    """
+    Which baseline a Δ-metric is measured against.
+    """
+    starting_model = "starting_model"
+    """
+    Δ measured against the input / starting model.
+    """
+    reference_truth = "reference_truth"
+    """
+    Δ measured against an independent gold standard.
+    """
+    same_data_reference = "same_data_reference"
+    """
+    Δ measured against another model refined against the same data.
+    """
+
+
 
 class Container(ConfiguredBaseModel):
     """
@@ -258,6 +334,8 @@ class Container(ConfiguredBaseModel):
     agent_artifacts: Optional[list[AgentArtifact]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container']} })
     evaluation_runs: Optional[list[EvaluationRun]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container']} })
     quality_data_sheets: Optional[list[QualityDataSheet]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container']} })
+    tool_recommendations: Optional[list[ToolRecommendation]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container']} })
+    pairwise_comparisons: Optional[list[PairwiseComparison]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'QualityDataSheet']} })
 
 
 class Finding(ConfiguredBaseModel):
@@ -266,10 +344,16 @@ class Finding(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/protstruct-review/schema', 'mixin': True})
 
-    metric_definition_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
+    metric_definition_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'ToolRecommendation']} })
     oracle_tool_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     oracle_family: ToolFamily = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
-    notes: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
+    notes: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'ToolRecommendation']} })
 
 
 class CatalogTask(ConfiguredBaseModel):
@@ -295,7 +379,11 @@ class CatalogTask(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     task_name: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask']} })
     phenix_tool_refs: Optional[list[str]] = Field(default=[], description="""PHENIX tools that primarily implement this task.""", json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask']} })
     phenix_doc_paths: Optional[list[str]] = Field(default=[], description="""Doc paths under ref/phenix_docs/phenix-online.org/documentation/.""", json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask']} })
@@ -329,7 +417,11 @@ class Tool(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     version: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Tool']} })
     install_path: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Tool']} })
     family: ToolFamily = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Tool']} })
@@ -359,7 +451,11 @@ class MetricDefinition(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     name: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['MetricDefinition']} })
     unit: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MetricDefinition', 'TypedMeasurementValue']} })
     description: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MetricDefinition', 'Structure', 'IdentityBlock']} })
@@ -389,7 +485,11 @@ class Structure(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     id_kind: Optional[StructureIdKind] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Structure']} })
     method: Optional[RefinementMethod] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Structure', 'IdentityBlock']} })
     resolution_a: Optional[float] = Field(default=None, description="""Best resolution in Ångström, where applicable.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Structure', 'IdentityBlock']} })
@@ -420,7 +520,11 @@ class ExperimentalData(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     kind: Optional[str] = Field(default=None, description="""One of mtz, half_maps, map.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ExperimentalData']} })
     attached_to_structure_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ExperimentalData']} })
     file_paths: Optional[list[str]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['ExperimentalData']} })
@@ -449,7 +553,11 @@ class AgentArtifact(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     short_id: Optional[str] = Field(default=None, description="""First 8 hex chars of the UUID (matches eval-naming convention).""", json_schema_extra = { "linkml_meta": {'domain_of': ['AgentArtifact']} })
     structure_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['AgentArtifact', 'EvaluationRun', 'QualityDataSheet']} })
     agent_provider: Optional[str] = Field(default=None, description="""e.g. coscientists.""", json_schema_extra = { "linkml_meta": {'domain_of': ['AgentArtifact']} })
@@ -480,7 +588,11 @@ class Refinement(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     round_number: int = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Refinement']} })
     model_file: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Refinement']} })
     mtz_file: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Refinement']} })
@@ -510,7 +622,11 @@ class MeasurementProvenance(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     command: Optional[str] = Field(default=None, description="""Exact CLI invocation (excluding interactive arguments).""", json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementProvenance']} })
     tool_version: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementProvenance']} })
     input_sha256: Optional[list[str]] = Field(default=[], description="""SHA-256 of each input file, in invocation order.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementProvenance']} })
@@ -541,10 +657,17 @@ class MeasurementValue(Finding):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     catalog_task_ref: CatalogTaskId = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'TaskCoverage']} })
     stage: Stage = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue']} })
-    metric_definition_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
+    metric_definition_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'ToolRecommendation']} })
     oracle_tool_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     oracle_family: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     agent_claim: Optional[TypedMeasurementValue] = Field(default=None, description="""Value reported by the agent.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'HeadlineFinding']} })
@@ -552,7 +675,10 @@ class MeasurementValue(Finding):
     delta: Optional[TypedMeasurementValue] = Field(default=None, description="""Optional pre-computed difference (oracle − agent or post − pre).""", json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue']} })
     pass_criterion: Optional[str] = Field(default=None, description="""Free-text pass criterion (e.g. \"< 0.05\", \"match within 0.005\").""", json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue']} })
     pass_status: Optional[PassStatus] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue']} })
-    notes: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
+    notes: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'ToolRecommendation']} })
     provenance_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue']} })
 
 
@@ -566,6 +692,7 @@ class TypedMeasurementValue(ConfiguredBaseModel):
     value_text: Optional[str] = Field(default=None, description="""Non-numeric textual value (ranges like \"49.97 → 2.50\", counts with annotation like \"1 (Asn A 39)\", percentages, or any cell that is not a clean number).""", json_schema_extra = { "linkml_meta": {'domain_of': ['TypedMeasurementValue']} })
     unit: Optional[str] = Field(default=None, description="""Unit string (Å, °, %, σ, count). Optional.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MetricDefinition', 'TypedMeasurementValue']} })
     is_not_applicable: Optional[bool] = Field(default=None, description="""True when the source cell is \"n/a\" or otherwise has no measurement.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TypedMeasurementValue']} })
+    percentile: Optional[float] = Field(default=None, description="""Optional rank against a reference distribution (e.g., wwPDB archive percentile for clashscore at this resolution; CASP ranking for TM-score). Range 0-100. Cite the source dataset in `notes` on the parent measurement.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TypedMeasurementValue']} })
 
 
 class HeadlineFinding(Finding):
@@ -592,15 +719,25 @@ class HeadlineFinding(Finding):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     catalog_task_refs: list[CatalogTaskId] = Field(default=..., description="""One or more catalog tasks this finding spans (e.g. T03 + T06 for R-factor).""", json_schema_extra = { "linkml_meta": {'domain_of': ['HeadlineFinding']} })
-    metric_definition_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
+    metric_definition_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'ToolRecommendation']} })
     oracle_tool_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     oracle_family: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     agent_claim: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'HeadlineFinding']} })
     oracle_measure: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'HeadlineFinding']} })
     verdict_label: Optional[str] = Field(default=None, description="""Free-text label such as \"confirms\", \"off_by_0.015\", \"fails_<_0.05_criterion\". Not an enum at v0 — the label space is still settling.""", json_schema_extra = { "linkml_meta": {'domain_of': ['HeadlineFinding']} })
-    notes: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
+    notes: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'ToolRecommendation']} })
     supporting_measurement_refs: Optional[list[str]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['HeadlineFinding']} })
 
 
@@ -627,7 +764,11 @@ class EvaluationRun(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     eval_filename_stem: Optional[str] = Field(default=None, description="""Filename stem matching ref/eval_naming.md.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
     structure_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['AgentArtifact', 'EvaluationRun', 'QualityDataSheet']} })
     artifact_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
@@ -663,7 +804,11 @@ class QualityDataSheet(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     structure_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['AgentArtifact', 'EvaluationRun', 'QualityDataSheet']} })
     derived_from_evaluation_run_refs: list[str] = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
     issued_at: datetime  = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
@@ -671,7 +816,11 @@ class QualityDataSheet(ConfiguredBaseModel):
     geometry_summary: Optional[GeometrySummary] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
     refinement_summary: Optional[RefinementSummary] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
     map_summary: Optional[MapSummary] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
+    data_quality_summary: Optional[DataQualitySummary] = Field(default=None, description="""X-ray data quality (completeness, ⟨I/σ⟩, CC½). Optional; omit for cryo-EM and predicted models.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
+    predicted_confidence_summary: Optional[PredictedConfidenceSummary] = Field(default=None, description="""AlphaFold/RoseTTAFold confidence (pLDDT distribution, PAE). Optional; only for predicted models.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
+    pairwise_comparisons: Optional[list[PairwiseComparison]] = Field(default=[], description="""One per relevant reference (deposited / starting / AlphaFold / truth). Empty when no reference comparison applies.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'QualityDataSheet']} })
     cross_tool_coverage: Optional[CrossToolCoverage] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
+    tool_recommendations_applied: Optional[list[ToolRecommendation]] = Field(default=[], description="""Snapshot of which recommendations were active at issue time. The QDS is immutable; recommendations evolve, so this captures the recommendations as-of issued_at.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
     headline_verdict: Optional[str] = Field(default=None, description="""One-paragraph pinned summary as of issued_at.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun', 'QualityDataSheet']} })
 
 
@@ -698,7 +847,11 @@ class IdentityBlock(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     pdb_id: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['IdentityBlock']} })
     emdb_id: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['IdentityBlock']} })
     alphafold_id: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['IdentityBlock']} })
@@ -731,7 +884,11 @@ class GeometrySummary(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     clashscore: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['GeometrySummary']} })
     ramachandran_outliers_pct: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['GeometrySummary']} })
     ramachandran_favored_pct: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['GeometrySummary']} })
@@ -764,7 +921,11 @@ class RefinementSummary(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     r_work: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['RefinementSummary']} })
     r_free: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['RefinementSummary']} })
     r_free_gap: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['RefinementSummary']} })
@@ -793,7 +954,11 @@ class MapSummary(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     cc_mask: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
     d_fsc_model_a: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MapSummary']} })
 
@@ -821,7 +986,11 @@ class CrossToolCoverage(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     task_coverage: Optional[list[TaskCoverage]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['CrossToolCoverage']} })
 
 
@@ -848,11 +1017,178 @@ class TaskCoverage(ConfiguredBaseModel):
                        'RefinementSummary',
                        'MapSummary',
                        'CrossToolCoverage',
-                       'TaskCoverage']} })
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
     catalog_task_ref: CatalogTaskId = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'TaskCoverage']} })
     cctbx_oracles: Optional[list[str]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['TaskCoverage']} })
     non_cctbx_oracles: Optional[list[str]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['TaskCoverage']} })
     gap_status: Optional[str] = Field(default=None, description="""Free-text (e.g. \"closed\", \"closed at clashscore\", \"open — needs standalone Rama-Z\"). Settling into an enum once we see more data.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TaskCoverage']} })
+
+
+class DataQualitySummary(ConfiguredBaseModel):
+    """
+    X-ray data-quality numbers — bound the model quality from below. Live in the QDS for X-ray structures; absent for cryo-EM and predicted. Sources: data-processing log, phenix.xtriage, CCP4 aimless, gemmi.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/protstruct-review/schema'})
+
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask',
+                       'Tool',
+                       'MetricDefinition',
+                       'Structure',
+                       'ExperimentalData',
+                       'AgentArtifact',
+                       'Refinement',
+                       'MeasurementProvenance',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'EvaluationRun',
+                       'QualityDataSheet',
+                       'IdentityBlock',
+                       'GeometrySummary',
+                       'RefinementSummary',
+                       'MapSummary',
+                       'CrossToolCoverage',
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
+    completeness_overall_pct: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['DataQualitySummary']} })
+    completeness_outer_shell_pct: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['DataQualitySummary']} })
+    mean_i_over_sigma_outer: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['DataQualitySummary']} })
+    cc_half_outer: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['DataQualitySummary']} })
+    r_merge: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['DataQualitySummary']} })
+    r_meas: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['DataQualitySummary']} })
+    wilson_b: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['DataQualitySummary']} })
+
+
+class PredictedConfidenceSummary(ConfiguredBaseModel):
+    """
+    AlphaFold/RoseTTAFold confidence summary. Mean pLDDT alone is insufficient — distribution shape is what tells you whether a model is uniformly confident or hides disordered regions.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/protstruct-review/schema'})
+
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask',
+                       'Tool',
+                       'MetricDefinition',
+                       'Structure',
+                       'ExperimentalData',
+                       'AgentArtifact',
+                       'Refinement',
+                       'MeasurementProvenance',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'EvaluationRun',
+                       'QualityDataSheet',
+                       'IdentityBlock',
+                       'GeometrySummary',
+                       'RefinementSummary',
+                       'MapSummary',
+                       'CrossToolCoverage',
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
+    predictor: Optional[str] = Field(default=None, description="""e.g. AlphaFold2, AlphaFold3, RoseTTAFold, ESMFold.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PredictedConfidenceSummary']} })
+    predictor_version: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PredictedConfidenceSummary']} })
+    mean_plddt: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PredictedConfidenceSummary']} })
+    plddt_distribution_shape: Optional[PlddtDistributionShape] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PredictedConfidenceSummary']} })
+    pae_max_a: Optional[TypedMeasurementValue] = Field(default=None, description="""Maximum PAE in Å across the matrix.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PredictedConfidenceSummary']} })
+    pae_multimer_block_min_a: Optional[TypedMeasurementValue] = Field(default=None, description="""For multimers — the minimum PAE in the off-diagonal block between subunits. Low values indicate confident inter-subunit placement; > 15 Å typically unreliable.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PredictedConfidenceSummary']} })
+
+
+class PairwiseComparison(ConfiguredBaseModel):
+    """
+    Candidate vs reference structure comparison. Modern default per ref/quality_reporting.md is to report TM-score AND lDDT as a mandatory pair (CASP15+ consensus, Mariani et al. 2013); CA RMSD is reported additionally for legibility but is not the basis of the verdict on its own.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/protstruct-review/schema'})
+
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask',
+                       'Tool',
+                       'MetricDefinition',
+                       'Structure',
+                       'ExperimentalData',
+                       'AgentArtifact',
+                       'Refinement',
+                       'MeasurementProvenance',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'EvaluationRun',
+                       'QualityDataSheet',
+                       'IdentityBlock',
+                       'GeometrySummary',
+                       'RefinementSummary',
+                       'MapSummary',
+                       'CrossToolCoverage',
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
+    candidate_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    reference_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    reference_kind: ReferenceKind = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    alignment_method: str = Field(default=..., description="""Tool used for the alignment that backs every metric in this row (e.g. \"TMalign\", \"phenix.superpose_models\", \"gemmi align\", \"ChimeraX matchmaker\"). State exactly one — different tools give subtly different alignments.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    atoms_aligned: Optional[str] = Field(default=None, description="""e.g. \"Cα\", \"all-atom\", \"main-chain\".""", json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    residues_aligned: Optional[int] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    tm_score: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    lddt: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    gdt_ts: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    gdt_ha: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    ca_rmsd_a: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    per_residue_max_displacement_a: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    delta_r_free: Optional[TypedMeasurementValue] = Field(default=None, description="""ΔR-free (candidate − baseline). Always quote `delta_baseline`.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    delta_cc_mask: Optional[TypedMeasurementValue] = Field(default=None, description="""ΔCC_mask for cryo-EM, same baseline rules as delta_r_free.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    delta_baseline: Optional[DeltaBaseline] = Field(default=None, description="""Required when any delta_* slot is populated.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+    verdict: Optional[str] = Field(default=None, description="""improved / equivalent / worse / incomparable, with rationale.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PairwiseComparison']} })
+
+
+class ToolRecommendation(ConfiguredBaseModel):
+    """
+    A ranked recommendation tying a Tool to a (MetricDefinition, role) pair. `top_considered` reflects literature/community consensus (\"the canonical tool for this metric\"); `top_performing` reflects empirical results within this harness (\"the tool that has done best on this metric in our evaluations\"). Often the same tool fills both roles; when they differ, both rows exist and a downstream consumer can compare. Stable across evaluations until the recommendation is consciously updated; bump `as_of_date` when that happens, don't mutate in place.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/protstruct-review/schema'})
+
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask',
+                       'Tool',
+                       'MetricDefinition',
+                       'Structure',
+                       'ExperimentalData',
+                       'AgentArtifact',
+                       'Refinement',
+                       'MeasurementProvenance',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'EvaluationRun',
+                       'QualityDataSheet',
+                       'IdentityBlock',
+                       'GeometrySummary',
+                       'RefinementSummary',
+                       'MapSummary',
+                       'CrossToolCoverage',
+                       'TaskCoverage',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation']} })
+    metric_definition_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'ToolRecommendation']} })
+    tool_ref: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation']} })
+    role: RecommendationRole = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation']} })
+    rank: Optional[int] = Field(default=None, description="""1 = primary recommendation, 2+ = alternatives in order.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation']} })
+    justification: Optional[str] = Field(default=None, description="""One-line rationale (\"CASP gold standard for fold similarity\"; \"matches PHENIX within 0.03 Å on 1SAR eval\"). Cite the source paper or the EvaluationRun id that supplies the evidence.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation']} })
+    evidence_refs: Optional[list[str]] = Field(default=[], description="""Citation keys (e.g. \"Zhang2004\", \"Williams2018\") and/or EvaluationRun ids that support this recommendation.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation']} })
+    as_of_date: Optional[date] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation']} })
+    notes: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'ToolRecommendation']} })
 
 
 # Model rebuild
@@ -878,3 +1214,7 @@ RefinementSummary.model_rebuild()
 MapSummary.model_rebuild()
 CrossToolCoverage.model_rebuild()
 TaskCoverage.model_rebuild()
+DataQualitySummary.model_rebuild()
+PredictedConfidenceSummary.model_rebuild()
+PairwiseComparison.model_rebuild()
+ToolRecommendation.model_rebuild()

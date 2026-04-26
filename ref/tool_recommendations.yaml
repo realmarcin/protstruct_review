@@ -1,0 +1,259 @@
+# Tool recommendations per metric — protstruct_review v0.1
+#
+# Two roles per (metric, tool) pair:
+#   top_considered  — community / literature consensus on the canonical tool
+#   top_performing  — empirically best in this harness (often the same tool)
+#
+# When the two roles differ, both rows exist. Downstream tooling can compare
+# the recommendation against MeasurementValue.oracle_tool_ref to flag evals
+# that used a non-recommended tool.
+#
+# Recommendations evolve. Bump `as_of_date` when a recommendation changes;
+# don't mutate in place. The QualityDataSheet snapshots the recommendations
+# active at its `issued_at` via `tool_recommendations_applied`.
+#
+# Schema: schemas/protstruct_review.yaml — class ToolRecommendation.
+
+tool_recommendations:
+
+  # ----- T01: Structure superposition + RMSD -----------------------------
+
+  - id: REC_T01_ca_rmsd_top_considered
+    metric_definition_ref: T01_ca_rmsd_å
+    tool_ref: TM-align
+    role: top_considered
+    rank: 1
+    justification: >-
+      Sequence-independent superposition; CASP/community gold-standard for
+      pair-of-structures RMSD when alignment quality matters.
+    evidence_refs:
+      - Zhang2004
+    as_of_date: '2026-04-25'
+
+  - id: REC_T01_ca_rmsd_top_performing
+    metric_definition_ref: T01_ca_rmsd_å
+    tool_ref: TM-align
+    role: top_performing
+    rank: 1
+    justification: >-
+      Matched phenix.superpose_models within 0.03 Å on the 1SAR eval
+      (TM-align 0.41 Å vs PHENIX 0.43 Å vs agent-reported 0.438 Å).
+    evidence_refs:
+      - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-25'
+
+  - id: REC_T01_ca_rmsd_alternative
+    metric_definition_ref: T01_ca_rmsd_å
+    tool_ref: gemmi align
+    role: alternative
+    rank: 2
+    justification: >-
+      Lightweight, scriptable second oracle. Use when TM-align is
+      unavailable or when a non-Zhang-lab implementation is needed.
+    as_of_date: '2026-04-25'
+
+  - id: REC_T01_tm_score_top_considered
+    metric_definition_ref: T01_tm-score
+    tool_ref: TM-align
+    role: top_considered
+    rank: 1
+    justification: >-
+      TM-score is the metric and TM-align is its reference implementation.
+    evidence_refs:
+      - Zhang2004
+    as_of_date: '2026-04-25'
+
+  # ----- T03: Reciprocal-space refinement (X-ray) ------------------------
+  # The catalog T06 oracle (phenix.model_vs_data) is what produces R-factors
+  # post-refinement; the canonical T03 second-opinion oracle is REFMAC5
+  # (CCP4) but it isn't installed locally — Servalcat sigmaa is the
+  # closest non-cctbx alternative we have.
+
+  - id: REC_T03_r_work_top_considered
+    metric_definition_ref: T03_r-work
+    tool_ref: phenix.model_vs_data
+    role: top_considered
+    rank: 1
+    justification: >-
+      Catalog-defined T06 oracle; re-derives R-factors from PDB+MTZ with
+      its own scaling, rather than reading them from a refinement log.
+    evidence_refs:
+      - Brünger1992
+      - EvansMurshudov2013
+    as_of_date: '2026-04-25'
+
+  - id: REC_T03_r_work_top_performing
+    metric_definition_ref: T03_r-work
+    tool_ref: gemmi sfcalc
+    role: top_performing
+    rank: 1
+    justification: >-
+      Non-cctbx independent oracle; corroborated phenix.model_vs_data on
+      the 1SAR eval (0.164 vs 0.156, both above the agent-reported 0.149)
+      and is what hardened the "agent's R-free is too low" finding.
+    evidence_refs:
+      - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-25'
+
+  - id: REC_T03_r_work_alternative_servalcat
+    metric_definition_ref: T03_r-work
+    tool_ref: Servalcat
+    role: alternative
+    rank: 2
+    justification: >-
+      Murshudov-group implementation; per-shell R via `servalcat sigmaa`.
+      Independent code base; preferred when REFMAC5 is unavailable.
+    evidence_refs:
+      - Yamashita2021
+    as_of_date: '2026-04-25'
+
+  - id: REC_T03_r_free_top_considered
+    metric_definition_ref: T03_r-free
+    tool_ref: phenix.model_vs_data
+    role: top_considered
+    rank: 1
+    justification: Same as R-work — re-derives from data; never read from refinement log alone.
+    evidence_refs:
+      - Brünger1992
+    as_of_date: '2026-04-25'
+
+  - id: REC_T03_r_free_top_performing
+    metric_definition_ref: T03_r-free
+    tool_ref: gemmi sfcalc
+    role: top_performing
+    rank: 1
+    justification: Non-cctbx confirmation of R-free finding on 1SAR eval.
+    evidence_refs:
+      - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-25'
+
+  - id: REC_T03_gap_top_considered
+    metric_definition_ref: T03_r-free_r-work_gap
+    tool_ref: phenix.model_vs_data
+    role: top_considered
+    rank: 1
+    justification: >-
+      The gap is computed from the same R-work / R-free pair, so the
+      strongest tool for those is also the strongest for the gap.
+    as_of_date: '2026-04-25'
+
+  # ----- T05: Geometry validation ---------------------------------------
+  # The catalog gold-standard oracle for T05 is standalone MolProbity,
+  # i.e., the Richardson lab probe + reduce binaries (NOT the PHENIX
+  # `phenix.molprobity` wrapper). The PHENIX wrapper is acceptable as
+  # an alternative — see notes.
+
+  - id: REC_T05_clashscore_top_considered
+    metric_definition_ref: T05_clashscore
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: >-
+      Standalone Richardson-lab pipeline (probe + reduce) is the catalog
+      gold standard. Same code that powers the wwPDB validation report.
+    evidence_refs:
+      - Davis2007
+      - Williams2018
+    as_of_date: '2026-04-25'
+
+  - id: REC_T05_clashscore_top_performing
+    metric_definition_ref: T05_clashscore
+    tool_ref: MolProbity (gold)
+    role: top_performing
+    rank: 1
+    justification: >-
+      11 unique clashes / 3027 atoms = 3.63 on 1SAR eval, in line with
+      mmtbx.validation_summary's 3.13 (Δ = 0.5, within MolProbity method
+      noise — different H-build / water handling).
+    evidence_refs:
+      - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-25'
+
+  - id: REC_T05_clashscore_alternative_phenix
+    metric_definition_ref: T05_clashscore
+    tool_ref: mmtbx.validation_summary
+    role: alternative
+    rank: 2
+    justification: >-
+      cctbx wrapper. Acceptable as a second opinion but does not satisfy
+      the trust model on its own (PHENIX-grading-PHENIX). Use with the
+      Richardson-lab standalone pipeline alongside.
+    as_of_date: '2026-04-25'
+
+  - id: REC_T05_rama_outlier_top_considered
+    metric_definition_ref: T05_ramachandran_outlier
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: >-
+      MolProbity Top8000 reference dataset is the field standard for
+      Ramachandran percentile classification.
+    evidence_refs:
+      - Williams2018
+    as_of_date: '2026-04-25'
+
+  - id: REC_T05_rama_favored_top_considered
+    metric_definition_ref: T05_ramachandran_favored
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: Same as Rama outlier — Top8000 reference.
+    evidence_refs:
+      - Williams2018
+    as_of_date: '2026-04-25'
+
+  - id: REC_T05_rotamer_outlier_top_considered
+    metric_definition_ref: T05_rotamer_outlier
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: >-
+      Top8000 rotamer library; canonical rotamer outlier classification.
+      Resolution-sensitive — flag rotamer outlier counts at > 3 Å with
+      caution.
+    evidence_refs:
+      - Williams2018
+    as_of_date: '2026-04-25'
+
+  - id: REC_T05_molprobity_score_top_considered
+    metric_definition_ref: T05_molprobity_composite
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: >-
+      The MolProbity composite is calibrated by the same code base; only
+      the Richardson-lab implementation is canonical.
+    evidence_refs:
+      - Davis2007
+    as_of_date: '2026-04-25'
+
+  # ----- T06: Model-vs-data statistics ----------------------------------
+
+  - id: REC_T06_r_work_top_considered
+    metric_definition_ref: T06_r-work
+    tool_ref: phenix.model_vs_data
+    role: top_considered
+    rank: 1
+    justification: Catalog-defined oracle for T06.
+    as_of_date: '2026-04-25'
+
+  - id: REC_T06_r_free_top_considered
+    metric_definition_ref: T06_r-free
+    tool_ref: phenix.model_vs_data
+    role: top_considered
+    rank: 1
+    justification: Catalog-defined oracle for T06.
+    as_of_date: '2026-04-25'
+
+  - id: REC_T06_d_fsc_model_top_considered
+    metric_definition_ref: T06_d_fsc_model
+    tool_ref: Servalcat
+    role: top_considered
+    rank: 1
+    justification: >-
+      Non-cctbx model-map FSC implementation by the Murshudov group.
+      RELION postprocess is also acceptable but is a heavier install.
+    evidence_refs:
+      - Yamashita2021
+      - Brink2021
+    as_of_date: '2026-04-25'

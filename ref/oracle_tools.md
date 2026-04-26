@@ -1,6 +1,31 @@
-# Independent oracle tools — install status
+# Independent oracle tools — install status and per-metric recommendations
 
-The protstruct_review trust model requires that PHENIX outputs be cross-checked by **at least one non-cctbx tool** per task (see `tasks_and_evaluations.md` philosophy section). This page records which oracles are installed locally on this machine and how to invoke them.
+The protstruct_review trust model requires that PHENIX outputs be cross-checked by **at least one non-cctbx tool** per task (see `tasks_and_evaluations.md` philosophy section). This page records which oracles are installed locally on this machine and how to invoke them. The **canonical per-metric recommendations** live in `ref/tool_recommendations.yaml` (LinkML-validated, schema-class `ToolRecommendation`).
+
+## Recommendations vocabulary
+
+For each metric in the catalog we track up to four kinds of tool record:
+
+| Role | Meaning | Source |
+|---|---|---|
+| **`top_considered`** | The canonical tool the literature / community consensus says to use for this metric. | Citations in `ref/quality_reporting.md` and `ref/tool_recommendations.yaml`. |
+| **`top_performing`** | The tool that has empirically done best on this metric **in this harness**. Often the same tool as `top_considered`; when they differ both rows exist. | Evidence is an `EvaluationRun.id` from `data/.../EVAL_*.yaml`. |
+| **`alternative`** | Acceptable second-line oracle. Used when the primary tool is unavailable or as a corroborating check. | Same. |
+| **`deprecated`** | Was recommended; no longer is. Kept for historical comparison. | Same; `notes` field carries the deprecation reason. |
+
+When a `MeasurementValue.oracle_tool_ref` doesn't match any `top_considered` or `top_performing` recommendation for that metric, downstream tooling should flag it. The `QualityDataSheet.tool_recommendations_applied[]` slot snapshots the recommendations active at the time the QDS was issued, since recommendations evolve and the QDS is immutable.
+
+To browse / query recommendations:
+
+```bash
+linkml-validate --schema schemas/protstruct_review.yaml ref/tool_recommendations.yaml
+python -c "
+import yaml; d = yaml.safe_load(open('ref/tool_recommendations.yaml'))
+for r in d['tool_recommendations']:
+    if r['role'] == 'top_considered':
+        print(f\"{r['metric_definition_ref']:40} -> {r['tool_ref']}\")
+"
+```
 
 ## Installed
 

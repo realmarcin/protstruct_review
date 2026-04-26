@@ -36,8 +36,9 @@ validate_one() {
   fi
 }
 
-# 1. Canonical catalog
+# 1. Canonical catalog + tool recommendations
 validate_one "${REPO_ROOT}/ref/catalog.yaml"
+validate_one "${REPO_ROOT}/ref/tool_recommendations.yaml"
 
 # 2. Every example record
 shopt -s nullglob
