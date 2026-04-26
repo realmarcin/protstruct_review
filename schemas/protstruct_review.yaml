@@ -138,6 +138,86 @@ enums:
       same_data_reference:
         description: Δ measured against another model refined against the same data.
 
+  ResidueOutlierKind:
+    description: >-
+      The validation category that flagged a residue. A single residue
+      can have multiple outlier rows (one per kind).
+    permissible_values:
+      ramachandran:
+        description: Backbone φ,ψ outside the 99.95th percentile region (MolProbity Top8000).
+      rotamer:
+        description: Side-chain χ angles outside the 98th percentile favored region.
+      c_beta:
+        description: Cβ deviation > 0.25 Å from ideal.
+      clash:
+        description: Steric overlap ≥ 0.4 Å with another atom.
+      cablam:
+        description: CaBLAM secondary-structure / backbone validation outlier.
+      cis_omega:
+        description: Non-Pro cis-peptide bond.
+      bad_geometry:
+        description: Bond / angle / planarity outlier > 4σ.
+      density_misfit:
+        description: High RSRZ / poor real-space density agreement.
+
+  FlaggedRegionKind:
+    description: Why a contiguous stretch of residues was flagged.
+    permissible_values:
+      disordered:
+      poor_density:
+      clash_dense:
+      loop_misfit:
+      interface:
+      missing:
+        description: Residues unmodelled in the deposited structure.
+
+  Severity:
+    description: >-
+      Coarse severity bucket used by ResidueOutlier and FlaggedRegion.
+      Detailed numeric values live on the associated MeasurementValue.
+    permissible_values:
+      low:
+      moderate:
+      severe:
+
+  SiteKind:
+    description: Type of functional / structural site of interest.
+    permissible_values:
+      active_site:
+      binding_site:
+      interface:
+        description: Protein-protein or protein-nucleic acid interface.
+      catalytic_residue_set:
+      metal_coordination:
+      allosteric_site:
+
+  MeasurementScope:
+    description: >-
+      The granularity at which a metric is measured. Used both on
+      MetricDefinition (the canonical scope of a metric) and on
+      MeasurementValue (the actual scope of a specific measurement —
+      can override the canonical scope when the same metric is
+      reported at a different level, e.g. clashscore restricted to a
+      site's residues is `site`-scoped).
+
+      For `residue` and `atom` scope, store every value in the
+      per-residue/per-atom slot and surface the summary statistics
+      (mean, std_dev, min, max, count) on the corresponding scalar
+      slot. The summary fields on TypedMeasurementValue exist for
+      this purpose.
+    permissible_values:
+      complex:
+        description: Whole asymmetric unit / biological assembly.
+      chain:
+        description: One polypeptide / nucleic-acid chain.
+      site:
+        description: A named functional site (active site, interface, ...).
+      residue:
+      atom:
+      dataset:
+        description: Diffraction data / cryo-EM map (not the model).
+      ligand:
+
 # ----------------------------------------------------------------------------
 # Slots — defined once, reused across classes
 # ----------------------------------------------------------------------------
@@ -221,6 +301,18 @@ classes:
         inlined_as_list: true
       pairwise_comparisons:
         range: PairwiseComparison
+        multivalued: true
+        inlined_as_list: true
+      residues:
+        range: ResidueRef
+        multivalued: true
+        inlined_as_list: true
+      sites:
+        range: Site
+        multivalued: true
+        inlined_as_list: true
+      ligands:
+        range: Ligand
         multivalued: true
         inlined_as_list: true
 
@@ -307,6 +399,15 @@ classes:
       applicable_task_refs:
         range: CatalogTaskId
         multivalued: true
+      scope:
+        range: MeasurementScope
+        description: >-
+          Canonical granularity for this metric. `complex` for
+          whole-structure metrics like global R-free; `residue` for
+          per-residue lDDT or RSRZ; `dataset` for crystallographic
+          completeness and CC½; `chain` for per-chain lDDT means;
+          `site` for site-restricted metrics; `ligand` for ligand
+          quality. A specific MeasurementValue may override this.
 
   # ------------------------------------------------------------- structures
 
@@ -407,6 +508,21 @@ classes:
       stage:
         range: Stage
         required: true
+      scope:
+        range: MeasurementScope
+        description: >-
+          Granularity of this specific measurement. Optional override
+          of the canonical `scope` on the referenced MetricDefinition.
+          When set, the `agent_claim` / `oracle_measure` may be a
+          summary (mean+SD over a residue/chain/site array) — see
+          TypedMeasurementValue.mean / std_dev / count.
+      scope_selector:
+        description: >-
+          When `scope` is `chain`, `site`, `residue`, `atom`, or
+          `ligand`, this is a free-text selector identifying what was
+          measured (e.g. "chain A residues 30-45", "active site 1",
+          "Asn A 39"). Site / residue selectors should also have a
+          structured ResidueRef / Site reference where appropriate.
       metric_definition_ref:
       oracle_tool_ref:
       oracle_family:
@@ -458,6 +574,28 @@ classes:
           archive percentile for clashscore at this resolution; CASP
           ranking for TM-score). Range 0-100. Cite the source dataset
           in `notes` on the parent measurement.
+      mean:
+        range: float
+        description: >-
+          Mean across an array of values. Populated when the
+          measurement summarises a per-residue / per-atom / per-chain
+          distribution. The full array of underlying values lives in
+          a sibling list slot (e.g. PerResidueQuality.lddt_per_residue).
+      std_dev:
+        range: float
+        description: Standard deviation paired with `mean`.
+      min_value:
+        range: float
+        description: Minimum across the array (paired with `mean`).
+      max_value:
+        range: float
+        description: Maximum across the array (paired with `mean`).
+      count:
+        range: integer
+        description: >-
+          Number of values summarised by `mean`/`std_dev`. Required
+          when `mean` is set, so a downstream consumer can interpret
+          the summary statistics.
 
   HeadlineFinding:
     description: >-
@@ -580,6 +718,25 @@ classes:
         multivalued: true
         inlined_as_list: true
         description: One per relevant reference (deposited / starting / AlphaFold / truth). Empty when no reference comparison applies.
+      per_residue_quality:
+        range: PerResidueQuality
+        inlined: true
+        description: >-
+          Residue-scoped local quality (per-residue lDDT/displacement,
+          outlier residues, density-difference peaks, flagged regions).
+          Required when the trust model needs evidence that local
+          regions — especially active sites and interfaces — are not
+          worse than the global average.
+      site_qualities:
+        range: SiteQuality
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          One per active site / binding site / interface / metal site
+          on this structure. Each carries the site-scoped metrics
+          (site RMSD to reference, mean per-residue lDDT, ligand
+          quality if a ligand is bound). Empty when the structure has
+          no functional site of record.
       cross_tool_coverage:
         range: CrossToolCoverage
         inlined: true
@@ -870,3 +1027,304 @@ classes:
       as_of_date:
         range: date
       notes:
+
+  # ---------------------------------------- residue / site / ligand v2
+
+  ResidueRef:
+    description: >-
+      A pointer to a specific residue in a specific chain. Used by
+      ResidueOutlier, PerResidueValue, and Site.member_residue_refs.
+      Identifier composes the structure id + chain id + residue number
+      so a given residue is identifiable across runs.
+    attributes:
+      id:
+        identifier: true
+        required: true
+        description: e.g. "1sar:A:33" (structure_ref:chain_id:residue_number).
+      structure_ref:
+        range: Structure
+        required: true
+      chain_id:
+        required: true
+        description: PDB chain identifier (typically a single letter).
+      residue_number:
+        range: integer
+        required: true
+      residue_name:
+        description: Three-letter code (ASN, TYR, HIS, ...).
+      insertion_code:
+        description: PDB insertion code where present (rare).
+
+  ResidueOutlier:
+    description: >-
+      One residue flagged by a validation tool. A residue can have
+      multiple ResidueOutlier rows (e.g. both a Ramachandran and a
+      rotamer outlier). The bare existence of this row is the
+      assertion; the numeric magnitude lives on `metric_value`.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      residue_ref:
+        range: ResidueRef
+        required: true
+      outlier_kind:
+        range: ResidueOutlierKind
+        required: true
+      severity:
+        range: Severity
+      tool_ref:
+        range: Tool
+      metric_value:
+        range: TypedMeasurementValue
+        inlined: true
+        description: >-
+          Numeric magnitude of the outlier (e.g. clash overlap in Å,
+          rotamer χ deviation in degrees, RSRZ z-score). The kind
+          determines the unit; cite it on the MeasurementValue.
+      details:
+        description: Free-text annotation (e.g. "ω = 8.91° non-Pro cis").
+
+  DensityPeak:
+    description: >-
+      A difference-density (mFo−DFc) peak that is not explained by the
+      modelled atoms. Positive peaks = unmodelled mass; negative peaks
+      = modelled atoms with no density support. The driving example
+      includes peaks > 4σ as a critical eval signal.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      sigma_level:
+        range: float
+        required: true
+        description: Signed peak height in σ (positive blob, negative hole).
+      coordinates_xyz:
+        range: float
+        multivalued: true
+        description: Cartesian coordinates [x, y, z] in Å.
+      nearest_atom_residue_ref:
+        range: ResidueRef
+      nearest_atom_distance_a:
+        range: float
+      interpretation:
+        description: >-
+          Free-text classification by the agent or harness:
+          "unmodelled water", "Ca²⁺ ion", "side-chain alt conf",
+          "noise", "unmodelled solvent", etc.
+      tool_ref:
+        range: Tool
+        description: Tool that produced the peak list (e.g. phenix.find_peaks_holes).
+
+  FlaggedRegion:
+    description: >-
+      A contiguous stretch of residues with an issue (disordered loop,
+      poor-density region, dense clash region, ...). Useful when the
+      problem is a region rather than a single residue.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      structure_ref:
+        range: Structure
+        required: true
+      chain_id:
+        required: true
+      residue_start:
+        range: integer
+        required: true
+      residue_end:
+        range: integer
+        required: true
+      kind:
+        range: FlaggedRegionKind
+        required: true
+      severity:
+        range: Severity
+      summary:
+        description: One-line human description of why the region is flagged.
+
+  PerResidueValue:
+    description: A scalar paired with a residue ref. Used by PerResidueQuality.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      residue_ref:
+        range: ResidueRef
+        required: true
+      value:
+        range: TypedMeasurementValue
+        inlined: true
+      tool_ref:
+        range: Tool
+
+  PerResidueQuality:
+    description: >-
+      Local-quality block for one structure: per-residue lDDT or
+      displacement, outlier residues, density-difference peaks, and
+      flagged regions. Lives on QualityDataSheet.per_residue_quality.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      lddt_per_residue:
+        range: PerResidueValue
+        multivalued: true
+        inlined_as_list: true
+      displacement_per_residue_a:
+        range: PerResidueValue
+        multivalued: true
+        inlined_as_list: true
+      ramachandran_z_per_residue:
+        range: PerResidueValue
+        multivalued: true
+        inlined_as_list: true
+      rsrz_per_residue:
+        range: PerResidueValue
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Real-space R-factor Z-score per residue (wwPDB validation).
+          RSRZ > 2 flags poor real-space density agreement for that
+          residue.
+      outliers:
+        range: ResidueOutlier
+        multivalued: true
+        inlined_as_list: true
+      density_peaks:
+        range: DensityPeak
+        multivalued: true
+        inlined_as_list: true
+        description: Δρ peaks above the configured σ threshold (typically > 4σ).
+      flagged_regions:
+        range: FlaggedRegion
+        multivalued: true
+        inlined_as_list: true
+
+  Ligand:
+    description: >-
+      A non-protein component of the structure: small-molecule ligand,
+      ion, cofactor, or covalent modification. Identified by chemical
+      component dictionary (CCD) code where possible.
+    attributes:
+      id:
+        identifier: true
+        required: true
+        description: e.g. "1sar:A:Ca33" (structure:chain:CCD+resnum).
+      structure_ref:
+        range: Structure
+        required: true
+      pdb_chemical_id:
+        description: CCD three-letter code (ATP, FAD, CA for calcium, ...).
+      smiles:
+      chain_id:
+      residue_number:
+        range: integer
+      partial_occupancy:
+        range: boolean
+        description: True when the ligand is modelled at occupancy < 1.
+
+  LigandQuality:
+    description: >-
+      Real-space and geometric quality metrics for a bound ligand.
+      Catalog T10 (ligand fitting) defines these; the QDS surfaces them
+      so a downstream consumer can verify the binding site is not
+      misfit. Required when a ligand is present and the structure
+      claims biological relevance for it.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      ligand_ref:
+        range: Ligand
+        required: true
+      rscc:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Real-space correlation coefficient. > 0.85 = good fit.
+      rsr:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Real-space R. < 0.20 = good fit at typical resolutions.
+      ligand_b_factor_mean:
+        range: TypedMeasurementValue
+        inlined: true
+      ligand_b_factor_vs_surroundings:
+        range: TypedMeasurementValue
+        inlined: true
+        description: >-
+          Ratio of ligand mean B to surrounding-protein mean B. > 1.5
+          can indicate partial occupancy or weak binding.
+      protein_ligand_hbond_count:
+        range: TypedMeasurementValue
+        inlined: true
+      pose_rmsd_to_deposited_a:
+        range: TypedMeasurementValue
+        inlined: true
+        description: RMSD of the ligand pose to a deposited reference complex.
+
+  Site:
+    description: >-
+      A named region of biological / structural interest — active
+      site, binding site, protein-protein interface, metal-coordination
+      sphere. Defined by an explicit set of member residues so quality
+      metrics can be computed per-site rather than per-whole-structure.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      structure_ref:
+        range: Structure
+        required: true
+      kind:
+        range: SiteKind
+        required: true
+      member_residue_refs:
+        range: ResidueRef
+        multivalued: true
+        required: true
+      ligand_ref:
+        range: Ligand
+        description: Ligand bound at this site, if any.
+      description:
+
+  SiteQuality:
+    description: >-
+      Site-scoped quality metrics. Lives on QualityDataSheet.site_qualities[].
+      The fields are deliberately overlapping with GeometrySummary so the
+      consumer can compare the site to the global average — a structure
+      with great global geometry but a wrecked active site is still a
+      bad model for its intended function.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      site_ref:
+        range: Site
+        required: true
+      site_rmsd_to_reference_a:
+        range: TypedMeasurementValue
+        inlined: true
+        description: RMSD over member_residue_refs vs the reference structure's same site.
+      mean_per_residue_lddt:
+        range: TypedMeasurementValue
+        inlined: true
+      mean_b_factor:
+        range: TypedMeasurementValue
+        inlined: true
+      site_clashscore:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Clashscore restricted to atoms within the site's member residues.
+      site_ramachandran_outlier_count:
+        range: TypedMeasurementValue
+        inlined: true
+      site_density_peaks:
+        range: DensityPeak
+        multivalued: true
+        inlined_as_list: true
+      ligand_quality:
+        range: LigandQuality
+        inlined: true
+        description: Required when site.ligand_ref is set.

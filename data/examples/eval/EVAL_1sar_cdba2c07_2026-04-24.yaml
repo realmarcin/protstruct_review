@@ -9,11 +9,12 @@ evaluation_runs:
   - T03
   - T05
   - T06
+  - T13
   measurements:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_001
     catalog_task_ref: T01
     stage: final
-    metric_definition_ref: T01_ca_rmsd_start_final_å
+    metric_definition_ref: T01_ca_rmsd_å
     oracle_tool_ref: phenix.superpose_models
     oracle_family: cctbx
     agent_claim:
@@ -27,8 +28,8 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_002
     catalog_task_ref: T01
     stage: final
-    metric_definition_ref: T01_ca_rmsd_start_final_å
-    oracle_tool_ref: TMalign 20220412 (Zhang lab)
+    metric_definition_ref: T01_ca_rmsd_å
+    oracle_tool_ref: TM-align
     oracle_family: non_cctbx
     agent_claim:
       value_numeric: 0.438
@@ -42,7 +43,7 @@ evaluation_runs:
     catalog_task_ref: T01
     stage: final
     metric_definition_ref: T01_tm-score
-    oracle_tool_ref: TMalign 20220412
+    oracle_tool_ref: TM-align
     oracle_family: non_cctbx
     agent_claim:
       is_not_applicable: true
@@ -98,7 +99,7 @@ evaluation_runs:
     catalog_task_ref: T03
     stage: final
     metric_definition_ref: T03_r-work
-    oracle_tool_ref: gemmi sfcalc + scaled R calc
+    oracle_tool_ref: gemmi sfcalc
     oracle_family: non_cctbx
     agent_claim:
       value_numeric: 0.149
@@ -126,7 +127,7 @@ evaluation_runs:
     catalog_task_ref: T03
     stage: final
     metric_definition_ref: T03_r-free
-    oracle_tool_ref: gemmi sfcalc + scaled R calc
+    oracle_tool_ref: gemmi sfcalc
     oracle_family: non_cctbx
     agent_claim:
       value_numeric: 0.199
@@ -139,7 +140,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_010
     catalog_task_ref: T03
     stage: final
-    metric_definition_ref: T03_r-work_r-free_gap
+    metric_definition_ref: T03_r-free_r-work_gap
     oracle_tool_ref: phenix.model_vs_data
     oracle_family: cctbx
     agent_claim:
@@ -153,8 +154,8 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_011
     catalog_task_ref: T03
     stage: final
-    metric_definition_ref: T03_r-work_r-free_gap
-    oracle_tool_ref: gemmi sfcalc + scaled R calc
+    metric_definition_ref: T03_r-free_r-work_gap
+    oracle_tool_ref: gemmi sfcalc
     oracle_family: non_cctbx
     agent_claim:
       value_numeric: 0.05
@@ -167,8 +168,8 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_012
     catalog_task_ref: T03
     stage: final
-    metric_definition_ref: T03_overall_r_per-shell_weighted
-    oracle_tool_ref: servalcat sigmaa
+    metric_definition_ref: T03_overall_r_per_shell_weighted
+    oracle_tool_ref: Servalcat
     oracle_family: non_cctbx
     agent_claim:
       is_not_applicable: true
@@ -181,7 +182,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_013
     catalog_task_ref: T03
     stage: final
-    metric_definition_ref: T03_δr-free_start_final
+    metric_definition_ref: T03_δr-free_vs_input
     oracle_tool_ref: phenix.model_vs_data
     oracle_family: cctbx
     agent_claim:
@@ -224,7 +225,7 @@ evaluation_runs:
     catalog_task_ref: T05
     stage: final
     metric_definition_ref: T05_clashscore
-    oracle_tool_ref: probe + reduce (Richardson lab)
+    oracle_tool_ref: MolProbity (gold)
     oracle_family: non_cctbx
     agent_claim:
       value_numeric: 3.12
@@ -238,7 +239,7 @@ evaluation_runs:
     catalog_task_ref: T05
     stage: final
     metric_definition_ref: T05_clashes_unique_pairs
-    oracle_tool_ref: probe -CONdense
+    oracle_tool_ref: MolProbity (gold)
     oracle_family: non_cctbx
     agent_claim:
       is_not_applicable: true
@@ -252,7 +253,7 @@ evaluation_runs:
     catalog_task_ref: T05
     stage: final
     metric_definition_ref: T05_atoms_used_in_clashscore_calc
-    oracle_tool_ref: reduce -build (H-built)
+    oracle_tool_ref: reduce (standalone, Richardson)
     oracle_family: non_cctbx
     agent_claim:
       is_not_applicable: true
@@ -265,7 +266,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_019
     catalog_task_ref: T05
     stage: start
-    metric_definition_ref: T05_ramachandran_outliers
+    metric_definition_ref: T05_ramachandran_outlier
     oracle_tool_ref: mmtbx.validation_summary
     oracle_family: cctbx
     agent_claim:
@@ -279,7 +280,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_020
     catalog_task_ref: T05
     stage: final
-    metric_definition_ref: T05_ramachandran_outliers
+    metric_definition_ref: T05_ramachandran_outlier
     oracle_tool_ref: mmtbx.validation_summary
     oracle_family: cctbx
     agent_claim:
@@ -321,7 +322,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_023
     catalog_task_ref: T05
     stage: final
-    metric_definition_ref: T05_rotamer_outliers
+    metric_definition_ref: T05_rotamer_outlier
     oracle_tool_ref: mmtbx.validation_summary
     oracle_family: cctbx
     agent_claim:
@@ -335,7 +336,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_024
     catalog_task_ref: T05
     stage: final
-    metric_definition_ref: T05_c-beta_deviations_count
+    metric_definition_ref: T05_cbeta_outliers
     oracle_tool_ref: mmtbx.validation_summary
     oracle_family: cctbx
     agent_claim:
@@ -349,7 +350,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_025
     catalog_task_ref: T05
     stage: final
-    metric_definition_ref: T05_molprobity_score
+    metric_definition_ref: T05_molprobity_composite
     oracle_tool_ref: mmtbx.validation_summary
     oracle_family: cctbx
     agent_claim:
@@ -363,7 +364,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_026
     catalog_task_ref: T05
     stage: final
-    metric_definition_ref: T05_bond_rmsd_å
+    metric_definition_ref: T05_bond-length_rmsd
     oracle_tool_ref: mmtbx.validation_summary
     oracle_family: cctbx
     agent_claim:
@@ -377,7 +378,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_027
     catalog_task_ref: T05
     stage: final
-    metric_definition_ref: T05_angle_rmsd
+    metric_definition_ref: T05_bond-angle_rmsd
     oracle_tool_ref: mmtbx.validation_summary
     oracle_family: cctbx
     agent_claim:
@@ -391,7 +392,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_028
     catalog_task_ref: T05
     stage: start
-    metric_definition_ref: T05_holton_geom-energy_ratio_σ
+    metric_definition_ref: T05_holton_geom_energy_ratio_sigma
     oracle_tool_ref: phenix.holton_geometry_validation
     oracle_family: cctbx
     agent_claim:
@@ -405,7 +406,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_029
     catalog_task_ref: T05
     stage: final
-    metric_definition_ref: T05_holton_geom-energy_ratio_σ
+    metric_definition_ref: T05_holton_geom_energy_ratio_sigma
     oracle_tool_ref: phenix.holton_geometry_validation
     oracle_family: cctbx
     agent_claim:
@@ -417,9 +418,9 @@ evaluation_runs:
     pass_criterion: improvement
     pass_status: pass
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_030
-    catalog_task_ref: T06
+    catalog_task_ref: T13
     stage: all
-    metric_definition_ref: T06_completeness
+    metric_definition_ref: T13_completeness_overall_outer
     oracle_tool_ref: phenix.model_vs_data
     oracle_family: cctbx
     agent_claim:
@@ -435,7 +436,7 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_031
     catalog_task_ref: T06
     stage: all
-    metric_definition_ref: T06_resolution_range_å
+    metric_definition_ref: T06_resolution_range
     oracle_tool_ref: phenix.model_vs_data
     oracle_family: cctbx
     agent_claim:
@@ -478,8 +479,8 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_H_001
     catalog_task_refs:
     - T01
-    metric_definition_ref: T01_ca_rmsd_start_final_å
-    oracle_tool_ref: TMalign 20220412 (Zhang lab)
+    metric_definition_ref: T01_ca_rmsd_å
+    oracle_tool_ref: TM-align
     oracle_family: non_cctbx
     agent_claim:
       value_numeric: 0.438
@@ -493,7 +494,7 @@ evaluation_runs:
     - T03
     - T06
     metric_definition_ref: T03_r-work
-    oracle_tool_ref: gemmi sfcalc + scaled R calc (gemmi_rfactor.py)
+    oracle_tool_ref: gemmi sfcalc
     oracle_family: non_cctbx
     agent_claim:
       value_numeric: 0.149
@@ -507,7 +508,7 @@ evaluation_runs:
     - T03
     - T06
     metric_definition_ref: T03_r-free
-    oracle_tool_ref: gemmi sfcalc + scaled R calc (gemmi_rfactor.py)
+    oracle_tool_ref: gemmi sfcalc
     oracle_family: non_cctbx
     agent_claim:
       value_numeric: 0.199
@@ -519,8 +520,8 @@ evaluation_runs:
     catalog_task_refs:
     - T03
     - T06
-    metric_definition_ref: T03_r-free_gap
-    oracle_tool_ref: gemmi sfcalc + scaled R calc (gemmi_rfactor.py)
+    metric_definition_ref: T03_r-free_r-work_gap
+    oracle_tool_ref: gemmi sfcalc
     oracle_family: non_cctbx
     agent_claim:
       value_numeric: 0.05
@@ -532,8 +533,8 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_H_005
     catalog_task_refs:
     - T03
-    metric_definition_ref: T03_overall_r_per-shell_weighted
-    oracle_tool_ref: servalcat sigmaa
+    metric_definition_ref: T03_overall_r_per_shell_weighted
+    oracle_tool_ref: Servalcat
     oracle_family: non_cctbx
     agent_claim:
       is_not_applicable: true
@@ -546,7 +547,7 @@ evaluation_runs:
     catalog_task_refs:
     - T05
     metric_definition_ref: T05_clashscore
-    oracle_tool_ref: probe + reduce (Richardson lab — standalone MolProbity)
+    oracle_tool_ref: MolProbity (gold)
     oracle_family: non_cctbx
     agent_claim:
       value_numeric: 3.12

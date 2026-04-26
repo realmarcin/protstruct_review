@@ -164,14 +164,45 @@ def _row_id(prefix: str, idx: int) -> str:
     return f"{prefix}_{idx:03d}"
 
 
+def _load_catalog_index(catalog_path: Path | None) -> dict[str, str]:
+    """Build a {(catalog_task_id, label_slug): metric_id} map from a catalog YAML.
+
+    When --catalog is provided, eval-row metric labels are resolved against
+    the catalog's MetricDefinition entries by case-insensitive slug match.
+    Labels that do not resolve are emitted with the row's local slug and
+    will be flagged by scripts/check_referential_integrity.py.
+    """
+    if catalog_path is None:
+        return {}
+    doc = yaml.safe_load(catalog_path.read_text())
+    index: dict[str, str] = {}
+    for m in doc.get("metric_definitions", []):
+        mid = m["id"]
+        name = m.get("name") or ""
+        # Index by (task_id, slugified_name) and by (task_id, raw_id_after_prefix).
+        for tid in m.get("applicable_task_refs", []) or []:
+            index[(tid, slugify(name))] = mid
+            # Also accept the raw "metric_id-without-task-prefix" form so a row
+            # whose metric column already names the canonical id resolves.
+            if mid.startswith(tid + "_"):
+                index[(tid, mid[len(tid) + 1 :].lower())] = mid
+    return index
+
+
 def load_metrics(
     tsv_path: Path,
     eval_id: str,
     structure_id: str,
     artifact_id: str,
     run_date: str,
+    catalog_index: dict[tuple[str, str], str] | None = None,
 ) -> dict[str, Any]:
-    """Parse an EVAL_*_metrics.tsv into one EvaluationRun record."""
+    """Parse an EVAL_*_metrics.tsv into one EvaluationRun record.
+
+    When `catalog_index` is provided (built from --catalog), eval-row metric
+    labels are resolved to canonical catalog metric ids; rows that do not
+    resolve fall back to the local slug.
+    """
     rows = list(csv.DictReader(tsv_path.open(), delimiter="\t"))
 
     measurements: list[dict[str, Any]] = []
@@ -181,7 +212,12 @@ def load_metrics(
         task = r["catalog_task"].strip()
         catalog_tasks_seen.add(task)
         metric_label = r["metric"].strip()
-        metric_id = f"{task}_{slugify(metric_label)}"
+        # Resolve via catalog if we have the index; fall back to local slug.
+        local_slug = slugify(metric_label)
+        if catalog_index and (task, local_slug) in catalog_index:
+            metric_id = catalog_index[(task, local_slug)]
+        else:
+            metric_id = f"{task}_{local_slug}"
         metric_ids_seen.add(metric_id)
         rec = {
             "id": _row_id(eval_id + "_M", i),
@@ -215,6 +251,7 @@ def load_metrics(
 def load_headline(
     tsv_path: Path,
     eval_id: str,
+    catalog_index: dict[tuple[str, str], str] | None = None,
 ) -> list[dict[str, Any]]:
     """Parse an EVAL_*_headline.tsv into a list of HeadlineFinding dicts."""
     rows = list(csv.DictReader(tsv_path.open(), delimiter="\t"))
@@ -227,7 +264,11 @@ def load_headline(
         # Use the first task as the metric-id namespace.
         primary_task = tasks[0]
         metric_label = r["metric"].strip()
-        metric_id = f"{primary_task}_{slugify(metric_label)}"
+        local_slug = slugify(metric_label)
+        if catalog_index and (primary_task, local_slug) in catalog_index:
+            metric_id = catalog_index[(primary_task, local_slug)]
+        else:
+            metric_id = f"{primary_task}_{local_slug}"
         rec = {
             "id": _row_id(eval_id + "_H", i),
             "catalog_task_refs": tasks,
@@ -274,9 +315,16 @@ def main() -> None:
     p.add_argument("--structure-id")
     p.add_argument("--artifact-id")
     p.add_argument("--run-date")
+    p.add_argument(
+        "--catalog",
+        type=Path,
+        help="Catalog YAML (e.g. ref/catalog.yaml). When provided, eval-row "
+        "metric labels are resolved to canonical catalog metric ids.",
+    )
     args = p.parse_args()
 
     kind = args.kind or detect_kind(args.tsv)
+    catalog_index = _load_catalog_index(args.catalog) if hasattr(args, "catalog") else {}
 
     if kind == "catalog":
         catalog_records = load_catalog(args.tsv)
@@ -292,7 +340,10 @@ def main() -> None:
         for required in ("eval_id", "structure_id", "artifact_id", "run_date"):
             if getattr(args, required) is None:
                 p.error(f"--{required.replace('_', '-')} is required for metrics kind")
-        eval_run = load_metrics(args.tsv, args.eval_id, args.structure_id, args.artifact_id, args.run_date)
+        eval_run = load_metrics(
+            args.tsv, args.eval_id, args.structure_id, args.artifact_id, args.run_date,
+            catalog_index=catalog_index,
+        )
         container = {"evaluation_runs": [eval_run]}
         out_text = yaml_dump(container)
 
@@ -300,7 +351,7 @@ def main() -> None:
         if not args.merge_into:
             if not args.eval_id:
                 p.error("--eval-id required for headline kind without --merge-into")
-            findings = load_headline(args.tsv, args.eval_id)
+            findings = load_headline(args.tsv, args.eval_id, catalog_index=catalog_index)
             container = {"evaluation_runs": [{"id": args.eval_id, "headline_findings": findings}]}
             out_text = yaml_dump(container)
         else:
@@ -308,7 +359,7 @@ def main() -> None:
             assert "evaluation_runs" in doc and len(doc["evaluation_runs"]) == 1, \
                 "expected exactly one EvaluationRun in --merge-into"
             eval_run = doc["evaluation_runs"][0]
-            findings = load_headline(args.tsv, eval_run["id"])
+            findings = load_headline(args.tsv, eval_run["id"], catalog_index=catalog_index)
             eval_run["headline_findings"] = findings
             container = doc
             out_text = yaml_dump(container)

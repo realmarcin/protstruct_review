@@ -145,6 +145,73 @@ For this harness, the practical implication is the rule already in `ref/oracle_t
 
 ---
 
+## 3a. Local quality — per-residue, per-site, per-ligand
+
+Global metrics can pass while the active site is wrecked. Reviews of deposited structures (Read et al. 2011, *Structure*; PDB-REDO findings) consistently show that the average residue is fine and the failures cluster at active sites, interfaces, and weakly-supported loops. The schema covers this with three layers:
+
+### Per-residue (scope = `residue`)
+
+| Metric | What it tells you | Tool / source |
+|---|---|---|
+| **Per-residue lDDT** | Local distance preservation around each residue. Robust to global alignment errors. CASP15+ primary metric. | OpenStructure `lddt`; lDDT web service; Mariani et al. 2013. |
+| **Per-residue Cα displacement** | Distance candidate-Cα to reference-Cα after global align. Plot vs. residue index; hot-spots > 2 Å are flagged regions. | gemmi script; ChimeraX matchmaker. |
+| **RSRZ** | wwPDB validation report's per-residue real-space R-factor Z-score. RSRZ > 2 ⇒ poor density agreement at that residue. | wwPDB validation pipeline; phenix.real_space_correlation. |
+| **Ramachandran outlier residue list** | The actual residue ids flagged, not just a percentage. | MolProbity `ramalyze`; phenix.holton_geometry_validation. |
+| **Rotamer outlier residue list** | Same — list, not just %. | MolProbity `rotalyze`. |
+| **C-β deviation residue list** | Residues with Cβ > 0.25 Å from ideal. | MolProbity. |
+| **Difference-density peaks** (mFo−DFc > +4σ or < −4σ) | Unmodelled mass / atoms with no density. The driving example flags peaks > 4σ as load-bearing eval signal. | phenix.find_peaks_holes; CCP4 `peakmax`. |
+
+**Reporting per-residue values** — store every value in the per-residue array AND surface a summary on the corresponding scalar slot. The schema's `TypedMeasurementValue` carries `value_numeric` (the scalar — usually the mean), plus `mean`, `std_dev`, `min_value`, `max_value`, and `count` so a summary can be reconstructed without downloading the full array. The full values live in `PerResidueQuality.lddt_per_residue[]`, `displacement_per_residue_a[]`, `rsrz_per_residue[]` etc. as a list of `PerResidueValue`.
+
+### Per-site (scope = `site`)
+
+A `Site` (active site, binding site, interface, metal-coordination sphere) is an explicit selection of residues. `SiteQuality` carries:
+
+- site RMSD to a reference (computed only over the member residues)
+- mean per-residue lDDT within the site
+- site clashscore (clashscore restricted to atoms in member residues)
+- site Ramachandran outlier count
+- difference-density peaks within the site
+- ligand quality (when a ligand is bound — see below)
+
+A model can have global clashscore = 3 (great) and site clashscore = 18 (broken) in the active site. Without site-scoping, this fails silently.
+
+### Per-ligand (scope = `ligand`)
+
+For bound ligands the catalog T10 metrics are load-bearing:
+
+| Metric | Threshold | Tool |
+|---|---|---|
+| **RSCC** (real-space correlation) | > 0.85 = good fit at typical resolutions | phenix.real_space_correlation; CCP4 `edstats`; Tickle (2012, *Acta D*) for thresholds. |
+| **RSR** (real-space R-factor) | < 0.20 = good fit | same |
+| **Ligand B vs. surrounding protein B** | ratio < 1.5 | phenix.b_factor_statistics |
+| **Protein-ligand H-bond count** | informational | gemmi `contact`; PLIP |
+| **Pose RMSD to deposited reference** | < 0.5 Å for refined-against-same-data | phenix.superpose_models on ligand atoms only |
+
+Ligand RSCC alone has flagged thousands of mismodelled ligands across the PDB (Pozharski et al. 2013, *Acta D*; Smart et al. 2018, *Acta D*); reporting it is mandatory when a ligand is structurally important.
+
+### Outlier reporting
+
+Always report outlier *lists*, not just outlier *counts*. A "0.5% Ramachandran outlier" rate is cheap when the outliers are buried in a flexible loop and load-bearing when one of them is a catalytic residue. The schema's `ResidueOutlier` class is the unit of report: one row per (residue, outlier-kind), with the outlier kind being one of `ramachandran` / `rotamer` / `c_beta` / `clash` / `cablam` / `cis_omega` / `bad_geometry` / `density_misfit`.
+
+## 3b. Metric scope — every measurement says what it covers
+
+Every `MeasurementValue` declares a `scope` (overriding the canonical scope on its `MetricDefinition` if needed):
+
+| Scope | What it covers | Examples |
+|---|---|---|
+| `complex` | Whole asymmetric unit / biological assembly | global clashscore, R-free, MolProbity score |
+| `chain` | One polypeptide / nucleic-acid chain | per-chain pLDDT mean, per-chain Ramachandran favored % |
+| `site` | A named functional site | site RMSD, site clashscore |
+| `residue` | A single residue or a residue array | per-residue lDDT, RSRZ |
+| `atom` | A single atom or atom set | clash atom-pair list |
+| `dataset` | Diffraction data / cryo-EM map (not the model) | completeness, ⟨I/σ⟩, CC½, R-merge |
+| `ligand` | A bound ligand | RSCC, RSR, pose RMSD |
+
+When `scope` is set to `residue`, `chain`, `atom`, or `ligand`, the measurement should also set `scope_selector` (free text — e.g. "chain A residues 30-45", "Asn A 39", "Ca²⁺ A 33") so a reader can locate what was measured without parsing the full array.
+
+For per-residue / per-atom / per-chain measurements, populate **every value in the array slot** plus the scalar summary on `TypedMeasurementValue`: `mean`, `std_dev`, `min_value`, `max_value`, `count`. The summary is what the QDS surfaces; the array is what auditing tools and per-residue plots consume.
+
 ## 4. The minimal Quality Data Sheet
 
 The fields below are the **smallest defensible** report. Anything beyond is fine; anything less leaves a downstream consumer guessing.
@@ -196,6 +263,31 @@ delta_data:         ΔR-free or ΔCC_mask (state baseline: starting vs reference
 verdict:            improved / equivalent / worse / incomparable
 ```
 
+### 4.5 When functional sites or ligands are present (mandatory additions)
+
+A QDS without these is incomplete for any structure where downstream consumers care about the binding site:
+
+```
+sites:              one entry per active site / binding site / interface
+                    each with: kind, member residue refs, ligand ref (if any)
+site_qualities:     one entry per site with:
+                      site_rmsd_to_reference_a (over member residues)
+                      mean_per_residue_lddt
+                      site_clashscore (atoms in members only)
+                      site_ramachandran_outlier_count
+                      site_density_peaks (Δρ peaks within the site)
+                      ligand_quality (when ligand_ref is set)
+ligand_quality:     RSCC (>0.85), RSR (<0.20),
+                    ligand_b_factor_vs_surroundings,
+                    protein_ligand_hbond_count,
+                    pose_rmsd_to_deposited_a
+per_residue_quality: lddt_per_residue[], displacement_per_residue_a[],
+                    rsrz_per_residue[], outliers[] (ResidueOutlier list),
+                    density_peaks[], flagged_regions[]
+```
+
+For per-residue arrays, the QDS surfaces summary statistics (mean ± std_dev, min, max, count) on the matching scalar slot; full values live in the array.
+
 ---
 
 ## 5. References
@@ -220,6 +312,10 @@ These are the citable sources for every threshold and rule above. The reference 
 16. **Word, J. M. et al. (1999).** Asparagine and glutamine: using hydrogen-atom contacts in the choice of side-chain amide orientation. *J. Mol. Biol.* 285, 1735–1747. [reduce, H-placement underlying clashscore]
 17. **Kidmose, R. T. et al. (2019).** Namdinator — automatic molecular dynamics flexible fitting of structural models into cryo-EM and crystallography experimental maps. *IUCrJ* 6, 526–531. [orthogonal cryo-EM refinement oracle, listed here for completeness]
 18. **Pintilie, G. et al. (2020).** Measurement of atom-resolvability in cryo-EM maps with Q-scores. *Nature Methods* 17, 328–334. [Q-score]
+19. **Read, R. J. et al. (2011).** A new generation of crystallographic validation tools for the Protein Data Bank. *Structure* 19, 1395–1412. [wwPDB validation report design; per-residue RSRZ]
+20. **Tickle, I. J. (2012).** Statistical quality indicators for electron-density maps. *Acta Cryst. D* 68, 454–467. [RSCC / RSR thresholds for ligands and residues]
+21. **Pozharski, E. et al. (2013).** Techniques, tools and best practices for ligand electron-density analysis and results from their application to deposited crystal structures. *Acta Cryst. D* 69, 150–167. [Mismodelled ligands flagged by RSCC across the PDB]
+22. **Smart, O. S. et al. (2018).** Validation of ligands in macromolecular structures determined by X-ray crystallography. *Acta Cryst. D* 74, 228–236. [Ligand validation pipeline; pose-RMSD and RSCC standards]
 
 URLs for tooling cited inline (not bibliographic, but useful from the harness):
 

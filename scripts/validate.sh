@@ -51,3 +51,9 @@ done
 if [[ "${QUIET}" == "0" ]]; then
   echo "all records valid"
 fi
+
+# 3. Referential integrity (metric_definition_ref / oracle_tool_ref /
+#    catalog_task_ref must resolve in ref/catalog.yaml)
+if ! python3 "${REPO_ROOT}/scripts/check_referential_integrity.py"; then
+  fail "referential integrity"
+fi

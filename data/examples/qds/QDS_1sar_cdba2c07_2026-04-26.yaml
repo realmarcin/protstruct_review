@@ -1,0 +1,70 @@
+quality_data_sheets:
+- id: QDS_1sar_cdba2c07_2026-04-26
+  structure_ref: 1sar
+  derived_from_evaluation_run_refs:
+  - EVAL_1sar_cdba2c07_2026-04-24
+  issued_at: '2026-04-26T08:02:42+00:00'
+  identity_block:
+    id: QDS_1sar_cdba2c07_2026-04-26_identity
+    pdb_id: 1sar
+  geometry_summary:
+    id: QDS_1sar_cdba2c07_2026-04-26_geometry
+    clashscore:
+      value_numeric: 3.63
+    ramachandran_favored_pct:
+      value_numeric: 98.4
+    angle_rmsd_deg:
+      value_numeric: 0.85
+  refinement_summary:
+    id: QDS_1sar_cdba2c07_2026-04-26_refinement
+    r_work:
+      value_numeric: 0.1644
+    r_free:
+      value_numeric: 0.217
+    r_free_gap:
+      value_numeric: 0.0526
+  data_quality_summary:
+    id: QDS_1sar_cdba2c07_2026-04-26_data_quality
+    completeness_overall_pct:
+      value_numeric: 99.38
+      unit: '%'
+  cross_tool_coverage:
+    id: QDS_1sar_cdba2c07_2026-04-26_coverage
+    task_coverage:
+    - id: QDS_1sar_cdba2c07_2026-04-26_coverage_T01
+      catalog_task_ref: T01
+      cctbx_oracles:
+      - phenix.superpose_models
+      non_cctbx_oracles:
+      - TM-align
+      gap_status: closed
+    - id: QDS_1sar_cdba2c07_2026-04-26_coverage_T03
+      catalog_task_ref: T03
+      cctbx_oracles:
+      - phenix.model_vs_data
+      non_cctbx_oracles:
+      - Servalcat
+      - gemmi sfcalc
+      gap_status: closed
+    - id: QDS_1sar_cdba2c07_2026-04-26_coverage_T05
+      catalog_task_ref: T05
+      cctbx_oracles:
+      - mmtbx.validation_summary
+      - phenix.holton_geometry_validation
+      non_cctbx_oracles:
+      - MolProbity (gold)
+      - reduce (standalone, Richardson)
+      gap_status: closed
+    - id: QDS_1sar_cdba2c07_2026-04-26_coverage_T06
+      catalog_task_ref: T06
+      cctbx_oracles:
+      - phenix.model_vs_data
+      - phenix.mtz.dump
+      non_cctbx_oracles: []
+      gap_status: open — cctbx only
+    - id: QDS_1sar_cdba2c07_2026-04-26_coverage_T13
+      catalog_task_ref: T13
+      cctbx_oracles:
+      - phenix.model_vs_data
+      non_cctbx_oracles: []
+      gap_status: open — cctbx only

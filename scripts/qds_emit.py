@@ -31,8 +31,19 @@ def yaml_dump(obj: Any) -> str:
     return yaml.safe_dump(obj, sort_keys=False, default_flow_style=False, allow_unicode=True)
 
 
-def _final_measurements(eval_run: dict[str, Any]) -> list[dict[str, Any]]:
-    return [m for m in eval_run.get("measurements", []) if m.get("stage") == "final"]
+def _final_or_all_measurements(eval_run: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return measurements that should populate the QDS.
+
+    The QDS surfaces the post-refinement model state plus dataset-wide
+    metrics (completeness, ⟨I/σ⟩, CC½, R-merge / R-meas, resolution).
+    Per-residue and per-chain measurements that are also `stage: final`
+    are kept and surfaced via per_residue_quality / site_qualities.
+    """
+    return [m for m in eval_run.get("measurements", []) if m.get("stage") in ("final", "all")]
+
+
+def _measurements_by_stage(eval_run: dict[str, Any], stage: str) -> list[dict[str, Any]]:
+    return [m for m in eval_run.get("measurements", []) if m.get("stage") == stage]
 
 
 def _pick_strongest(
@@ -127,6 +138,48 @@ def build_map_summary(qds_id: str, measurements: list[dict[str, Any]]) -> dict[s
     return {"id": f"{qds_id}_map", **populated}
 
 
+def build_data_quality_summary(qds_id: str, measurements: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """Populate DataQualitySummary from `stage: all` measurements.
+
+    Closes Codex finding #1: previously the QDS dropped every dataset-
+    level metric because the emitter filtered to `stage == final` only.
+    """
+    completeness_overall = _pick_strongest(
+        measurements, ("completeness",), exclude_substrings=("outer",)
+    )
+    completeness_outer = _pick_strongest(measurements, ("completeness",), exclude_substrings=("overall",))
+    if completeness_overall is None and completeness_outer is None:
+        # Many evals use a single combined "completeness" row — fall back.
+        completeness_overall = _pick_strongest(measurements, ("completeness",))
+
+    i_over_sigma = _pick_strongest(measurements, ("i_over_sigma", "i_σ", "i_sigma"))
+    cc_half = _pick_strongest(measurements, ("cc_half", "cc½", "cc_one_half"))
+    r_merge = _pick_strongest(measurements, ("r-merge", "r_merge"))
+    r_meas = _pick_strongest(measurements, ("r-meas", "r_meas"))
+    wilson_b = _pick_strongest(measurements, ("wilson_b", "wilson"))
+
+    populated: dict[str, Any] = {}
+    if completeness_overall:
+        populated["completeness_overall_pct"] = _wrap_value(completeness_overall)
+    if completeness_outer:
+        populated["completeness_outer_shell_pct"] = _wrap_value(completeness_outer)
+    if i_over_sigma:
+        populated["mean_i_over_sigma_outer"] = _wrap_value(i_over_sigma)
+    if cc_half:
+        populated["cc_half_outer"] = _wrap_value(cc_half)
+    if r_merge:
+        populated["r_merge"] = _wrap_value(r_merge)
+    if r_meas:
+        populated["r_meas"] = _wrap_value(r_meas)
+    if wilson_b:
+        populated["wilson_b"] = _wrap_value(wilson_b)
+
+    populated = {k: v for k, v in populated.items() if v}
+    if not populated:
+        return None
+    return {"id": f"{qds_id}_data_quality", **populated}
+
+
 def build_cross_tool_coverage(qds_id: str, measurements: list[dict[str, Any]]) -> dict[str, Any]:
     by_task: dict[str, dict[str, set[str]]] = {}
     for m in measurements:
@@ -186,7 +239,11 @@ def main() -> None:
         for r in doc.get("evaluation_runs", []):
             runs.append(r)
 
-    final_measurements = [m for r in runs for m in _final_measurements(r)]
+    # Use both `final` (post-refinement model state) and `all`
+    # (dataset-wide metrics like completeness) for QDS construction.
+    qds_measurements = [m for r in runs for m in _final_or_all_measurements(r)]
+    final_only = [m for m in qds_measurements if m.get("stage") == "final"]
+    all_only = [m for m in qds_measurements if m.get("stage") == "all"]
 
     qds_id = args.qds_id
     qds: dict[str, Any] = {
@@ -196,16 +253,22 @@ def main() -> None:
         "issued_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat(),
         "identity_block": build_identity_block(qds_id, args.structure_id),
     }
-    geom = build_geometry_summary(qds_id, final_measurements)
+    # Geometry / refinement / map summaries describe the post-refinement model.
+    geom = build_geometry_summary(qds_id, final_only)
     if geom:
         qds["geometry_summary"] = geom
-    refn = build_refinement_summary(qds_id, final_measurements)
+    refn = build_refinement_summary(qds_id, final_only)
     if refn:
         qds["refinement_summary"] = refn
-    mp = build_map_summary(qds_id, final_measurements)
+    mp = build_map_summary(qds_id, final_only)
     if mp:
         qds["map_summary"] = mp
-    qds["cross_tool_coverage"] = build_cross_tool_coverage(qds_id, final_measurements)
+    # Data-quality summary comes from dataset-wide measurements (stage=all).
+    dq = build_data_quality_summary(qds_id, all_only)
+    if dq:
+        qds["data_quality_summary"] = dq
+    # Cross-tool coverage uses every measurement that informed the QDS.
+    qds["cross_tool_coverage"] = build_cross_tool_coverage(qds_id, qds_measurements)
 
     headline_lines = []
     for r in runs:

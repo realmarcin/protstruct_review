@@ -376,6 +376,11 @@ catalog_tasks:
   gold_standard: standalone reduce; neutron structure if available
   example_dataset: PDB 1HQ1; PDB 5E5V (neutron pair)
 tools:
+- id: phenix.mtz.dump
+  family: cctbx
+  catalog_tasks_served:
+  - T06
+  - T13
 - id: phenix.superpose_models
   family: cctbx
   catalog_tasks_served:
@@ -1148,3 +1153,68 @@ metric_definitions:
   name: hbond-network consistency vs standalone reduce
   applicable_task_refs:
   - T14
+
+# --- Informational / derived metrics surfaced by evaluation runs but not
+# --- present in the original catalog source TSV. Added directly here in
+# --- the canonical YAML. records_to_tsv.py round-trips the original rows
+# --- only; these informational ones live in the YAML.
+
+- id: T03_overall_r_per_shell_weighted
+  name: overall R per-shell weighted
+  description: >-
+    Reflection-count-weighted average of per-shell R-factor produced by
+    Servalcat sigmaa. Informational; bounds the R-factor range when the
+    work/free split is not separately reported.
+  applicable_task_refs:
+  - T03
+
+- id: T05_ramachandran_outliers_count
+  name: Ramachandran outliers (count)
+  description: >-
+    Absolute count of Ramachandran outlier residues. Sub-form of
+    T05_ramachandran_outlier that records the integer count.
+  applicable_task_refs:
+  - T05
+
+- id: T05_clashes_unique_pairs
+  name: clashes (unique pairs)
+  description: >-
+    Number of unique atom-pair clashes (overlap ≥ 0.4 Å) reported by probe.
+    Feeds the clashscore computation; useful for cross-tool debugging.
+  applicable_task_refs:
+  - T05
+
+- id: T05_atoms_used_in_clashscore_calc
+  name: atoms used in clashscore calc
+  description: >-
+    Total atom count (heavy + H) used as the denominator in
+    clashscore = 1000 * clashes / atoms.
+  applicable_task_refs:
+  - T05
+
+- id: T05_holton_geom_energy_ratio_sigma
+  name: Holton geom-energy ratio (σ)
+  description: >-
+    Ratio of model geometry energy to ideal-distribution energy in
+    sigma units, from phenix.holton_geometry_validation.
+  applicable_task_refs:
+  - T05
+
+- id: T06_resolution_range
+  name: resolution range (Å)
+  description: >-
+    Low/high resolution span of the reflection data, recorded as text.
+  applicable_task_refs:
+  - T06
+
+- id: T06_reflections_input_mtz
+  name: reflections (input MTZ)
+  description: Reflection count in the agent's input MTZ.
+  applicable_task_refs:
+  - T06
+
+- id: T06_reflections_final_mtz
+  name: reflections (final MTZ)
+  description: Reflection count in the agent's final MTZ.
+  applicable_task_refs:
+  - T06
