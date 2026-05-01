@@ -379,3 +379,44 @@ tool_recommendations:
       - Yamashita2021
       - Brink2021
     as_of_date: '2026-04-26'
+
+  # ----- OpenStructure (closes the cctbx-only gap on lDDT) ------------
+
+  - id: REC_T01_lddt_global_top_considered
+    metric_definition_ref: T01_lddt_global
+    tool_ref: OpenStructure
+    role: top_considered
+    rank: 1
+    justification: >-
+      Reference implementation of lDDT (CASP15+ primary similarity
+      metric, Mariani et al. 2013). Pure C++/Python; independent of
+      cctbx. Produces global + per-residue scores in one CLI call.
+    evidence_refs:
+      - Mariani2013
+    as_of_date: '2026-04-30'
+
+  - id: REC_T01_lddt_global_top_performing
+    metric_definition_ref: T01_lddt_global
+    tool_ref: OpenStructure
+    role: top_performing
+    rank: 1
+    justification: >-
+      Independently confirmed start→final lDDT 0.9725 on 1SAR
+      (preserves 97.25% of local distances). Also flagged Gly A 34
+      as the lowest-lDDT residue (0.878), corroborating the gemmi
+      finding that Gly A 34 has the highest Cα displacement.
+    evidence_refs:
+      - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-30'
+
+  - id: REC_T01_per_residue_lddt_top_considered
+    metric_definition_ref: T01_per_residue_lddt
+    tool_ref: OpenStructure
+    role: top_considered
+    rank: 1
+    justification: >-
+      OST `lddt` CLI emits per-residue lDDT in one invocation. Closes
+      the per-residue lDDT cctbx-only gap.
+    evidence_refs:
+      - Mariani2013
+    as_of_date: '2026-04-30'

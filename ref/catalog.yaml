@@ -376,6 +376,13 @@ catalog_tasks:
   gold_standard: standalone reduce; neutron structure if available
   example_dataset: PDB 1HQ1; PDB 5E5V (neutron pair)
 tools:
+- id: OpenStructure
+  family: non_cctbx
+  catalog_tasks_served:
+  - T01
+  - T02
+  - T05
+  - T07
 - id: phenix.emringer
   family: cctbx
   catalog_tasks_served:
@@ -1303,6 +1310,16 @@ metric_definitions:
     Per-residue local distance difference test score. Stored as one
     PerResidueValue per residue; QDS surfaces summary stats and the
     full array on QualityDataSheet.per_residue_quality.lddt_per_residue.
+  applicable_task_refs:
+  - T01
+
+- id: T01_lddt_global
+  name: global lDDT
+  description: >-
+    Global lDDT score (whole-structure mean of per-residue lDDT,
+    weighted by reference distance count). CASP15+ primary similarity
+    metric for pair-of-structures comparison. Reference implementation
+    is the OST `lddt` CLI (Mariani et al. 2013).
   applicable_task_refs:
   - T01
 

@@ -758,6 +758,24 @@ evaluation_runs:
         the agent's own narrative, not on oracle agreement.
       mitigation: Re-run peak finder with consistent settings; flag peaks > 5 σ.
       status: known_violation
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_lddt_global
+    catalog_task_ref: T01
+    stage: final
+    scope: complex
+    metric_definition_ref: T01_lddt_global
+    oracle_tool_ref: OpenStructure
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.9725
+    pass_criterion: '> 0.85 for refined-against-near-identical'
+    pass_status: pass
+    notes: Global lDDT 0.9725 — first non-cctbx confirmation of the structure preservation
+      claim. Computed with OST 2.11.1 lddt CLI in Cα-only mode (-c), 15 Å inclusion
+      radius. Closes the cctbx-only gap on lDDT for the project. Lowest per-residue
+      lDDT is at Gly A 34 (0.878), corroborating the Cα displacement finding (max
+      0.955 Å at the same residue).
   headline_findings:
   - id: EVAL_1sar_cdba2c07_2026-04-24_H_001
     catalog_task_refs:
@@ -1224,6 +1242,66 @@ evaluation_runs:
       value_numeric: 0.708
       unit: Å
     tool_ref: gemmi sfcalc
+  - id: EVAL_1sar_cdba2c07_2026-04-24_lddt_001
+    residue_ref: 1sar:A:34
+    metric_definition_ref: T01_per_residue_lddt
+    value:
+      value_numeric: 0.877907
+    tool_ref: OpenStructure
+  - id: EVAL_1sar_cdba2c07_2026-04-24_lddt_002
+    residue_ref: 1sar:A:68
+    metric_definition_ref: T01_per_residue_lddt
+    value:
+      value_numeric: 0.886364
+    tool_ref: OpenStructure
+  - id: EVAL_1sar_cdba2c07_2026-04-24_lddt_003
+    residue_ref: 1sar:A:33
+    metric_definition_ref: T01_per_residue_lddt
+    value:
+      value_numeric: 0.90625
+    tool_ref: OpenStructure
+  - id: EVAL_1sar_cdba2c07_2026-04-24_lddt_004
+    residue_ref: 1sar:A:16
+    metric_definition_ref: T01_per_residue_lddt
+    value:
+      value_numeric: 0.914894
+    tool_ref: OpenStructure
+  - id: EVAL_1sar_cdba2c07_2026-04-24_lddt_005
+    residue_ref: 1sar:A:15
+    metric_definition_ref: T01_per_residue_lddt
+    value:
+      value_numeric: 0.915179
+    tool_ref: OpenStructure
+  - id: EVAL_1sar_cdba2c07_2026-04-24_lddt_006
+    residue_ref: 1sar:A:60
+    metric_definition_ref: T01_per_residue_lddt
+    value:
+      value_numeric: 0.916667
+    tool_ref: OpenStructure
+  - id: EVAL_1sar_cdba2c07_2026-04-24_lddt_007
+    residue_ref: 1sar:A:50
+    metric_definition_ref: T01_per_residue_lddt
+    value:
+      value_numeric: 0.919643
+    tool_ref: OpenStructure
+  - id: EVAL_1sar_cdba2c07_2026-04-24_lddt_008
+    residue_ref: 1sar:A:26
+    metric_definition_ref: T01_per_residue_lddt
+    value:
+      value_numeric: 0.922414
+    tool_ref: OpenStructure
+  - id: EVAL_1sar_cdba2c07_2026-04-24_lddt_009
+    residue_ref: 1sar:A:31
+    metric_definition_ref: T01_per_residue_lddt
+    value:
+      value_numeric: 0.923077
+    tool_ref: OpenStructure
+  - id: EVAL_1sar_cdba2c07_2026-04-24_lddt_010
+    residue_ref: 1sar:A:96
+    metric_definition_ref: T01_per_residue_lddt
+    value:
+      value_numeric: 0.927083
+    tool_ref: OpenStructure
   assumptions:
   - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_report_r_from_refine_log
     kind: implicit
@@ -1416,3 +1494,26 @@ evaluation_runs:
     status: mitigated
     evidence_refs:
     - EVAL_1sar_cdba2c07_2026-04-24
+  pairwise_comparisons:
+  - id: EVAL_1sar_cdba2c07_2026-04-24_pair_start_final
+    candidate_ref: 1sar
+    reference_ref: 1sar_starting
+    reference_kind: starting_model
+    alignment_method: OpenStructure lddt (Cα-only mode)
+    atoms_aligned: Cα
+    residues_aligned: 96
+    lddt:
+      value_numeric: 0.9725
+      mean: 0.9714290520833333
+      std_dev: 0.025869062797645708
+      min_value: 0.877907
+      max_value: 1.0
+      count: 96
+    ca_rmsd_a:
+      value_numeric: 0.423
+      unit: Å
+    tm_score:
+      value_numeric: 0.987
+    delta_baseline: starting_model
+    verdict: improved (lDDT 0.97 = local structure preserved; max displacement 0.955
+      Å at A:34 explains lowest lDDT 0.878)

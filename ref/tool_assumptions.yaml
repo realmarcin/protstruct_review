@@ -295,6 +295,89 @@ assumptions:
     evidence_refs:
       - EVAL_1sar_cdba2c07_2026-04-24
 
+  # ---------- OpenStructure (OST) ---------------------------------------
+
+  - id: ASSUM_ost_lddt_inclusion_radius
+    kind: explicit
+    scope: tool
+    title: lDDT inclusion radius (default 15 Å)
+    description: >-
+      OST's `lddt` CLI defaults to a 15 Å distance inclusion radius.
+      Reducing the radius rewards local fidelity; increasing it
+      rewards extended geometry. Two lDDT scores produced with
+      different radii are not directly comparable.
+    consequences: >-
+      A 0.97 lDDT at 15 Å is not the same as a 0.97 lDDT at 10 Å.
+      Cross-tool comparisons must use the same radius.
+    mitigation: >-
+      Always quote the radius in PairwiseComparison.notes when reporting
+      lDDT. Default 15 Å for the project; document any deviation.
+    status: mitigated
+    tool_ref: OpenStructure
+    evidence_refs:
+      - Mariani2013
+
+  - id: ASSUM_ost_lddt_thresholds
+    kind: explicit
+    scope: tool
+    title: lDDT cutoff thresholds (0.5, 1, 2, 4 Å)
+    description: >-
+      lDDT counts a distance as "preserved" if it falls within any of
+      four cutoffs (0.5 / 1 / 2 / 4 Å). The score is the unweighted
+      mean of the four pass-fractions.
+    consequences: >-
+      A model can score 0.97 at 4 Å tolerance but <0.5 at the strict
+      0.5 Å cutoff. The headline lDDT averages over all four; sites
+      with sub-Å precision needs need the per-cutoff breakdown.
+    mitigation: >-
+      OST emits per-cutoff fractions if requested; surface them when
+      the structure claims sub-Å accuracy.
+    status: unchecked
+    tool_ref: OpenStructure
+    evidence_refs:
+      - Mariani2013
+
+  - id: ASSUM_ost_lddt_cα_only_mode
+    kind: explicit
+    scope: tool
+    title: -c flag computes Cα-only lDDT
+    description: >-
+      Running `lddt -c` restricts the calculation to Cα atoms (faster,
+      backbone-only). Without -c the full all-atom lDDT is computed.
+      The -c variant is what AlphaFold's pLDDT predicts.
+    consequences: >-
+      lDDT-Cα is more permissive than all-atom lDDT (it ignores
+      side-chain placement quality entirely).
+    mitigation: >-
+      State which mode was used. For the project: -c is acceptable
+      when the structure is at moderate resolution (≥ 2.5 Å) where
+      side-chain placement is itself uncertain.
+    status: mitigated
+    tool_ref: OpenStructure
+    evidence_refs:
+      - EVAL_1sar_cdba2c07_2026-04-24
+
+  - id: ASSUM_ost_no_built_in_rama_contour
+    kind: implicit
+    scope: tool
+    title: No built-in Top8000 Ramachandran contour
+    description: >-
+      OST exposes φ/ψ extraction via residue.GetPhiTorsion() /
+      GetPsiTorsion() but does not ship Top8000 contour data for
+      Ramachandran outlier classification. Outlier classification via
+      OST requires either external contour data files or a custom
+      coarse classifier (which mis-fires on the boundary).
+    consequences: >-
+      OST is not a drop-in replacement for MolProbity's Rama outlier
+      analysis. It IS a drop-in replacement for lDDT, structural
+      comparison, and Cα displacement analysis.
+    mitigation: >-
+      Do not use OST for headline Rama outlier % numbers. Use it as a
+      φ/ψ extractor where needed; defer outlier classification to
+      MolProbity or a future OST plugin that ships contour data.
+    status: known_violation
+    tool_ref: OpenStructure
+
   # ---------- wwPDB validation report --------------------------------
 
   - id: ASSUM_wwpdb_percentile_source

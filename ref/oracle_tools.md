@@ -36,6 +36,7 @@ for r in d['tool_recommendations']:
 | **probe** (Richardson lab) | 2.26.021123 | `$HOME/tools/probe-src/probe` | T05 (clash detection — feeds clashscore) |
 | **reduce** (Richardson lab) | 4.16.250520 | `$HOME/tools/reduce-src/build/reduce_src/reduce` | T14 (H-atom placement); T05 (input prep for clashscore) |
 | **Servalcat** | 0.4.131 | conda env `cryst-oracles` (`mamba activate cryst-oracles`) | T03 (`servalcat refine_xtal_norefmac`), T06 (`servalcat fsc`, `fofc`, `sigmaa`), T12 |
+| **OpenStructure (OST)** | 2.11.1 | conda env `cryst-oracles` (CLI `lddt`, Python `import ost`) | T01 (`lddt` — CASP15+ reference implementation, global + per-residue), T02 (per-residue Cα distance + structural comparison), T05 (Ramachandran φ/ψ extraction; outlier classification needs external Top8000 contour data), T07 (per-residue lDDT for predicted-vs-experimental) |
 
 Together, `probe` + `reduce` constitute the standalone Richardson-lab MolProbity pipeline that the catalog calls "MolProbity standalone" — these are the same binaries the MolProbity web service runs.
 
