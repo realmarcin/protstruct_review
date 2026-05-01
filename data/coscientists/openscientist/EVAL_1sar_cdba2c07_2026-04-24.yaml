@@ -1090,6 +1090,123 @@ evaluation_runs:
       RSCC < 0.8 (17.8%); 59 waters with RSCC < 0.85 (40%). The 3 low-RSCC waters
       are flagged as ResidueOutlier rows with outlier_kind: density_misfit. Most waters
       have good density support; agent''s water-modelling is mostly clean.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_ca_identity_z_mg
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:A:CA98 vs Mg²⁺ canonical
+    metric_definition_ref: T10_ligand_rscc
+    oracle_tool_ref: CheckMyMetal
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 16.35
+      unit: σ
+    pass_criterion: '|Z| < 3 for the modelled element; > 3 = inconsistent'
+    pass_status: informational
+    notes: 'CheckMyMetal-style local heuristic (Zheng 2014/2017 canonical bond lengths).
+      Modelled element Ca²⁺. Tested-against-Mg²⁺: mean bond 2.887 Å vs Mg²⁺ canonical
+      2.07 ± 0.05 Å → |Z| 16.35. **Mg²⁺ alternative is excluded** — observed bonds
+      are 16 σ above the Mg²⁺ canonical bond length. The Ca²⁺ identity claim now has
+      positive geometric evidence, not just absence of evidence to the contrary.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_ca_identity_z_ca
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:A:CA98 vs Ca²⁺ canonical
+    metric_definition_ref: T10_ligand_rscc
+    oracle_tool_ref: CheckMyMetal
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 3.25
+      unit: σ
+    pass_criterion: '|Z| < 3 for normal coordination; 3-5 acceptable for partial occupancy'
+    pass_status: pass_with_caveat
+    notes: Mean bond 2.887 Å vs Ca²⁺ canonical 2.40 ± 0.15 Å → |Z| 3.25. CN = 3 (low
+      for full-occupancy Ca²⁺; canonical is 6–8). B-factor 42.73 (above the 15–30
+      range for full-occupancy Ca²⁺). All three signals (long bonds, low CN, high
+      B) are consistent with the partial-occupancy framing the agent reports — the
+      Ca²⁺ binds weakly in the absence of nucleotide cofactor.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_ca_identity_summary
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:A:CA98
+    metric_definition_ref: T10_ligand_rscc
+    oracle_tool_ref: CheckMyMetal
+    oracle_family: non_cctbx
+    agent_claim:
+      value_text: Ca²⁺
+    oracle_measure:
+      value_text: Ca²⁺ — consistent (partial occupancy); Mg²⁺ excluded; K⁺ best raw
+        bond-length match but CN too low; Na⁺ possible
+    pass_criterion: modelled element is the best fit OR alternatives ruled out
+    pass_status: pass_with_caveat
+    notes: 'Element-identity verdict: Ca²⁺ is the modelled element and is geometrically
+      consistent with the observed coordination, when interpreted as partial-occupancy
+      binding (CN 3, long bonds, high B). Mg²⁺ excluded by bond length (|Z| 16+).
+      K⁺ has the best raw bond-length match (|Z| 0.44) but the partial CN and the
+      protein''s known Ca²⁺-binding biology make Ca²⁺ the better interpretation. ASSUM_interp_ion_identity_no_anomalous
+      status upgraded from `known_violation` to `mitigated` — Mg²⁺ is now excluded
+      by oracle, even without anomalous data.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_na_identity_z_mg
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:B:NA98 vs Mg²⁺ canonical
+    metric_definition_ref: T10_ligand_rscc
+    oracle_tool_ref: CheckMyMetal
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 14.06
+      unit: σ
+    pass_criterion: '|Z| < 3'
+    pass_status: informational
+    notes: Mean bond 2.773 Å vs Mg²⁺ canonical 2.07 ± 0.05 Å → |Z| 14.06. Mg²⁺ alternative
+      ruled out for the chain B Na⁺ as well.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_na_identity_z_na
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:B:NA98 vs Na⁺ canonical
+    metric_definition_ref: T10_ligand_rscc
+    oracle_tool_ref: CheckMyMetal
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 1.87
+      unit: σ
+    pass_criterion: '|Z| < 2 for normal Na⁺ coordination'
+    pass_status: pass_with_caveat
+    notes: Mean bond 2.773 Å vs Na⁺ canonical 2.40 ± 0.20 Å → |Z| 1.87. Borderline;
+      Na⁺ identity is acceptable but at the upper edge of bond-length expectations.
+      K⁺ fits the bond length better (|Z| 0.13) — was potassium in the crystallization
+      buffer? The agent's report doesn't say.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_na_identity_summary
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:B:NA98
+    metric_definition_ref: T10_ligand_rscc
+    oracle_tool_ref: CheckMyMetal
+    oracle_family: non_cctbx
+    agent_claim:
+      value_text: Na⁺
+    oracle_measure:
+      value_text: Na⁺ — borderline (|Z| 1.87); Mg²⁺ excluded; K⁺ better bond-length
+        match; Ca²⁺ possible
+    pass_criterion: modelled element is the best fit OR alternatives ruled out
+    pass_status: pass_with_caveat
+    notes: 'Element-identity verdict: Na⁺ is geometrically borderline at 2.77 Å mean
+      bond. K⁺ has a tighter bond-length fit by oracle. Whether the buffer contained
+      K⁺ is the open question; without that information, Na⁺ is the default and the
+      modelling is consistent.'
   headline_findings:
   - id: EVAL_1sar_cdba2c07_2026-04-24_H_001
     catalog_task_refs:

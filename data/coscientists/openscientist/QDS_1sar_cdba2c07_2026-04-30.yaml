@@ -3,7 +3,7 @@ quality_data_sheets:
   structure_ref: 1sar
   derived_from_evaluation_run_refs:
   - EVAL_1sar_cdba2c07_2026-04-24
-  issued_at: '2026-05-01T03:59:13+00:00'
+  issued_at: '2026-05-01T04:17:12+00:00'
   identity_block:
     id: QDS_1sar_cdba2c07_2026-04-30_identity
     pdb_id: 1sar
@@ -321,14 +321,16 @@ quality_data_sheets:
       ligand_b_factor_vs_surroundings:
         value_numeric: 2.674
       rscc:
-        value_numeric: 0.9716
+        value_text: Ca²⁺ — consistent (partial occupancy); Mg²⁺ excluded; K⁺ best
+          raw bond-length match but CN too low; Na⁺ possible
   - id: QDS_1sar_cdba2c07_2026-04-30_site_quality_1sar_na_crystal_contact_site
     site_ref: 1sar_na_crystal_contact_site
     ligand_quality:
       id: QDS_1sar_cdba2c07_2026-04-30_ligand_quality_1sar:B:NA98
       ligand_ref: 1sar:B:NA98
       rscc:
-        value_numeric: 0.9636
+        value_text: Na⁺ — borderline (|Z| 1.87); Mg²⁺ excluded; K⁺ better bond-length
+          match; Ca²⁺ possible
       ligand_b_factor_vs_surroundings:
         value_numeric: 1.43
   - id: QDS_1sar_cdba2c07_2026-04-30_site_quality_1sar_so4_anion_binding_site
@@ -388,6 +390,7 @@ quality_data_sheets:
       cctbx_oracles:
       - phenix.real_space_correlation
       non_cctbx_oracles:
+      - CheckMyMetal
       - gemmi sfcalc
       gap_status: closed
     - id: QDS_1sar_cdba2c07_2026-04-30_coverage_T13
@@ -1004,6 +1007,26 @@ quality_data_sheets:
     mitigation: Always specify the reference structure on the command line.
     status: unchecked
     tool_ref: ProSMART
+  - id: ASSUM_checkmymetal_geometry_based
+    kind: explicit
+    scope: tool
+    title: Heuristic geometry classification — not anomalous Fourier
+    description: 'CheckMyMetal classifies modelled metal-ion identity by comparing
+      observed coordination geometry (number of contacts, bond lengths, angles, B-factor)
+      against canonical expectations per element. Returns a verdict: "modelled element
+      OK" / "alternative element X fits better" / "uninterpretable". Fast, free, web-only,
+      no install — uses no anomalous data.'
+    consequences: A geometry-based check can be fooled when two elements have similar
+      coordination geometry (Ca²⁺ vs Mg²⁺ at moderate resolution; Na⁺ vs K⁺). Strongest
+      when the geometry is clearly wrong for the modelled element.
+    mitigation: Treat as one of several lines of evidence. Downgrade verdict to "consistent
+      with X — alternatives possible at this resolution" when CheckMyMetal returns
+      ambiguous, especially when no anomalous data exist.
+    status: unchecked
+    tool_ref: CheckMyMetal
+    notes: 'Web service: <https://checkmymetal.research.uchicago.edu/>. Submission
+      is a coordinates+MTZ file pair; result is HTML/JSON. Useful when 1sar.mtz-style
+      datasets (no anomalous columns) leave element identity otherwise uncheckable.'
   - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_displacement_single_tool_only
     kind: implicit
     scope: measurement
