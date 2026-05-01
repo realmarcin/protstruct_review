@@ -394,6 +394,21 @@ tools:
   catalog_tasks_served:
   - T02
   - T05
+- id: edstats
+  family: non_cctbx
+  catalog_tasks_served:
+  - T05
+  - T06
+  - T10
+- id: CheckMyMetal
+  family: non_cctbx
+  catalog_tasks_served:
+  - T10
+- id: gemmi blobs
+  family: non_cctbx
+  catalog_tasks_served:
+  - T05
+  - T06
 - id: aimless
   family: non_cctbx
   catalog_tasks_served:

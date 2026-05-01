@@ -259,6 +259,60 @@ What's load-bearing per modality is documented with citations in `ref/quality_re
 
 Filename: `QDS_<structure>_<artifact-short-id>_<YYYY-MM-DD>.yaml`. Same convention as `EVAL_*` per `ref/eval_naming.md`.
 
+## Validating waters, ligands, and metals
+
+Catalog T10 (ligand fitting) declares the metrics; the skill version below makes them an explicit checklist so an agent doesn't ship a QDS that's silent on these. Run these on every artefact that has a non-protein residue (HOH, SO4, metal ion, drug-like ligand, glycan, …).
+
+### Per-ligand / per-metal checklist
+
+For every Ligand record in the eval:
+
+1. **Position vs deposited PDB** — verify quoted coordinates against the deposited final-model coordinates to within ≤ 0.05 Å (gemmi audit script). Treat > 0.05 Å as a flag — possibly the agent quoted an *initial* placement (1SAR Ca²⁺ was 0.215 Å off for exactly this reason).
+2. **Density support — RSCC** — `phenix.real_space_correlation` (cctbx) and ideally a non-cctbx confirmation (`edstats` from CCP4, or `gemmi sfcalc` + custom RSCC script). Threshold: > 0.85 for ligands at typical resolutions; document any deviation in `notes`.
+3. **B-factor vs surroundings** — compute the ratio `B(ligand) / mean_B(protein)`. < 1.5× = consistent with full occupancy. 1.5–3× = partial occupancy or weak binding. > 3× = very weak; investigate alternative interpretations.
+4. **Coordination geometry** (metals) — inner-sphere bonds 2.0–2.6 Å for hard metals (Ca²⁺, Mg²⁺, Zn²⁺); coordination number 6–8 for Ca²⁺. Use `gemmi contact` or a small gemmi script.
+5. **Element identity** (metals) — does the data type allow it to be cross-checked?
+   - **Anomalous data present** (e.g. multi-wavelength MAD, peak/edge/remote) → run anomalous Fourier; check anomalous map peak height at the metal site. Tools: `phenix.anomalous_signal`, CCP4 `fft` with anomalous coefficients.
+   - **No anomalous data** → element identity cannot be cross-validated by oracle. Downgrade verdict to "consistent with X — alternatives not excluded". For 1SAR's `1sar.mtz` (only F-obs / SIGF-obs / R-free flags) this is the case.
+   - **CheckMyMetal web service** (<https://checkmymetal.research.uchicago.edu/>) — geometry-based heuristic check: classifies modelled element by coordination geometry against expected. No anomalous data needed; web-only, no install. Useful when the only choice is "downgrade to consistent-with" or "submit for an external sanity check".
+6. **Pose RMSD to deposited reference** (small-molecule ligands) — `phenix.superpose_models` on the ligand atoms only. Threshold < 0.5 Å for "good fit" against a deposited co-crystal.
+7. **H-bond network** — `gemmi contact` or PLIP. Count protein–ligand H-bonds; compare to expected for the ligand class.
+
+### Per-water audit (whole-structure, not per-residue)
+
+For the water set as a whole:
+
+1. **Count** the waters in the deposited PDB (`grep -cE '^HETATM.* HOH ' final.pdb` or `gemmi residues`). Compare to agent claim — 1SAR had a 13-water gap (146 actual vs 159 reported), exactly matching the total-atom gap.
+2. **B-factor distribution** — mean, std, min, max. Mean ~1.5–2× protein-mean is typical for surface waters. Flag waters with B > 60 Å² as `density_misfit` candidates.
+3. **RSCC distribution** — `phenix.real_space_correlation` outputs RSCC per HOH. Expect mean ~0.85, range 0.65–0.99. Flag waters with RSCC < 0.7 as **density_misfit ResidueOutliers**. 1SAR had 3 such waters (HOH S 680, 707, 729) with RSCC 0.658–0.691.
+4. **Per-water summary on the QDS** — populate `TypedMeasurementValue.mean / std_dev / min_value / max_value / count` on a single scope=complex measurement. Add `ResidueOutlier` rows for the worst N waters (not all N=146).
+
+### Tools — what we have and what's missing
+
+| Check | Available oracles | Gap |
+|---|---|---|
+| RSCC (per residue) | `phenix.real_space_correlation` (cctbx) | non-cctbx: `edstats` (CCP4, installed-but-needs-wiring), `gemmi sfcalc + sigma-A`-style scripting |
+| Difference-density peaks | `phenix.find_peaks_holes` (cctbx) | non-cctbx: `gemmi blobs --diff` (installed; flag-handling quirks in 0.7.5 — emit a CCP4 `.map` from REFMAC and run on that) |
+| B-factor extraction | gemmi structural audit (non-cctbx) | none |
+| Coordination geometry | gemmi (non-cctbx) | none |
+| Element identity (geometry-based) | none locally | **CheckMyMetal web service** (free, no install). Add as a manual step for any ion claim. |
+| Element identity (anomalous-Fourier) | `phenix.anomalous_signal`, CCP4 `fft` | requires anomalous data in the MTZ |
+| Pose RMSD | `phenix.superpose_models`, `gemmi align` | none |
+| H-bond network | `gemmi contact` | none — additional tools (PLIP) optional |
+
+### Schema integration
+
+Each per-ligand check populates a `MeasurementValue` at `scope: ligand`, `scope_selector: <ligand_id>`, with the canonical T10 metric:
+- `T10_ligand_rscc` → `LigandQuality.rscc`
+- `T10_ligand_rsr` → `LigandQuality.rsr`
+- `T10_ligand_b_vs_surroundings` → `LigandQuality.ligand_b_factor_vs_surroundings`
+- `T10_protein-ligand_hbond_count` → `LigandQuality.protein_ligand_hbond_count`
+- `T10_rmsd_to_deposited_ligand_pose` → `LigandQuality.pose_rmsd_to_deposited_a`
+
+The QDS emitter joins via `Site.ligand_ref` → `LigandQuality` so every ligand bound at a Site has its quality block in `site_qualities[].ligand_quality`. Declare the Site (kind: `binding_site`, `metal_coordination`, etc.) explicitly in the eval — without it, scope=ligand measurements will trigger `_check_implied_blocks` to fail the QDS emit.
+
+For waters specifically: do NOT declare every HOH as a Ligand (146 records would explode the YAML). Use a single scope=complex measurement carrying the water B and RSCC distribution stats (mean/std/min/max/count), plus ResidueOutlier rows only for the worst N. The 1SAR eval shows the pattern — 4 outliers (1 Asn A 39 + 3 waters) explicitly listed; 146 waters summarised in two scope=complex rows.
+
 ## QDS emitter contract (v3)
 
 `scripts/qds_emit.py` follows two hard rules:

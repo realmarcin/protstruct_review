@@ -373,6 +373,83 @@ assumptions:
     status: unchecked
     tool_ref: ProSMART
 
+  # ---------- CheckMyMetal (web service) -----------------------------
+
+  - id: ASSUM_checkmymetal_geometry_based
+    kind: explicit
+    scope: tool
+    title: Heuristic geometry classification — not anomalous Fourier
+    description: >-
+      CheckMyMetal classifies modelled metal-ion identity by comparing
+      observed coordination geometry (number of contacts, bond lengths,
+      angles, B-factor) against canonical expectations per element.
+      Returns a verdict: "modelled element OK" / "alternative element X
+      fits better" / "uninterpretable". Fast, free, web-only, no
+      install — uses no anomalous data.
+    consequences: >-
+      A geometry-based check can be fooled when two elements have
+      similar coordination geometry (Ca²⁺ vs Mg²⁺ at moderate
+      resolution; Na⁺ vs K⁺). Strongest when the geometry is clearly
+      wrong for the modelled element.
+    mitigation: >-
+      Treat as one of several lines of evidence. Downgrade verdict to
+      "consistent with X — alternatives possible at this resolution"
+      when CheckMyMetal returns ambiguous, especially when no
+      anomalous data exist.
+    status: unchecked
+    tool_ref: CheckMyMetal
+    notes: >-
+      Web service: <https://checkmymetal.research.uchicago.edu/>.
+      Submission is a coordinates+MTZ file pair; result is HTML/JSON.
+      Useful when 1sar.mtz-style datasets (no anomalous columns)
+      leave element identity otherwise uncheckable.
+
+  # ---------- CCP4 edstats -------------------------------------------
+
+  - id: ASSUM_edstats_needs_2fofc_dfofc_in_mtz
+    kind: explicit
+    scope: tool
+    title: edstats requires both 2mFo-DFc AND mFo-DFc in the input MTZ
+    description: >-
+      `edstats` reads weighted map coefficients (FWT/PHWT for
+      2mFo-DFc, DELFWT/PHDELWT for mFo-DFc) from the input MTZ.
+      Refining with REFMAC NCYC=0 produces both columns; `phenix.refine`
+      with `output.map_coefficients` does the same.
+    consequences: >-
+      Running edstats on a plain F-obs MTZ will fail with cryptic
+      "ERROR(S) in input" without naming the missing column.
+    mitigation: >-
+      Pre-stage by running REFMAC NCYC=0 on the model+data first;
+      use that output MTZ as edstats input. Already in the pipeline
+      for 1SAR.
+    status: unchecked
+    tool_ref: edstats
+    notes: >-
+      The 1SAR refmac NCYC=0 run wrote refmac_out.mtz with FWT/PHWT/
+      DELFWT/PHDELWT — the right input shape. Specific keyword-input
+      syntax is the remaining wiring task.
+
+  # ---------- gemmi blobs --------------------------------------------
+
+  - id: ASSUM_gemmi_blobs_diff_flag_quirks
+    kind: implicit
+    scope: tool
+    title: gemmi blobs --diff flag handling quirks in 0.7.5
+    description: >-
+      `gemmi blobs --diff -f DELFWT -p PHDELWT MTZ PDB` emits the help
+      text instead of running, on macOS arm64 build 0.7.5.
+      `gemmi blobs --sigma=N MTZ PDB` (without --diff) runs the
+      2mFo-DFc analysis fine.
+    consequences: >-
+      Cannot directly use gemmi blobs as a non-cctbx confirmation of
+      `phenix.find_peaks_holes` until the flag handling is sorted.
+    mitigation: >-
+      Workaround — emit a CCP4 .map file from REFMAC's output MTZ
+      (`gemmi map2sf` or REFMAC fft), then run `gemmi blobs MAP_FILE
+      PDB` which uses the map directly without flag confusion.
+    status: unchecked
+    tool_ref: gemmi blobs
+
   # ---------- OpenStructure (OST) ---------------------------------------
 
   - id: ASSUM_ost_lddt_inclusion_radius
