@@ -180,6 +180,45 @@ enums:
       moderate:
       severe:
 
+  AssumptionKind:
+    description: >-
+      Whether an assumption is documented in the tool's docs / source
+      (explicit) or arises from a default behaviour, threshold, or
+      reference dataset that is not loudly advertised (implicit).
+    permissible_values:
+      explicit:
+      implicit:
+
+  AssumptionScope:
+    description: >-
+      Where the assumption operates: at the tool level (it shapes every
+      number the tool produces); at a single measurement (it shaped this
+      specific value); at the report level (the agent's narrative
+      framing); at aggregation (combining many measurements into one
+      verdict); at interpretation (deriving structural meaning from a
+      number).
+    permissible_values:
+      tool:
+      measurement:
+      report:
+      aggregation:
+      interpretation:
+
+  AssumptionStatus:
+    description: >-
+      Whether the assumption has been actively checked. `verified` =
+      cross-tool confirmation showed the assumption holds for this case.
+      `mitigated` = a workaround or independent check is in place.
+      `unchecked` = the assumption is documented but no verification
+      has been run. `known_violation` = the assumption is documented
+      to be wrong for this case (and the affected number should not be
+      taken at face value).
+    permissible_values:
+      verified:
+      mitigated:
+      unchecked:
+      known_violation:
+
   ContactKind:
     description: >-
       Kind of atom-atom contact recorded by a CoordinationContact row.
@@ -329,6 +368,14 @@ classes:
         range: Ligand
         multivalued: true
         inlined_as_list: true
+      assumptions:
+        range: Assumption
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Container-level Assumption catalog. Used as a lookup target
+          when a Tool's assumptions[] block needs to reference a
+          shared assumption rather than inline it.
 
   # ------------------------------------------------------------------ mixins
 
@@ -399,6 +446,15 @@ classes:
       catalog_tasks_served:
         range: CatalogTaskId
         multivalued: true
+      assumptions:
+        range: Assumption
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Implicit and explicit assumptions baked into this tool's
+          default behaviour: reference distribution, scaling model,
+          hyper-parameter defaults, etc. Surfaced into the QDS via
+          measurement.oracle_tool_ref → tool.assumptions.
 
   MetricDefinition:
     description: A named numeric deliverable that one or more tools can produce.
@@ -601,6 +657,15 @@ classes:
       notes:
       provenance_ref:
         range: MeasurementProvenance
+      assumptions:
+        range: Assumption
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Assumptions specific to this measurement (parameter choices
+          that differ from tool defaults, interpretive flags, etc.).
+          Tool-level assumptions are NOT duplicated here; the QDS
+          report aggregates both via the oracle_tool_ref join.
 
   TypedMeasurementValue:
     description: >-
@@ -785,6 +850,16 @@ classes:
         range: integer
       criteria_total:
         range: integer
+      assumptions:
+        range: Assumption
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Run-level assumptions — typically the agentic-framework's
+          reporting / interpretation / aggregation conventions
+          (e.g. "R-factors read from refine in-run log, not
+          re-derived"). The QDS surfaces these alongside tool and
+          measurement assumptions in assumptions_report[].
       headline_verdict:
         description: One-paragraph human summary of the eval outcome.
 
@@ -866,6 +941,17 @@ classes:
           Snapshot of which recommendations were active at issue time.
           The QDS is immutable; recommendations evolve, so this captures
           the recommendations as-of issued_at.
+      assumptions_report:
+        range: Assumption
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Aggregated tool / measurement / framework assumptions that
+          shaped this QDS. Built by qds_emit.py from
+          tool.assumptions[] (joined via measurement.oracle_tool_ref) +
+          measurement.assumptions[] + eval_run.assumptions[]. Anyone
+          citing this QDS sees the full inferential basis without
+          having to dig into per-tool docs.
       headline_verdict:
         description: One-paragraph pinned summary as of issued_at.
 
@@ -1481,6 +1567,56 @@ classes:
         range: TypedMeasurementValue
         inlined: true
         description: RMSD of the ligand pose to a deposited reference complex.
+
+  Assumption:
+    description: >-
+      One documented assumption that affects how a measurement, tool,
+      or report should be interpreted. Assumptions are first-class
+      because they're the inferential basis the QDS rests on — a
+      number paired with its assumption set is reproducible; a number
+      alone is not. See ref/quality_reporting.md and the skill's
+      "Tool assumptions" / "Agentic-framework assumptions" sections
+      for the canonical catalog.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      kind:
+        range: AssumptionKind
+        required: true
+      scope:
+        range: AssumptionScope
+        required: true
+      title:
+        required: true
+        description: One-line label for the assumption (used in QDS table headers).
+      description:
+        required: true
+        description: What the assumption is, in prose.
+      consequences:
+        description: >-
+          What can go wrong if the assumption is violated — the
+          mechanism by which the affected number could be misleading.
+      mitigation:
+        description: >-
+          What check, cross-tool comparison, or follow-up oracle would
+          catch a violation. Should be runnable.
+      status:
+        range: AssumptionStatus
+      tool_ref:
+        range: Tool
+        description: When the assumption is tool-level, point at the tool.
+      measurement_ref:
+        range: MeasurementValue
+        description: When the assumption is measurement-level, point at the measurement.
+      evidence_refs:
+        range: string
+        multivalued: true
+        description: >-
+          Citations or EvaluationRun ids supporting the assumption's
+          presence (e.g. cite the paper documenting the tool's default,
+          or the eval that observed a violation).
+      notes:
 
   CoordinationContact:
     description: >-

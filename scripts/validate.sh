@@ -36,9 +36,10 @@ validate_one() {
   fi
 }
 
-# 1. Canonical catalog + tool recommendations
+# 1. Canonical catalog + tool recommendations + tool assumptions
 validate_one "${REPO_ROOT}/ref/catalog.yaml"
 validate_one "${REPO_ROOT}/ref/tool_recommendations.yaml"
+validate_one "${REPO_ROOT}/ref/tool_assumptions.yaml"
 
 # 2. Every record under data/ — both synthetic test fixtures
 #    (data/examples/) and real per-artefact evals + QDS in

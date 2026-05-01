@@ -114,7 +114,11 @@ def check_record(yaml_path: Path, indices: dict[str, set[str]]) -> list[str]:
 
 def main() -> int:
     indices = load_catalog_indices()
-    targets = [CATALOG, REPO / "ref" / "tool_recommendations.yaml"]
+    targets = [
+        CATALOG,
+        REPO / "ref" / "tool_recommendations.yaml",
+        REPO / "ref" / "tool_assumptions.yaml",
+    ]
     targets += sorted((REPO / "data" / "examples").rglob("*.yaml"))
     targets += sorted((REPO / "data" / "coscientists").rglob("EVAL_*.yaml"))
     targets += sorted((REPO / "data" / "coscientists").rglob("QDS_*.yaml"))

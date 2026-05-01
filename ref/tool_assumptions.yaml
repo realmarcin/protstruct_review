@@ -1,0 +1,318 @@
+# Per-tool assumption catalog — protstruct_review v5
+#
+# One Assumption record per (tool, distinct assumption). Joined into the
+# QDS via measurement.oracle_tool_ref → tool.assumptions[]. The QDS
+# emitter aggregates these into QualityDataSheet.assumptions_report so
+# a downstream consumer sees the full inferential basis for every
+# number, without having to read each tool's docs.
+#
+# Schema: schemas/protstruct_review.yaml — class Assumption.
+# Companion prose: .claude/skills/protstruct-eval.md, "Tool assumptions"
+# section.
+#
+# Convention: id = ASSUM_<tool-slug>_<assumption-slug>.
+
+assumptions:
+
+  # ---------- MolProbity / probe / reduce -------------------------------
+
+  - id: ASSUM_molprobity_top8000_reference
+    kind: implicit
+    scope: tool
+    title: Top8000 reference distribution is high-resolution
+    description: >-
+      MolProbity's percentile rankings and outlier definitions come from
+      Top8000, a corpus of high-resolution (≤ 2.0 Å) deposited
+      structures. Applying these to a 3.0 Å model still produces a
+      percentile, but the threshold for "outlier" was set against
+      tighter geometry than the model can deliver.
+    consequences: >-
+      Mid-resolution models (2.5–3.5 Å) accumulate "outliers" that are
+      not actual modelling errors but resolution-driven coordinate
+      uncertainty. The published rate can look worse than the model is.
+    mitigation: >-
+      Pair every MolProbity number with the model's resolution; cite
+      the resolution-bin percentile (wwPDB validation report's column)
+      rather than the all-archive percentile when comparing across
+      datasets.
+    status: unchecked
+    tool_ref: MolProbity (gold)
+    evidence_refs:
+      - Williams2018
+
+  - id: ASSUM_molprobity_h_atom_placement
+    kind: implicit
+    scope: tool
+    title: H-atom placement governs clashscore
+    description: >-
+      `reduce -build` chooses Asn/Gln/His flips and adds H atoms with
+      default bond-length and rotamer choices. Different builds shift
+      clashscore by ~0.5 — confirmed on 1SAR (mmtbx.validation_summary
+      reports 3.13, standalone Richardson probe + reduce reports 3.63).
+    consequences: >-
+      "Matches MolProbity within 1.0" is a guarantee about the metric
+      bucket, not the geometry of the H-built model.
+    mitigation: >-
+      Quote the H-build flags actually used. Do not equate the cctbx
+      wrapper's clashscore with the standalone Richardson pipeline's
+      without saying so.
+    status: mitigated
+    tool_ref: MolProbity (gold)
+    evidence_refs:
+      - EVAL_1sar_cdba2c07_2026-04-24
+
+  - id: ASSUM_molprobity_water_altloc
+    kind: implicit
+    scope: tool
+    title: probe water + altloc filter (`ogt33`)
+    description: >-
+      `probe`'s default selection — occupancy > 33% — determines which
+      atoms are eligible to clash. Disordered residues at 30% occupancy
+      drop out of the calculation entirely.
+    consequences: >-
+      Clashscore can hide real geometry problems at low-occupancy
+      altlocs — exactly the regions a refinement most needs scrutiny.
+    mitigation: Re-run probe with `--noaltloc` or relaxed occupancy thresholds.
+    status: unchecked
+    tool_ref: MolProbity (gold)
+
+  - id: ASSUM_molprobity_rotamer_library_discreteness
+    kind: implicit
+    scope: tool
+    title: Discrete rotamer library
+    description: >-
+      A side-chain χ angle one degree outside the favored region scores
+      as a rotamer outlier. The "% rotamer outliers" metric is sharp
+      by construction.
+    consequences: Borderline outliers are indistinguishable from severe ones in the headline percentage.
+    mitigation: >-
+      Surface the residue ids of all outliers via PerResidueQuality.
+      outliers[] with the actual χ deviation as metric_value.
+    status: mitigated
+    tool_ref: MolProbity (gold)
+
+  # ---------- phenix.refine in-run R-factors -------------------------
+
+  - id: ASSUM_phenix_refine_in_run_r_factors_use_internal_scaling
+    kind: explicit
+    scope: tool
+    title: In-run R-factors use a particular bulk-solvent + scaling
+    description: >-
+      `phenix.refine` reports R-work / R-free using its in-run bulk-
+      solvent (Babinet) and overall anisotropic scaling that minimised
+      during refinement. These numbers are NOT the same as those
+      `phenix.model_vs_data` produces from a fresh re-derivation.
+    consequences: >-
+      Repeatedly observed 0.01–0.015 R-unit gap on the 1SAR artefact;
+      the round-7 R-free-gap straddles the < 0.05 success criterion
+      precisely because of this gap (agent 0.050, oracle 0.0552).
+    mitigation: >-
+      Always re-derive R-factors with `phenix.model_vs_data` against
+      the same MTZ; compare. Report the model_vs_data number as the
+      QDS value of record.
+    status: known_violation
+    tool_ref: phenix.refine
+    evidence_refs:
+      - EVAL_1sar_cdba2c07_2026-04-24
+
+  - id: ASSUM_phenix_refine_rfree_flags_fixed
+    kind: explicit
+    scope: tool
+    title: R-free flag set is fixed across rounds
+    description: >-
+      Cross-validation by R-free assumes the test set is fixed and
+      untouched between rounds. Regenerating R-free flags partway
+      through silently breaks the cross-validation.
+    consequences: An apparent improvement in R-free can be an artefact of test-set rotation.
+    mitigation: Compare reflection counts and R-free-flag column labels at every round.
+    status: unchecked
+    tool_ref: phenix.refine
+
+  # ---------- phenix.model_vs_data -----------------------------------
+
+  - id: ASSUM_phenix_mvd_treats_model_as_fixed
+    kind: explicit
+    scope: tool
+    title: Model is fixed; not a refinement
+    description: >-
+      `phenix.model_vs_data` re-computes R-factors with its own bulk-
+      solvent fit but does not move atoms. The R-factors it reports
+      are for the input model exactly as deposited.
+    consequences: >-
+      A model that converged in PHENIX with one scaling will look
+      slightly different here. Treat the model_vs_data value as the
+      catalog T06 oracle of record.
+    mitigation: None needed; this is the intended behaviour.
+    status: verified
+    tool_ref: phenix.model_vs_data
+
+  # ---------- gemmi sfcalc + custom R calc ---------------------------
+
+  - id: ASSUM_gemmi_sfcalc_simpler_bulk_solvent
+    kind: explicit
+    scope: tool
+    title: Flat-bulk solvent, no anisotropic scaling
+    description: >-
+      `scripts/gemmi_rfactor.py` uses a flat-bulk solvent + bin-wise
+      isotropic rescaling. PHENIX uses anisotropic scaling on top of
+      a Babinet-style bulk-solvent fit.
+    consequences: >-
+      Expect 0.005–0.015 higher R-work from gemmi than from PHENIX on
+      the same data — that is the price of an independent code path.
+      Do NOT report the gemmi number as the agent's claim being wrong;
+      report the bracket between the two.
+    mitigation: >-
+      Cite both numbers in the QDS notes. Use the larger Δ as the
+      conservative bound.
+    status: mitigated
+    tool_ref: gemmi sfcalc
+
+  - id: ASSUM_gemmi_sfcalc_linear_resolution_shells
+    kind: implicit
+    scope: tool
+    title: Linearly-binned resolution shells
+    description: >-
+      The custom R-calc bins reflections by 1/d² in equal-count bins;
+      PHENIX uses adaptive shells.
+    consequences: Per-shell R numbers are not directly comparable across the two tools.
+    mitigation: Use overall R-work / R-free for cross-tool comparison, not per-shell.
+    status: mitigated
+    tool_ref: gemmi sfcalc
+
+  # ---------- TM-align ---------------------------------------------------
+
+  - id: ASSUM_tmalign_tm_score_normaliser
+    kind: implicit
+    scope: tool
+    title: TM-score is normalised by the FIRST input length
+    description: >-
+      `TMalign A.pdb B.pdb` normalises TM-score by the length of A.
+      Swapping arguments swaps the normaliser and produces a slightly
+      different score.
+    consequences: >-
+      Reporting "TM-score = 0.987" without identifying which input was
+      first leaves a 0.5–2 % ambiguity.
+    mitigation: >-
+      Always state which structure was the reference (the normaliser);
+      record both TM-scores when chains have different lengths.
+    status: mitigated
+    tool_ref: TM-align
+
+  - id: ASSUM_tmalign_optimal_alignment_drops_residues
+    kind: explicit
+    scope: tool
+    title: Sequence-independent — optimal Cα subset
+    description: >-
+      TM-align finds the optimal Cα subset by dynamic programming and
+      drops residues from the score that don't fit the alignment.
+      The `Aligned length` field tells you how many were used.
+    consequences: >-
+      For near-identical structures TM-align produces a more
+      generous alignment than LSQ-based superposition. RMSD reported
+      next to a TM-align alignment is over a different atom set than
+      RMSD reported next to a phenix.superpose_models alignment.
+    mitigation: >-
+      Quote `aligned_length` in PairwiseComparison.residues_aligned.
+      Quote both LSQ and TM-align RMSD when reporting both.
+    status: mitigated
+    tool_ref: TM-align
+
+  # ---------- Servalcat -------------------------------------------------
+
+  - id: ASSUM_servalcat_sigmaa_per_shell_only
+    kind: explicit
+    scope: tool
+    title: per-shell sigma-A R, not work/free split by default
+    description: >-
+      `servalcat sigmaa` reports a per-shell composite R and per-bin
+      sigma-A weights, not a separately-cross-validated R-work / R-free.
+      The "overall R" we surface is a reflection-count-weighted mean
+      over the shells.
+    consequences: >-
+      Treating the Servalcat number as a direct R-free substitute is
+      incorrect — it is a different quantity.
+    mitigation: >-
+      In the QDS, label this as "overall R per-shell weighted" (already
+      done via T03_overall_r_per_shell_weighted) and keep R-free
+      reporting on phenix.model_vs_data and gemmi.
+    status: mitigated
+    tool_ref: Servalcat
+
+  - id: ASSUM_servalcat_refine_xtal_actually_refines
+    kind: explicit
+    scope: tool
+    title: refine_xtal_norefmac re-refines the model
+    description: >-
+      `servalcat refine_xtal_norefmac` runs a full refinement; the
+      resulting R-factor is for a NEW model, not a re-measurement of
+      the input.
+    consequences: >-
+      Comparing this R-factor to the agent's R-factor is comparing
+      two different models. It is a useful "what does an independent
+      refiner do with this data" check, not a re-measurement.
+    mitigation: "Cite both — input model R via model_vs_data, re-refined R via servalcat."
+    status: mitigated
+    tool_ref: Servalcat
+
+  # ---------- phenix.holton_geometry_validation -----------------------
+
+  - id: ASSUM_holton_rmsz_not_rmsd
+    kind: explicit
+    scope: tool
+    title: Reports RMSZ against PHENIX restraint targets
+    description: >-
+      Holton geometry validation reports σ-units against PHENIX's
+      internal restraint library. RMSZ is not interchangeable with
+      raw RMSD — a tight restraint library can flag small absolute
+      RMSDs as high-Z outliers.
+    consequences: >-
+      "Bond RMSD 0.008 Å" and "bond RMSZ 1.4 σ" are both fine; they
+      are not the same number.
+    mitigation: Schema v3+ carries both bond_rmsd_a and bond_rmsz on GeometrySummary.
+    status: mitigated
+    tool_ref: phenix.holton_geometry_validation
+
+  # ---------- phenix.find_peaks_holes ----------------------------------
+
+  - id: ASSUM_find_peaks_holes_cutoff_and_merging
+    kind: explicit
+    scope: tool
+    title: σ cutoff, merging radius, atom exclusion all change peak counts
+    description: >-
+      Default 4.0 σ cutoff; default peak-merging radius collapses
+      multi-atom features; near-modelled-atom peaks are excluded by
+      default. The 1SAR agent's report listed 9 peaks; the oracle
+      run at 4 σ found 23 positive + 8 negative peaks.
+    consequences: >-
+      Different parameter choices = different counts. "All peaks > 4
+      σ are explained" is meaningless without naming the cutoff /
+      merging radius / exclusion settings used to produce the list.
+    mitigation: >-
+      Always quote the cutoff and merging settings. Re-run the oracle
+      with the same settings before adopting the agent's peak list.
+    status: known_violation
+    tool_ref: phenix.find_peaks_holes
+    evidence_refs:
+      - EVAL_1sar_cdba2c07_2026-04-24
+
+  # ---------- wwPDB validation report --------------------------------
+
+  - id: ASSUM_wwpdb_percentile_source
+    kind: explicit
+    scope: tool
+    title: Percentile rank — whole archive vs resolution-binned
+    description: >-
+      The wwPDB validation report computes percentile ranks both
+      against the entire archive AND against a resolution-binned
+      subset. They are different numbers.
+    consequences: >-
+      A clashscore of 8 might be 70th percentile vs all PDB but 30th
+      percentile at 1.5 Å — same model, different interpretation.
+    mitigation: Surface both percentile numbers when both are reported.
+    status: mitigated
+    tool_ref: phenix.find_peaks_holes  # placeholder — applies broadly
+    notes: >-
+      tool_ref points at phenix.find_peaks_holes only because LinkML
+      requires a class reference; in practice this assumption applies
+      to any percentile report. Use Container-level assumptions[] to
+      attach to a non-tool host once that pattern is needed.

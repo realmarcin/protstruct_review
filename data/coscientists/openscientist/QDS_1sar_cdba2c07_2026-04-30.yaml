@@ -1,0 +1,862 @@
+quality_data_sheets:
+- id: QDS_1sar_cdba2c07_2026-04-30
+  structure_ref: 1sar
+  derived_from_evaluation_run_refs:
+  - EVAL_1sar_cdba2c07_2026-04-24
+  issued_at: '2026-05-01T00:00:32+00:00'
+  identity_block:
+    id: QDS_1sar_cdba2c07_2026-04-30_identity
+    pdb_id: 1sar
+  geometry_summary:
+    id: QDS_1sar_cdba2c07_2026-04-30_geometry
+    clashscore:
+      value_numeric: 3.63
+    ramachandran_outliers_pct:
+      value_numeric: 0.53
+    ramachandran_favored_pct:
+      value_numeric: 98.4
+    rotamer_outliers_pct:
+      value_numeric: 4.88
+    cbeta_deviations_count:
+      value_numeric: 0.0
+    molprobity_score:
+      value_numeric: 1.63
+    bond_rmsd_a:
+      value_numeric: 0.007
+    angle_rmsd_deg:
+      value_numeric: 0.85
+  refinement_summary:
+    id: QDS_1sar_cdba2c07_2026-04-30_refinement
+    r_work:
+      value_numeric: 0.1644
+    r_free:
+      value_numeric: 0.217
+    r_free_gap:
+      value_numeric: 0.0526
+  data_quality_summary:
+    id: QDS_1sar_cdba2c07_2026-04-30_data_quality
+    completeness_overall_pct:
+      value_numeric: 99.38
+      unit: '%'
+  per_residue_quality:
+    id: QDS_1sar_cdba2c07_2026-04-30_per_residue
+    displacement_per_residue_a:
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_001
+      residue_ref: 1sar:A:34
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.955
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_002
+      residue_ref: 1sar:B:83
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.92
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_003
+      residue_ref: 1sar:B:84
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.868
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_004
+      residue_ref: 1sar:B:20
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.791
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_005
+      residue_ref: 1sar:A:68
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.763
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_006
+      residue_ref: 1sar:A:32
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.745
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_007
+      residue_ref: 1sar:A:33
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.73
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_008
+      residue_ref: 1sar:B:19
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.72
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_009
+      residue_ref: 1sar:A:67
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.715
+        unit: Å
+      tool_ref: gemmi sfcalc
+    - id: EVAL_1sar_cdba2c07_2026-04-24_disp_010
+      residue_ref: 1sar:A:35
+      metric_definition_ref: T01_per_residue_displacement
+      value:
+        value_numeric: 0.708
+        unit: Å
+      tool_ref: gemmi sfcalc
+    outliers:
+    - id: EVAL_1sar_cdba2c07_2026-04-24_outlier_asn_a39
+      residue_ref: 1sar:A:39
+      outlier_kind: ramachandran
+      severity: moderate
+      tool_ref: MolProbity (gold)
+      details: phi,psi outside 99.95th percentile; both phenix.holton_geometry_validation
+        and mmtbx.validation_summary flag this residue. Agent's claim of 0.00% Rama
+        outliers does not reproduce.
+    density_peaks:
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_01
+      sigma_level: 6.177
+      nearest_atom_residue_ref: 1sar:A:54
+      nearest_atom_distance_a: 1.906
+      interpretation: Glu A 54 CD — unmodelled side-chain density; agent did not surface
+        this peak
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_02
+      sigma_level: 5.936
+      nearest_atom_residue_ref: 1sar:S:34
+      nearest_atom_distance_a: 2.437
+      interpretation: near HOH S 34 — possible alt-conf or unmodelled water
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_03
+      sigma_level: 5.83
+      nearest_atom_residue_ref: 1sar:A:67
+      nearest_atom_distance_a: 2.386
+      interpretation: Thr A 67 CG2 — side-chain disorder
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_04
+      sigma_level: 5.608
+      nearest_atom_residue_ref: 1sar:A:39
+      nearest_atom_distance_a: 1.983
+      interpretation: Asn A 39 CB — active-site flexibility (matches agent's 4.82σ
+        flag at OD1)
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_05
+      sigma_level: 4.964
+      nearest_atom_residue_ref: 1sar:B:42
+      nearest_atom_distance_a: 2.124
+      interpretation: Ser B 42 OG
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_06
+      sigma_level: 4.963
+      nearest_atom_residue_ref: 1sar:S:736
+      nearest_atom_distance_a: 2.513
+      interpretation: HOH S 736 — water adjustment (matches agent's 4.98σ peak)
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_07
+      sigma_level: 4.716
+      nearest_atom_residue_ref: 1sar:B:72
+      nearest_atom_distance_a: 2.46
+      interpretation: Cys B 72 SG
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_08
+      sigma_level: 4.342
+      nearest_atom_residue_ref: 1sar:A:48
+      nearest_atom_distance_a: 2.615
+      interpretation: Ser A 48 CB
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_09
+      sigma_level: 4.234
+      nearest_atom_residue_ref: 1sar:A:95
+      nearest_atom_distance_a: 2.28
+      interpretation: Thr A 95 OG1
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_10
+      sigma_level: 4.133
+      nearest_atom_residue_ref: 1sar:S:103
+      nearest_atom_distance_a: 1.89
+      interpretation: HOH S 103 — water adjustment
+      tool_ref: phenix.find_peaks_holes
+    - id: EVAL_1sar_cdba2c07_2026-04-24_peak_11
+      sigma_level: -4.108
+      nearest_atom_residue_ref: 1sar:S:401
+      nearest_atom_distance_a: 2.597
+      interpretation: HOH S 401 — modelled water with no density support
+      tool_ref: phenix.find_peaks_holes
+  site_qualities:
+  - id: QDS_1sar_cdba2c07_2026-04-30_site_quality_1sar_ca_active_site
+    site_ref: 1sar_ca_active_site
+    ligand_quality:
+      id: QDS_1sar_cdba2c07_2026-04-30_ligand_quality_1sar:A:CA98
+      ligand_ref: 1sar:A:CA98
+      ligand_b_factor_vs_surroundings:
+        value_numeric: 2.674
+  cross_tool_coverage:
+    id: QDS_1sar_cdba2c07_2026-04-30_coverage
+    task_coverage:
+    - id: QDS_1sar_cdba2c07_2026-04-30_coverage_T01
+      catalog_task_ref: T01
+      cctbx_oracles:
+      - phenix.superpose_models
+      non_cctbx_oracles:
+      - TM-align
+      - gemmi sfcalc
+      gap_status: closed
+    - id: QDS_1sar_cdba2c07_2026-04-30_coverage_T03
+      catalog_task_ref: T03
+      cctbx_oracles:
+      - phenix.model_vs_data
+      non_cctbx_oracles:
+      - Servalcat
+      - gemmi sfcalc
+      gap_status: closed
+    - id: QDS_1sar_cdba2c07_2026-04-30_coverage_T05
+      catalog_task_ref: T05
+      cctbx_oracles:
+      - mmtbx.validation_summary
+      - phenix.find_peaks_holes
+      - phenix.holton_geometry_validation
+      non_cctbx_oracles:
+      - MolProbity (gold)
+      - gemmi sfcalc
+      - reduce (standalone, Richardson)
+      gap_status: closed
+    - id: QDS_1sar_cdba2c07_2026-04-30_coverage_T06
+      catalog_task_ref: T06
+      cctbx_oracles:
+      - phenix.model_vs_data
+      - phenix.mtz.dump
+      non_cctbx_oracles: []
+      gap_status: open — cctbx only
+    - id: QDS_1sar_cdba2c07_2026-04-30_coverage_T10
+      catalog_task_ref: T10
+      cctbx_oracles: []
+      non_cctbx_oracles:
+      - gemmi sfcalc
+      gap_status: non-cctbx only
+    - id: QDS_1sar_cdba2c07_2026-04-30_coverage_T13
+      catalog_task_ref: T13
+      cctbx_oracles:
+      - phenix.model_vs_data
+      non_cctbx_oracles: []
+      gap_status: open — cctbx only
+  tool_recommendations_applied:
+  - id: REC_T01_ca_rmsd_top_considered
+    metric_definition_ref: T01_ca_rmsd_å
+    tool_ref: TM-align
+    role: top_considered
+    rank: 1
+    justification: Sequence-independent superposition; CASP/community gold-standard
+      for pair-of-structures RMSD when alignment quality matters.
+    evidence_refs:
+    - Zhang2004
+    as_of_date: '2026-04-25'
+  - id: REC_T01_ca_rmsd_top_performing
+    metric_definition_ref: T01_ca_rmsd_å
+    tool_ref: TM-align
+    role: top_performing
+    rank: 1
+    justification: Matched phenix.superpose_models within 0.03 Å on the 1SAR eval
+      (TM-align 0.41 Å vs PHENIX 0.43 Å vs agent-reported 0.438 Å).
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-25'
+  - id: REC_T01_ca_rmsd_alternative
+    metric_definition_ref: T01_ca_rmsd_å
+    tool_ref: gemmi align
+    role: alternative
+    rank: 2
+    justification: Lightweight, scriptable second oracle. Use when TM-align is unavailable
+      or when a non-Zhang-lab implementation is needed.
+    as_of_date: '2026-04-25'
+  - id: REC_T01_tm_score_top_considered
+    metric_definition_ref: T01_tm-score
+    tool_ref: TM-align
+    role: top_considered
+    rank: 1
+    justification: TM-score is the metric and TM-align is its reference implementation.
+    evidence_refs:
+    - Zhang2004
+    as_of_date: '2026-04-25'
+  - id: REC_T03_r_work_top_considered
+    metric_definition_ref: T03_r-work
+    tool_ref: phenix.model_vs_data
+    role: top_considered
+    rank: 1
+    justification: Catalog-defined T06 oracle; re-derives R-factors from PDB+MTZ with
+      its own scaling, rather than reading them from a refinement log.
+    evidence_refs:
+    - Brünger1992
+    - EvansMurshudov2013
+    as_of_date: '2026-04-25'
+  - id: REC_T03_r_work_top_performing
+    metric_definition_ref: T03_r-work
+    tool_ref: gemmi sfcalc
+    role: top_performing
+    rank: 1
+    justification: Non-cctbx independent oracle; corroborated phenix.model_vs_data
+      on the 1SAR eval (0.164 vs 0.156, both above the agent-reported 0.149) and is
+      what hardened the "agent's R-free is too low" finding.
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-25'
+  - id: REC_T03_r_work_alternative_servalcat
+    metric_definition_ref: T03_r-work
+    tool_ref: Servalcat
+    role: alternative
+    rank: 2
+    justification: Murshudov-group implementation; per-shell R via `servalcat sigmaa`.
+      Independent code base; preferred when REFMAC5 is unavailable.
+    evidence_refs:
+    - Yamashita2021
+    as_of_date: '2026-04-25'
+  - id: REC_T03_r_free_top_considered
+    metric_definition_ref: T03_r-free
+    tool_ref: phenix.model_vs_data
+    role: top_considered
+    rank: 1
+    justification: Same as R-work — re-derives from data; never read from refinement
+      log alone.
+    evidence_refs:
+    - Brünger1992
+    as_of_date: '2026-04-25'
+  - id: REC_T03_r_free_top_performing
+    metric_definition_ref: T03_r-free
+    tool_ref: gemmi sfcalc
+    role: top_performing
+    rank: 1
+    justification: Non-cctbx confirmation of R-free finding on 1SAR eval.
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-25'
+  - id: REC_T03_gap_top_considered
+    metric_definition_ref: T03_r-free_r-work_gap
+    tool_ref: phenix.model_vs_data
+    role: top_considered
+    rank: 1
+    justification: The gap is computed from the same R-work / R-free pair, so the
+      strongest tool for those is also the strongest for the gap.
+    as_of_date: '2026-04-25'
+  - id: REC_T05_clashscore_top_considered
+    metric_definition_ref: T05_clashscore
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: Standalone Richardson-lab pipeline (probe + reduce) is the catalog
+      gold standard. Same code that powers the wwPDB validation report.
+    evidence_refs:
+    - Davis2007
+    - Williams2018
+    as_of_date: '2026-04-25'
+  - id: REC_T05_clashscore_top_performing
+    metric_definition_ref: T05_clashscore
+    tool_ref: MolProbity (gold)
+    role: top_performing
+    rank: 1
+    justification: 11 unique clashes / 3027 atoms = 3.63 on 1SAR eval, in line with
+      mmtbx.validation_summary's 3.13 (Δ = 0.5, within MolProbity method noise — different
+      H-build / water handling).
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-25'
+  - id: REC_T05_clashscore_alternative_phenix
+    metric_definition_ref: T05_clashscore
+    tool_ref: mmtbx.validation_summary
+    role: alternative
+    rank: 2
+    justification: cctbx wrapper. Acceptable as a second opinion but does not satisfy
+      the trust model on its own (PHENIX-grading-PHENIX). Use with the Richardson-lab
+      standalone pipeline alongside.
+    as_of_date: '2026-04-25'
+  - id: REC_T05_rama_outlier_top_considered
+    metric_definition_ref: T05_ramachandran_outlier
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: MolProbity Top8000 reference dataset is the field standard for
+      Ramachandran percentile classification.
+    evidence_refs:
+    - Williams2018
+    as_of_date: '2026-04-25'
+  - id: REC_T05_rama_favored_top_considered
+    metric_definition_ref: T05_ramachandran_favored
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: Same as Rama outlier — Top8000 reference.
+    evidence_refs:
+    - Williams2018
+    as_of_date: '2026-04-25'
+  - id: REC_T05_rotamer_outlier_top_considered
+    metric_definition_ref: T05_rotamer_outlier
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: Top8000 rotamer library; canonical rotamer outlier classification.
+      Resolution-sensitive — flag rotamer outlier counts at > 3 Å with caution.
+    evidence_refs:
+    - Williams2018
+    as_of_date: '2026-04-25'
+  - id: REC_T05_molprobity_score_top_considered
+    metric_definition_ref: T05_molprobity_composite
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: The MolProbity composite is calibrated by the same code base; only
+      the Richardson-lab implementation is canonical.
+    evidence_refs:
+    - Davis2007
+    as_of_date: '2026-04-25'
+  - id: REC_T05_clashes_unique_pairs_top_considered
+    metric_definition_ref: T05_clashes_unique_pairs
+    tool_ref: MolProbity (gold)
+    role: top_considered
+    rank: 1
+    justification: Probe + reduce list every clashing atom pair. The unique-pair count
+      is the load-bearing intermediate in the clashscore formula and also the input
+      for residue-level outlier reports.
+    evidence_refs:
+    - Davis2007
+    - Williams2018
+    as_of_date: '2026-04-26'
+  - id: REC_T05_holton_geom_energy_top_considered
+    metric_definition_ref: T05_holton_geom_energy_ratio_sigma
+    tool_ref: phenix.holton_geometry_validation
+    role: top_considered
+    rank: 1
+    justification: The metric is intrinsic to phenix.holton_geometry_validation; no
+      external implementation exists. Cross-check the inputs (clashscore, Ramachandran,
+      rotamer) against MolProbity standalone.
+    as_of_date: '2026-04-26'
+  - id: REC_T13_completeness_overall_top_considered
+    metric_definition_ref: T13_completeness_overall_outer
+    tool_ref: phenix.xtriage
+    role: top_considered
+    rank: 1
+    justification: Catalog T13 oracle. Cross-check with CCP4 aimless when CCP4 is
+      installed.
+    evidence_refs:
+    - EvansMurshudov2013
+    as_of_date: '2026-04-26'
+  assumptions_report:
+  - id: ASSUM_tmalign_tm_score_normaliser
+    kind: implicit
+    scope: tool
+    title: TM-score is normalised by the FIRST input length
+    description: '`TMalign A.pdb B.pdb` normalises TM-score by the length of A. Swapping
+      arguments swaps the normaliser and produces a slightly different score.'
+    consequences: Reporting "TM-score = 0.987" without identifying which input was
+      first leaves a 0.5–2 % ambiguity.
+    mitigation: Always state which structure was the reference (the normaliser); record
+      both TM-scores when chains have different lengths.
+    status: mitigated
+    tool_ref: TM-align
+  - id: ASSUM_tmalign_optimal_alignment_drops_residues
+    kind: explicit
+    scope: tool
+    title: Sequence-independent — optimal Cα subset
+    description: TM-align finds the optimal Cα subset by dynamic programming and drops
+      residues from the score that don't fit the alignment. The `Aligned length` field
+      tells you how many were used.
+    consequences: For near-identical structures TM-align produces a more generous
+      alignment than LSQ-based superposition. RMSD reported next to a TM-align alignment
+      is over a different atom set than RMSD reported next to a phenix.superpose_models
+      alignment.
+    mitigation: Quote `aligned_length` in PairwiseComparison.residues_aligned. Quote
+      both LSQ and TM-align RMSD when reporting both.
+    status: mitigated
+    tool_ref: TM-align
+  - id: ASSUM_phenix_mvd_treats_model_as_fixed
+    kind: explicit
+    scope: tool
+    title: Model is fixed; not a refinement
+    description: '`phenix.model_vs_data` re-computes R-factors with its own bulk-
+      solvent fit but does not move atoms. The R-factors it reports are for the input
+      model exactly as deposited.'
+    consequences: A model that converged in PHENIX with one scaling will look slightly
+      different here. Treat the model_vs_data value as the catalog T06 oracle of record.
+    mitigation: None needed; this is the intended behaviour.
+    status: verified
+    tool_ref: phenix.model_vs_data
+  - id: ASSUM_gemmi_sfcalc_simpler_bulk_solvent
+    kind: explicit
+    scope: tool
+    title: Flat-bulk solvent, no anisotropic scaling
+    description: '`scripts/gemmi_rfactor.py` uses a flat-bulk solvent + bin-wise isotropic
+      rescaling. PHENIX uses anisotropic scaling on top of a Babinet-style bulk-solvent
+      fit.'
+    consequences: Expect 0.005–0.015 higher R-work from gemmi than from PHENIX on
+      the same data — that is the price of an independent code path. Do NOT report
+      the gemmi number as the agent's claim being wrong; report the bracket between
+      the two.
+    mitigation: Cite both numbers in the QDS notes. Use the larger Δ as the conservative
+      bound.
+    status: mitigated
+    tool_ref: gemmi sfcalc
+  - id: ASSUM_gemmi_sfcalc_linear_resolution_shells
+    kind: implicit
+    scope: tool
+    title: Linearly-binned resolution shells
+    description: The custom R-calc bins reflections by 1/d² in equal-count bins; PHENIX
+      uses adaptive shells.
+    consequences: Per-shell R numbers are not directly comparable across the two tools.
+    mitigation: Use overall R-work / R-free for cross-tool comparison, not per-shell.
+    status: mitigated
+    tool_ref: gemmi sfcalc
+  - id: ASSUM_servalcat_sigmaa_per_shell_only
+    kind: explicit
+    scope: tool
+    title: per-shell sigma-A R, not work/free split by default
+    description: '`servalcat sigmaa` reports a per-shell composite R and per-bin sigma-A
+      weights, not a separately-cross-validated R-work / R-free. The "overall R" we
+      surface is a reflection-count-weighted mean over the shells.'
+    consequences: Treating the Servalcat number as a direct R-free substitute is incorrect
+      — it is a different quantity.
+    mitigation: In the QDS, label this as "overall R per-shell weighted" (already
+      done via T03_overall_r_per_shell_weighted) and keep R-free reporting on phenix.model_vs_data
+      and gemmi.
+    status: mitigated
+    tool_ref: Servalcat
+  - id: ASSUM_servalcat_refine_xtal_actually_refines
+    kind: explicit
+    scope: tool
+    title: refine_xtal_norefmac re-refines the model
+    description: '`servalcat refine_xtal_norefmac` runs a full refinement; the resulting
+      R-factor is for a NEW model, not a re-measurement of the input.'
+    consequences: Comparing this R-factor to the agent's R-factor is comparing two
+      different models. It is a useful "what does an independent refiner do with this
+      data" check, not a re-measurement.
+    mitigation: Cite both — input model R via model_vs_data, re-refined R via servalcat.
+    status: mitigated
+    tool_ref: Servalcat
+  - id: ASSUM_molprobity_top8000_reference
+    kind: implicit
+    scope: tool
+    title: Top8000 reference distribution is high-resolution
+    description: MolProbity's percentile rankings and outlier definitions come from
+      Top8000, a corpus of high-resolution (≤ 2.0 Å) deposited structures. Applying
+      these to a 3.0 Å model still produces a percentile, but the threshold for "outlier"
+      was set against tighter geometry than the model can deliver.
+    consequences: Mid-resolution models (2.5–3.5 Å) accumulate "outliers" that are
+      not actual modelling errors but resolution-driven coordinate uncertainty. The
+      published rate can look worse than the model is.
+    mitigation: Pair every MolProbity number with the model's resolution; cite the
+      resolution-bin percentile (wwPDB validation report's column) rather than the
+      all-archive percentile when comparing across datasets.
+    status: unchecked
+    tool_ref: MolProbity (gold)
+    evidence_refs:
+    - Williams2018
+  - id: ASSUM_molprobity_h_atom_placement
+    kind: implicit
+    scope: tool
+    title: H-atom placement governs clashscore
+    description: '`reduce -build` chooses Asn/Gln/His flips and adds H atoms with
+      default bond-length and rotamer choices. Different builds shift clashscore by
+      ~0.5 — confirmed on 1SAR (mmtbx.validation_summary reports 3.13, standalone
+      Richardson probe + reduce reports 3.63).'
+    consequences: '"Matches MolProbity within 1.0" is a guarantee about the metric
+      bucket, not the geometry of the H-built model.'
+    mitigation: Quote the H-build flags actually used. Do not equate the cctbx wrapper's
+      clashscore with the standalone Richardson pipeline's without saying so.
+    status: mitigated
+    tool_ref: MolProbity (gold)
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+  - id: ASSUM_molprobity_water_altloc
+    kind: implicit
+    scope: tool
+    title: probe water + altloc filter (`ogt33`)
+    description: '`probe`''s default selection — occupancy > 33% — determines which
+      atoms are eligible to clash. Disordered residues at 30% occupancy drop out of
+      the calculation entirely.'
+    consequences: Clashscore can hide real geometry problems at low-occupancy altlocs
+      — exactly the regions a refinement most needs scrutiny.
+    mitigation: Re-run probe with `--noaltloc` or relaxed occupancy thresholds.
+    status: unchecked
+    tool_ref: MolProbity (gold)
+  - id: ASSUM_molprobity_rotamer_library_discreteness
+    kind: implicit
+    scope: tool
+    title: Discrete rotamer library
+    description: A side-chain χ angle one degree outside the favored region scores
+      as a rotamer outlier. The "% rotamer outliers" metric is sharp by construction.
+    consequences: Borderline outliers are indistinguishable from severe ones in the
+      headline percentage.
+    mitigation: Surface the residue ids of all outliers via PerResidueQuality. outliers[]
+      with the actual χ deviation as metric_value.
+    status: mitigated
+    tool_ref: MolProbity (gold)
+  - id: ASSUM_holton_rmsz_not_rmsd
+    kind: explicit
+    scope: tool
+    title: Reports RMSZ against PHENIX restraint targets
+    description: Holton geometry validation reports σ-units against PHENIX's internal
+      restraint library. RMSZ is not interchangeable with raw RMSD — a tight restraint
+      library can flag small absolute RMSDs as high-Z outliers.
+    consequences: '"Bond RMSD 0.008 Å" and "bond RMSZ 1.4 σ" are both fine; they are
+      not the same number.'
+    mitigation: Schema v3+ carries both bond_rmsd_a and bond_rmsz on GeometrySummary.
+    status: mitigated
+    tool_ref: phenix.holton_geometry_validation
+  - id: ASSUM_find_peaks_holes_cutoff_and_merging
+    kind: explicit
+    scope: tool
+    title: σ cutoff, merging radius, atom exclusion all change peak counts
+    description: Default 4.0 σ cutoff; default peak-merging radius collapses multi-atom
+      features; near-modelled-atom peaks are excluded by default. The 1SAR agent's
+      report listed 9 peaks; the oracle run at 4 σ found 23 positive + 8 negative
+      peaks.
+    consequences: Different parameter choices = different counts. "All peaks > 4 σ
+      are explained" is meaningless without naming the cutoff / merging radius / exclusion
+      settings used to produce the list.
+    mitigation: Always quote the cutoff and merging settings. Re-run the oracle with
+      the same settings before adopting the agent's peak list.
+    status: known_violation
+    tool_ref: phenix.find_peaks_holes
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+  - id: ASSUM_wwpdb_percentile_source
+    kind: explicit
+    scope: tool
+    title: Percentile rank — whole archive vs resolution-binned
+    description: The wwPDB validation report computes percentile ranks both against
+      the entire archive AND against a resolution-binned subset. They are different
+      numbers.
+    consequences: A clashscore of 8 might be 70th percentile vs all PDB but 30th percentile
+      at 1.5 Å — same model, different interpretation.
+    mitigation: Surface both percentile numbers when both are reported.
+    status: mitigated
+    tool_ref: phenix.find_peaks_holes
+    notes: tool_ref points at phenix.find_peaks_holes only because LinkML requires
+      a class reference; in practice this assumption applies to any percentile report.
+      Use Container-level assumptions[] to attach to a non-tool host once that pattern
+      is needed.
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_displacement_single_tool_only
+    kind: implicit
+    scope: measurement
+    title: Per-residue displacement is single-tool (gemmi only)
+    description: The per-residue Cα displacement array was computed via gemmi only.
+      The cross-tool trust model requires ≥ 1 confirmation from a different code base.
+    consequences: The 0.955 Å max displacement at A:34 is consistent with the agent's
+      claim, but not independently confirmed.
+    mitigation: Cross-check with phenix.superpose_models per-residue mode.
+    status: unchecked
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_ligand_no_anomalous_columns_in_mtz
+    kind: explicit
+    scope: measurement
+    title: No anomalous columns in 1sar.mtz — element identity unchecked
+    description: phenix.mtz.dump shows only F-obs / SIGF-obs / R-free-flags columns.
+      No anomalous-difference signal is available to distinguish Ca²⁺ from Mg²⁺.
+    consequences: Element-identity claim cannot be cross-checked against anomalous
+      data.
+    mitigation: If the deposition has anomalous data on file, request and verify.
+      Otherwise mark verdict as 'consistent with' rather than 'is'.
+    status: known_violation
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_peaks_classification_interpretive
+    kind: implicit
+    scope: interpretation
+    title: Peak classifications are interpretive labels, not measurements
+    description: The agent's labels — 'water adjustment', 'side-chain flex', 'possible
+      unmodelled water' — were not verified by independent oracle work.
+    consequences: The "all peaks > 4 σ are explained" success criterion rests on the
+      agent's own narrative, not on oracle agreement.
+    mitigation: Re-run peak finder with consistent settings; flag peaks > 5 σ.
+    status: known_violation
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_report_r_from_refine_log
+    kind: implicit
+    scope: report
+    title: R-factors read from phenix.refine in-run log
+    description: The agent's reported R-work / R-free for the final model come from
+      phenix.refine's in-run statistics, not from a fresh re-derivation by phenix.model_vs_data.
+    consequences: On the 1SAR final model the gap is 0.149 / 0.199 (agent) vs 0.156
+      / 0.212 (model_vs_data) — exactly enough for the round-7 R-free-gap claim to
+      straddle the < 0.05 success criterion.
+    mitigation: Always re-derive R-factors with phenix.model_vs_data and report that
+      as the QDS value of record.
+    status: known_violation
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_report_round_table_collapses_rounds
+    kind: implicit
+    scope: report
+    title: Per-round table collapses rounds 5-6
+    description: The agent's narrative reports "Round 5-6" as a single row even though
+      the artefact contains separate round-5 and round-6 PDB+MTZ pairs.
+    consequences: Round 6 oracle R-free (0.207) is BETTER than round 7 (0.212) — an
+      effect the collapsed reporting hides. Round 7's NCS torsion restraints did not
+      improve the cross-validated R.
+    mitigation: Run phenix.model_vs_data on every round individually; surface a Refinement
+      record per round.
+    status: known_violation
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_report_position_initial_not_final
+    kind: implicit
+    scope: report
+    title: Quoted ion position is initial placement, not final
+    description: The agent's report quotes Ca²⁺ at (66.611, 3.895, 13.404). The actual
+      final-model PDB has Ca²⁺ at (66.752, 3.733, 13.397) — 0.215 Å away.
+    consequences: Anyone citing the report's coordinates will be 0.2 Å off from the
+      deposited model. The narrative also refers to a 0.19 Å coordinate shift — the
+      position-of-record is the *initial* placement before refinement moved it.
+    mitigation: Verify every quoted coordinate against the deposited PDB to within
+      ≤ 0.05 Å. Treat a > 0.05 Å gap as a flag, not a rounding artefact.
+    status: known_violation
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_report_water_count_stage_drift
+    kind: implicit
+    scope: report
+    title: Water count from a different stage than the deposited PDB
+    description: Agent reports 159 ordered waters; the deposited 1sar_final.pdb has
+      146. The 13-water gap matches the 1654 vs 1641 total-atom gap exactly.
+    consequences: Atom-count and water-count narrative numbers are taken from a pre-pruning
+      step; the deposited model is post-pruning. Anyone reproducing the count from
+      the PDB will be off by 13.
+    mitigation: Always count waters from the actual deposited PDB.
+    status: known_violation
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_report_mean_b_subset_drift
+    kind: implicit
+    scope: report
+    title: Mean B-factor uses a different atom subset than the oracle
+    description: Agent quotes ⟨B⟩ = 14.6 Å²; gemmi-based oracle on heavy atoms gives
+      ⟨B⟩ = 15.98 Å². Δ = 1.4 Å² exceeds the published wwPDB B-factor uncertainty
+      bracket (~6-9 Å² spread is normal but the mean should agree).
+    consequences: Suggests the agent's mean was computed over a different atom subset
+      (possibly excluding solvent, possibly using the residue-mean rather than atom-mean).
+    mitigation: State which atom subset the mean is computed over (heavy-only vs all,
+      with-or-without solvent, with-or-without ions).
+    status: known_violation
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_interp_ion_identity_no_anomalous
+    kind: implicit
+    scope: interpretation
+    title: Ion identity inferred from peak height alone
+    description: The "6.5 σ peak near Asp33 = Ca²⁺" identification is asserted from
+      the difference map alone. No anomalous-difference Fourier was computed; Mg²⁺,
+      Mn²⁺, and Na⁺ were not excluded by occupancy refinement; no alternative-element
+      refinement was tried.
+    consequences: Mg²⁺ would give very similar geometry. The structural conclusion
+      "this is Ca²⁺" is consistent with the data but not uniquely so.
+    mitigation: Check whether anomalous data is available; if not, downgrade the verdict
+      to "consistent with Ca²⁺ — alternatives not excluded". Run alternative-element
+      occupancy refinement.
+    status: known_violation
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+    notes: 1sar.mtz has only F-obs / SIGF-obs / R-free-flags columns — no anomalous
+      columns. The single-wavelength data cannot distinguish Ca²⁺ from Mg²⁺ on element
+      identity alone.
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_interp_density_peak_narratives
+    kind: implicit
+    scope: interpretation
+    title: Density-peak classifications are interpretive, not measured
+    description: Each peak in the agent's table is labelled "water adjustment" / "side-chain
+      flexibility" / "possible unmodelled water" / etc. None of these classifications
+      were verified by independent oracle work (no alt-conf refinement, no anomalous
+      Fourier, no occupancy refinement).
+    consequences: The "all peaks > 4 σ are explained" claim is the agent's annotation,
+      not an oracle-verifiable finding.
+    mitigation: Re-run phenix.find_peaks_holes with consistent settings and compare
+      the peak inventory directly. Flag peaks > 5 σ that the agent did not surface
+      (5 such peaks on 1SAR).
+    status: known_violation
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_interp_ncs_effective_ratio_heuristic
+    kind: implicit
+    scope: interpretation
+    title: NCS effective data-to-parameter ratio is a heuristic
+    description: The "846 NCS torsion restraints effectively double the data" claim
+      (0.98 → 1.79) treats the restraints as fully saturated and uncorrelated with
+      model coordinates. The actual contribution depends on restraint weight and geometry
+      coupling and is not a measured quantity.
+    consequences: Cannot be cross-checked with an oracle; it's a model-assumption
+      number.
+    mitigation: Report it as agent-claim only; do not include in the cross-tool verdict.
+      If verification is needed, refine without NCS and compare R-free directly.
+    status: unchecked
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_interp_baseline_is_deposited_model
+    kind: implicit
+    scope: interpretation
+    title: Pre-refinement baseline is the deposited model
+    description: Δ start → final framing implicitly equates "the deposited 1SAR" with
+      an unrefined starting model. The deposited model is itself a refined product.
+    consequences: ΔR-free 0.184 measures improvement over the deposition, not over
+      a truly unrefined model.
+    mitigation: When evaluating agentic refinement on deposited targets, treat the
+      deposition as the floor, not the worst-case baseline.
+    status: mitigated
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_interp_cooperative_binding_literature
+    kind: implicit
+    scope: interpretation
+    title: Cooperative binding rationale is literature interpretation
+    description: The "weaker Ca²⁺ binding without nucleotide" structural-biology argument
+      is a hypothesis from the literature, not a measurement made by any oracle in
+      the catalog.
+    consequences: Should not appear in the QDS verdict as a quality finding.
+    mitigation: Treat such reasoning as inference, kept separate from oracle measurements.
+    status: mitigated
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_interp_round7_ncs_improvement_claim
+    kind: explicit
+    scope: interpretation
+    title: Round-7 NCS-restraint improvement claim does not hold by oracle
+    description: 'Agent: "Round 7 reduced the gap from 0.053 to 0.050 by adding NCS
+      torsion restraints." Oracle: round 6 gap was 0.053, round 7 gap is 0.055 — the
+      gap went UP.'
+    consequences: An effect the agent reports as the headline outcome of round 7 (meeting
+      < 0.05 by adding NCS) is not visible in the cross-validated data.
+    mitigation: Verify any "X improved Y by Z" claim with the oracle re-measurement
+      of X-without and X-with.
+    status: known_violation
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_agg_single_model_verdict
+    kind: implicit
+    scope: aggregation
+    title: Single-model verdicts treat the final PDB as a point estimate
+    description: No B-factor uncertainty propagation, no rotamer alternate-conformation
+      enumeration, no map-error envelope. Numbers are quoted as scalars.
+    consequences: An R-free of 0.199 ± 0.005 (uncertainty propagated from data-quality
+      and model-error sources) reads the same as a noiseless 0.199. The 0.013 R-unit
+      gap to phenix.model_vs_data sits within plausible uncertainty but the agent's
+      report does not surface that bracket.
+    mitigation: Populate TypedMeasurementValue.mean / std_dev / min_value / max_value
+      / count for any measurement that summarises an array. Schema v3+ supports this.
+    status: mitigated
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_agg_zero_rama_rounds_one_outlier_to_zero
+    kind: implicit
+    scope: aggregation
+    title: '"0.00% Ramachandran outliers" rounds 1 outlier to zero'
+    description: Agent's round-7 row reports 0.00% Rama outliers; both PHENIX tools
+      actually flag 1 residue (Asn A 39) → 0.53%.
+    consequences: A claim of "all outliers eliminated" reads as headline-true while
+      an outlier remains in a functional region.
+    mitigation: Surface every outlier residue id via PerResidueQuality.outliers[]
+      even when the rate rounds to 0%.
+    status: mitigated
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24
+  - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_agg_single_tool_geometry_validation
+    kind: explicit
+    scope: aggregation
+    title: Single-tool geometry validation (cctbx-only via phenix.molprobity)
+    description: The agent's geometry numbers come from `phenix.molprobity` — the
+      cctbx wrapper. Same code base as the refiner that minimised those restraints.
+    consequences: Does not satisfy the cross-tool trust model on its own.
+    mitigation: Run probe + reduce (Richardson lab standalone) alongside; surface
+      both with oracle_family annotations. Already done for clashscore on 1SAR; extend
+      to Ramachandran / rotamer.
+    status: mitigated
+    evidence_refs:
+    - EVAL_1sar_cdba2c07_2026-04-24

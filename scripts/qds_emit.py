@@ -39,6 +39,7 @@ import yaml
 REPO = Path(__file__).resolve().parent.parent
 CATALOG_PATH = REPO / "ref" / "catalog.yaml"
 TOOL_RECS_PATH = REPO / "ref" / "tool_recommendations.yaml"
+TOOL_ASSUMPTIONS_PATH = REPO / "ref" / "tool_assumptions.yaml"
 
 
 # ---------------------------------------------------------------------------
@@ -432,6 +433,69 @@ def build_predicted_confidence_summary(
     return {"id": f"{qds_id}_predicted_confidence"}
 
 
+def build_assumptions_report(eval_runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Aggregate per-tool, per-measurement, per-run assumptions into a flat list.
+
+    Source order (and the order surfaced in the QDS):
+      1. Tool-level: every distinct oracle_tool_ref in the eval's measurements
+         is looked up in ref/tool_assumptions.yaml; the matching tool's
+         assumptions[] are emitted.
+      2. Measurement-level: assumptions[] attached directly to a
+         MeasurementValue (or HeadlineFinding).
+      3. Run-level: EvaluationRun.assumptions[] (typically the agentic-
+         framework's reporting / interpretation / aggregation conventions).
+
+    Duplicate assumption ids are dropped on the second-and-later occurrence
+    so the QDS doesn't repeat a tool-level assumption per measurement.
+    """
+    out: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+
+    # Load tool_assumptions.yaml once and index by tool_ref.
+    tool_assumptions_by_tool: dict[str, list[dict[str, Any]]] = {}
+    if TOOL_ASSUMPTIONS_PATH.exists():
+        ta_doc = yaml.safe_load(TOOL_ASSUMPTIONS_PATH.read_text()) or {}
+        for a in ta_doc.get("assumptions", []) or []:
+            tref = a.get("tool_ref")
+            if tref:
+                tool_assumptions_by_tool.setdefault(tref, []).append(a)
+
+    # 1. Tool-level (distinct oracle_tool_ref values used in the eval).
+    distinct_tools: list[str] = []
+    seen_tools: set[str] = set()
+    for r in eval_runs:
+        for m in r.get("measurements", []) or []:
+            t = m.get("oracle_tool_ref")
+            if t and t not in seen_tools:
+                seen_tools.add(t)
+                distinct_tools.append(t)
+    for t in distinct_tools:
+        for a in tool_assumptions_by_tool.get(t, []):
+            if a["id"] in seen_ids:
+                continue
+            seen_ids.add(a["id"])
+            out.append(a)
+
+    # 2. Measurement-level assumptions.
+    for r in eval_runs:
+        for m in r.get("measurements", []) or []:
+            for a in m.get("assumptions", []) or []:
+                if a["id"] in seen_ids:
+                    continue
+                seen_ids.add(a["id"])
+                out.append(a)
+
+    # 3. Run-level (agent-framework) assumptions.
+    for r in eval_runs:
+        for a in r.get("assumptions", []) or []:
+            if a["id"] in seen_ids:
+                continue
+            seen_ids.add(a["id"])
+            out.append(a)
+
+    return out
+
+
 def build_tool_recommendations_applied(eval_runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Snapshot of recommendations whose metric was actually measured here.
 
@@ -600,6 +664,11 @@ def emit_qds(
     recs = build_tool_recommendations_applied(runs)
     if recs:
         qds["tool_recommendations_applied"] = recs
+
+    # Aggregated tool / measurement / framework assumptions.
+    assumptions = build_assumptions_report(runs)
+    if assumptions:
+        qds["assumptions_report"] = assumptions
 
     # Headline verdict — stitch together any per-run verdicts.
     headline_lines = [r["headline_verdict"] for r in runs if r.get("headline_verdict")]
