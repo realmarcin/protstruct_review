@@ -3,7 +3,7 @@ quality_data_sheets:
   structure_ref: 1sar
   derived_from_evaluation_run_refs:
   - EVAL_1sar_cdba2c07_2026-04-24
-  issued_at: '2026-05-01T00:51:09+00:00'
+  issued_at: '2026-05-01T01:58:18+00:00'
   identity_block:
     id: QDS_1sar_cdba2c07_2026-04-30_identity
     pdb_id: 1sar
@@ -22,9 +22,17 @@ quality_data_sheets:
     molprobity_score:
       value_numeric: 1.63
     bond_rmsd_a:
-      value_numeric: 0.007
+      value_numeric: 0.0105
+      unit: Å
     angle_rmsd_deg:
-      value_numeric: 0.85
+      value_numeric: 1.4957
+      unit: °
+    bond_rmsz:
+      value_numeric: 0.884
+      unit: σ
+    angle_rmsz:
+      value_numeric: 0.864
+      unit: σ
   refinement_summary:
     id: QDS_1sar_cdba2c07_2026-04-30_refinement
     r_work:
@@ -60,7 +68,10 @@ quality_data_sheets:
       value_numeric: 0.987
     delta_baseline: starting_model
     verdict: improved (lDDT 0.97 = local structure preserved; max displacement 0.955
-      Å at A:34 explains lowest lDDT 0.878)
+      Å at A:34 explains lowest lDDT 0.878). Cross-tool RMSD across four code paths
+      converges 0.41-0.48 Å (TM-align 0.41, gemmi 0.42, PHENIX 0.43, ProSMART 0.475).
+      ProSMART Asn A 39 Procrustes score 0.526 (elevated vs 0.27-0.40 per-residue
+      average) — third code-base confirmation of the Ramachandran outlier flag.
   per_residue_quality:
     id: QDS_1sar_cdba2c07_2026-04-30_per_residue
     lddt_per_residue:
@@ -290,6 +301,7 @@ quality_data_sheets:
       - phenix.superpose_models
       non_cctbx_oracles:
       - OpenStructure
+      - ProSMART
       - TM-align
       - gemmi sfcalc
       gap_status: closed
@@ -298,6 +310,7 @@ quality_data_sheets:
       cctbx_oracles:
       - phenix.model_vs_data
       non_cctbx_oracles:
+      - REFMAC5
       - Servalcat
       - gemmi sfcalc
       gap_status: closed
@@ -309,6 +322,8 @@ quality_data_sheets:
       - phenix.holton_geometry_validation
       non_cctbx_oracles:
       - MolProbity (gold)
+      - ProSMART
+      - REFMAC5
       - gemmi sfcalc
       - reduce (standalone, Richardson)
       gap_status: closed
@@ -529,6 +544,22 @@ quality_data_sheets:
     evidence_refs:
     - EvansMurshudov2013
     as_of_date: '2026-04-26'
+  - id: REC_T05_bond_length_rmsz_top_considered
+    metric_definition_ref: T05_bond-length_rmsz
+    tool_ref: phenix.holton_geometry_validation
+    role: top_considered
+    rank: 1
+    justification: Holton geometry validation reports per-class Z-scores. CCP4 REFMAC
+      also reports geometry RMSZ; until REFMAC is installed, Holton is the available
+      oracle.
+    as_of_date: '2026-04-26'
+  - id: REC_T05_bond_angle_rmsz_top_considered
+    metric_definition_ref: T05_bond-angle_rmsz
+    tool_ref: phenix.holton_geometry_validation
+    role: top_considered
+    rank: 1
+    justification: Same as bond-length RMSZ.
+    as_of_date: '2026-04-26'
   - id: REC_T01_lddt_global_top_considered
     metric_definition_ref: T01_lddt_global
     tool_ref: OpenStructure
@@ -550,6 +581,65 @@ quality_data_sheets:
       (0.878), corroborating the gemmi finding that Gly A 34 has the highest Cα displacement.
     evidence_refs:
     - EVAL_1sar_cdba2c07_2026-04-24
+    as_of_date: '2026-04-30'
+  - id: REC_T05_ramachandran_outlier_top_performing
+    metric_definition_ref: T05_ramachandran_outlier
+    tool_ref: ProSMART
+    role: top_performing
+    rank: 1
+    justification: ProSMART is non-cctbx (CCP4 stack, Murshudov-group code path).
+      It provides per-residue Ramachandran-Z scores against a reference distribution,
+      complementing MolProbity's Top8000 classification. Use ProSMART as the second
+      confirmation when the MolProbity tools split on a borderline residue.
+    evidence_refs:
+    - Joosten2012
+    as_of_date: '2026-04-30'
+  - id: REC_T05_rotamer_outlier_top_performing
+    metric_definition_ref: T05_rotamer_outlier
+    tool_ref: ProSMART
+    role: top_performing
+    rank: 1
+    justification: ProSMART per-residue rotamer comparison is non-cctbx and runs against
+      any reference structure (typically the deposited model or a higher-resolution
+      comparator).
+    as_of_date: '2026-04-30'
+  - id: REC_T05_bond_length_rmsz_top_performing
+    metric_definition_ref: T05_bond-length_rmsz
+    tool_ref: REFMAC5
+    role: top_performing
+    rank: 1
+    justification: REFMAC5 reports geometry RMSZ in its log against the CCP4 restraint
+      library — fully independent code base from PHENIX's restraint dictionary. The
+      two should agree within ~0.2 σ on a well-refined model; > 0.5 σ disagreement
+      indicates the restraint libraries differ on which atoms are involved.
+    as_of_date: '2026-04-30'
+  - id: REC_T05_bond_angle_rmsz_top_performing
+    metric_definition_ref: T05_bond-angle_rmsz
+    tool_ref: REFMAC5
+    role: top_performing
+    rank: 1
+    justification: Same as bond-length RMSZ — REFMAC5 internal restraint library.
+    as_of_date: '2026-04-30'
+  - id: REC_T03_r_work_top_performing_refmac
+    metric_definition_ref: T03_r-work
+    tool_ref: REFMAC5
+    role: alternative
+    rank: 3
+    justification: Once installed, REFMAC5 is the canonical second-opinion refiner
+      (PDB-REDO methodology, Joosten 2012). Re-refine the model with REFMAC and report
+      whether R-work / R-free converge within ~0.01-0.02 of the agent's PHENIX numbers.
+      Currently rank 3 (gemmi sfcalc + Servalcat are easier installs); promote to
+      rank 1 once REFMAC re-refinement is the default path.
+    evidence_refs:
+    - Joosten2012
+    as_of_date: '2026-04-30'
+  - id: REC_T13_completeness_outer_top_performing
+    metric_definition_ref: T13_completeness_overall_outer
+    tool_ref: aimless
+    role: top_performing
+    rank: 1
+    justification: CCP4 aimless is the canonical data-processing tool for completeness,
+      ⟨I/σ⟩, and CC½ statistics. Catalog T13 oracle (catalog notes name it explicitly).
     as_of_date: '2026-04-30'
   assumptions_report:
   - id: ASSUM_tmalign_tm_score_normaliser
@@ -807,6 +897,63 @@ quality_data_sheets:
       OST plugin that ships contour data.
     status: known_violation
     tool_ref: OpenStructure
+  - id: ASSUM_refmac_restraint_library
+    kind: explicit
+    scope: tool
+    title: REFMAC5 uses the CCP4 monomer library
+    description: REFMAC5 reports geometry RMSZ against the CCP4 restraint dictionary,
+      which is an independent code path from PHENIX's restraint library (mon_lib).
+    consequences: RMSZ from REFMAC and RMSZ from phenix.holton_geometry_validation
+      can disagree on the same atoms because the σ targets differ — typically by 0.1-0.3
+      σ, occasionally more for unusual residues.
+    mitigation: State which library was used. Cross-tool RMSZ agreement within ~0.5
+      σ counts as confirmed; larger disagreement flags either a modelling issue or
+      a restraint-library mismatch.
+    status: mitigated
+    tool_ref: REFMAC5
+  - id: ASSUM_refmac_solvent_modelling
+    kind: explicit
+    scope: tool
+    title: REFMAC5 uses Babinet-style bulk solvent
+    description: REFMAC5's bulk-solvent model differs from PHENIX's. R-factors from
+      a REFMAC re-refinement are not directly comparable to PHENIX in-run values;
+      expect differences in the 0.005-0.015 range on the same data.
+    consequences: A REFMAC re-refinement of the agent's model giving 0.158 R-free
+      vs phenix.refine 0.149 is not necessarily a "regression" — it's a different
+      scaling.
+    mitigation: When using REFMAC as a second-opinion refiner, compare on the same
+      scale (REFMAC vs REFMAC, PHENIX vs PHENIX) for cross-round Δ-claims; cross-tool
+      comparison is for "are we in the same bracket".
+    status: mitigated
+    tool_ref: REFMAC5
+  - id: ASSUM_prosmart_reference_dependent
+    kind: explicit
+    scope: tool
+    title: ProSMART analysis is reference-dependent
+    description: ProSMART computes per-residue scores AGAINST a reference structure
+      (typically the deposited model or a high-resolution comparator). Choosing a
+      different reference changes every score. There is no "absolute" ProSMART number
+      for a structure.
+    consequences: A ProSMART Rama-Z of 1.2 vs reference X is not the same number as
+      1.2 vs reference Y. Reports must always quote the reference.
+    mitigation: Pin the reference per evaluation. For agentic refinement vs starting
+      model, use the agent's input model as the reference. For absolute geometry analysis,
+      use Top8000 (when available via ProSMART's data files) or compare to a high-resolution
+      family member.
+    status: mitigated
+    tool_ref: ProSMART
+  - id: ASSUM_prosmart_no_top8000_default
+    kind: implicit
+    scope: tool
+    title: ProSMART needs an explicit reference; no Top8000 default
+    description: Unlike MolProbity (which has Top8000 baked in), ProSMART's Rama-Z
+      analysis requires the user to supply a reference. The tool ships with template-based
+      options but no single default.
+    consequences: Running ProSMART without specifying a reference gives a meaningless
+      score; misconfigured runs can pass silently.
+    mitigation: Always specify the reference structure on the command line.
+    status: unchecked
+    tool_ref: ProSMART
   - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_displacement_single_tool_only
     kind: implicit
     scope: measurement
@@ -838,6 +985,20 @@ quality_data_sheets:
       agent's own narrative, not on oracle agreement.
     mitigation: Re-run peak finder with consistent settings; flag peaks > 5 σ.
     status: known_violation
+  - id: EVAL_1sar_cdba2c07_2026-04-24_assum_prosmart_reference_dependent_for_asn39
+    kind: explicit
+    scope: measurement
+    title: ProSMART score is relative to the deposited starting model
+    description: This measurement compared 1sar_final.pdb to the deposited 1sar.pdb.
+      The Procrustes score is a relative measure of local-fragment geometric divergence
+      from that specific reference.
+    consequences: If we used a different reference (e.g. an ultra-high-res SNase structure),
+      the score would change. The score indicates Asn A 39 moved most relative to
+      the starting model — consistent with the Cα displacement / lDDT findings — and
+      is a Ramachandran outlier flag at the same residue under MolProbity.
+    mitigation: Reference is pinned and named in scope_selector.
+    status: mitigated
+    tool_ref: ProSMART
   - id: ASSUM_EVAL_1sar_cdba2c07_2026-04-24_report_r_from_refine_log
     kind: implicit
     scope: report

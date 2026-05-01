@@ -776,6 +776,176 @@ evaluation_runs:
       radius. Closes the cctbx-only gap on lDDT for the project. Lowest per-residue
       lDDT is at Gly A 34 (0.878), corroborating the Cα displacement finding (max
       0.955 Å at the same residue).
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_refmac_rwork
+    catalog_task_ref: T03
+    stage: final
+    scope: complex
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: REFMAC5
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.149
+    oracle_measure:
+      value_numeric: 0.1693
+    delta:
+      value_numeric: 0.0203
+    pass_criterion: match within 0.005
+    pass_status: fail_by_oracle
+    notes: REFMAC5 5.8.0431 (CCP4 9.0.015), NCYC=0. R-work 0.169 vs agent's 0.149
+      — Δ 0.020. Third independent code base after phenix.model_vs_data (0.156) and
+      gemmi sfcalc (0.164). The bracket 0.156-0.169 is the real R-work; agent's 0.149
+      is below all three.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_refmac_rfree
+    catalog_task_ref: T03
+    stage: final
+    scope: complex
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: REFMAC5
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.199
+    oracle_measure:
+      value_numeric: 0.2128
+    delta:
+      value_numeric: 0.0138
+    pass_criterion: match within 0.005
+    pass_status: fail_by_oracle
+    notes: 'REFMAC5 R-free 0.2128 — essentially identical to phenix.model_vs_data
+      0.2114 (Δ 0.0014). Three independent code paths now converge on R-free ≈ 0.21;
+      agent''s 0.199 is reproducibly below all three. R-free gap with REFMAC R-work:
+      0.0435 — this is one of the few scaling combinations where the gap < 0.05 is
+      met.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_refmac_bond_rmsd
+    catalog_task_ref: T05
+    stage: final
+    scope: complex
+    metric_definition_ref: T05_bond-length_rmsd
+    oracle_tool_ref: REFMAC5
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.008
+      unit: Å
+    oracle_measure:
+      value_numeric: 0.0105
+      unit: Å
+    delta:
+      value_numeric: 0.0025
+    pass_criterion: match within 0.005 Å (cross-library)
+    pass_status: pass
+    notes: 'REFMAC bond RMSD 0.0105 Å is higher than PHENIX/MolProbity''s 0.007-0.008.
+      This is the expected restraint-library gap (CCP4 monomer library uses tighter
+      ideal bond lengths than PHENIX mon_lib). The Z-score (zBOND = 0.884 σ) is what
+      counts: model is well within REFMAC''s expectation. See ASSUM_refmac_restraint_library.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_refmac_angle_rmsd
+    catalog_task_ref: T05
+    stage: final
+    scope: complex
+    metric_definition_ref: T05_bond-angle_rmsd
+    oracle_tool_ref: REFMAC5
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.99
+      unit: °
+    oracle_measure:
+      value_numeric: 1.4957
+      unit: °
+    delta:
+      value_numeric: 0.51
+    pass_criterion: match within 0.5° (cross-library)
+    pass_status: pass_with_caveat
+    notes: REFMAC angle RMSD 1.50° vs PHENIX 0.85-0.99° — large bridge, but both Z-scores
+      < 1 σ. The CCP4 angle restraint library has tighter targets than PHENIX, so
+      absolute RMSD is larger but RMSZ is comparable. zANGL = 0.864 σ confirms the
+      model is well within REFMAC restraint expectations.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_refmac_bond_rmsz
+    catalog_task_ref: T05
+    stage: final
+    scope: complex
+    metric_definition_ref: T05_bond-length_rmsz
+    oracle_tool_ref: REFMAC5
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.884
+      unit: σ
+    pass_criterion: < 1 σ for well-refined model
+    pass_status: pass
+    notes: Closes the cctbx-only gap on bond RMSZ. zBOND 0.884 σ — model is well-restrained
+      against the CCP4 dictionary.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_refmac_angle_rmsz
+    catalog_task_ref: T05
+    stage: final
+    scope: complex
+    metric_definition_ref: T05_bond-angle_rmsz
+    oracle_tool_ref: REFMAC5
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.864
+      unit: σ
+    pass_criterion: < 1 σ for well-refined model
+    pass_status: pass
+    notes: Closes the cctbx-only gap on angle RMSZ. zANGL 0.864 σ.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_prosmart_global_rmsd
+    catalog_task_ref: T01
+    stage: final
+    scope: complex
+    metric_definition_ref: T01_ca_rmsd_å
+    oracle_tool_ref: ProSMART
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.438
+      unit: Å
+    oracle_measure:
+      value_numeric: 0.475
+      unit: Å
+    delta:
+      value_numeric: 0.037
+    pass_criterion: match within 0.10 Å
+    pass_status: pass
+    notes: ProSMART rigid-alignment RMSD 0.475 Å — fourth independent RMSD measurement
+      (after PHENIX 0.43, gemmi 0.42, TM-align 0.41). Slightly higher because ProSMART
+      uses a different alignment objective (fragment-by-fragment Procrustes, not global
+      LSQ).
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_prosmart_asn_a39_score
+    catalog_task_ref: T05
+    stage: final
+    scope: residue
+    scope_selector: 1sar:A:39
+    metric_definition_ref: T05_per_residue_rsrz
+    oracle_tool_ref: ProSMART
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.5262
+      value_text: Procrustes score 0.5262 (avg 0.27-0.40); MaxDist 1.313 Å; hinge
+        12°
+    pass_criterion: Procrustes < 0.45 (reference-relative)
+    pass_status: fail_by_oracle
+    notes: ProSMART per-residue analysis flags Asn A 39 as having unusual local geometry
+      vs the deposited reference. Procrustes 0.526 is elevated above the per-residue
+      average of ~0.27-0.40. This is a third independent code base flagging this residue
+      (after mmtbx.validation_summary and phenix.holton_geometry_validation), now
+      CCP4 / Murshudov-group code path. Closes the cctbx-only confirmation gap on
+      Asn A 39 — agent's 'zero outliers' claim is refuted by three independent tools.
+    assumptions:
+    - id: EVAL_1sar_cdba2c07_2026-04-24_assum_prosmart_reference_dependent_for_asn39
+      kind: explicit
+      scope: measurement
+      title: ProSMART score is relative to the deposited starting model
+      description: This measurement compared 1sar_final.pdb to the deposited 1sar.pdb.
+        The Procrustes score is a relative measure of local-fragment geometric divergence
+        from that specific reference.
+      consequences: If we used a different reference (e.g. an ultra-high-res SNase
+        structure), the score would change. The score indicates Asn A 39 moved most
+        relative to the starting model — consistent with the Cα displacement / lDDT
+        findings — and is a Ramachandran outlier flag at the same residue under MolProbity.
+      mitigation: Reference is pinned and named in scope_selector.
+      status: mitigated
+      tool_ref: ProSMART
   headline_findings:
   - id: EVAL_1sar_cdba2c07_2026-04-24_H_001
     catalog_task_refs:
@@ -1516,4 +1686,7 @@ evaluation_runs:
       value_numeric: 0.987
     delta_baseline: starting_model
     verdict: improved (lDDT 0.97 = local structure preserved; max displacement 0.955
-      Å at A:34 explains lowest lDDT 0.878)
+      Å at A:34 explains lowest lDDT 0.878). Cross-tool RMSD across four code paths
+      converges 0.41-0.48 Å (TM-align 0.41, gemmi 0.42, PHENIX 0.43, ProSMART 0.475).
+      ProSMART Asn A 39 Procrustes score 0.526 (elevated vs 0.27-0.40 per-residue
+      average) — third code-base confirmation of the Ramachandran outlier flag.
