@@ -3,7 +3,7 @@ quality_data_sheets:
   structure_ref: 1sar
   derived_from_evaluation_run_refs:
   - EVAL_1sar_cdba2c07_2026-04-24
-  issued_at: '2026-05-01T01:58:18+00:00'
+  issued_at: '2026-05-01T03:59:13+00:00'
   identity_block:
     id: QDS_1sar_cdba2c07_2026-04-30_identity
     pdb_id: 1sar
@@ -215,6 +215,34 @@ quality_data_sheets:
       details: phi,psi outside 99.95th percentile; both phenix.holton_geometry_validation
         and mmtbx.validation_summary flag this residue. Agent's claim of 0.00% Rama
         outliers does not reproduce.
+    - id: EVAL_1sar_cdba2c07_2026-04-24_outlier_water_S_680
+      residue_ref: 1sar:S:680
+      outlier_kind: density_misfit
+      severity: severe
+      tool_ref: phenix.real_space_correlation
+      metric_value:
+        value_numeric: 0.658
+        unit: RSCC
+      details: Worst-RSCC water (0.658). Combined with B 44.56 — likely modelling
+        error or noise-fit. Should be re-evaluated.
+    - id: EVAL_1sar_cdba2c07_2026-04-24_outlier_water_S_707
+      residue_ref: 1sar:S:707
+      outlier_kind: density_misfit
+      severity: moderate
+      tool_ref: phenix.real_space_correlation
+      metric_value:
+        value_numeric: 0.668
+        unit: RSCC
+      details: Second-worst RSCC (0.668).
+    - id: EVAL_1sar_cdba2c07_2026-04-24_outlier_water_S_729
+      residue_ref: 1sar:S:729
+      outlier_kind: density_misfit
+      severity: moderate
+      tool_ref: phenix.real_space_correlation
+      metric_value:
+        value_numeric: 0.691
+        unit: RSCC
+      details: RSCC 0.691; B 48.75 (high). Borderline — possibly real but poorly supported.
     density_peaks:
     - id: EVAL_1sar_cdba2c07_2026-04-24_peak_01
       sigma_level: 6.177
@@ -292,6 +320,26 @@ quality_data_sheets:
       ligand_ref: 1sar:A:CA98
       ligand_b_factor_vs_surroundings:
         value_numeric: 2.674
+      rscc:
+        value_numeric: 0.9716
+  - id: QDS_1sar_cdba2c07_2026-04-30_site_quality_1sar_na_crystal_contact_site
+    site_ref: 1sar_na_crystal_contact_site
+    ligand_quality:
+      id: QDS_1sar_cdba2c07_2026-04-30_ligand_quality_1sar:B:NA98
+      ligand_ref: 1sar:B:NA98
+      rscc:
+        value_numeric: 0.9636
+      ligand_b_factor_vs_surroundings:
+        value_numeric: 1.43
+  - id: QDS_1sar_cdba2c07_2026-04-30_site_quality_1sar_so4_anion_binding_site
+    site_ref: 1sar_so4_anion_binding_site
+    ligand_quality:
+      id: QDS_1sar_cdba2c07_2026-04-30_ligand_quality_1sar:A:SO4_97
+      ligand_ref: 1sar:A:SO4_97
+      rscc:
+        value_numeric: 0.9882
+      ligand_b_factor_vs_surroundings:
+        value_numeric: 1.101
   cross_tool_coverage:
     id: QDS_1sar_cdba2c07_2026-04-30_coverage
     task_coverage:
@@ -320,6 +368,7 @@ quality_data_sheets:
       - mmtbx.validation_summary
       - phenix.find_peaks_holes
       - phenix.holton_geometry_validation
+      - phenix.real_space_correlation
       non_cctbx_oracles:
       - MolProbity (gold)
       - ProSMART
@@ -336,10 +385,11 @@ quality_data_sheets:
       gap_status: open — cctbx only
     - id: QDS_1sar_cdba2c07_2026-04-30_coverage_T10
       catalog_task_ref: T10
-      cctbx_oracles: []
+      cctbx_oracles:
+      - phenix.real_space_correlation
       non_cctbx_oracles:
       - gemmi sfcalc
-      gap_status: non-cctbx only
+      gap_status: closed
     - id: QDS_1sar_cdba2c07_2026-04-30_coverage_T13
       catalog_task_ref: T13
       cctbx_oracles:

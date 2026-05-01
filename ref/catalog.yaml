@@ -415,6 +415,12 @@ tools:
   catalog_tasks_served:
   - T05
   - T06
+- id: phenix.real_space_correlation
+  family: cctbx
+  catalog_tasks_served:
+  - T05
+  - T06
+  - T10
 - id: phenix.mtz.dump
   family: cctbx
   catalog_tasks_served:

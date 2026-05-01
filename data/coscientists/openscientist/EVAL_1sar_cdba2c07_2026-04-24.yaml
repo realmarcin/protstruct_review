@@ -946,6 +946,150 @@ evaluation_runs:
       mitigation: Reference is pinned and named in scope_selector.
       status: mitigated
       tool_ref: ProSMART
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_ca_rscc
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:A:CA98
+    metric_definition_ref: T10_ligand_rscc
+    oracle_tool_ref: phenix.real_space_correlation
+    oracle_family: cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.9716
+    pass_status: pass
+    pass_criterion: '> 0.85'
+    notes: Ca²⁺ density support is excellent — RSCC 0.97 is well above the > 0.85
+      threshold. Independent confirmation that the ion is real (modulo element identity,
+      which still requires anomalous Fourier — see ASSUM_ligand_no_anomalous_columns_in_mtz).
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_ca_b_vs_protein
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:A:CA98
+    metric_definition_ref: T10_ligand_b_vs_surroundings
+    oracle_tool_ref: phenix.real_space_correlation
+    oracle_family: cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 2.674
+    pass_status: pass_with_caveat
+    pass_criterion: < 1.5 typical, < 3.0 acceptable for partial-occupancy ions
+    notes: Ca²⁺ B 42.73 Å² / protein mean 15.98 Å² = 2.67×. Agent reported '~3×'.
+      Consistent with partial occupancy in the absence of nucleotide cofactor.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_na_rscc
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:B:NA98
+    metric_definition_ref: T10_ligand_rscc
+    oracle_tool_ref: phenix.real_space_correlation
+    oracle_family: cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.9636
+    pass_status: pass
+    pass_criterion: '> 0.85'
+    notes: Na⁺ RSCC 0.96. Density support excellent.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_na_b_vs_protein
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:B:NA98
+    metric_definition_ref: T10_ligand_b_vs_surroundings
+    oracle_tool_ref: phenix.real_space_correlation
+    oracle_family: cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 1.43
+    pass_status: pass
+    pass_criterion: < 1.5
+    notes: Na⁺ B 22.85 Å² / protein mean 15.98 Å² = 1.43×. Below the partial-occupancy
+      threshold; consistent with the agent's full-occupancy modelling.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_so4_rscc
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:A:SO4_97
+    metric_definition_ref: T10_ligand_rscc
+    oracle_tool_ref: phenix.real_space_correlation
+    oracle_family: cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.9882
+    pass_status: pass
+    pass_criterion: '> 0.85'
+    notes: Chain A sulfate (kept in final model) — RSCC 0.99, excellent density support.
+      Confirms agent's decision to retain this sulfate (and remove the chain B one
+      with B 80-133).
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_so4_b_vs_protein
+    catalog_task_ref: T10
+    stage: final
+    scope: ligand
+    scope_selector: 1sar:A:SO4_97
+    metric_definition_ref: T10_ligand_b_vs_surroundings
+    oracle_tool_ref: phenix.real_space_correlation
+    oracle_family: cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 1.101
+    pass_status: pass
+    pass_criterion: < 1.5
+    notes: SO4 B 17.59 Å² / protein mean 15.98 Å² = 1.10×. Agent reported B 18.2 Å²;
+      oracle re-extracted 17.59. Match within 0.6 Å². The sulfate is at protein-mean
+      B as the agent says — well-ordered.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_water_b_distribution
+    catalog_task_ref: T05
+    stage: final
+    scope: complex
+    scope_selector: all 146 waters in chain S
+    metric_definition_ref: T05_overall_b_mean
+    oracle_tool_ref: phenix.real_space_correlation
+    oracle_family: cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 20.76
+      mean: 20.76
+      std_dev: 8.78
+      min_value: 6.62
+      max_value: 53.76
+      count: 146
+      unit: Å²
+    pass_criterion: no waters with B > 60
+    pass_status: pass
+    notes: 'Water B distribution: mean 20.76 Å² (well above protein mean 15.98 — expected
+      for surface waters); 1 water with B > 50 (HOH S 724); 0 waters with B > 60.
+      Distribution is healthy.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_water_rscc_distribution
+    catalog_task_ref: T05
+    stage: final
+    scope: complex
+    scope_selector: all 146 waters
+    metric_definition_ref: T10_ligand_rscc
+    oracle_tool_ref: phenix.real_space_correlation
+    oracle_family: cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.867
+      mean: 0.867
+      std_dev: 0.073
+      min_value: 0.658
+      max_value: 0.983
+      count: 146
+    pass_criterion: ≤ 5% waters with RSCC < 0.7
+    pass_status: pass_with_caveat
+    notes: 'Water RSCC: mean 0.867. 3 waters with RSCC < 0.7 (2.1%); 26 waters with
+      RSCC < 0.8 (17.8%); 59 waters with RSCC < 0.85 (40%). The 3 low-RSCC waters
+      are flagged as ResidueOutlier rows with outlier_kind: density_misfit. Most waters
+      have good density support; agent''s water-modelling is mostly clean.'
   headline_findings:
   - id: EVAL_1sar_cdba2c07_2026-04-24_H_001
     catalog_task_refs:
@@ -1253,6 +1397,15 @@ evaluation_runs:
         unit: Å
       kind: outer_sphere
       notes: Agent claim 3.45 Å — Δ = 0.155 Å.
+  - id: 1sar:A:SO4_97
+    structure_ref: 1sar
+    pdb_chemical_id: SO4
+    chain_id: A
+    residue_number: 97
+    partial_occupancy: false
+    b_factor:
+      value_numeric: 17.59
+      unit: Å²
   sites:
   - id: 1sar_ca_active_site
     structure_ref: 1sar
@@ -1263,6 +1416,23 @@ evaluation_runs:
     - 1sar:S:537
     ligand_ref: 1sar:A:CA98
     description: Canonical SNase Ca²⁺-binding site (Asp33 + Thr56 + ordered water).
+  - id: 1sar_na_crystal_contact_site
+    structure_ref: 1sar
+    kind: metal_coordination
+    member_residue_refs:
+    - 1sar:B:17
+    - 1sar:S:93
+    - 1sar:S:605
+    - 1sar:S:618
+    ligand_ref: 1sar:B:NA98
+    description: Na⁺ at chain B crystal contact (Asp17 + 3 waters).
+  - id: 1sar_so4_anion_binding_site
+    structure_ref: 1sar
+    kind: binding_site
+    member_residue_refs:
+    - 1sar:A:97
+    ligand_ref: 1sar:A:SO4_97
+    description: Chain A sulfate binding pocket (kept in final model).
   density_peaks:
   - id: EVAL_1sar_cdba2c07_2026-04-24_peak_01
     sigma_level: 6.177
@@ -1341,6 +1511,34 @@ evaluation_runs:
     details: phi,psi outside 99.95th percentile; both phenix.holton_geometry_validation
       and mmtbx.validation_summary flag this residue. Agent's claim of 0.00% Rama
       outliers does not reproduce.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_outlier_water_S_680
+    residue_ref: 1sar:S:680
+    outlier_kind: density_misfit
+    severity: severe
+    tool_ref: phenix.real_space_correlation
+    metric_value:
+      value_numeric: 0.658
+      unit: RSCC
+    details: Worst-RSCC water (0.658). Combined with B 44.56 — likely modelling error
+      or noise-fit. Should be re-evaluated.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_outlier_water_S_707
+    residue_ref: 1sar:S:707
+    outlier_kind: density_misfit
+    severity: moderate
+    tool_ref: phenix.real_space_correlation
+    metric_value:
+      value_numeric: 0.668
+      unit: RSCC
+    details: Second-worst RSCC (0.668).
+  - id: EVAL_1sar_cdba2c07_2026-04-24_outlier_water_S_729
+    residue_ref: 1sar:S:729
+    outlier_kind: density_misfit
+    severity: moderate
+    tool_ref: phenix.real_space_correlation
+    metric_value:
+      value_numeric: 0.691
+      unit: RSCC
+    details: RSCC 0.691; B 48.75 (high). Borderline — possibly real but poorly supported.
   per_residue_values:
   - id: EVAL_1sar_cdba2c07_2026-04-24_disp_001
     residue_ref: 1sar:A:34
