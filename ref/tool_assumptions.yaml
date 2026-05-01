@@ -295,6 +295,84 @@ assumptions:
     evidence_refs:
       - EVAL_1sar_cdba2c07_2026-04-24
 
+  # ---------- CCP4 / REFMAC5 / ProSMART -----------------------------
+
+  - id: ASSUM_refmac_restraint_library
+    kind: explicit
+    scope: tool
+    title: REFMAC5 uses the CCP4 monomer library
+    description: >-
+      REFMAC5 reports geometry RMSZ against the CCP4 restraint
+      dictionary, which is an independent code path from PHENIX's
+      restraint library (mon_lib).
+    consequences: >-
+      RMSZ from REFMAC and RMSZ from phenix.holton_geometry_validation
+      can disagree on the same atoms because the σ targets differ —
+      typically by 0.1-0.3 σ, occasionally more for unusual residues.
+    mitigation: >-
+      State which library was used. Cross-tool RMSZ agreement within
+      ~0.5 σ counts as confirmed; larger disagreement flags either a
+      modelling issue or a restraint-library mismatch.
+    status: mitigated
+    tool_ref: REFMAC5
+
+  - id: ASSUM_refmac_solvent_modelling
+    kind: explicit
+    scope: tool
+    title: REFMAC5 uses Babinet-style bulk solvent
+    description: >-
+      REFMAC5's bulk-solvent model differs from PHENIX's. R-factors
+      from a REFMAC re-refinement are not directly comparable to
+      PHENIX in-run values; expect differences in the 0.005-0.015
+      range on the same data.
+    consequences: >-
+      A REFMAC re-refinement of the agent's model giving 0.158 R-free
+      vs phenix.refine 0.149 is not necessarily a "regression" — it's
+      a different scaling.
+    mitigation: >-
+      When using REFMAC as a second-opinion refiner, compare on the
+      same scale (REFMAC vs REFMAC, PHENIX vs PHENIX) for cross-round
+      Δ-claims; cross-tool comparison is for "are we in the same
+      bracket".
+    status: mitigated
+    tool_ref: REFMAC5
+
+  - id: ASSUM_prosmart_reference_dependent
+    kind: explicit
+    scope: tool
+    title: ProSMART analysis is reference-dependent
+    description: >-
+      ProSMART computes per-residue scores AGAINST a reference
+      structure (typically the deposited model or a high-resolution
+      comparator). Choosing a different reference changes every
+      score. There is no "absolute" ProSMART number for a structure.
+    consequences: >-
+      A ProSMART Rama-Z of 1.2 vs reference X is not the same number
+      as 1.2 vs reference Y. Reports must always quote the reference.
+    mitigation: >-
+      Pin the reference per evaluation. For agentic refinement vs
+      starting model, use the agent's input model as the reference.
+      For absolute geometry analysis, use Top8000 (when available
+      via ProSMART's data files) or compare to a high-resolution
+      family member.
+    status: mitigated
+    tool_ref: ProSMART
+
+  - id: ASSUM_prosmart_no_top8000_default
+    kind: implicit
+    scope: tool
+    title: ProSMART needs an explicit reference; no Top8000 default
+    description: >-
+      Unlike MolProbity (which has Top8000 baked in), ProSMART's
+      Rama-Z analysis requires the user to supply a reference. The
+      tool ships with template-based options but no single default.
+    consequences: >-
+      Running ProSMART without specifying a reference gives a
+      meaningless score; misconfigured runs can pass silently.
+    mitigation: Always specify the reference structure on the command line.
+    status: unchecked
+    tool_ref: ProSMART
+
   # ---------- OpenStructure (OST) ---------------------------------------
 
   - id: ASSUM_ost_lddt_inclusion_radius

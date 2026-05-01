@@ -46,7 +46,7 @@ Servalcat ships a no-REFMAC refinement mode (`refine_xtal_norefmac`, `refine_spa
 
 | Tool | Why not installed | Catalog tasks affected | Recommendation |
 |---|---|---|---|
-| **CCP4 / REFMAC5** | Gated behind academic registration at <https://www.ccp4.ac.uk/download/>; multi-GB. | T03, T06, T13 | Register and download manually; install to `$HOME/ccp4` |
+| **CCP4 / REFMAC5 / ProSMART** | Gated behind free academic registration at <https://www.ccp4.ac.uk/download/registration/>; multi-GB suite. | T03 (REFMAC5 = canonical second-opinion refiner; PDB-REDO methodology), T05 (ProSMART = non-cctbx Ramachandran-Z + per-residue rotamer comparison; closes the cctbx-only gap on the geometry %s), T06 (REFMAC5 R-factors), T13 (aimless / pointless / ctruncate for data-quality metrics) | Register at the URL above; download macOS-arm64 installer; install to `$HOME/ccp4`; source `$HOME/ccp4/setup-scripts/sh/ccp4.setup-sh`. Catalog tool entries (REFMAC5, ProSMART, aimless, pointless, ctruncate) are pre-staged at commit a54964a's successor. |
 | **ChimeraX** | Heavy GUI install; useful for `matchmaker` (T01) and `fitmap` (T08) | T01, T08 | <https://www.cgl.ucsf.edu/chimerax/download.html> |
 | **MoRDa** | Specialised MR pipeline | T09 only | Install only if T09 becomes a regression target |
 

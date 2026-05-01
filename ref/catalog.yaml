@@ -383,6 +383,29 @@ tools:
   - T02
   - T05
   - T07
+- id: REFMAC5
+  family: non_cctbx
+  catalog_tasks_served:
+  - T03
+  - T05
+  - T06
+- id: ProSMART
+  family: non_cctbx
+  catalog_tasks_served:
+  - T02
+  - T05
+- id: aimless
+  family: non_cctbx
+  catalog_tasks_served:
+  - T13
+- id: pointless
+  family: non_cctbx
+  catalog_tasks_served:
+  - T13
+- id: ctruncate
+  family: non_cctbx
+  catalog_tasks_served:
+  - T13
 - id: phenix.emringer
   family: cctbx
   catalog_tasks_served:

@@ -420,3 +420,81 @@ tool_recommendations:
     evidence_refs:
       - Mariani2013
     as_of_date: '2026-04-30'
+
+  # ----- CCP4 / REFMAC5 / ProSMART (closes cctbx-only gap on
+  # ----- Ramachandran outliers, rotamer outliers, MolProbity composite,
+  # ----- and adds T03 refinement second-opinion).
+
+  - id: REC_T05_ramachandran_outlier_top_performing
+    metric_definition_ref: T05_ramachandran_outlier
+    tool_ref: ProSMART
+    role: top_performing
+    rank: 1
+    justification: >-
+      ProSMART is non-cctbx (CCP4 stack, Murshudov-group code path).
+      It provides per-residue Ramachandran-Z scores against a
+      reference distribution, complementing MolProbity's Top8000
+      classification. Use ProSMART as the second confirmation when
+      the MolProbity tools split on a borderline residue.
+    evidence_refs:
+      - Joosten2012
+    as_of_date: '2026-04-30'
+
+  - id: REC_T05_rotamer_outlier_top_performing
+    metric_definition_ref: T05_rotamer_outlier
+    tool_ref: ProSMART
+    role: top_performing
+    rank: 1
+    justification: >-
+      ProSMART per-residue rotamer comparison is non-cctbx and runs
+      against any reference structure (typically the deposited model
+      or a higher-resolution comparator).
+    as_of_date: '2026-04-30'
+
+  - id: REC_T05_bond_length_rmsz_top_performing
+    metric_definition_ref: T05_bond-length_rmsz
+    tool_ref: REFMAC5
+    role: top_performing
+    rank: 1
+    justification: >-
+      REFMAC5 reports geometry RMSZ in its log against the CCP4
+      restraint library — fully independent code base from PHENIX's
+      restraint dictionary. The two should agree within ~0.2 σ on
+      a well-refined model; > 0.5 σ disagreement indicates the
+      restraint libraries differ on which atoms are involved.
+    as_of_date: '2026-04-30'
+
+  - id: REC_T05_bond_angle_rmsz_top_performing
+    metric_definition_ref: T05_bond-angle_rmsz
+    tool_ref: REFMAC5
+    role: top_performing
+    rank: 1
+    justification: Same as bond-length RMSZ — REFMAC5 internal restraint library.
+    as_of_date: '2026-04-30'
+
+  - id: REC_T03_r_work_top_performing_refmac
+    metric_definition_ref: T03_r-work
+    tool_ref: REFMAC5
+    role: alternative
+    rank: 3
+    justification: >-
+      Once installed, REFMAC5 is the canonical second-opinion refiner
+      (PDB-REDO methodology, Joosten 2012). Re-refine the model with
+      REFMAC and report whether R-work / R-free converge within
+      ~0.01-0.02 of the agent's PHENIX numbers. Currently rank 3
+      (gemmi sfcalc + Servalcat are easier installs); promote to
+      rank 1 once REFMAC re-refinement is the default path.
+    evidence_refs:
+      - Joosten2012
+    as_of_date: '2026-04-30'
+
+  - id: REC_T13_completeness_outer_top_performing
+    metric_definition_ref: T13_completeness_overall_outer
+    tool_ref: aimless
+    role: top_performing
+    rank: 1
+    justification: >-
+      CCP4 aimless is the canonical data-processing tool for
+      completeness, ⟨I/σ⟩, and CC½ statistics. Catalog T13 oracle
+      (catalog notes name it explicitly).
+    as_of_date: '2026-04-30'
