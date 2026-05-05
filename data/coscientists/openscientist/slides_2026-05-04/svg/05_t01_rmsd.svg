@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">T01 — Superposition · RMSD bracket [0.41, 0.48 Å]</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">Four tools converge · OST lDDT 0.9725 · Gly A 34 lowest-lDDT residue, also gemmi’s biggest Cα displacement</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-04</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-04</text>
+
+  <rect x="80" y="220" width="800" height="52" fill="#1f4e8c"/>
+  <text x="94" y="253.33333333333334" font-size="22" font-weight="700" fill="#ffffff" text-anchor="start">Tool</text>
+  <text x="646" y="253.33333333333334" font-size="22" font-weight="700" fill="#ffffff" text-anchor="end">RMSD (Å)</text>
+  <text x="770.0" y="253.33333333333334" font-size="22" font-weight="700" fill="#ffffff" text-anchor="middle">Family</text>
+  <rect x="80" y="272" width="800" height="52" fill="#ffffff"/>
+  <text x="94" y="304.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">TM-align</text>
+  <text x="646" y="304.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">0.41</text>
+  <rect x="660" y="272" width="220" height="52" fill="#1f7a3f"/>
+  <text x="770.0" y="304.6666666666667" font-size="20" fill="#ffffff" text-anchor="middle">non_cctbx</text>
+  <rect x="80" y="324" width="800" height="52" fill="#f7f8fb"/>
+  <text x="94" y="356.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">gemmi</text>
+  <text x="646" y="356.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">0.42</text>
+  <rect x="660" y="324" width="220" height="52" fill="#1f7a3f"/>
+  <text x="770.0" y="356.6666666666667" font-size="20" fill="#ffffff" text-anchor="middle">non_cctbx</text>
+  <rect x="80" y="376" width="800" height="52" fill="#ffffff"/>
+  <text x="94" y="408.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">phenix.superpose_models</text>
+  <text x="646" y="408.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">0.43</text>
+  <rect x="660" y="376" width="220" height="52" fill="#1f4e8c"/>
+  <text x="770.0" y="408.6666666666667" font-size="20" fill="#ffffff" text-anchor="middle">cctbx</text>
+  <rect x="80" y="428" width="800" height="52" fill="#f7f8fb"/>
+  <text x="94" y="460.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">ProSMART</text>
+  <text x="646" y="460.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">0.475</text>
+  <rect x="660" y="428" width="220" height="52" fill="#1f7a3f"/>
+  <text x="770.0" y="460.6666666666667" font-size="20" fill="#ffffff" text-anchor="middle">non_cctbx</text>
+  <rect x="80" y="480" width="800" height="52" fill="#ffffff"/>
+  <text x="94" y="512.6666666666666" font-size="20" fill="#1a1a2e" text-anchor="start">Agent</text>
+  <text x="646" y="512.6666666666666" font-size="20" fill="#1a1a2e" text-anchor="end">0.438</text>
+  <rect x="660" y="480" width="220" height="52" fill="#5a6071"/>
+  <text x="770.0" y="512.6666666666666" font-size="20" fill="#ffffff" text-anchor="middle">—</text>
+  <rect x="80" y="220" width="800" height="312" fill="none" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="460" y1="220" x2="460" y2="532" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="660" y1="220" x2="660" y2="532" stroke="#e3e6ee" stroke-width="1"/>
+
+  <text x="900" y="240" font-size="22" font-weight="700" fill="#1f4e8c">RMSD bracket (Å)</text>
+  <line x1="900" y1="380" x2="1700" y2="380" stroke="#1a1a2e" stroke-width="2"/>
+  <line x1="900.0" y1="374" x2="900.0" y2="386" stroke="#1a1a2e" stroke-width="2"/>
+  <text x="900.0" y="410" font-size="16" fill="#5a6071" text-anchor="middle">0.40</text>
+  <line x1="1059.9999999999998" y1="374" x2="1059.9999999999998" y2="386" stroke="#1a1a2e" stroke-width="2"/>
+  <text x="1059.9999999999998" y="410" font-size="16" fill="#5a6071" text-anchor="middle">0.42</text>
+  <line x1="1219.9999999999998" y1="374" x2="1219.9999999999998" y2="386" stroke="#1a1a2e" stroke-width="2"/>
+  <text x="1219.9999999999998" y="410" font-size="16" fill="#5a6071" text-anchor="middle">0.44</text>
+  <line x1="1380.0" y1="374" x2="1380.0" y2="386" stroke="#1a1a2e" stroke-width="2"/>
+  <text x="1380.0" y="410" font-size="16" fill="#5a6071" text-anchor="middle">0.46</text>
+  <line x1="1539.9999999999995" y1="374" x2="1539.9999999999995" y2="386" stroke="#1a1a2e" stroke-width="2"/>
+  <text x="1539.9999999999995" y="410" font-size="16" fill="#5a6071" text-anchor="middle">0.48</text>
+  <line x1="1699.9999999999998" y1="374" x2="1699.9999999999998" y2="386" stroke="#1a1a2e" stroke-width="2"/>
+  <text x="1699.9999999999998" y="410" font-size="16" fill="#5a6071" text-anchor="middle">0.50</text>
+  <rect x="979.9999999999997" y="358" width="559.9999999999999" height="44" fill="#dce6f4" stroke="#1f4e8c" stroke-width="1" opacity="0.7"/>
+  <circle cx="979.9999999999997" cy="380" r="9" fill="#1f7a3f" stroke="#ffffff" stroke-width="2"/>
+  <text x="979.9999999999997" y="330" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">TM-align</text>
+  <circle cx="1059.9999999999998" cy="380" r="9" fill="#1f7a3f" stroke="#ffffff" stroke-width="2"/>
+  <text x="1059.9999999999998" y="450" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">gemmi</text>
+  <circle cx="1139.9999999999998" cy="380" r="9" fill="#1f4e8c" stroke="#ffffff" stroke-width="2"/>
+  <text x="1139.9999999999998" y="330" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">PHENIX</text>
+  <circle cx="1499.9999999999995" cy="380" r="9" fill="#1f7a3f" stroke="#ffffff" stroke-width="2"/>
+  <text x="1499.9999999999995" y="450" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">ProSMART</text>
+  <circle cx="1203.9999999999998" cy="380" r="9" fill="#5a6071" stroke="#ffffff" stroke-width="2"/>
+  <text x="1203.9999999999998" y="330" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">Agent</text>
+  <rect x="80" y="640" width="1760" height="280" rx="10" fill="#dce6f4" stroke="#1f4e8c" stroke-width="2"/>
+  <text x="100" y="690" font-size="26" font-weight="700" fill="#1a1a2e">OST lDDT (global) = 0.9725</text>
+  <text x="100" y="730" font-size="20" fill="#1a1a2e">Local structure preserved start → final.</text>
+  <text x="100" y="772" font-size="20" fill="#1a1a2e">Lowest per-residue lDDT: <tspan font-weight="700">Gly A 34 = 0.878</tspan> (also gemmi’s biggest Cα displacement at 0.955 Å — same residue, two metrics, two code bases).</text>
+  <text x="100" y="820" font-size="20" fill="#5a6071">Five superposition oracles across two code families. Agent’s 0.438 Å sits inside the bracket.</text>
+  <text x="100" y="862" font-size="18" fill="#5a6071">Tools: TM-align (Zhang) · gemmi (CCP4) · phenix.superpose_models (cctbx) · ProSMART (CCP4) · OST (SIB)</text>
+</svg>

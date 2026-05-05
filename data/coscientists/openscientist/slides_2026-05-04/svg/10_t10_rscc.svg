@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">T10 — Ligand / metal RSCC + B-vs-protein ratio</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">phenix.real_space_correlation · all three components have RSCC ≥ 0.96 · density excellent for retained ligands</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-04</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-04</text>
+
+  <rect x="80" y="220" width="1760" height="70" fill="#1f4e8c"/>
+  <text x="94" y="262.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="start">Component</text>
+  <text x="486" y="262.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="end">RSCC</text>
+  <text x="666" y="262.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="end">B (Å²)</text>
+  <text x="906" y="262.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="end">B / protein-mean</text>
+  <text x="934" y="262.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="start">Verdict</text>
+  <rect x="80" y="290" width="1760" height="70" fill="#ffffff"/>
+  <text x="94" y="331.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">Ca²⁺ A 98</text>
+  <text x="486" y="331.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">0.9716</text>
+  <text x="666" y="331.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">42.73</text>
+  <text x="906" y="331.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">2.67×</text>
+  <text x="934" y="331.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">density excellent · partial-occ framing consistent (long bonds + low CN + high B)</text>
+  <rect x="80" y="360" width="1760" height="70" fill="#f7f8fb"/>
+  <text x="94" y="401.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">Na⁺ B 98</text>
+  <text x="486" y="401.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">0.9636</text>
+  <text x="666" y="401.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">22.85</text>
+  <text x="906" y="401.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">1.43×</text>
+  <text x="934" y="401.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">density excellent · full-occupancy framing consistent</text>
+  <rect x="80" y="430" width="1760" height="70" fill="#ffffff"/>
+  <text x="94" y="471.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">SO4 A 97</text>
+  <text x="486" y="471.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">0.9882</text>
+  <text x="666" y="471.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">17.59</text>
+  <text x="906" y="471.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">1.10×</text>
+  <text x="934" y="471.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">density excellent · agent’s decision to retain confirmed</text>
+  <rect x="80" y="220" width="1760" height="280" fill="none" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="320" y1="220" x2="320" y2="500" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="500" y1="220" x2="500" y2="500" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="680" y1="220" x2="680" y2="500" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="920" y1="220" x2="920" y2="500" stroke="#e3e6ee" stroke-width="1"/>
+
+  <text x="120" y="480" font-size="24" font-weight="700" fill="#1f4e8c">RSCC threshold check</text>
+  <text x="120" y="510" font-size="16" fill="#5a6071">Threshold for retaining ligand / metal: RSCC > 0.85</text>
+  <text x="120" y="590" font-size="18" fill="#1a1a2e" font-weight="600">Ca²⁺ A 98</text>
+  <rect x="340" y="570" width="1280" height="36" fill="#f7f8fb"/>
+  <rect x="340" y="570" width="1098.2400000000002" height="36" fill="#1f4e8c"/>
+  <text x="1448.2400000000002" y="594" font-size="18" fill="#1a1a2e" font-weight="700">0.972</text>
+  <text x="120" y="646" font-size="18" fill="#1a1a2e" font-weight="600">Na⁺ B 98</text>
+  <rect x="340" y="626" width="1280" height="36" fill="#f7f8fb"/>
+  <rect x="340" y="626" width="1047.04" height="36" fill="#1f4e8c"/>
+  <text x="1397.04" y="650" font-size="18" fill="#1a1a2e" font-weight="700">0.964</text>
+  <text x="120" y="702" font-size="18" fill="#1a1a2e" font-weight="600">SO4 A 97</text>
+  <rect x="340" y="682" width="1280" height="36" fill="#f7f8fb"/>
+  <rect x="340" y="682" width="1204.4799999999998" height="36" fill="#1f4e8c"/>
+  <text x="1554.4799999999998" y="706" font-size="18" fill="#1a1a2e" font-weight="700">0.988</text>
+  <text x="120" y="758" font-size="18" fill="#1a1a2e" font-weight="600">HOH mean (146)</text>
+  <rect x="340" y="738" width="1280" height="36" fill="#f7f8fb"/>
+  <rect x="340" y="738" width="428.7999999999997" height="36" fill="#5a6071"/>
+  <text x="778.7999999999997" y="762" font-size="18" fill="#1a1a2e" font-weight="700">0.867</text>
+  <text x="120" y="814" font-size="18" fill="#1a1a2e" font-weight="600">HOH S 680 (worst)</text>
+  <rect x="340" y="794" width="1280" height="36" fill="#f7f8fb"/>
+  <rect x="340" y="794" width="0" height="36" fill="#a8201a"/>
+  <text x="350" y="818" font-size="18" fill="#1a1a2e" font-weight="700">0.658</text>
+  <line x1="659.9999999999997" y1="558" x2="659.9999999999997" y2="818" stroke="#a8201a" stroke-width="3" stroke-dasharray="6,4"/>
+  <text x="659.9999999999997" y="552" font-size="14" fill="#a8201a" font-weight="700" text-anchor="middle">threshold 0.85</text>
+  <text x="340.0" y="826" font-size="14" fill="#5a6071" text-anchor="middle">0.80</text>
+  <text x="659.9999999999997" y="826" font-size="14" fill="#5a6071" text-anchor="middle">0.85</text>
+  <text x="980.0" y="826" font-size="14" fill="#5a6071" text-anchor="middle">0.90</text>
+  <text x="1299.9999999999995" y="826" font-size="14" fill="#5a6071" text-anchor="middle">0.95</text>
+  <text x="1620.0" y="826" font-size="14" fill="#5a6071" text-anchor="middle">1.00</text>
+</svg>

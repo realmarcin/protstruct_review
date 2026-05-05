@@ -66,6 +66,13 @@ Every oracle in this harness rests on assumptions that determine what it sees an
 - **Distance inclusion radius** (default 15 Å) determines what counts as "local". Smaller radius rewards local fidelity, larger rewards extended geometry.
 - **Tolerance thresholds** (0.5 / 1 / 2 / 4 Å) are baked in — comparing two lDDT scores produced by different code paths requires verifying the same thresholds.
 
+### CCP4 `aimless` and `ctruncate` (T13 data-quality oracle)
+- **`aimless` requires unmerged intensities** (M/ISYM column). On a merged-only MTZ (e.g. F-obs / SIGF-obs only — the 1SAR case) it aborts immediately with `hkl_unmerge_list::prepare - EMPTY`. CC½, ⟨I/σ⟩ outer, and Rmerge / Rmeas all flow from unmerged data and are **unobtainable** if the artefact does not ship it. Document this as a known gap rather than substituting unrelated metrics.
+- **`ctruncate` is the merged-data fallback** for the T13 metrics that *are* recoverable from amplitudes alone: Wilson B, L-test twin fraction (+ moments), ΔB anisotropy, tNCS via Patterson search, ice-ring summary. These are CCP4 / non-cctbx and close the T13 cross-tool gap when aimless can't run.
+- **`scripts/t13_data_quality.py`** wraps both: it tries aimless first (so the limitation is captured as a provenance row), then runs ctruncate and parses out the scalars into ready-to-paste EvaluationMeasurement rows. Pass `--columns 'F-obs,SIGF-obs'` for typical phenix-refined MTZs; logs and output MTZs are persisted under `<mtz_dir>/t13_oracle_logs/` for QDS evidence_refs.
+- **Twinning thresholds.** L-test fraction < 0.05 = effectively untwinned; 0.05–0.20 = mild / borderline; > 0.20 = strong. ctruncate's "first-principles operator search" is independent of the L-test and reports zero operators when the lattice/symmetry permits no twin laws.
+- **Anisotropy ΔB rule of thumb.** Eigenvalue spread (max − min) < ~20 Å² on the orthogonal-coords B-tensor is acceptable for general refinement; ctruncate's "some anisotropy detect" message fires at much lower thresholds and is informational unless ΔB is large.
+
 ### wwPDB validation report
 - **Percentile rankings** computed against the entire archive (and against the resolution-binned subset). Quote which one. A clashscore of 8 is 70th percentile vs all PDB but 30th percentile at 1.5 Å.
 
@@ -107,6 +114,7 @@ When evaluating a new OpenScientist artefact:
 5. **For ion identity claims**, ask whether anomalous data was used; if not, downgrade the verdict.
 6. **For Δ-claims between rounds**, run the oracle on each round's PDB+MTZ (we have the MTZs in the artefact zip) and confirm the direction of change.
 7. **Quote `oracle_family`** on every measurement; require ≥ 1 non-cctbx confirmation for every load-bearing finding.
+8. **Run the T13 data-quality oracle** with `python scripts/t13_data_quality.py <mtz> --eval-id <EVAL-id>`. Wilson B, twinning, anisotropy ΔB, tNCS, and ice-ring flags all come from a single ctruncate pass; aimless will be tried first so the unmerged-data limitation is captured as a provenance row. Without this step the cross-tool coverage for T13 stays "open — cctbx only".
 
 ## Repo layout (the parts that matter for this skill)
 

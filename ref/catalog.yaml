@@ -113,6 +113,9 @@ catalog_tasks:
   - MolProbity (gold)
   - wwPDB validation pipeline
   - gemmi validators
+  - RosettaHoles2
+  - ProSA
+  - Verify3D
   metric_definition_refs:
   - T05_clashscore
   - T05_ramachandran_favored
@@ -125,6 +128,10 @@ catalog_tasks:
   - T05_chirality_outliers
   - T05_molprobity_composite
   - T05_cablam_outliers
+  - T05_rama_z_score
+  - T05_packing_z_score
+  - T05_unsatisfied_buried_hbond_count
+  - T05_b_factor_outlier_z
   inputs_description: model (PDB/mmCIF)
   gold_standard: MolProbity report; wwPDB validation for deposited comparator
   example_dataset: any PDB; 3NIR as clean ultra-high-res baseline
@@ -145,6 +152,8 @@ catalog_tasks:
   - Servalcat
   - gemmi sfcalc
   - gemmi validate
+  - PDB-REDO
+  - FSC-Q
   metric_definition_refs:
   - T06_r-work
   - T06_r-free
@@ -155,6 +164,9 @@ catalog_tasks:
   - T06_d_fsc_model
   - T06_overall_b
   - T06_wilson_b
+  - T06_residue_rscc
+  - T06_rscc_outlier_fraction
+  - T06_diffraction_precision_index
   inputs_description: model + MTZ (X-ray) or map(s) (cryo-EM)
   gold_standard: PDB/EMDB header-reported values
   example_dataset: PDB 1YQV + MTZ; PDB 7a4m + EMDB-11668 half-maps
@@ -174,12 +186,16 @@ catalog_tasks:
   - biotite AF parsers
   - colabfold domain-splitter
   - ChimeraX alphafold
+  - QMEANDisCo
   metric_definition_refs:
   - T07_fraction_residues_retained_after_trim
   - T07_mean_plddt_pre_post
   - T07_b-factor_1_plddt²_correlation
   - T07_domain_count_vs_pae_oracle
   - T07_rmsd_of_processed_model_vs_reference_experimental
+  - T07_predicted_tm_score
+  - T07_interface_predicted_tm_score
+  - T07_prediction_ensemble_convergence
   inputs_description: AlphaFold/RoseTTAFold prediction (PDB/mmCIF) w/ pLDDT|optional
     PAE JSON
   gold_standard: AlphaFold-DB pLDDT; experimental structure for same UniProt
@@ -315,11 +331,15 @@ catalog_tasks:
   - cryoSPARC 3DFSC
   - ResMap
   - e2proc3d.py (EMAN2)
+  - 3DFSC
+  - FSC-Q
   metric_definition_refs:
   - T12_global_fsc_resolution_at_0.143_masked_unmasked
   - T12_local_resolution_distribution_mean_stdev_10th_90th
   - T12_d_fsc_model_if_model
   - T12_b-factor_sharpening_estimate
+  - T12_directional_resolution_anisotropy
+  - T12_local_model_map_fsc_q
   inputs_description: two half-maps|optional mask|optional model
   gold_standard: EMDB-deposited resolution; RELION postprocess report
   example_dataset: EMDB-11668 half-maps; EMDB-20646 half-maps
@@ -375,6 +395,51 @@ catalog_tasks:
   inputs_description: model without hydrogens (or partial)
   gold_standard: standalone reduce; neutron structure if available
   example_dataset: PDB 1HQ1; PDB 5E5V (neutron pair)
+- id: T15
+  task_name: Structural/domain classification
+  phenix_tool_refs: []
+  phenix_doc_paths: []
+  oracle_tool_refs:
+  - DSSP
+  - STRIDE
+  - CATH
+  - SCOPe
+  - ECOD
+  metric_definition_refs:
+  - T15_secondary_structure_assignment
+  - T15_structural_domain_assignment
+  - T15_fold_classification
+  inputs_description: model (PDB/mmCIF)
+  gold_standard: CATH/SCOPe/ECOD consensus where available; DSSP/STRIDE agreement for secondary structure
+  example_dataset: deposited PDB entries with curated CATH/SCOPe/ECOD mappings
+- id: T16
+  task_name: Interface and assembly quality
+  phenix_tool_refs: []
+  phenix_doc_paths: []
+  oracle_tool_refs:
+  - PISA/PDBePISA
+  - DockQ
+  metric_definition_refs:
+  - T16_interface_buried_surface_area
+  - T16_interface_dockq_score
+  - T16_capri_interface_quality_class
+  inputs_description: complex or assembly model (PDB/mmCIF)
+  gold_standard: deposited biological assembly and CAPRI/DockQ class where available
+  example_dataset: protein-protein complexes with deposited biological assemblies
+- id: T17
+  task_name: NMR ensemble/restraint validation
+  phenix_tool_refs: []
+  phenix_doc_paths: []
+  oracle_tool_refs:
+  - wwPDB NMR validation
+  - PROCHECK-NMR
+  - RPF
+  metric_definition_refs:
+  - T17_nmr_restraint_violation_summary
+  - T17_nmr_ensemble_precision_rmsd
+  inputs_description: NMR ensemble model plus restraints where available
+  gold_standard: wwPDB NMR validation report and deposited restraint files
+  example_dataset: deposited NMR ensemble with validation report
 tools:
 - id: OpenStructure
   family: non_cctbx
@@ -856,6 +921,78 @@ tools:
   family: non_cctbx
   catalog_tasks_served:
   - T14
+- id: DSSP
+  family: non_cctbx
+  catalog_tasks_served:
+  - T15
+- id: STRIDE
+  family: non_cctbx
+  catalog_tasks_served:
+  - T15
+- id: CATH
+  family: non_cctbx
+  catalog_tasks_served:
+  - T15
+- id: SCOPe
+  family: non_cctbx
+  catalog_tasks_served:
+  - T15
+- id: ECOD
+  family: non_cctbx
+  catalog_tasks_served:
+  - T15
+- id: PISA/PDBePISA
+  family: non_cctbx
+  catalog_tasks_served:
+  - T16
+- id: DockQ
+  family: non_cctbx
+  catalog_tasks_served:
+  - T16
+- id: PDB-REDO
+  family: non_cctbx
+  catalog_tasks_served:
+  - T03
+  - T06
+- id: RosettaHoles2
+  family: non_cctbx
+  catalog_tasks_served:
+  - T05
+- id: QMEANDisCo
+  family: non_cctbx
+  catalog_tasks_served:
+  - T07
+- id: ProSA
+  family: non_cctbx
+  catalog_tasks_served:
+  - T05
+  - T07
+- id: Verify3D
+  family: non_cctbx
+  catalog_tasks_served:
+  - T05
+  - T07
+- id: 3DFSC
+  family: non_cctbx
+  catalog_tasks_served:
+  - T12
+- id: FSC-Q
+  family: non_cctbx
+  catalog_tasks_served:
+  - T06
+  - T12
+- id: wwPDB NMR validation
+  family: non_cctbx
+  catalog_tasks_served:
+  - T17
+- id: PROCHECK-NMR
+  family: non_cctbx
+  catalog_tasks_served:
+  - T17
+- id: RPF
+  family: non_cctbx
+  catalog_tasks_served:
+  - T17
 metric_definitions:
 - id: T01_ca_rmsd_å
   name: CA RMSD (Å)
@@ -1451,3 +1588,139 @@ metric_definitions:
   description: Mean B-factor over ligand atoms.
   applicable_task_refs:
   - T10
+
+# --- Protein structure quality/refinement indicators added from
+# --- ref/protein_structure_quality_refinement_indicators.md.
+
+- id: T05_packing_z_score
+  name: packing Z-score
+  description: Packing-quality Z-score against a structural reference distribution.
+  applicable_task_refs:
+  - T05
+  scope: complex
+
+- id: T05_unsatisfied_buried_hbond_count
+  name: unsatisfied buried H-bond count
+  description: Count of buried polar groups lacking satisfying hydrogen bonds.
+  applicable_task_refs:
+  - T05
+  scope: complex
+
+- id: T05_b_factor_outlier_z
+  name: B-factor outlier Z-score
+  description: Z-score for unusually high or low atomic/residue B-factors.
+  applicable_task_refs:
+  - T05
+  scope: residue
+
+- id: T06_residue_rscc
+  name: residue RSCC
+  description: Per-residue real-space correlation coefficient.
+  applicable_task_refs:
+  - T06
+  scope: residue
+
+- id: T06_rscc_outlier_fraction
+  name: RSCC outlier fraction
+  description: Fraction of residues below the configured RSCC quality threshold.
+  applicable_task_refs:
+  - T06
+  scope: complex
+
+- id: T06_diffraction_precision_index
+  name: diffraction precision index
+  description: Coordinate precision estimate derived from diffraction data and refinement statistics.
+  applicable_task_refs:
+  - T06
+  scope: complex
+
+- id: T07_predicted_tm_score
+  name: predicted TM-score
+  description: AlphaFold-style predicted TM-score (pTM).
+  applicable_task_refs:
+  - T07
+  scope: complex
+
+- id: T07_interface_predicted_tm_score
+  name: interface predicted TM-score
+  description: AlphaFold-Multimer interface predicted TM-score (ipTM).
+  applicable_task_refs:
+  - T07
+  scope: interface
+
+- id: T07_prediction_ensemble_convergence
+  name: prediction ensemble convergence
+  description: Convergence or agreement across predicted-model ensemble replicates.
+  applicable_task_refs:
+  - T07
+  scope: ensemble
+
+- id: T12_directional_resolution_anisotropy
+  name: directional resolution anisotropy
+  description: Directional resolution spread from 3DFSC-style analysis.
+  applicable_task_refs:
+  - T12
+  scope: dataset
+
+- id: T12_local_model_map_fsc_q
+  name: local model-map FSC-Q
+  description: Local model-map FSC-Q or equivalent model-map agreement score.
+  applicable_task_refs:
+  - T12
+  scope: residue
+
+- id: T15_secondary_structure_assignment
+  name: secondary-structure assignment
+  description: DSSP/STRIDE-style secondary-structure labels.
+  applicable_task_refs:
+  - T15
+  scope: residue
+
+- id: T15_structural_domain_assignment
+  name: structural domain assignment
+  description: Domain boundaries and identifiers from CATH/SCOPe/ECOD-style classification.
+  applicable_task_refs:
+  - T15
+  scope: domain
+
+- id: T15_fold_classification
+  name: fold classification
+  description: Fold/class assignment from CATH/SCOPe/ECOD-style classification.
+  applicable_task_refs:
+  - T15
+  scope: domain
+
+- id: T16_interface_buried_surface_area
+  name: interface buried surface area
+  description: Buried surface area for a chain-chain or assembly interface.
+  applicable_task_refs:
+  - T16
+  scope: interface
+
+- id: T16_interface_dockq_score
+  name: interface DockQ score
+  description: DockQ score for interface model quality.
+  applicable_task_refs:
+  - T16
+  scope: interface
+
+- id: T16_capri_interface_quality_class
+  name: CAPRI interface quality class
+  description: CAPRI quality class for an interface model.
+  applicable_task_refs:
+  - T16
+  scope: interface
+
+- id: T17_nmr_restraint_violation_summary
+  name: NMR restraint violation summary
+  description: Summary of distance/angle restraint violations for an NMR ensemble.
+  applicable_task_refs:
+  - T17
+  scope: ensemble
+
+- id: T17_nmr_ensemble_precision_rmsd
+  name: NMR ensemble precision RMSD
+  description: Ensemble precision RMSD across accepted NMR models.
+  applicable_task_refs:
+  - T17
+  scope: ensemble

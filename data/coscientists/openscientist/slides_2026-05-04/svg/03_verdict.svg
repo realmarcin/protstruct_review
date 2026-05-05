@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">Headline verdict</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">Mostly pass · 3 triangulated discrepancies · K⁺ alternative still open · cross-tool coverage closed</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-04</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-04</text>
+
+  <rect x="80" y="180" width="1760" height="120" rx="10" fill="#dce6f4" stroke="#1f4e8c" stroke-width="2"/>
+  <text x="120" y="240" font-size="32" font-weight="700" fill="#1a1a2e">1SAR is a real and substantial improvement over the deposited starting model.</text>
+  <text x="120" y="278" font-size="22" fill="#5a6071">Modelling decisions on structure, geometry, ion identity (Mg²⁺ excluded), water, disulfides — all defensible.</text>
+  <text x="80" y="350" font-size="26" font-weight="700" fill="#1f7a3f">Closed across the 04-30 / 05-01 / 05-04 re-issues</text>
+  <rect x="80" y="380" width="850" height="40" rx="6" fill="#dff0e1"/>
+  <text x="100" y="407" font-size="20" fill="#1a1a2e">✓ Mg²⁺ alternative ruled out — CheckMyMetal-style |Z| 16.35</text>
+  <rect x="80" y="430" width="850" height="40" rx="6" fill="#dff0e1"/>
+  <text x="100" y="457" font-size="20" fill="#1a1a2e">✓ Ligand / metal density support confirmed — RSCC ≥ 0.96</text>
+  <rect x="80" y="480" width="850" height="40" rx="6" fill="#dff0e1"/>
+  <text x="100" y="507" font-size="20" fill="#1a1a2e">✓ T13 data-quality cross-tool gap closed — ctruncate (NEW 05-04)</text>
+  <text x="980" y="350" font-size="26" font-weight="700" fill="#a8201a">Still discrepant (3-tool confirmed)</text>
+  <rect x="980" y="380" width="860" height="40" rx="6" fill="#f5d6d4"/>
+  <text x="1000" y="407" font-size="20" fill="#1a1a2e">✗ R-free reproducibly ≈ 0.21, agent reports 0.199</text>
+  <rect x="980" y="430" width="860" height="40" rx="6" fill="#f5d6d4"/>
+  <text x="1000" y="457" font-size="20" fill="#1a1a2e">✗ Round 6 R-free 0.207 &lt; round 7 R-free 0.213</text>
+  <rect x="980" y="480" width="860" height="40" rx="6" fill="#f5d6d4"/>
+  <text x="1000" y="507" font-size="20" fill="#1a1a2e">✗ Asn A 39 is a Ramachandran outlier</text>
+  <rect x="980" y="530" width="860" height="40" rx="6" fill="#f5d6d4"/>
+  <text x="1000" y="557" font-size="20" fill="#1a1a2e">✗ Density-peak inventory incomplete (23+ / 8− vs 9 listed)</text>
+  <text x="80" y="640" font-size="26" font-weight="700" fill="#b07c00">Open question</text>
+  <rect x="80" y="660" width="1760" height="100" rx="10" fill="#fbeecb" stroke="#b07c00" stroke-width="2"/>
+  <text x="100" y="700" font-size="22" font-weight="700" fill="#1a1a2e">K⁺ alternative for both ions</text>
+  <text x="100" y="734" font-size="20" fill="#1a1a2e">K⁺ has the best raw bond-length fit (|Z| 0.13–0.44) but coordination number is too low for K⁺ canonical, and the protein is a known Ca²⁺ enzyme. Needs crystallisation buffer information.</text>
+  <text x="80" y="820" font-size="26" font-weight="700" fill="#1f4e8c">Net acceptance against agent’s own success criteria — 3 / 6 pass cleanly</text>
+  <rect x="80" y="850" width="276" height="100" rx="10" fill="#ffffff" stroke="#1f7a3f" stroke-width="2"/>
+  <text x="95" y="894" font-size="18" font-weight="600" fill="#1a1a2e">R-free improvement</text>
+  <text x="95" y="924" font-size="17" fill="#1f7a3f" font-weight="700">✓ pass</text>
+  <rect x="376" y="850" width="276" height="100" rx="10" fill="#ffffff" stroke="#a8201a" stroke-width="2"/>
+  <text x="391" y="894" font-size="18" font-weight="600" fill="#1a1a2e">R-free gap &lt; 0.05</text>
+  <text x="391" y="924" font-size="17" fill="#a8201a" font-weight="700">⚠ oracle fails</text>
+  <rect x="672" y="850" width="276" height="100" rx="10" fill="#ffffff" stroke="#b07c00" stroke-width="2"/>
+  <text x="687" y="894" font-size="18" font-weight="600" fill="#1a1a2e">Ramachandran &lt; 1%</text>
+  <text x="687" y="924" font-size="17" fill="#b07c00" font-weight="700">✓ headline wrong</text>
+  <rect x="968" y="850" width="276" height="100" rx="10" fill="#ffffff" stroke="#1f7a3f" stroke-width="2"/>
+  <text x="983" y="894" font-size="18" font-weight="600" fill="#1a1a2e">Clashscore &lt; 5</text>
+  <text x="983" y="924" font-size="17" fill="#1f7a3f" font-weight="700">✓ pass</text>
+  <rect x="1264" y="850" width="276" height="100" rx="10" fill="#ffffff" stroke="#a8201a" stroke-width="2"/>
+  <text x="1279" y="894" font-size="18" font-weight="600" fill="#1a1a2e">No Δρ &gt; 4σ</text>
+  <text x="1279" y="924" font-size="17" fill="#a8201a" font-weight="700">✗ fails</text>
+  <rect x="1560" y="850" width="276" height="100" rx="10" fill="#ffffff" stroke="#1f7a3f" stroke-width="2"/>
+  <text x="1575" y="894" font-size="18" font-weight="600" fill="#1a1a2e">Data quality (T13)</text>
+  <text x="1575" y="924" font-size="17" fill="#1f7a3f" font-weight="700">✓ pass (NEW)</text>
+</svg>

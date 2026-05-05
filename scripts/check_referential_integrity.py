@@ -30,7 +30,7 @@ import yaml
 REPO = Path(__file__).resolve().parent.parent
 CATALOG = REPO / "ref" / "catalog.yaml"
 
-KNOWN_TASK_IDS = {f"T{n:02d}" for n in range(1, 15)}
+KNOWN_TASK_IDS = {f"T{n:02d}" for n in range(1, 18)}
 
 
 def load_catalog_indices() -> dict[str, set[str]]:

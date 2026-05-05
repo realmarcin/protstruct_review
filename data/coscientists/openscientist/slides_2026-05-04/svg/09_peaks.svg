@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">T05 — Density peaks at 4σ (phenix.find_peaks_holes)</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">Oracle: 23 + / 8 − peaks · agent listed 9 · 5 peaks above 5σ are not in agent’s table</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-04</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-04</text>
+
+  <rect x="80" y="220" width="1580" height="54" fill="#1f4e8c"/>
+  <text x="246" y="254.33333333333334" font-size="22" font-weight="700" fill="#ffffff" text-anchor="end">Oracle σ</text>
+  <text x="274" y="254.33333333333334" font-size="22" font-weight="700" fill="#ffffff" text-anchor="start">Nearest atom</text>
+  <text x="594" y="254.33333333333334" font-size="22" font-weight="700" fill="#ffffff" text-anchor="start">Notes</text>
+  <text x="1520.0" y="254.33333333333334" font-size="22" font-weight="700" fill="#ffffff" text-anchor="middle">In agent’s table?</text>
+  <rect x="80" y="274" width="1580" height="54" fill="#ffffff"/>
+  <text x="246" y="307.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">+6.18</text>
+  <text x="274" y="307.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">Glu A 54 CD</text>
+  <text x="594" y="307.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">highest positive peak</text>
+  <rect x="1380" y="274" width="280" height="54" fill="#a8201a"/>
+  <text x="1520.0" y="307.6666666666667" font-size="20" fill="#ffffff" text-anchor="middle">no</text>
+  <rect x="80" y="328" width="1580" height="54" fill="#f7f8fb"/>
+  <text x="246" y="361.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">+5.94</text>
+  <text x="274" y="361.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">HOH S 34</text>
+  <text x="594" y="361.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">near modelled water</text>
+  <rect x="1380" y="328" width="280" height="54" fill="#a8201a"/>
+  <text x="1520.0" y="361.6666666666667" font-size="20" fill="#ffffff" text-anchor="middle">no</text>
+  <rect x="80" y="382" width="1580" height="54" fill="#ffffff"/>
+  <text x="246" y="415.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">+5.83</text>
+  <text x="274" y="415.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">Thr A 67 CG2</text>
+  <text x="594" y="415.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">side-chain density unaccounted</text>
+  <rect x="1380" y="382" width="280" height="54" fill="#a8201a"/>
+  <text x="1520.0" y="415.6666666666667" font-size="20" fill="#ffffff" text-anchor="middle">no</text>
+  <rect x="80" y="436" width="1580" height="54" fill="#f7f8fb"/>
+  <text x="246" y="469.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="end">+5.61</text>
+  <text x="274" y="469.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">Asn A 39 CB</text>
+  <text x="594" y="469.6666666666667" font-size="20" fill="#1a1a2e" text-anchor="start">matches agent’s 4.82σ near OD1</text>
+  <rect x="1380" y="436" width="280" height="54" fill="#1f7a3f"/>
+  <text x="1520.0" y="469.6666666666667" font-size="20" fill="#ffffff" text-anchor="middle">yes</text>
+  <rect x="80" y="490" width="1580" height="54" fill="#ffffff"/>
+  <text x="246" y="523.6666666666666" font-size="20" fill="#1a1a2e" text-anchor="end">+4.96</text>
+  <text x="274" y="523.6666666666666" font-size="20" fill="#1a1a2e" text-anchor="start">HOH S 736</text>
+  <text x="594" y="523.6666666666666" font-size="20" fill="#1a1a2e" text-anchor="start">matches agent’s 4.98σ entry</text>
+  <rect x="1380" y="490" width="280" height="54" fill="#1f7a3f"/>
+  <text x="1520.0" y="523.6666666666666" font-size="20" fill="#ffffff" text-anchor="middle">yes</text>
+  <rect x="80" y="544" width="1580" height="54" fill="#f7f8fb"/>
+  <text x="246" y="577.6666666666666" font-size="20" fill="#1a1a2e" text-anchor="end">−4.11</text>
+  <text x="274" y="577.6666666666666" font-size="20" fill="#1a1a2e" text-anchor="start">HOH S 401</text>
+  <text x="594" y="577.6666666666666" font-size="20" fill="#1a1a2e" text-anchor="start">modelled water with no density (negative peak)</text>
+  <rect x="1380" y="544" width="280" height="54" fill="#a8201a"/>
+  <text x="1520.0" y="577.6666666666666" font-size="20" fill="#ffffff" text-anchor="middle">no</text>
+  <rect x="80" y="220" width="1580" height="378" fill="none" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="260" y1="220" x2="260" y2="598" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="580" y1="220" x2="580" y2="598" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="1380" y1="220" x2="1380" y2="598" stroke="#e3e6ee" stroke-width="1"/>
+
+  <rect x="80" y="640" width="1760" height="320" rx="10" fill="#f5d6d4" stroke="#a8201a" stroke-width="2"/>
+  <text x="100" y="690" font-size="28" font-weight="700" fill="#a8201a">Density-peak inventory is incomplete — fails the success criterion</text>
+  <text x="100" y="734" font-size="20" fill="#1a1a2e">Agent’s success criterion: <tspan font-weight="700">no unexplained Δρ > 4σ</tspan> · agent reports 9 peaks, max 4.98σ.</text>
+  <text x="100" y="772" font-size="20" fill="#1a1a2e">Oracle: <tspan font-weight="700">23 +</tspan> / <tspan font-weight="700">8 −</tspan> peaks at 4σ · max <tspan font-weight="700">+6.18σ</tspan> · 5 peaks above 5σ not surfaced.</text>
+  <text x="100" y="810" font-size="20" fill="#1a1a2e">Likely cause: agent’s peak-finding cutoff or merging step is more aggressive than the catalog oracle’s.</text>
+  <text x="100" y="850" font-size="18" fill="#5a6071">ASSUM_find_peaks_holes_cutoff_and_merging — known_violation.</text>
+  <text x="100" y="890" font-size="18" fill="#5a6071">Recommended remedy: re-run phenix.find_peaks_holes with map_cutoff=4.0 and accept default merging.</text>
+</svg>

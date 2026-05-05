@@ -41,6 +41,9 @@ enums:
       T12: { description: Map quality assessment (cryo-EM) }
       T13: { description: X-ray data quality assessment }
       T14: { description: Hydrogen placement / protonation }
+      T15: { description: Structural/domain classification }
+      T16: { description: Interface and assembly quality }
+      T17: { description: NMR ensemble/restraint validation }
 
   ToolFamily:
     description: >-
@@ -263,6 +266,8 @@ enums:
         description: Whole asymmetric unit / biological assembly.
       chain:
         description: One polypeptide / nucleic-acid chain.
+      domain:
+        description: A named structural domain.
       site:
         description: A named functional site (active site, interface, ...).
       residue:
@@ -270,6 +275,12 @@ enums:
       dataset:
         description: Diffraction data / cryo-EM map (not the model).
       ligand:
+      interface:
+        description: A named chain-chain or molecule-molecule interface.
+      ensemble:
+        description: An NMR or prediction ensemble.
+      assembly:
+        description: Biological assembly or multimeric complex.
 
 # ----------------------------------------------------------------------------
 # Slots — defined once, reused across classes
@@ -360,8 +371,28 @@ classes:
         range: ResidueRef
         multivalued: true
         inlined_as_list: true
+      secondary_structure_assignments:
+        range: SecondaryStructureAssignment
+        multivalued: true
+        inlined_as_list: true
+      domain_assignments:
+        range: DomainAssignment
+        multivalued: true
+        inlined_as_list: true
       sites:
         range: Site
+        multivalued: true
+        inlined_as_list: true
+      interface_qualities:
+        range: InterfaceQuality
+        multivalued: true
+        inlined_as_list: true
+      nmr_ensemble_qualities:
+        range: NmrEnsembleQuality
+        multivalued: true
+        inlined_as_list: true
+      prediction_ensemble_qualities:
+        range: PredictionEnsembleQuality
         multivalued: true
         inlined_as_list: true
       ligands:
@@ -812,6 +843,23 @@ classes:
           Per-residue scalars (lDDT, displacement, RSRZ, ...). The
           metric_definition_ref attached to the underlying value
           determines which PerResidueQuality slot they feed.
+      secondary_structure_assignments:
+        range: SecondaryStructureAssignment
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          DSSP/STRIDE-style secondary-structure assignment rows. When
+          an eval reports scope=domain/classification content, these
+          rows make the assignment explicit instead of burying it in
+          prose.
+      domain_assignments:
+        range: DomainAssignment
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Domain and fold-classification rows from CATH/SCOPe/ECOD or
+          equivalent tools. Domain-scoped measurements should point at
+          one of these via scope_selector.
       sites:
         range: Site
         multivalued: true
@@ -828,6 +876,30 @@ classes:
         description: >-
           Ligands referenced by sites. Same fail-hard contract as
           sites: scope=ligand measurement implies a Ligand row.
+      interface_qualities:
+        range: InterfaceQuality
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Interface/assembly rows. Interface-scoped measurements should
+          identify one of these rows via scope_selector.
+      nmr_ensemble_qualities:
+        range: NmrEnsembleQuality
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          NMR ensemble/restraint validation rows. Ensemble-scoped NMR
+          measurements should identify one of these rows via
+          scope_selector.
+      prediction_ensemble_qualities:
+        range: PredictionEnsembleQuality
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Prediction ensemble convergence rows for AlphaFold/ColabFold/
+          RoseTTAFold-style replicate ensembles. Ensemble-scoped
+          predicted-model measurements should identify one of these rows
+          via scope_selector.
       pairwise_comparisons:
         range: PairwiseComparison
         multivalued: true
@@ -906,6 +978,26 @@ classes:
         range: PredictedConfidenceSummary
         inlined: true
         description: AlphaFold/RoseTTAFold confidence (pLDDT distribution, PAE). Optional; only for predicted models.
+      packing_summary:
+        range: PackingSummary
+        inlined: true
+        description: Optional packing and buried-H-bond diagnostics.
+      classification_summary:
+        range: ClassificationSummary
+        inlined: true
+        description: Optional secondary-structure/domain/fold classification snapshot.
+      interface_quality_summary:
+        range: InterfaceQualitySummary
+        inlined: true
+        description: Optional interface and assembly-quality snapshot.
+      prediction_ensemble_summary:
+        range: PredictionEnsembleSummary
+        inlined: true
+        description: Optional prediction ensemble convergence snapshot.
+      nmr_validation_summary:
+        range: NmrValidationSummary
+        inlined: true
+        description: Optional NMR restraint and ensemble validation snapshot.
       pairwise_comparisons:
         range: PairwiseComparison
         multivalued: true
@@ -1016,6 +1108,18 @@ classes:
         range: TypedMeasurementValue
         inlined: true
         description: Number of Cβ-deviation outliers (> 0.25 Å from ideal).
+      ramachandran_z_score:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Ramachandran-Z distribution score against a high-resolution reference.
+      packing_z_score:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Packing-quality Z-score against a structural reference distribution.
+      unsatisfied_buried_hbond_count:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Count of buried polar groups lacking a satisfying hydrogen bond.
 
   RefinementSummary:
     description: Headline R-factors as of QDS issue date (X-ray refinement only).
@@ -1032,6 +1136,14 @@ classes:
       r_free_gap:
         range: TypedMeasurementValue
         inlined: true
+      r_free_trajectory_stability:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Stability of the R-free trajectory across refinement rounds.
+      diffraction_precision_index:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Diffraction precision index estimate of coordinate precision.
 
   MapSummary:
     description: >-
@@ -1090,6 +1202,18 @@ classes:
         range: TypedMeasurementValue
         inlined: true
         description: Standard deviation of local-resolution distribution.
+      directional_resolution_anisotropy:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Directional resolution anisotropy from 3DFSC-style analysis.
+      local_model_map_fsc_q:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Local FSC-Q or equivalent per-model-map agreement summary.
+      rscc_outlier_fraction:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Fraction of residues with poor real-space correlation.
 
   CrossToolCoverage:
     description: >-
@@ -1187,6 +1311,109 @@ classes:
           For multimers — the minimum PAE in the off-diagonal block
           between subunits. Low values indicate confident inter-subunit
           placement; > 15 Å typically unreliable.
+      predicted_tm_score:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Predicted TM-score (pTM) for the model.
+      interface_predicted_tm_score:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Interface predicted TM-score (ipTM) for multimers.
+      prediction_ensemble_convergence:
+        range: TypedMeasurementValue
+        inlined: true
+        description: Convergence score across prediction ensemble replicates.
+
+  PackingSummary:
+    description: Packing and buried-H-bond diagnostics that complement generic geometry.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      packing_z_score:
+        range: TypedMeasurementValue
+        inlined: true
+      unsatisfied_buried_hbond_count:
+        range: TypedMeasurementValue
+        inlined: true
+      b_factor_outlier_z:
+        range: TypedMeasurementValue
+        inlined: true
+
+  ClassificationSummary:
+    description: Secondary-structure, domain, and fold-classification assignments.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      secondary_structure_assignment:
+        range: TypedMeasurementValue
+        inlined: true
+      structural_domain_assignment:
+        range: TypedMeasurementValue
+        inlined: true
+      fold_classification:
+        range: TypedMeasurementValue
+        inlined: true
+      secondary_structure_assignments:
+        range: SecondaryStructureAssignment
+        multivalued: true
+        inlined_as_list: true
+      domain_assignments:
+        range: DomainAssignment
+        multivalued: true
+        inlined_as_list: true
+
+  InterfaceQualitySummary:
+    description: Interface and biological-assembly quality summary.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      interface_buried_surface_area:
+        range: TypedMeasurementValue
+        inlined: true
+      interface_dockq_score:
+        range: TypedMeasurementValue
+        inlined: true
+      capri_interface_quality_class:
+        range: TypedMeasurementValue
+        inlined: true
+      interface_qualities:
+        range: InterfaceQuality
+        multivalued: true
+        inlined_as_list: true
+
+  PredictionEnsembleSummary:
+    description: Prediction ensemble convergence and replicate quality.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      prediction_ensemble_convergence:
+        range: TypedMeasurementValue
+        inlined: true
+      prediction_ensemble_qualities:
+        range: PredictionEnsembleQuality
+        multivalued: true
+        inlined_as_list: true
+
+  NmrValidationSummary:
+    description: NMR restraint and ensemble validation summary.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      nmr_restraint_violation_summary:
+        range: TypedMeasurementValue
+        inlined: true
+      nmr_ensemble_precision_rmsd:
+        range: TypedMeasurementValue
+        inlined: true
+      nmr_ensemble_qualities:
+        range: NmrEnsembleQuality
+        multivalued: true
+        inlined_as_list: true
 
   PairwiseComparison:
     description: >-
@@ -1466,6 +1693,26 @@ classes:
           Real-space R-factor Z-score per residue (wwPDB validation).
           RSRZ > 2 flags poor real-space density agreement for that
           residue.
+      rscc_per_residue:
+        range: PerResidueValue
+        multivalued: true
+        inlined_as_list: true
+        description: Per-residue real-space correlation coefficient.
+      b_factor_z_per_residue:
+        range: PerResidueValue
+        multivalued: true
+        inlined_as_list: true
+        description: Per-residue B-factor Z-score against local/model distribution.
+      secondary_structure_per_residue:
+        range: PerResidueValue
+        multivalued: true
+        inlined_as_list: true
+        description: Per-residue secondary-structure labels encoded as measurement values.
+      fsc_q_per_residue:
+        range: PerResidueValue
+        multivalued: true
+        inlined_as_list: true
+        description: Per-residue FSC-Q or equivalent local model-map agreement values.
       outliers:
         range: ResidueOutlier
         multivalued: true
@@ -1479,6 +1726,139 @@ classes:
         range: FlaggedRegion
         multivalued: true
         inlined_as_list: true
+
+  SecondaryStructureAssignment:
+    description: DSSP/STRIDE-style assignment for a residue range.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      structure_ref:
+        range: Structure
+        required: true
+      chain_id:
+        required: true
+      residue_start:
+        range: integer
+        required: true
+      residue_end:
+        range: integer
+        required: true
+      assignment:
+        required: true
+        description: Secondary-structure label or code (e.g. helix, sheet, coil, H, E).
+      confidence:
+        range: TypedMeasurementValue
+        inlined: true
+      tool_ref:
+        range: Tool
+      notes:
+
+  DomainAssignment:
+    description: Structural domain and fold-classification assignment.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      structure_ref:
+        range: Structure
+        required: true
+      chain_id:
+        description: Chain containing the assigned domain.
+      residue_start:
+        range: integer
+      residue_end:
+        range: integer
+      classification_scheme:
+        description: CATH, SCOPe, ECOD, or another named scheme.
+      classification_id:
+        description: Scheme-specific identifier.
+      fold_name:
+        description: Human-readable fold/class name.
+      domain_label:
+        description: Local stable label for this domain assignment.
+      confidence:
+        range: TypedMeasurementValue
+        inlined: true
+      tool_ref:
+        range: Tool
+      notes:
+
+  InterfaceQuality:
+    description: Structured quality record for one interface or assembly contact.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      structure_ref:
+        range: Structure
+        required: true
+      interface_label:
+        description: Stable local label for the interface.
+      chain_id_1:
+        description: First partner chain or component selector.
+      chain_id_2:
+        description: Second partner chain or component selector.
+      partner_1_selector:
+        description: Free-text selector for partner 1 when a chain id is insufficient.
+      partner_2_selector:
+        description: Free-text selector for partner 2 when a chain id is insufficient.
+      buried_surface_area:
+        range: TypedMeasurementValue
+        inlined: true
+      dockq_score:
+        range: TypedMeasurementValue
+        inlined: true
+      capri_quality_class:
+        range: TypedMeasurementValue
+        inlined: true
+      tool_ref:
+        range: Tool
+      notes:
+
+  NmrEnsembleQuality:
+    description: Structured NMR ensemble/restraint validation record.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      structure_ref:
+        range: Structure
+        required: true
+      ensemble_label:
+      model_count:
+        range: integer
+      restraint_violation_summary:
+        range: TypedMeasurementValue
+        inlined: true
+      ensemble_precision_rmsd:
+        range: TypedMeasurementValue
+        inlined: true
+      tool_ref:
+        range: Tool
+      notes:
+
+  PredictionEnsembleQuality:
+    description: Structured predicted-model ensemble convergence record.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      structure_ref:
+        range: Structure
+        required: true
+      ensemble_label:
+      model_count:
+        range: integer
+      convergence:
+        range: TypedMeasurementValue
+        inlined: true
+      diversity:
+        range: TypedMeasurementValue
+        inlined: true
+      tool_ref:
+        range: Tool
+      notes:
 
   Ligand:
     description: >-
