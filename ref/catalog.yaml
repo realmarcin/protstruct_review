@@ -370,6 +370,7 @@ catalog_tasks:
   - T13_wilson_b
   - T13_tncs_flag
   - T13_ice-ring_flags
+  - T13_aimless_status
   inputs_description: merged or unmerged reflection data (MTZ/SCA/CIF)
   gold_standard: publication Table 1; aimless log on same reflections
   example_dataset: PHENIX xtriage tutorial MTZ; PDB-REDO MTZs
@@ -1332,6 +1333,14 @@ metric_definitions:
   - T13
 - id: T13_ice-ring_flags
   name: ice-ring flags
+  applicable_task_refs:
+  - T13
+- id: T13_aimless_status
+  name: aimless run status
+  description: >-
+    Provenance/status row for the CCP4 aimless attempt when the input
+    data cannot produce aimless completeness, CC½, or I/σ(I) metrics
+    (for example, merged-only amplitudes without M/ISYM).
   applicable_task_refs:
   - T13
 - id: T14_h_added

@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import copy
 import sys
+import tempfile
 from pathlib import Path
 
 import yaml
@@ -111,31 +112,31 @@ def test_negative_site_scope_without_site_decl_fails() -> None:
         r["sites"] = []
         r["ligands"] = []
 
-    bad_path = REPO / "/tmp/eval_bad_no_sites.yaml"
-    bad_path.parent.mkdir(parents=True, exist_ok=True)
-    bad_path.write_text(yaml.safe_dump(bad, sort_keys=False))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bad_path = Path(tmpdir) / "eval_bad_no_sites.yaml"
+        bad_path.write_text(yaml.safe_dump(bad, sort_keys=False))
 
-    try:
-        qds_emit.emit_qds(
-            [bad_path], qds_id="QDS_bad_test", structure_id="synth1"
-        )
-    except qds_emit.QdsCompletenessError as e:
-        msg = str(e)
-        _check(
-            "scope=site" in msg or "site_qualities" in msg,
-            f"emitter raised but message lacks scope-site context: {msg!r}",
-        )
-        print("PASS  test_negative_site_scope_without_site_decl_fails")
-        return
-    except SystemExit as e:
-        # QdsCompletenessError is a SystemExit subclass — accept either.
-        msg = str(e)
-        _check(
-            "scope=site" in msg or "site_qualities" in msg,
-            f"emitter exited but message lacks scope-site context: {msg!r}",
-        )
-        print("PASS  test_negative_site_scope_without_site_decl_fails")
-        return
+        try:
+            qds_emit.emit_qds(
+                [bad_path], qds_id="QDS_bad_test", structure_id="synth1"
+            )
+        except qds_emit.QdsCompletenessError as e:
+            msg = str(e)
+            _check(
+                "scope=site" in msg or "site_qualities" in msg,
+                f"emitter raised but message lacks scope-site context: {msg!r}",
+            )
+            print("PASS  test_negative_site_scope_without_site_decl_fails")
+            return
+        except SystemExit as e:
+            # QdsCompletenessError is a SystemExit subclass — accept either.
+            msg = str(e)
+            _check(
+                "scope=site" in msg or "site_qualities" in msg,
+                f"emitter exited but message lacks scope-site context: {msg!r}",
+            )
+            print("PASS  test_negative_site_scope_without_site_decl_fails")
+            return
     _check(False, "emit_qds did not fail when site-scope measurement had no Site declared")
 
 
@@ -204,28 +205,28 @@ def test_negative_structured_scopes_without_rows_fail() -> None:
         r["prediction_ensemble_qualities"] = []
         r["nmr_ensemble_qualities"] = []
 
-    bad_path = REPO / "/tmp/eval_bad_no_structured_scopes.yaml"
-    bad_path.parent.mkdir(parents=True, exist_ok=True)
-    bad_path.write_text(yaml.safe_dump(bad, sort_keys=False))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bad_path = Path(tmpdir) / "eval_bad_no_structured_scopes.yaml"
+        bad_path.write_text(yaml.safe_dump(bad, sort_keys=False))
 
-    try:
-        qds_emit.emit_qds(
-            [bad_path], qds_id="QDS_bad_structured_test", structure_id="synth_quality"
-        )
-    except qds_emit.QdsCompletenessError as e:
-        msg = str(e)
-        _check("scope=domain" in msg, f"missing domain-scope error context: {msg!r}")
-        _check("scope=interface" in msg, f"missing interface-scope error context: {msg!r}")
-        _check("scope=ensemble" in msg, f"missing ensemble-scope error context: {msg!r}")
-        print("PASS  test_negative_structured_scopes_without_rows_fail")
-        return
-    except SystemExit as e:
-        msg = str(e)
-        _check("scope=domain" in msg, f"missing domain-scope error context: {msg!r}")
-        _check("scope=interface" in msg, f"missing interface-scope error context: {msg!r}")
-        _check("scope=ensemble" in msg, f"missing ensemble-scope error context: {msg!r}")
-        print("PASS  test_negative_structured_scopes_without_rows_fail")
-        return
+        try:
+            qds_emit.emit_qds(
+                [bad_path], qds_id="QDS_bad_structured_test", structure_id="synth_quality"
+            )
+        except qds_emit.QdsCompletenessError as e:
+            msg = str(e)
+            _check("scope=domain" in msg, f"missing domain-scope error context: {msg!r}")
+            _check("scope=interface" in msg, f"missing interface-scope error context: {msg!r}")
+            _check("scope=ensemble" in msg, f"missing ensemble-scope error context: {msg!r}")
+            print("PASS  test_negative_structured_scopes_without_rows_fail")
+            return
+        except SystemExit as e:
+            msg = str(e)
+            _check("scope=domain" in msg, f"missing domain-scope error context: {msg!r}")
+            _check("scope=interface" in msg, f"missing interface-scope error context: {msg!r}")
+            _check("scope=ensemble" in msg, f"missing ensemble-scope error context: {msg!r}")
+            print("PASS  test_negative_structured_scopes_without_rows_fail")
+            return
     _check(False, "emit_qds did not fail when structured-scope rows were missing")
 
 

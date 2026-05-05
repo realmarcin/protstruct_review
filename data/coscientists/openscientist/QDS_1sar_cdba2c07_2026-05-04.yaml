@@ -43,8 +43,6 @@ quality_data_sheets:
       value_numeric: 0.0526
   data_quality_summary:
     id: QDS_1sar_cdba2c07_2026-05-04_data_quality
-    completeness_overall_pct:
-      value_text: aimless aborted (input is merged)
     wilson_b:
       value_numeric: 14.542
       unit: Å²
@@ -591,16 +589,6 @@ quality_data_sheets:
       external implementation exists. Cross-check the inputs (clashscore, Ramachandran,
       rotamer) against MolProbity standalone.
     as_of_date: '2026-04-26'
-  - id: REC_T13_completeness_overall_top_considered
-    metric_definition_ref: T13_completeness_overall_outer
-    tool_ref: phenix.xtriage
-    role: top_considered
-    rank: 1
-    justification: Catalog T13 oracle. Cross-check with CCP4 aimless when CCP4 is
-      installed.
-    evidence_refs:
-    - EvansMurshudov2013
-    as_of_date: '2026-04-26'
   - id: REC_T05_bond_length_rmsz_top_considered
     metric_definition_ref: T05_bond-length_rmsz
     tool_ref: phenix.holton_geometry_validation
@@ -689,14 +677,6 @@ quality_data_sheets:
       rank 1 once REFMAC re-refinement is the default path.
     evidence_refs:
     - Joosten2012
-    as_of_date: '2026-04-30'
-  - id: REC_T13_completeness_outer_top_performing
-    metric_definition_ref: T13_completeness_overall_outer
-    tool_ref: aimless
-    role: top_performing
-    rank: 1
-    justification: CCP4 aimless is the canonical data-processing tool for completeness,
-      ⟨I/σ⟩, and CC½ statistics. Catalog T13 oracle (catalog notes name it explicitly).
     as_of_date: '2026-04-30'
   assumptions_report:
   - id: ASSUM_tmalign_tm_score_normaliser

@@ -6,7 +6,7 @@ back to ctruncate, which does work on merged amplitudes and is also
 non_cctbx.
 
 Parses Wilson B, L-test twin fraction, moments-based twin estimate,
-anisotropy ΔB, tNCS flag, ice-ring flag, and overall completeness.
+anisotropy ΔB, tNCS flag, and ice-ring flags.
 Prints a YAML fragment of EvaluationMeasurement rows ready to paste
 into an existing EvaluationRun's `measurements:` section.
 
@@ -24,7 +24,6 @@ Notes:
 from __future__ import annotations
 
 import argparse
-import os
 import re
 import shutil
 import subprocess
@@ -240,7 +239,7 @@ def render_yaml(stats: dict, eval_id: str, aimless: dict) -> str:
     lines.append(f"  - id: {eval_id}_M_t13_aimless_attempt")
     lines.append(f"    catalog_task_ref: T13")
     lines.append(f"    stage: all")
-    lines.append(f"    metric_definition_ref: T13_completeness_overall_outer")
+    lines.append(f"    metric_definition_ref: T13_aimless_status")
     lines.append(f"    oracle_tool_ref: CCP4 aimless")
     lines.append(f"    oracle_family: non_cctbx")
     lines.append(f"    agent_claim:")
