@@ -888,6 +888,62 @@ evaluation_runs:
     pass_criterion: < 1 σ for well-refined model
     pass_status: pass
     notes: Closes the cctbx-only gap on angle RMSZ. zANGL 0.864 σ.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_servalcat_sigmaa_rwork
+    catalog_task_ref: T03
+    stage: final
+    scope: complex
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: Servalcat
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.149
+    oracle_measure:
+      value_numeric: 0.1705
+    delta:
+      value_numeric: 0.0215
+    pass_criterion: match within 0.005
+    pass_status: fail_by_oracle
+    notes: 'Servalcat 0.4.131 `sigmaa` per-bin Rwork from sigma-A weighting (Murshudov-group
+      code path, separate from REFMAC5 minimiser). Fourth independent R-work measurement:
+      0.156 (PHENIX) / 0.164 (gemmi) / 0.169 (REFMAC5) / 0.171 (Servalcat) — bracket
+      tightens around 0.16-0.17. Agent''s 0.149 is below all four. Re-run on 2026-05-05.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_servalcat_sigmaa_rfree
+    catalog_task_ref: T03
+    stage: final
+    scope: complex
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: Servalcat
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.199
+    oracle_measure:
+      value_numeric: 0.2209
+    delta:
+      value_numeric: 0.0219
+    pass_criterion: match within 0.005
+    pass_status: fail_by_oracle
+    notes: 'Servalcat 0.4.131 `sigmaa` per-bin Rfree (n_free=362). Fourth independent
+      R-free measurement: 0.211 (PHENIX) / 0.217 (gemmi) / 0.213 (REFMAC5) / 0.221
+      (Servalcat) — all four code paths above 0.21. Agent''s 0.199 is reproducibly
+      below the bracket. Re-run on 2026-05-05.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_servalcat_sigmaa_gap
+    catalog_task_ref: T03
+    stage: final
+    scope: complex
+    metric_definition_ref: T03_r-free_r-work_gap
+    oracle_tool_ref: Servalcat
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.05
+    oracle_measure:
+      value_numeric: 0.0504
+    delta:
+      value_numeric: 0.0004
+    pass_criterion: gap < 0.05
+    pass_status: fail_by_oracle
+    notes: 'Servalcat sigmaa Rfree-Rwork gap = 0.0504. Catalog oracle of record (PHENIX)
+      reports 0.0552; gemmi 0.0526; REFMAC5 0.0435; Servalcat 0.0504 — three of four
+      code paths fail the < 0.05 criterion. Re-run on 2026-05-05.'
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_prosmart_global_rmsd
     catalog_task_ref: T01
     stage: final

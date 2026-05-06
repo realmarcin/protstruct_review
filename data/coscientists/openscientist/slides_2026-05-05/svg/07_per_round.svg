@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">T03 — Per-round trajectory · oracle re-measurement (2026-05-05)</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">Round 6 R-free 0.207 beats round 7 R-free 0.212 · NCS-torsion claim doesn’t reproduce at oracle scaling</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-05</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-05</text>
+
+  <rect x="120" y="220" width="1100" height="540" fill="#ffffff" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="220" y1="700.0" x2="1190" y2="700.0" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="208" y="705.0" font-size="14" fill="#5a6071" text-anchor="end">0.10</text>
+  <line x1="220" y1="625.0" x2="1190" y2="625.0" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="208" y="630.0" font-size="14" fill="#5a6071" text-anchor="end">0.15</text>
+  <line x1="220" y1="550.0" x2="1190" y2="550.0" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="208" y="555.0" font-size="14" fill="#5a6071" text-anchor="end">0.20</text>
+  <line x1="220" y1="475.00000000000006" x2="1190" y2="475.00000000000006" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="208" y="480.00000000000006" font-size="14" fill="#5a6071" text-anchor="end">0.25</text>
+  <line x1="220" y1="400.00000000000006" x2="1190" y2="400.00000000000006" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="208" y="405.00000000000006" font-size="14" fill="#5a6071" text-anchor="end">0.30</text>
+  <line x1="220" y1="325.00000000000006" x2="1190" y2="325.00000000000006" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="208" y="330.00000000000006" font-size="14" fill="#5a6071" text-anchor="end">0.35</text>
+  <line x1="220" y1="250.0" x2="1190" y2="250.0" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="208" y="255.0" font-size="14" fill="#5a6071" text-anchor="end">0.40</text>
+  <rect x="260.8333333333333" y="350.5" width="36" height="349.5" fill="#1f4e8c"/>
+  <text x="278.8333333333333" y="344.5" font-size="14" fill="#1f4e8c" text-anchor="middle" font-weight="700">0.333</text>
+  <rect x="304.8333333333333" y="256.0" width="36" height="444.0" fill="#a8201a"/>
+  <text x="322.8333333333333" y="250.0" font-size="14" fill="#a8201a" text-anchor="middle" font-weight="700">0.396</text>
+  <text x="300.8333333333333" y="725" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">round start</text>
+  <rect x="422.5" y="596.5" width="36" height="103.5" fill="#1f4e8c"/>
+  <text x="440.5" y="590.5" font-size="14" fill="#1f4e8c" text-anchor="middle" font-weight="700">0.169</text>
+  <rect x="466.5" y="505.0" width="36" height="195.0" fill="#a8201a"/>
+  <text x="484.5" y="499.0" font-size="14" fill="#a8201a" text-anchor="middle" font-weight="700">0.230</text>
+  <text x="462.5" y="725" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">round 2</text>
+  <rect x="584.1666666666666" y="611.5" width="36" height="88.5" fill="#1f4e8c"/>
+  <text x="602.1666666666666" y="605.5" font-size="14" fill="#1f4e8c" text-anchor="middle" font-weight="700">0.159</text>
+  <rect x="628.1666666666666" y="526.0" width="36" height="174.0" fill="#a8201a"/>
+  <text x="646.1666666666666" y="520.0" font-size="14" fill="#a8201a" text-anchor="middle" font-weight="700">0.216</text>
+  <text x="624.1666666666666" y="725" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">round 3</text>
+  <rect x="745.8333333333333" y="616.0" width="36" height="84.0" fill="#1f4e8c"/>
+  <text x="763.8333333333333" y="610.0" font-size="14" fill="#1f4e8c" text-anchor="middle" font-weight="700">0.156</text>
+  <rect x="789.8333333333333" y="535.0" width="36" height="165.0" fill="#a8201a"/>
+  <text x="807.8333333333333" y="529.0" font-size="14" fill="#a8201a" text-anchor="middle" font-weight="700">0.210</text>
+  <text x="785.8333333333333" y="725" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">round 5</text>
+  <rect x="907.5" y="619.0" width="36" height="81.0" fill="#1f4e8c"/>
+  <text x="925.5" y="613.0" font-size="14" fill="#1f4e8c" text-anchor="middle" font-weight="700">0.154</text>
+  <rect x="951.5" y="539.5" width="36" height="160.5" fill="#a8201a"/>
+  <text x="969.5" y="533.5" font-size="14" fill="#a8201a" text-anchor="middle" font-weight="700">0.207</text>
+  <text x="947.5" y="725" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">round 6</text>
+  <rect x="1069.1666666666665" y="616.0" width="36" height="84.0" fill="#1f4e8c"/>
+  <text x="1087.1666666666665" y="610.0" font-size="14" fill="#1f4e8c" text-anchor="middle" font-weight="700">0.156</text>
+  <rect x="1113.1666666666665" y="532.0" width="36" height="168.0" fill="#a8201a"/>
+  <text x="1131.1666666666665" y="526.0" font-size="14" fill="#a8201a" text-anchor="middle" font-weight="700">0.212</text>
+  <text x="1109.1666666666665" y="725" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">round 7 final</text>
+  <rect x="899.5" y="246" width="253.66666666666652" height="458" fill="none" stroke="#b07c00" stroke-width="3" stroke-dasharray="6,4" rx="6"/>
+  <rect x="970" y="260" width="14" height="14" fill="#1f4e8c"/>
+  <text x="990" y="272" font-size="16" fill="#1a1a2e">R-work (oracle)</text>
+  <rect x="970" y="284" width="14" height="14" fill="#a8201a"/>
+  <text x="990" y="296" font-size="16" fill="#1a1a2e">R-free (oracle)</text>
+  <rect x="1250" y="220" width="590" height="540" rx="10" fill="#fbeecb" stroke="#b07c00" stroke-width="2"/>
+  <text x="1270" y="265" font-size="22" font-weight="700" fill="#b07c00">Round 6 → Round 7</text>
+  <text x="1270" y="305" font-size="18" fill="#1a1a2e">R-free <tspan font-weight="700">0.207 → 0.212</tspan></text>
+  <text x="1270" y="335" font-size="18" fill="#1a1a2e">Δ = +0.005 (worse)</text>
+  <text x="1270" y="385" font-size="16" fill="#1a1a2e">Agent claims round-7 NCS torsion restraints reduced the gap.</text>
+  <text x="1270" y="420" font-size="16" fill="#1a1a2e">Oracle scaling shows the opposite: a small but reproducible regression.</text>
+  <text x="1270" y="470" font-size="14" fill="#5a6071">ASSUM_report_round_table_collapses_rounds</text>
+  <text x="1270" y="492" font-size="14" fill="#5a6071">known_violation · hardened by per-round oracle.</text>
+</svg>

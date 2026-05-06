@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">Oracle stack — 11 independent code paths</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">9 non-cctbx · trust comes from cross-family agreement, not from any single tool · re-run 2026-05-05</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-05</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-05</text>
+
+  <text x="80" y="200" font-size="26" font-weight="700" fill="#1f4e8c">cctbx family (1)</text>
+  <rect x="80" y="220" width="600" height="40" rx="6" fill="#dce6f4"/>
+  <text x="100" y="248" font-size="20" fill="#1a1a2e">PHENIX (mmtbx · phenix.* binaries)</text>
+  <text x="80" y="320" font-size="26" font-weight="700" fill="#1f4e8c">non-cctbx (10 binaries across 9 code paths)</text>
+  <rect x="80" y="340" width="380" height="38" rx="6" fill="#dff0e1"/>
+  <text x="100" y="367" font-size="18" font-weight="700" fill="#1a1a2e">MolProbity standalone</text>
+  <text x="480" y="367" font-size="17" fill="#5a6071">Richardson lab — probe + reduce</text>
+  <rect x="80" y="384" width="380" height="38" rx="6" fill="#dff0e1"/>
+  <text x="100" y="411" font-size="18" font-weight="700" fill="#1a1a2e">TM-align</text>
+  <text x="480" y="411" font-size="17" fill="#5a6071">Zhang lab — sequence-independent superposition</text>
+  <rect x="80" y="428" width="380" height="38" rx="6" fill="#dff0e1"/>
+  <text x="100" y="455" font-size="18" font-weight="700" fill="#1a1a2e">gemmi</text>
+  <text x="480" y="455" font-size="17" fill="#5a6071">Global Phasing / CCP4 — sfcalc, R-factors, RMSD</text>
+  <rect x="80" y="472" width="380" height="38" rx="6" fill="#dff0e1"/>
+  <text x="100" y="499" font-size="18" font-weight="700" fill="#1a1a2e">Servalcat sigmaa (NEW R-work/R-free)</text>
+  <text x="480" y="499" font-size="17" fill="#5a6071">Murshudov — direct R-work/R-free + σ_A</text>
+  <rect x="80" y="516" width="380" height="38" rx="6" fill="#dff0e1"/>
+  <text x="100" y="543" font-size="18" font-weight="700" fill="#1a1a2e">OpenStructure (OST)</text>
+  <text x="480" y="543" font-size="17" fill="#5a6071">SIB — lDDT, structure assessment</text>
+  <rect x="80" y="560" width="380" height="38" rx="6" fill="#dff0e1"/>
+  <text x="100" y="587" font-size="18" font-weight="700" fill="#1a1a2e">REFMAC5</text>
+  <text x="480" y="587" font-size="17" fill="#5a6071">CCP4 — independent refinement engine, NCYC=0 R-factors</text>
+  <rect x="80" y="604" width="380" height="38" rx="6" fill="#dff0e1"/>
+  <text x="100" y="631" font-size="18" font-weight="700" fill="#1a1a2e">ProSMART</text>
+  <text x="480" y="631" font-size="17" fill="#5a6071">CCP4 / Murshudov — Procrustes geometry analysis</text>
+  <rect x="80" y="648" width="380" height="38" rx="6" fill="#dff0e1"/>
+  <text x="100" y="675" font-size="18" font-weight="700" fill="#1a1a2e">CheckMyMetal-local</text>
+  <text x="480" y="675" font-size="17" fill="#5a6071">Zheng-criteria geometry classifier (local heuristic)</text>
+  <rect x="80" y="692" width="380" height="38" rx="6" fill="#dff0e1"/>
+  <text x="100" y="719" font-size="18" font-weight="700" fill="#1a1a2e">ctruncate</text>
+  <text x="480" y="719" font-size="17" fill="#5a6071">CCP4 — Wilson B · L-test twinning · ΔB aniso · tNCS · ice rings</text>
+  <text x="1100" y="200" font-size="26" font-weight="700" fill="#1f4e8c">Cross-tool coverage by task — fully closed</text>
+  <rect x="1100" y="230" width="780" height="46" fill="#1f4e8c"/>
+  <text x="1114" y="259.0" font-size="18" font-weight="700" fill="#ffffff" text-anchor="start">Task</text>
+  <text x="1314" y="259.0" font-size="18" font-weight="700" fill="#ffffff" text-anchor="start">cctbx</text>
+  <text x="1554" y="259.0" font-size="18" font-weight="700" fill="#ffffff" text-anchor="start">non-cctbx</text>
+  <text x="1835.0" y="259.0" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">Status</text>
+  <rect x="1100" y="276" width="780" height="46" fill="#ffffff"/>
+  <text x="1114" y="304.0" font-size="15" fill="#1a1a2e" text-anchor="start">T01 RMSD/superpose</text>
+  <text x="1314" y="304.0" font-size="15" fill="#1a1a2e" text-anchor="start">phenix.superpose_models</text>
+  <text x="1554" y="304.0" font-size="15" fill="#1a1a2e" text-anchor="start">TM-align · gemmi · OST · ProSMART</text>
+  <rect x="1790" y="276" width="90" height="46" fill="#1f7a3f"/>
+  <text x="1835.0" y="304.0" font-size="15" fill="#ffffff" text-anchor="middle">closed</text>
+  <rect x="1100" y="322" width="780" height="46" fill="#f7f8fb"/>
+  <text x="1114" y="350.0" font-size="15" fill="#1a1a2e" text-anchor="start">T03 R-factors</text>
+  <text x="1314" y="350.0" font-size="15" fill="#1a1a2e" text-anchor="start">phenix.model_vs_data</text>
+  <text x="1554" y="350.0" font-size="15" fill="#1a1a2e" text-anchor="start">gemmi · Servalcat sigmaa · REFMAC5</text>
+  <rect x="1790" y="322" width="90" height="46" fill="#1f7a3f"/>
+  <text x="1835.0" y="350.0" font-size="15" fill="#ffffff" text-anchor="middle">strengthened</text>
+  <rect x="1100" y="368" width="780" height="46" fill="#ffffff"/>
+  <text x="1114" y="396.0" font-size="15" fill="#1a1a2e" text-anchor="start">T05 Geometry</text>
+  <text x="1314" y="396.0" font-size="15" fill="#1a1a2e" text-anchor="start">mmtbx.validation_summary</text>
+  <text x="1554" y="396.0" font-size="15" fill="#1a1a2e" text-anchor="start">MolProbity · ProSMART · REFMAC5</text>
+  <rect x="1790" y="368" width="90" height="46" fill="#1f7a3f"/>
+  <text x="1835.0" y="396.0" font-size="15" fill="#ffffff" text-anchor="middle">closed</text>
+  <rect x="1100" y="414" width="780" height="46" fill="#f7f8fb"/>
+  <text x="1114" y="442.0" font-size="15" fill="#1a1a2e" text-anchor="start">T06 Density fit</text>
+  <text x="1314" y="442.0" font-size="15" fill="#1a1a2e" text-anchor="start">phenix.real_space_correlation</text>
+  <text x="1554" y="442.0" font-size="15" fill="#1a1a2e" text-anchor="start">gemmi · Servalcat</text>
+  <rect x="1790" y="414" width="90" height="46" fill="#1f7a3f"/>
+  <text x="1835.0" y="442.0" font-size="15" fill="#ffffff" text-anchor="middle">closed</text>
+  <rect x="1100" y="460" width="780" height="46" fill="#ffffff"/>
+  <text x="1114" y="488.0" font-size="15" fill="#1a1a2e" text-anchor="start">T10 Ligand / metal</text>
+  <text x="1314" y="488.0" font-size="15" fill="#1a1a2e" text-anchor="start">phenix.real_space_correlation</text>
+  <text x="1554" y="488.0" font-size="15" fill="#1a1a2e" text-anchor="start">CheckMyMetal-local</text>
+  <rect x="1790" y="460" width="90" height="46" fill="#1f7a3f"/>
+  <text x="1835.0" y="488.0" font-size="15" fill="#ffffff" text-anchor="middle">closed</text>
+  <rect x="1100" y="506" width="780" height="46" fill="#f7f8fb"/>
+  <text x="1114" y="534.0" font-size="15" fill="#1a1a2e" text-anchor="start">T13 Data quality</text>
+  <text x="1314" y="534.0" font-size="15" fill="#1a1a2e" text-anchor="start">phenix.model_vs_data</text>
+  <text x="1554" y="534.0" font-size="15" fill="#1a1a2e" text-anchor="start">ctruncate · CCP4 aimless</text>
+  <rect x="1790" y="506" width="90" height="46" fill="#1f7a3f"/>
+  <text x="1835.0" y="534.0" font-size="15" fill="#ffffff" text-anchor="middle">closed</text>
+  <rect x="1100" y="230" width="780" height="322" fill="none" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="1300" y1="230" x2="1300" y2="552" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="1540" y1="230" x2="1540" y2="552" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="1790" y1="230" x2="1790" y2="552" stroke="#e3e6ee" stroke-width="1"/>
+
+</svg>

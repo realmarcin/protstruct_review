@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">Skill checklist — protstruct-eval applied end-to-end (2026-05-05 re-run)</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">All 8 steps green · plus water / ligand / metal sub-checklist · every value re-measured today</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-05</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-05</text>
+
+  <rect x="80" y="190" width="1460" height="46" fill="#1f4e8c"/>
+  <text x="110.0" y="219.66666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="middle">#</text>
+  <text x="154" y="219.66666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="start">Step</text>
+  <text x="734" y="219.66666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="start">Result</text>
+  <rect x="80" y="236" width="1460" height="46" fill="#ffffff"/>
+  <text x="110.0" y="264.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="middle">1</text>
+  <text x="154" y="264.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">Re-derive R-factors with phenix.model_vs_data</text>
+  <text x="734" y="264.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">agent 0.149 / 0.199 · oracle 0.156 / 0.211</text>
+  <rect x="80" y="282" width="1460" height="46" fill="#f7f8fb"/>
+  <text x="110.0" y="310.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="middle">2</text>
+  <text x="154" y="310.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">Re-extract atom + water counts</text>
+  <text x="734" y="310.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">atoms 1641 vs 1654 · waters 146 vs 159 · both Δ −13</text>
+  <rect x="80" y="328" width="1460" height="46" fill="#ffffff"/>
+  <text x="110.0" y="356.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="middle">3</text>
+  <text x="154" y="356.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">Re-run peak finder at 4σ</text>
+  <text x="734" y="356.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">23 + / 8 − · agent listed 9 · max +6.18σ</text>
+  <rect x="80" y="374" width="1460" height="46" fill="#f7f8fb"/>
+  <text x="110.0" y="402.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="middle">4</text>
+  <text x="154" y="402.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">Verify quoted coordinates</text>
+  <text x="734" y="402.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">Ca²⁺ position 0.215 Å off (initial placement, not final)</text>
+  <rect x="80" y="420" width="1460" height="46" fill="#ffffff"/>
+  <text x="110.0" y="448.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="middle">5</text>
+  <text x="154" y="448.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">Anomalous-data check</text>
+  <text x="734" y="448.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">none in 1sar.mtz · closed by CheckMyMetal-style geometry</text>
+  <rect x="80" y="466" width="1460" height="46" fill="#f7f8fb"/>
+  <text x="110.0" y="494.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="middle">6</text>
+  <text x="154" y="494.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">Per-round Δ-claim</text>
+  <text x="734" y="494.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">round 6 R-free 0.2068 &lt; round 7 0.2116 (re-measured)</text>
+  <rect x="80" y="512" width="1460" height="46" fill="#ffffff"/>
+  <text x="110.0" y="540.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="middle">7</text>
+  <text x="154" y="540.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">Non-cctbx confirmation per finding</text>
+  <text x="734" y="540.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">9 / 11 oracles tagged · cross_tool_coverage all closed</text>
+  <rect x="80" y="558" width="1460" height="46" fill="#f7f8fb"/>
+  <text x="110.0" y="586.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="middle">8</text>
+  <text x="154" y="586.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">T13 data-quality oracle</text>
+  <text x="734" y="586.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">ctruncate: Wilson B 14.5 · L-test 0.03 · ΔB 7.3 · no tNCS · 1 borderline ice ring</text>
+  <rect x="80" y="190" width="1460" height="414" fill="none" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="140" y1="190" x2="140" y2="604" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="720" y1="190" x2="720" y2="604" stroke="#e3e6ee" stroke-width="1"/>
+
+  <text x="80" y="640" font-size="26" font-weight="700" fill="#1f4e8c">Water / ligand / metal sub-checklist</text>
+  <rect x="80" y="670" width="1460" height="44" fill="#1f4e8c"/>
+  <text x="94" y="698.6666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="start">Check</text>
+  <text x="520.0" y="698.6666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="middle">Done</text>
+  <text x="574" y="698.6666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="start">Result</text>
+  <rect x="80" y="714" width="1460" height="44" fill="#ffffff"/>
+  <text x="94" y="742.0" font-size="18" fill="#1a1a2e" text-anchor="start">Per-ion RSCC</text>
+  <rect x="480" y="714" width="80" height="44" fill="#1f7a3f"/>
+  <text x="520.0" y="742.0" font-size="18" fill="#ffffff" text-anchor="middle">✓</text>
+  <text x="574" y="742.0" font-size="18" fill="#1a1a2e" text-anchor="start">Ca²⁺ 0.972 · Na⁺ 0.964 · SO4 0.988 — all &gt; 0.85</text>
+  <rect x="80" y="758" width="1460" height="44" fill="#f7f8fb"/>
+  <text x="94" y="786.0" font-size="18" fill="#1a1a2e" text-anchor="start">Per-ion B-vs-protein</text>
+  <rect x="480" y="758" width="80" height="44" fill="#1f7a3f"/>
+  <text x="520.0" y="786.0" font-size="18" fill="#ffffff" text-anchor="middle">✓</text>
+  <text x="574" y="786.0" font-size="18" fill="#1a1a2e" text-anchor="start">Ca²⁺ 2.67× · Na⁺ 1.43× · SO4 1.10×</text>
+  <rect x="80" y="802" width="1460" height="44" fill="#ffffff"/>
+  <text x="94" y="830.0" font-size="18" fill="#1a1a2e" text-anchor="start">Coordination geometry</text>
+  <rect x="480" y="802" width="80" height="44" fill="#1f7a3f"/>
+  <text x="520.0" y="830.0" font-size="18" fill="#ffffff" text-anchor="middle">✓</text>
+  <text x="574" y="830.0" font-size="18" fill="#1a1a2e" text-anchor="start">CN = 3 inner-sphere both ions (low — partial-occ framing)</text>
+  <rect x="80" y="846" width="1460" height="44" fill="#f7f8fb"/>
+  <text x="94" y="874.0" font-size="18" fill="#1a1a2e" text-anchor="start">Element identity (geometry)</text>
+  <rect x="480" y="846" width="80" height="44" fill="#1f7a3f"/>
+  <text x="520.0" y="874.0" font-size="18" fill="#ffffff" text-anchor="middle">✓</text>
+  <text x="574" y="874.0" font-size="18" fill="#1a1a2e" text-anchor="start">CheckMyMetal-style: Mg²⁺ ruled out by |Z| 14–16</text>
+  <rect x="80" y="890" width="1460" height="44" fill="#ffffff"/>
+  <text x="94" y="918.0" font-size="18" fill="#1a1a2e" text-anchor="start">Element identity (anomalous)</text>
+  <rect x="480" y="890" width="80" height="44" fill="#5a6071"/>
+  <text x="520.0" y="918.0" font-size="18" fill="#ffffff" text-anchor="middle">n/a</text>
+  <text x="574" y="918.0" font-size="18" fill="#1a1a2e" text-anchor="start">no anomalous columns in 1sar.mtz</text>
+  <rect x="80" y="934" width="1460" height="44" fill="#f7f8fb"/>
+  <text x="94" y="962.0" font-size="18" fill="#1a1a2e" text-anchor="start">Per-water B + RSCC distribution</text>
+  <rect x="480" y="934" width="80" height="44" fill="#1f7a3f"/>
+  <text x="520.0" y="962.0" font-size="18" fill="#ffffff" text-anchor="middle">✓</text>
+  <text x="574" y="962.0" font-size="18" fill="#1a1a2e" text-anchor="start">mean B 20.76 · mean RSCC 0.867 · 3 waters RSCC &lt; 0.7</text>
+  <rect x="80" y="978" width="1460" height="44" fill="#ffffff"/>
+  <text x="94" y="1006.0" font-size="18" fill="#1a1a2e" text-anchor="start">Density-misfit ResidueOutliers</text>
+  <rect x="480" y="978" width="80" height="44" fill="#1f7a3f"/>
+  <text x="520.0" y="1006.0" font-size="18" fill="#ffffff" text-anchor="middle">✓</text>
+  <text x="574" y="1006.0" font-size="18" fill="#1a1a2e" text-anchor="start">HOH S 680, 707, 729</text>
+  <rect x="80" y="670" width="1460" height="352" fill="none" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="480" y1="670" x2="480" y2="1022" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="560" y1="670" x2="560" y2="1022" stroke="#e3e6ee" stroke-width="1"/>
+
+</svg>
