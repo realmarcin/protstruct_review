@@ -1,3 +1,8 @@
+---
+name: protstruct-eval
+description: Conventions for the protstruct_review harness — the task × evaluation catalog, per-task driving examples, PHENIX tool + independent oracle pairings, and the cross-tool trust model. Use when adding or editing catalog entries, authoring a driving_example_T<NN>.md, wiring an evaluation run, choosing an oracle for a structural-biology operation, or checking the PHENIX docs mirror.
+---
+
 # Protstruct Eval Skill
 
 Support work on the **protstruct_review** harness — a quality-assessment framework for agentically refined or generated protein structures, built around PHENIX with cross-tool oracles for trust.

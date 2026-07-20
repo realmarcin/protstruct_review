@@ -4,3 +4,10 @@ __pycache__/
 schemas/json-schema/
 .claude/scheduled_tasks.lock
 .claude/*.lock
+
+# Vendored external skill set — Matt Pocock's engineering skills (github.com/mattpocock/skills,
+# v1.2.0), installed locally and renamed with an mp- prefix. Not ours to version here.
+# Reinstall with: npx skills@latest add mattpocock/skills
+# docs/agents/ is that skill set's per-repo config (issue tracker, triage labels, domain docs).
+.claude/skills/mp-*/
+docs/agents/
