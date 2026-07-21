@@ -9,6 +9,9 @@ Provenance tags: `[catalog]` = stated in `ref/catalog.yaml`; `[literature]` = an
 standard (cited inline); `[oracle_tools]` = a constraint documented in `ref/oracle_tools.md`;
 `[calibration]` = a sanity check against the deposition.
 
+
+> **Thresholds are defined once** in `ref/thresholds_and_standards.md`; the `[provenance]` tags below point into it.
+
 ## Scenario
 
 The agent is handed a reflection file (MTZ/SCA/CIF), merged or unmerged, and asked to report data

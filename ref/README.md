@@ -12,6 +12,7 @@ This directory holds offline reference material and the key **task × evaluation
 | `tasks_and_evaluations.tsv` | Machine-loadable version of the same table (pipe-separated lists within tab-separated columns). **Generated** from `catalog.yaml`; `scripts/validate.sh` fails if it drifts. |
 | `driving_example.md` | Worked end-to-end example (**compare → refine → RMSD**) that exercises tasks T01 + T04 + T05 + T06 together. Template for the per-task driving examples. |
 | `driving_example_T{01,05,13}.md` | Per-task drivers for superposition+RMSD (T01), geometry validation (T05), and X-ray data quality (T13). Each grades cross-tool agreement and tags every threshold with its provenance. Remaining tasks tracked in issue #2. |
+| `thresholds_and_standards.md` | **Single source of truth** for every numeric threshold the harness scores against — outlier definitions, literature values, cross-tool agreement tolerances, calibration checks — each with a `[provenance]` tag. The driving examples cite it rather than restating values. |
 | `oracle_tools.md` | Install status of independent (non-cctbx) oracle tools the catalog requires (gemmi, TM-align, probe + reduce, Servalcat); per-task oracle assignment. |
 | `eval_naming.md` | Filename convention for `EVAL_*` evaluation reports (`EVAL_<structure>_<artifact-short-id>_<YYYY-MM-DD>.{md,tsv}`). |
 | `catalog.yaml` | Canonical machine-readable catalog (LinkML-validated). The `tasks_and_evaluations.tsv` above is regenerated from this YAML by `scripts/records_to_tsv.py`. Schema lives at `schemas/protstruct_review.yaml`. |

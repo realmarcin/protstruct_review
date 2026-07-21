@@ -9,6 +9,9 @@ Provenance tags: `[catalog]` = the gold-standard tolerance stated in `ref/catalo
 `[template]` = a check reused from `ref/driving_example.md`; `[literature]` = an established
 community threshold (cited inline); `[calibration]` = a sanity check against a known case.
 
+
+> **Thresholds are defined once** in `ref/thresholds_and_standards.md`; the `[provenance]` tags below point into it.
+
 ## Scenario
 
 The agent is handed two models — a **fixed** reference and a **moving** candidate — and asked to

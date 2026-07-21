@@ -13,6 +13,9 @@ adjust it. Tags: `[schema]` = a threshold committed in `schemas/protstruct_revie
 `[template]` = the agreement tolerance already used in `ref/driving_example.md`; `[calibration]` =
 a sanity check against a deposited comparator.
 
+
+> **Thresholds are defined once** in `ref/thresholds_and_standards.md`; the `[provenance]` tags below point into it.
+
 ## Scenario
 
 The agent is handed a single model (PDB/mmCIF) and asked to validate its stereochemistry: report
