@@ -11,3 +11,5 @@ schemas/json-schema/
 # docs/agents/ is that skill set's per-repo config (issue tracker, triage labels, domain docs).
 .claude/skills/mp-*/
 docs/agents/
+# CLAUDE.local.md carries the pointer to docs/agents/ that those skills read.
+CLAUDE.local.md
