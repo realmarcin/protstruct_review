@@ -51,6 +51,11 @@ For **T13** the practical layering is: **aimless** is the canonical recommendati
 |---|---|---|---|
 | **ChimeraX** | Heavy GUI install; useful for `matchmaker` (T01) and `fitmap` (T08) | T01, T08 | <https://www.cgl.ucsf.edu/chimerax/download.html> |
 | **MoRDa** | Specialised MR pipeline | T09 only | Install only if T09 becomes a regression target |
+| **DSSP / STRIDE** | Not yet needed — T15 has no runnable evaluation | T15 | `brew install dssp`; STRIDE from <https://webclu.bio.wzw.tum.de/stride/> — install both, since the T15 gradeable metric is DSSP-vs-STRIDE agreement |
+| **CATH / SCOPe / ECOD** | Database lookups rather than local binaries | T15 | Query the web APIs, or cache per-domain assignments alongside the example datasets |
+| **PISA/PDBePISA** | No local build; PDBe web service covers it | T16 | <https://www.ebi.ac.uk/pdbe/pisa/> |
+| **DockQ** | Not yet needed — T16 has no runnable evaluation | T16 | `pip install DockQ` (<https://github.com/bjornwallner/DockQ>) |
+| **wwPDB NMR validation / PROCHECK-NMR / RPF** | No local install; wwPDB validation reports are fetched per entry | T17 | Fetch the deposited validation report; install PROCHECK-NMR only if T17 becomes a regression target |
 
 ## Quick activation snippets
 
@@ -93,8 +98,14 @@ conda activate cryst-oracles && servalcat --version  # 0.4.131
 | T12 | `phenix.mtriage` | `servalcat fsc`, `servalcat localcc` | RELION postprocess, ResMap |
 | T13 | `phenix.model_vs_data` (completeness, resolution range) | CCP4 ctruncate (Wilson B, L-test twinning, ΔB aniso, tNCS, ice rings); CCP4 aimless when unmerged intensities exist; wrapper `scripts/t13_data_quality.py` | (CC½ / ⟨I/σ⟩ / Rmerge require unmerged intensities — gap when artefact ships merged-only) |
 | T14 | `phenix.reduce` | standalone `reduce` (Richardson lab — same binary, different build) | propka3, OpenBabel |
+| T15 | *(none — PHENIX has no fold/domain classifier)* | *(none installed)* | DSSP, STRIDE (secondary structure); CATH, SCOPe, ECOD (domain/fold) |
+| T16 | *(none — no PHENIX interface scorer)* | *(none installed)* | PISA/PDBePISA (buried surface area), DockQ (interface quality) |
+| T17 | *(none — no PHENIX NMR restraint validator)* | *(none installed)* | wwPDB NMR validation, PROCHECK-NMR, RPF |
 
-All tasks now have at least one **non-cctbx** oracle. The trust model is satisfied at minimum strength; CCP4/REFMAC will harden T03/T06.
+Every task that has an installed oracle is cross-checked by at least one **non-cctbx** tool, so the trust model holds for T01–T14. CCP4/REFMAC hardens T03/T06.
+
+**T15–T17 are oracle-only tasks with nothing installed yet.** They have no PHENIX implementation at all, so there is no PHENIX-grades-PHENIX risk — but there is also no measurement path until one of the listed oracles is installed. Treat their catalog entries as declared-but-not-yet-runnable; the synthetic fixture
+`data/examples/eval/EVAL_synth_quality_indicators_2026-05-04.yaml` exercises the schema and emitter routing, not real tools.
 
 ## Build notes (for reproducibility)
 

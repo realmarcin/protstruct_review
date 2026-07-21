@@ -1346,6 +1346,11 @@ classes:
       id:
         identifier: true
         required: true
+      secondary_structure_agreement:
+        description: Fraction of residues on which two independent secondary-structure
+          assigners agree (three-state). The gradeable T15 metric.
+        range: TypedMeasurementValue
+        inlined: true
       secondary_structure_assignment:
         range: TypedMeasurementValue
         inlined: true

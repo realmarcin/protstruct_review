@@ -1961,6 +1961,7 @@ class ClassificationSummary(ConfiguredBaseModel):
                        'CoordinationContact',
                        'Site',
                        'SiteQuality']} })
+    secondary_structure_agreement: Optional[TypedMeasurementValue] = Field(default=None, description="""Fraction of residues on which two independent secondary-structure assigners agree (three-state). The gradeable T15 metric.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ClassificationSummary']} })
     secondary_structure_assignment: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ClassificationSummary']} })
     structural_domain_assignment: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ClassificationSummary']} })
     fold_classification: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ClassificationSummary']} })

@@ -8,12 +8,15 @@ This directory holds offline reference material and the key **task × evaluation
 |---|---|
 | `phenix_docs/` | Mirrored PHENIX documentation (HTML, offline). Populated by `download_phenix_docs.sh`. |
 | `download_phenix_docs.sh` | Re-runnable `wget` mirror script for the PHENIX docs. |
-| `tasks_and_evaluations.md` | **Key doc.** 14-row catalog of rote structural-biology tasks, each paired with PHENIX tool(s), independent-oracle tool(s), inputs, evaluation metrics, gold standard, and an example dataset. |
-| `tasks_and_evaluations.tsv` | Machine-loadable version of the same table (pipe-separated lists within tab-separated columns). |
+| `tasks_and_evaluations.md` | **Key doc.** 17-row catalog of rote structural-biology tasks, each paired with PHENIX tool(s), independent-oracle tool(s), inputs, evaluation metrics, gold standard, and an example dataset. Hand-written prose; `scripts/validate.sh` checks that every catalog task has a section here. |
+| `tasks_and_evaluations.tsv` | Machine-loadable version of the same table (pipe-separated lists within tab-separated columns). **Generated** from `catalog.yaml`; `scripts/validate.sh` fails if it drifts. |
 | `driving_example.md` | Worked end-to-end example (**compare → refine → RMSD**) that exercises tasks T01 + T04 + T05 + T06 together. Template for future per-task driving examples. |
 | `oracle_tools.md` | Install status of independent (non-cctbx) oracle tools the catalog requires (gemmi, TM-align, probe + reduce, Servalcat); per-task oracle assignment. |
 | `eval_naming.md` | Filename convention for `EVAL_*` evaluation reports (`EVAL_<structure>_<artifact-short-id>_<YYYY-MM-DD>.{md,tsv}`). |
 | `catalog.yaml` | Canonical machine-readable catalog (LinkML-validated). The `tasks_and_evaluations.tsv` above is regenerated from this YAML by `scripts/records_to_tsv.py`. Schema lives at `schemas/protstruct_review.yaml`. |
+| `tool_recommendations.yaml` | Canonical per-metric oracle recommendations (LinkML-validated, schema-class `ToolRecommendation`). Consumed by `scripts/qds_emit.py` to build the QDS tool-recommendations block. |
+| `tool_assumptions.yaml` | Per-tool implicit/explicit assumptions (LinkML-validated). Feeds the QDS assumptions report. |
+| `protein_structure_quality_refinement_indicators.md` | Survey of quality/refinement indicators behind the T15–T17 tasks and the newer QDS summary blocks (classification, interface, prediction-ensemble, NMR). |
 | `quality_reporting.md` | Synthesis of community consensus on the smallest defensible quality report (single-structure, X-ray / cryo-EM / predicted) and pair-of-structures (TM-score, lDDT, GDT-TS, RMSD, Δ model-vs-data). Evidence base for the QualityDataSheet schema. ~18 citations. |
 
 ## Regenerating the PHENIX docs mirror
@@ -22,7 +25,7 @@ This directory holds offline reference material and the key **task × evaluation
 bash ref/download_phenix_docs.sh
 ```
 
-Output lands in `ref/phenix_docs/phenix-online.org/documentation/`. Re-runs are idempotent — `wget --mirror` only re-downloads changed files. Expected footprint: 20–50 MB, ~200–300 HTML pages.
+Output lands in `ref/phenix_docs/phenix-online.org/documentation/`. Re-runs are idempotent — `wget --mirror` only re-downloads changed files. Expected footprint: ~50 MB, 550+ files (of which ~250 are HTML reference pages; the rest are images, CSS, and index assets).
 
 Sanity check after a run:
 

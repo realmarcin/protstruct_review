@@ -197,6 +197,18 @@ evaluation_runs:
       oracle_measure:
         value_numeric: 0.84
       pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_010b
+      catalog_task_ref: T15
+      stage: final
+      scope: complex
+      scope_selector: synth_quality
+      metric_definition_ref: T15_secondary_structure_agreement
+      oracle_tool_ref: STRIDE
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.94
+      pass_status: informational
+      notes: three-state DSSP vs STRIDE agreement over 92 assigned residues
     - id: EVAL_synth_quality_indicators_2026-05-04_M_011
       catalog_task_ref: T15
       stage: final

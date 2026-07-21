@@ -68,3 +68,39 @@ fi
 if ! python3 "${REPO_ROOT}/scripts/test_qds_emit.py"; then
   fail "qds_emit regression"
 fi
+
+# 5. Published-view drift. ref/tasks_and_evaluations.{tsv,md} are views of
+#    ref/catalog.yaml. Nothing else here compares them, so a task added to the
+#    catalog alone used to ship silently (T15-T17 did exactly that).
+#    The TSV is generated, so it must match byte-for-byte. The .md is
+#    hand-written prose, so only check that every catalog task has a section.
+TSV="${REPO_ROOT}/ref/tasks_and_evaluations.tsv"
+MD="${REPO_ROOT}/ref/tasks_and_evaluations.md"
+TSV_REGEN="$(mktemp)"
+trap 'rm -f "${TSV_REGEN}"' EXIT
+
+if ! python3 "${REPO_ROOT}/scripts/records_to_tsv.py" \
+       "${REPO_ROOT}/ref/catalog.yaml" --kind catalog -o "${TSV_REGEN}" >/dev/null; then
+  fail "tasks_and_evaluations.tsv could not be regenerated"
+fi
+if ! diff -q "${TSV}" "${TSV_REGEN}" >/dev/null; then
+  diff "${TSV}" "${TSV_REGEN}" >&2 || true
+  fail "ref/tasks_and_evaluations.tsv is stale — regenerate with: python3 scripts/records_to_tsv.py ref/catalog.yaml --kind catalog -o ref/tasks_and_evaluations.tsv"
+fi
+
+missing=""
+while IFS= read -r task_id; do
+  grep -q "^### ${task_id} " "${MD}" || missing="${missing} ${task_id}"
+done < <(python3 -c "
+import yaml, sys
+doc = yaml.safe_load(open('${REPO_ROOT}/ref/catalog.yaml'))
+for task in doc.get('catalog_tasks', []):
+    print(task['id'])
+")
+if [[ -n "${missing}" ]]; then
+  fail "ref/tasks_and_evaluations.md has no section for:${missing}"
+fi
+
+if [[ "${QUIET}" == "0" ]]; then
+  echo "published views in sync with ref/catalog.yaml"
+fi

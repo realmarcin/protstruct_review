@@ -25,6 +25,7 @@ from __future__ import annotations
 import copy
 import sys
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
 
 import yaml
@@ -54,6 +55,28 @@ def _check(condition: bool, msg: str) -> None:
     if not condition:
         print(f"FAIL: {msg}", file=sys.stderr)
         sys.exit(1)
+
+
+def assert_raises_completeness(
+    fn: Callable[[], object], expected_fragments: list[str], what: str
+) -> None:
+    """Run `fn` and assert it fails the completeness check with context.
+
+    QdsCompletenessError subclasses SystemExit deliberately, so callers of the
+    emitter that only catch SystemExit still stop. Accept either here, and
+    require every fragment in `expected_fragments` to appear in the message.
+    """
+    try:
+        fn()
+    except SystemExit as e:  # covers QdsCompletenessError
+        msg = str(e)
+        for fragment in expected_fragments:
+            _check(
+                fragment in msg,
+                f"emitter failed but message lacks {fragment!r} context: {msg!r}",
+            )
+        return
+    _check(False, f"emit_qds did not fail when {what}")
 
 
 def test_1sar_geometry_slots_all_present() -> None:
@@ -116,28 +139,14 @@ def test_negative_site_scope_without_site_decl_fails() -> None:
         bad_path = Path(tmpdir) / "eval_bad_no_sites.yaml"
         bad_path.write_text(yaml.safe_dump(bad, sort_keys=False))
 
-        try:
-            qds_emit.emit_qds(
+        assert_raises_completeness(
+            lambda: qds_emit.emit_qds(
                 [bad_path], qds_id="QDS_bad_test", structure_id="synth1"
-            )
-        except qds_emit.QdsCompletenessError as e:
-            msg = str(e)
-            _check(
-                "scope=site" in msg or "site_qualities" in msg,
-                f"emitter raised but message lacks scope-site context: {msg!r}",
-            )
-            print("PASS  test_negative_site_scope_without_site_decl_fails")
-            return
-        except SystemExit as e:
-            # QdsCompletenessError is a SystemExit subclass — accept either.
-            msg = str(e)
-            _check(
-                "scope=site" in msg or "site_qualities" in msg,
-                f"emitter exited but message lacks scope-site context: {msg!r}",
-            )
-            print("PASS  test_negative_site_scope_without_site_decl_fails")
-            return
-    _check(False, "emit_qds did not fail when site-scope measurement had no Site declared")
+            ),
+            ["scope=site", "site_qualities"],
+            "site-scope measurement had no Site declared",
+        )
+    print("PASS  test_negative_site_scope_without_site_decl_fails")
 
 
 def test_quality_indicator_extensions_present() -> None:
@@ -209,25 +218,14 @@ def test_negative_structured_scopes_without_rows_fail() -> None:
         bad_path = Path(tmpdir) / "eval_bad_no_structured_scopes.yaml"
         bad_path.write_text(yaml.safe_dump(bad, sort_keys=False))
 
-        try:
-            qds_emit.emit_qds(
+        assert_raises_completeness(
+            lambda: qds_emit.emit_qds(
                 [bad_path], qds_id="QDS_bad_structured_test", structure_id="synth_quality"
-            )
-        except qds_emit.QdsCompletenessError as e:
-            msg = str(e)
-            _check("scope=domain" in msg, f"missing domain-scope error context: {msg!r}")
-            _check("scope=interface" in msg, f"missing interface-scope error context: {msg!r}")
-            _check("scope=ensemble" in msg, f"missing ensemble-scope error context: {msg!r}")
-            print("PASS  test_negative_structured_scopes_without_rows_fail")
-            return
-        except SystemExit as e:
-            msg = str(e)
-            _check("scope=domain" in msg, f"missing domain-scope error context: {msg!r}")
-            _check("scope=interface" in msg, f"missing interface-scope error context: {msg!r}")
-            _check("scope=ensemble" in msg, f"missing ensemble-scope error context: {msg!r}")
-            print("PASS  test_negative_structured_scopes_without_rows_fail")
-            return
-    _check(False, "emit_qds did not fail when structured-scope rows were missing")
+            ),
+            ["scope=domain", "scope=interface", "scope=ensemble"],
+            "structured-scope rows were missing",
+        )
+    print("PASS  test_negative_structured_scopes_without_rows_fail")
 
 
 def main() -> int:

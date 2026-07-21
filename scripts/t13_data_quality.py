@@ -28,7 +28,12 @@ import re
 import shutil
 import subprocess
 import sys
+import textwrap
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
+
+import yaml
 
 
 def _run(cmd: list[str], stdin: str = "", env: dict | None = None,
@@ -164,93 +169,149 @@ def parse_ctruncate(text: str, log_path: str) -> dict:
 # Render YAML fragment
 # ---------------------------------------------------------------------------
 
-def render_yaml(stats: dict, eval_id: str, aimless: dict) -> str:
-    """Produce the snippet of measurement rows for the EVAL yaml."""
-    lines: list[str] = []
+@dataclass
+class Measurement:
+    """One EvaluationMeasurement row emitted by the T13 oracle.
 
-    def m(suffix: str, metric: str, value, kind: str = "numeric",
-          unit: str | None = None, criterion: str = "informational",
-          status: str = "informational", notes: str | None = None):
-        lines.append(f"  - id: {eval_id}_M_t13_{suffix}")
-        lines.append(f"    catalog_task_ref: T13")
-        lines.append(f"    stage: all")
-        lines.append(f"    metric_definition_ref: {metric}")
-        lines.append(f"    oracle_tool_ref: ctruncate")
-        lines.append(f"    oracle_family: non_cctbx")
-        lines.append(f"    agent_claim:")
-        lines.append(f"      is_not_applicable: true")
-        lines.append(f"    oracle_measure:")
-        if kind == "numeric":
-            lines.append(f"      value_numeric: {value}")
+    `suffix` is appended to `<eval_id>_M_t13_` to form the row id; `value`
+    is written as `value_numeric` when `kind == "numeric"` and as
+    `value_text` otherwise.
+    """
+
+    suffix: str
+    metric_definition_ref: str
+    value: Any
+    kind: str = "numeric"
+    unit: str | None = None
+    pass_criterion: str = "informational"
+    pass_status: str = "informational"
+    notes: str | None = None
+    oracle_tool_ref: str = "ctruncate"
+
+    def to_row(self, eval_id: str) -> dict[str, Any]:
+        """Render as a plain dict in the field order the EVAL YAML uses."""
+        measure: dict[str, Any] = {}
+        if self.kind == "numeric":
+            measure["value_numeric"] = self.value
         else:
-            lines.append(f"      value_text: {value!r}")
-        if unit:
-            lines.append(f"      unit: {unit!r}")
-        lines.append(f"    pass_criterion: {criterion}")
-        lines.append(f"    pass_status: {status}")
-        if notes:
-            lines.append(f"    notes: {notes!r}")
+            measure["value_text"] = self.value
+        if self.unit:
+            measure["unit"] = self.unit
+
+        row: dict[str, Any] = {
+            "id": f"{eval_id}_M_t13_{self.suffix}",
+            "catalog_task_ref": "T13",
+            "stage": "all",
+            "metric_definition_ref": self.metric_definition_ref,
+            "oracle_tool_ref": self.oracle_tool_ref,
+            "oracle_family": "non_cctbx",
+            "agent_claim": {"is_not_applicable": True},
+            "oracle_measure": measure,
+            "pass_criterion": self.pass_criterion,
+            "pass_status": self.pass_status,
+        }
+        if self.notes:
+            row["notes"] = self.notes
+        return row
+
+
+def build_measurements(stats: dict, aimless: dict) -> list[Measurement]:
+    """Select the measurement rows supported by what ctruncate reported."""
+    measurements: list[Measurement] = []
 
     if "wilson_b" in stats:
-        m("wilson_b", "T13_wilson_b", stats["wilson_b"], unit="Å²",
-          notes=f"ctruncate Wilson scaling; sigma {stats.get('wilson_b_sigma', '?')}.")
+        measurements.append(Measurement(
+            suffix="wilson_b",
+            metric_definition_ref="T13_wilson_b",
+            value=stats["wilson_b"],
+            unit="Å²",
+            notes=(f"ctruncate Wilson scaling; "
+                   f"sigma {stats.get('wilson_b_sigma', '?')}."),
+        ))
 
     if "twin_fraction_l" in stats:
-        m("twin_fraction_l", "T13_l-test_twinning",
-          stats["twin_fraction_l"], unit="fraction",
-          criterion="< 0.05",
-          status="pass" if stats["twin_fraction_l"] < 0.05 else "fail",
-          notes=(f"L statistic {stats.get('l_statistic')} (untwinned 0.5, "
-                 f"perfect twin 0.375); moments-based estimate "
-                 f"{stats.get('twin_fraction_moments')}; "
-                 f"first-principles twin operators found: "
-                 f"{stats.get('twin_operators_found')}."))
+        measurements.append(Measurement(
+            suffix="twin_fraction_l",
+            metric_definition_ref="T13_l-test_twinning",
+            value=stats["twin_fraction_l"],
+            unit="fraction",
+            pass_criterion="< 0.05",
+            pass_status="pass" if stats["twin_fraction_l"] < 0.05 else "fail",
+            notes=(f"L statistic {stats.get('l_statistic')} (untwinned 0.5, "
+                   f"perfect twin 0.375); moments-based estimate "
+                   f"{stats.get('twin_fraction_moments')}; "
+                   f"first-principles twin operators found: "
+                   f"{stats.get('twin_operators_found')}."),
+        ))
 
     if "delta_b_aniso" in stats:
-        m("delta_b_aniso", "T13_anisotropy_δb_aniso",
-          round(stats["delta_b_aniso"], 3), unit="Å²",
-          criterion="< 20 Å² (rough rule of thumb)",
-          status="pass" if stats["delta_b_aniso"] < 20 else "fail",
-          notes=(f"ctruncate anisotropy eigenvalues {stats.get('aniso_eigenvalues')}; "
-                 f"flag = {stats.get('aniso_flag')}."))
+        measurements.append(Measurement(
+            suffix="delta_b_aniso",
+            metric_definition_ref="T13_anisotropy_δb_aniso",
+            value=round(stats["delta_b_aniso"], 3),
+            unit="Å²",
+            pass_criterion="< 20 Å² (rough rule of thumb)",
+            pass_status="pass" if stats["delta_b_aniso"] < 20 else "fail",
+            notes=(f"ctruncate anisotropy eigenvalues "
+                   f"{stats.get('aniso_eigenvalues')}; "
+                   f"flag = {stats.get('aniso_flag')}."),
+        ))
 
     if "tncs_flag" in stats:
-        m("tncs_flag", "T13_tncs_flag",
-          str(bool(stats["tncs_flag"])).lower(),
-          kind="text",
-          criterion="false",
-          status="pass" if not stats["tncs_flag"] else "fail",
-          notes="ctruncate Patterson search at 4 Å resolution limit.")
+        measurements.append(Measurement(
+            suffix="tncs_flag",
+            metric_definition_ref="T13_tncs_flag",
+            value=str(bool(stats["tncs_flag"])).lower(),
+            kind="text",
+            pass_criterion="false",
+            pass_status="pass" if not stats["tncs_flag"] else "fail",
+            notes="ctruncate Patterson search at 4 Å resolution limit.",
+        ))
 
     if "ice_ring_resolutions_flagged" in stats:
         flagged = stats["ice_ring_resolutions_flagged"]
-        m("ice_ring_flags", "T13_ice-ring_flags",
-          (",".join(f"{r:.2f}Å" for r in flagged) if flagged else "none"),
-          kind="text",
-          criterion="no flagged rings (Z > 5)",
-          status="pass" if not flagged else "informational",
-          notes=(f"ctruncate ice-ring summary: {stats.get('ice_ring_count_total')} "
-                 f"sensitive bins scanned; "
-                 f"{len(flagged)} flagged at Z-score > 5. "
-                 f"Borderline rings near 3.44 Å are common and not necessarily "
-                 f"actionable; surface as informational."))
+        measurements.append(Measurement(
+            suffix="ice_ring_flags",
+            metric_definition_ref="T13_ice-ring_flags",
+            value=(",".join(f"{r:.2f}Å" for r in flagged) if flagged else "none"),
+            kind="text",
+            pass_criterion="no flagged rings (Z > 5)",
+            pass_status="pass" if not flagged else "informational",
+            notes=(f"ctruncate ice-ring summary: "
+                   f"{stats.get('ice_ring_count_total')} "
+                   f"sensitive bins scanned; "
+                   f"{len(flagged)} flagged at Z-score > 5. "
+                   f"Borderline rings near 3.44 Å are common and not necessarily "
+                   f"actionable; surface as informational."),
+        ))
 
     # Provenance row about the aimless attempt
-    lines.append(f"  - id: {eval_id}_M_t13_aimless_attempt")
-    lines.append(f"    catalog_task_ref: T13")
-    lines.append(f"    stage: all")
-    lines.append(f"    metric_definition_ref: T13_aimless_status")
-    lines.append(f"    oracle_tool_ref: CCP4 aimless")
-    lines.append(f"    oracle_family: non_cctbx")
-    lines.append(f"    agent_claim:")
-    lines.append(f"      is_not_applicable: true")
-    lines.append(f"    oracle_measure:")
-    lines.append(f"      value_text: {aimless['status']!r}")
-    lines.append(f"    pass_criterion: informational")
-    lines.append(f"    pass_status: informational")
-    lines.append(f"    notes: {aimless['reason']!r}")
+    measurements.append(Measurement(
+        suffix="aimless_attempt",
+        metric_definition_ref="T13_aimless_status",
+        value=aimless["status"],
+        kind="text",
+        oracle_tool_ref="CCP4 aimless",
+        notes=aimless["reason"],
+    ))
 
-    return "\n".join(lines) + "\n"
+    return measurements
+
+
+def render_yaml(stats: dict, eval_id: str, aimless: dict) -> str:
+    """Produce the snippet of measurement rows for the EVAL yaml."""
+    rows = [m.to_row(eval_id) for m in build_measurements(stats, aimless)]
+    body = yaml.safe_dump(
+        rows,
+        sort_keys=False,
+        allow_unicode=True,
+        default_flow_style=False,
+        # Never fold long notes onto continuation lines: the fragment is
+        # pasted into an EVAL file by hand and must stay one row per field.
+        width=10 ** 9,
+    )
+    # Two-space lead-in so the block drops straight under `measurements:`.
+    return textwrap.indent(body, "  ")
 
 
 def main() -> int:

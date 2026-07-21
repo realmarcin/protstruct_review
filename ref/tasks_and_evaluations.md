@@ -62,9 +62,9 @@ Local PHENIX docs are mirrored in `ref/phenix_docs/`; doc paths below assume tha
 
 - **PHENIX tool(s):** `phenix.holton_geometry_validation`, `phenix.validation` (GUI), `phenix.cablam`, `mmtbx.validation_summary`
 - **Doc paths:** `reference/holton_geometry_validation.html`, `reference/validation.html`, `reference/cablam_validation.html`
-- **Independent oracle(s):** **MolProbity** (web/standalone — gold standard for geometry), wwPDB validation pipeline, iotbx-independent parsers via gemmi
+- **Independent oracle(s):** **MolProbity** (web/standalone — gold standard for geometry), wwPDB validation pipeline, iotbx-independent parsers via gemmi, RosettaHoles2 (packing), ProSA, Verify3D
 - **Typical inputs:** model (PDB/mmCIF)
-- **Metrics:** clashscore, Ramachandran favored %, Ramachandran outlier %, rotamer outlier %, CBeta outliers, bond-length RMSD, bond-angle RMSD, planarity RMSD, chirality outliers, MolProbity composite score, CaBLAM outliers
+- **Metrics:** clashscore, Ramachandran favored %, Ramachandran outlier %, rotamer outlier %, CBeta outliers, bond-length RMSD, bond-angle RMSD, planarity RMSD, chirality outliers, MolProbity composite score, CaBLAM outliers, Ramachandran-Z score, packing Z-score (complex), unsatisfied buried H-bond count (complex), B-factor outlier Z-score (per-residue)
 - **Gold standard:** MolProbity report; wwPDB validation report for deposited comparator
 - **Example dataset:** any PDB entry; for regression use `3nir` (ultra-high-res crambin) as a clean baseline
 
@@ -72,9 +72,9 @@ Local PHENIX docs are mirrored in `ref/phenix_docs/`; doc paths below assume tha
 
 - **PHENIX tool(s):** `phenix.model_vs_data`, `phenix.mtriage` (map side), `phenix.fmodel` (listed in the PHENIX reference index but its doc page currently 404s upstream), `phenix.map_correlations`
 - **Doc paths:** `reference/model_vs_data.html`, `reference/mtriage.html`, `reference/map_correlations.html`
-- **Independent oracle(s):** CCP4 `sfcheck` / `refmac -hklin`, Servalcat, `gemmi` (`gemmi sfcalc`, `gemmi validate`)
+- **Independent oracle(s):** CCP4 `sfcheck` / `refmac -hklin`, Servalcat, `gemmi` (`gemmi sfcalc`, `gemmi validate`), PDB-REDO, FSC-Q
 - **Typical inputs:** model + experimental data (MTZ for X-ray, map(s) for cryo-EM)
-- **Metrics:** R-work, R-free, CC_work, CC_free, CC*, map-model FSC (global + per-resolution-shell), d_FSC_model, overall B, Wilson B
+- **Metrics:** R-work, R-free, CC_work, CC_free, CC*, map-model FSC (global + per-resolution-shell), d_FSC_model, overall B, Wilson B, residue RSCC (per-residue), RSCC outlier fraction (complex), diffraction precision index (complex)
 - **Gold standard:** values reported in the deposition header for that PDB/EMDB pair
 - **Example dataset:** PDB `1YQV` + deposited MTZ; PDB `7a4m` + EMDB-`11668` half-maps
 
@@ -82,9 +82,9 @@ Local PHENIX docs are mirrored in `ref/phenix_docs/`; doc paths below assume tha
 
 - **PHENIX tool(s):** `phenix.process_predicted_model`, `phenix.predict_model`, `phenix.predict_and_build`
 - **Doc paths:** `reference/process_predicted_model.html`, `reference/predict_model.html`, `reference/predict_and_build.html`, `overviews/predicted_models_index.html`
-- **Independent oracle(s):** `pae_to_domains.py` (Croll/Tronrud), `biotite` AlphaFold parsers, `colabfold` domain-splitter, ChimeraX `alphafold` tool
+- **Independent oracle(s):** `pae_to_domains.py` (Croll/Tronrud), `biotite` AlphaFold parsers, `colabfold` domain-splitter, ChimeraX `alphafold` tool, QMEANDisCo
 - **Typical inputs:** AlphaFold/RoseTTAFold prediction (PDB/mmCIF) with pLDDT in B-factor column, optional PAE matrix (JSON)
-- **Metrics:** fraction of residues retained after pLDDT trim, mean pLDDT before/after, B-factor ↔ (1/pLDDT²) correlation post-conversion, domain count agreement vs PAE-clustering oracle, RMSD of processed model vs reference experimental structure
+- **Metrics:** fraction of residues retained after pLDDT trim, mean pLDDT before/after, B-factor ↔ (1/pLDDT²) correlation post-conversion, domain count agreement vs PAE-clustering oracle, RMSD of processed model vs reference experimental structure, predicted TM-score (complex), interface predicted TM-score (interface), prediction ensemble convergence (ensemble)
 - **Gold standard:** AlphaFold-DB deposited pLDDT values; experimental structure for the same UniProt entry (when one exists) for downstream RMSD
 - **Example dataset:** `AF-P00698-F1` (lysozyme AF2 model) vs PDB `2LYZ`; `AF-P0DTC2-F1` (SARS-CoV-2 spike) vs `6VXX`
 
@@ -132,9 +132,9 @@ Local PHENIX docs are mirrored in `ref/phenix_docs/`; doc paths below assume tha
 
 - **PHENIX tool(s):** `phenix.mtriage`, `phenix.local_resolution`, `phenix.map_sharpening`, `phenix.resolve_cryo_em`
 - **Doc paths:** `reference/mtriage.html`, `reference/local_resolution.html`, `reference/map_sharpening.html`, `reference/resolve_cryo_em.html`, `overviews/cryo-em_index.html`
-- **Independent oracle(s):** RELION `postprocess`, cryoSPARC 3DFSC, ResMap, Phenix-independent `gemmi fprime`, `e2proc3d.py` (EMAN2)
+- **Independent oracle(s):** RELION `postprocess`, cryoSPARC 3DFSC, ResMap, Phenix-independent `gemmi fprime`, `e2proc3d.py` (EMAN2), 3DFSC, FSC-Q
 - **Typical inputs:** two half-maps (MRC/CCP4), optional mask, optional model for model-map FSC
-- **Metrics:** global FSC resolution at 0.143 (unmasked + masked), local resolution distribution (mean, stdev, 10th/90th percentile), d_FSC_model (if model provided), B-factor sharpening estimate
+- **Metrics:** global FSC resolution at 0.143 (unmasked + masked), local resolution distribution (mean, stdev, 10th/90th percentile), d_FSC_model (if model provided), B-factor sharpening estimate, directional resolution anisotropy (dataset), local model-map FSC-Q (per-residue)
 - **Gold standard:** EMDB-deposited resolution; RELION `postprocess` reports on the same half-maps
 - **Example dataset:** EMDB-`11668` half-maps (apoferritin), EMDB-`20646` half-maps
 
@@ -144,7 +144,7 @@ Local PHENIX docs are mirrored in `ref/phenix_docs/`; doc paths below assume tha
 - **Doc paths:** `reference/xtriage.html`, `reference/reflection_statistics.html`, `reference/anomalous_signal.html`, `reference/explore_metric_symmetry.html`
 - **Independent oracle(s):** CCP4 `aimless`, `pointless`, `ctruncate`, `phaser` anisotropy analysis
 - **Typical inputs:** merged or unmerged reflection data (MTZ, SCA, CIF)
-- **Metrics:** completeness (overall + outer shell), ⟨I/σ(I)⟩, R-merge / R-meas, CC½, L-test statistic (twinning), anisotropy (Δ B_aniso), Wilson B, translational NCS indicator, ice-ring flags
+- **Metrics:** completeness (overall + outer shell), ⟨I/σ(I)⟩, R-merge / R-meas, CC½, L-test statistic (twinning), anisotropy (Δ B_aniso), Wilson B, translational NCS indicator, ice-ring flags, `aimless` run status
 - **Gold standard:** data-processing table (Table 1) from the corresponding publication / wwPDB deposition; `aimless` log on the same reflections
 - **Example dataset:** PHENIX xtriage tutorial MTZ; any `.mtz` from PDB-REDO
 
@@ -157,6 +157,36 @@ Local PHENIX docs are mirrored in `ref/phenix_docs/`; doc paths below assume tha
 - **Metrics:** number of H atoms added, Asn/Gln/His flips proposed, clashscore delta (pre vs post), hbond-network consistency vs standalone `reduce`
 - **Gold standard:** standalone `reduce` output on the same input (PHENIX `phenix.reduce` wraps it but exposing both lets us catch wrapping bugs); neutron structure if available (e.g. PDB `5E5V`)
 - **Example dataset:** PDB `1HQ1` (high-res, no hydrogens deposited), or a neutron-paired structure for comparison
+
+### T15 — Structural/domain classification
+
+- **PHENIX tool(s):** none — PHENIX has no first-class fold/domain classifier, so this task is oracle-only.
+- **Doc paths:** none
+- **Independent oracle(s):** DSSP, STRIDE (secondary structure); CATH, SCOPe, ECOD (domain and fold classification)
+- **Typical inputs:** model (PDB/mmCIF)
+- **Metrics:** secondary-structure assignment agreement (three-state DSSP vs STRIDE, complex — the gradeable metric); secondary-structure assignment (per-residue labels, informational); structural domain assignment (per-domain boundaries, informational); fold classification (per-domain, informational)
+- **Gold standard:** CATH/SCOPe/ECOD consensus where available; DSSP/STRIDE agreement for secondary structure
+- **Example dataset:** PDB `1AKE` (multi-domain, CATH-classified); PDB `2LYZ` (single-domain control)
+
+### T16 — Interface and assembly quality
+
+- **PHENIX tool(s):** none — interface scoring is handled entirely by external oracles.
+- **Doc paths:** none
+- **Independent oracle(s):** PISA/PDBePISA (buried surface area, assembly prediction), DockQ (interface model quality)
+- **Typical inputs:** complex or assembly model (PDB/mmCIF)
+- **Metrics:** interface buried surface area (Å², per interface), interface DockQ score (per interface), CAPRI interface quality class (per interface, informational — the ordinal class label behind the DockQ score)
+- **Gold standard:** deposited biological assembly and CAPRI/DockQ class where available
+- **Example dataset:** PDB `1BRS` (barnase–barstar); PDB `2SIC` (subtilisin–SSI)
+
+### T17 — NMR ensemble/restraint validation
+
+- **PHENIX tool(s):** none — NMR restraint validation is handled by external oracles.
+- **Doc paths:** none
+- **Independent oracle(s):** wwPDB NMR validation pipeline, PROCHECK-NMR, RPF
+- **Typical inputs:** NMR ensemble model plus deposited restraints where available
+- **Metrics:** NMR ensemble precision RMSD (Å, across accepted models); NMR restraint violation summary (per ensemble, informational)
+- **Gold standard:** wwPDB NMR validation report and deposited restraint files
+- **Example dataset:** PDB `1D3Z` (ubiquitin NMR ensemble, deposited restraints + wwPDB NMR validation report)
 
 ## How the harness uses this table
 

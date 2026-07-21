@@ -57,6 +57,13 @@ The committed `protstruct_review/models.py` is the pinned API surface for downst
 4. Regenerate Pydantic models: `gen-pydantic schemas/protstruct_review.yaml > protstruct_review/models.py`.
 5. Commit schema + models + scripts in one commit.
 
+> **Status (2026-07-20): the threshold is well past — the schema is ~2,100 lines and still one
+> file.** The split is deliberately deferred, not forgotten. The second trigger has not fired: there
+> is still exactly one consumer (`gen-pydantic` → `protstruct_review/models.py`), and no downstream
+> needs a subset. Splitting now would add five files and an import graph while every editor still
+> loads the whole thing. Revisit when a second consumer appears — a JSON-Schema export for an
+> external validator, or a catalog-only reader — since that is what makes the seam pay for itself.
+
 When the schema crosses ~600 lines or a second consumer needs only a subset, split into:
 
 ```
