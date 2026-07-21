@@ -42,8 +42,10 @@ Where this file and the handbook overlap, they must agree; if they drift, that i
    *agreement between two independent labellers* as a number
    (e.g. `T15_secondary_structure_agreement` = three-state DSSP-vs-STRIDE concordance).
 10. **Pass thresholds do not live in the catalog** — the catalog is metric-shape, not thresholds.
-    Until per-task `driving_example_T<NN>.md` files exist, state the threshold you used in the
-    eval `notes:` rather than implying a documented one exists.
+    They live in per-task `driving_example_T<NN>.md` files (present for T01, T05, T13; the rest are
+    tracked in issue #2). Each threshold there carries a `[provenance]` tag naming its source; a new
+    threshold without one is not admissible. For a task that has no driver yet, state the threshold
+    you used in the eval `notes:` rather than implying a documented one exists.
 
 ## QDS emitter (`scripts/qds_emit.py`)
 

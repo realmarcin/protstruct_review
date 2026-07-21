@@ -174,10 +174,14 @@ shipped in `catalog.yaml` alone and the published views went stale without anyth
 
 **Pass criteria do NOT live in this catalog** — they live in the per-task driving-example files. The catalog is metric-shape, not thresholds.
 
-⚠️ **No `driving_example_T<NN>.md` file exists yet** — only the combined `ref/driving_example.md`
-(T01+T04+T05+T06). So for every other task, pass thresholds currently have no home: they are set
-ad hoc per review. Writing the per-task drivers is open work; until then, state the threshold you
-used explicitly in the eval `notes:` rather than implying a documented one exists.
+**Per-task drivers exist for T01, T05, and T13** (`ref/driving_example_T{01,05,13}.md`), plus the
+combined `ref/driving_example.md` (T01+T04+T05+T06). Each per-task driver grades **cross-tool
+agreement**, not an absolute quality bar, and tags every rubric threshold with its provenance
+(`[schema]` / `[MolProbity]` / `[literature]` / `[catalog]` / `[template]` / `[calibration]`) so a
+domain reviewer can audit it. The remaining tasks (T02–T04, T06–T12, T14–T17) have **no driver
+yet** — see issue #2. Until a task has one, state the threshold you used explicitly in the eval
+`notes:` rather than implying a documented one exists. T15–T17 drivers wait on those tasks becoming
+runnable (issue #3).
 
 ## Existing tasks (don't reinvent these — extend them)
 
