@@ -403,6 +403,7 @@ catalog_tasks:
   oracle_tool_refs:
   - DSSP
   - STRIDE
+  - biotite P-SEA
   - CATH
   - SCOPe
   - ECOD
@@ -928,6 +929,10 @@ tools:
   catalog_tasks_served:
   - T15
 - id: STRIDE
+  family: non_cctbx
+  catalog_tasks_served:
+  - T15
+- id: biotite P-SEA
   family: non_cctbx
   catalog_tasks_served:
   - T15
