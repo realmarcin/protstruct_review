@@ -5,11 +5,11 @@ schemas/json-schema/
 .claude/scheduled_tasks.lock
 .claude/*.lock
 
-# Vendored external skill set — Matt Pocock's engineering skills (github.com/mattpocock/skills,
-# v1.2.0), installed locally and renamed with an mp- prefix. Not ours to version here.
-# Reinstall with: npx skills@latest add mattpocock/skills
-# docs/agents/ is that skill set's per-repo config (issue tracker, triage labels, domain docs).
-.claude/skills/mp-*/
+# Matt Pocock's engineering skills are installed as a user-scope Claude Code plugin
+# (mattpocock-skills@mattpocock), not vendored here. Install with:
+#   claude plugin marketplace add mattpocock/skills
+#   claude plugin install mattpocock-skills@mattpocock
+# docs/agents/ is that skill set's per-repo config (issue tracker, triage labels, domain
+# docs); CLAUDE.local.md is the pointer to it that the skills read. Both are machine-local.
 docs/agents/
-# CLAUDE.local.md carries the pointer to docs/agents/ that those skills read.
 CLAUDE.local.md
