@@ -183,6 +183,11 @@ def test_quality_indicator_extensions_present() -> None:
     _check(prq.get("fsc_q_per_residue"), "fsc_q_per_residue array missing")
 
     cls = qds.get("classification_summary") or {}
+    _check("secondary_structure_agreement" in cls,
+           "secondary_structure_agreement (the gradeable T15 metric) missing from classification_summary")
+    ssa = cls.get("secondary_structure_agreement") or {}
+    _check(ssa.get("value_numeric") is not None,
+           "secondary_structure_agreement must carry a numeric value — it is the gradeable T15 metric")
     _check(cls.get("secondary_structure_assignments"), "secondary_structure_assignments missing")
     _check(cls.get("domain_assignments"), "domain_assignments missing")
     _check("fold_classification" in cls, "fold_classification missing")

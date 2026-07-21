@@ -19,6 +19,10 @@ When the user invokes `/protstruct-eval` or asks about:
 
 …follow the conventions documented below. All paths in this skill are relative to the repo root.
 
+The enforceable form of these conventions — the rules a code review can cite as hard violations —
+lives in `CODING_STANDARDS.md` at the repo root. This handbook is the *why and how*; that file is
+the *must*. Keep them in agreement.
+
 ## Trust model (load-bearing — do not violate)
 
 Every task in the catalog is graded by **cross-tool agreement**, not by PHENIX alone. The harness re-runs critical metrics with at least one independent oracle (MolProbity, ChimeraX, REFMAC/Servalcat, TM-align, RELION, gemmi, …) and compares. The deposited PDB/EMDB entry or publication Table 1 is the tiebreaker.
