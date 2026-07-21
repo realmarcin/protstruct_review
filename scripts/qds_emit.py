@@ -490,6 +490,14 @@ def build_predicted_confidence_summary(
     return None
 
 
+# NOTE: a block's (name, rows-key) association is repeated across three tables
+# below — this one (build), SCOPE_IMPLIED_ROWS (scope->block check), and
+# EVAL_ROWS_IMPLIED_BLOCKS (eval-rows check). They are deliberately kept
+# separate: each serves a different consumer with different fields, and the
+# `ensemble` scope is special-cased inline, so a single master table would be a
+# wide sparse config every consumer mostly ignores (see issue #5). If you rename
+# a block or its rows key, update all three tables together.
+#
 # Optional summary blocks that carry both routed scalar slots and row lists
 # copied straight off the eval runs: (QDS block name, block-id suffix,
 # row keys — same name on the EvaluationRun and on the QDS block).
