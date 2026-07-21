@@ -37,18 +37,25 @@ for r in d['tool_recommendations']:
 | **reduce** (Richardson lab) | 4.16.250520 | `$HOME/tools/reduce-src/build/reduce_src/reduce` | T14 (H-atom placement); T05 (input prep for clashscore) |
 | **Servalcat** | 0.4.131 | conda env `cryst-oracles` (`mamba activate cryst-oracles`) | T03 (`servalcat refine_xtal_norefmac`), T06 (`servalcat fsc`, `fofc`, `sigmaa`), T12 |
 | **OpenStructure (OST)** | 2.11.1 | conda env `cryst-oracles` (CLI `lddt`, Python `import ost`) | T01 (`lddt` — CASP15+ reference implementation, global + per-residue), T02 (per-residue Cα distance + structural comparison), T05 (Ramachandran φ/ψ extraction; outlier classification needs external Top8000 contour data), T07 (per-residue lDDT for predicted-vs-experimental) |
+| **CCP4 suite** (REFMAC5, ProSMART, aimless, ctruncate, pointless) | 9.0.015 | `/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/` (source `bin/ccp4.setup-sh` first) | T03 (REFMAC5 — independent refiner / R-factors), T05 (ProSMART — Procrustes per-residue geometry, non-cctbx Ramachandran-Z), T13 (ctruncate — Wilson B / twinning / anisotropy / tNCS / ice rings on merged data; aimless — canonical when unmerged intensities are available; pointless — space-group sanity) |
 
 Together, `probe` + `reduce` constitute the standalone Richardson-lab MolProbity pipeline that the catalog calls "MolProbity standalone" — these are the same binaries the MolProbity web service runs.
 
 Servalcat ships a no-REFMAC refinement mode (`refine_xtal_norefmac`, `refine_spa_norefmac`) so it can serve as a T03 second-opinion oracle even without CCP4.
 
+For **T13** the practical layering is: **aimless** is the canonical recommendation but requires *unmerged* intensities (M/ISYM column). When the artefact ships only merged amplitudes (the 1SAR case — F-obs / SIGF-obs only), aimless aborts with `hkl_unmerge_list::prepare - EMPTY`. **ctruncate** is the merged-data fallback for the metrics it can still compute (Wilson B, L-test twinning, ΔB anisotropy, tNCS, ice rings); CC½, ⟨I/σ⟩ outer, and Rmerge / Rmeas remain unobtainable without raw integration intensities. The wrapper at `scripts/t13_data_quality.py` runs both and emits parsed measurement rows.
+
 ## Not installed (recorded gaps)
 
 | Tool | Why not installed | Catalog tasks affected | Recommendation |
 |---|---|---|---|
-| **CCP4 / REFMAC5 / ProSMART** | Gated behind free academic registration at <https://www.ccp4.ac.uk/download/registration/>; multi-GB suite. | T03 (REFMAC5 = canonical second-opinion refiner; PDB-REDO methodology), T05 (ProSMART = non-cctbx Ramachandran-Z + per-residue rotamer comparison; closes the cctbx-only gap on the geometry %s), T06 (REFMAC5 R-factors), T13 (aimless / pointless / ctruncate for data-quality metrics) | Register at the URL above; download macOS-arm64 installer; install to `$HOME/ccp4`; source `$HOME/ccp4/setup-scripts/sh/ccp4.setup-sh`. Catalog tool entries (REFMAC5, ProSMART, aimless, pointless, ctruncate) are pre-staged at commit a54964a's successor. |
 | **ChimeraX** | Heavy GUI install; useful for `matchmaker` (T01) and `fitmap` (T08) | T01, T08 | <https://www.cgl.ucsf.edu/chimerax/download.html> |
 | **MoRDa** | Specialised MR pipeline | T09 only | Install only if T09 becomes a regression target |
+| **DSSP / STRIDE** | Not yet needed — T15 has no runnable evaluation | T15 | `brew install dssp`; STRIDE from <https://webclu.bio.wzw.tum.de/stride/> — install both, since the T15 gradeable metric is DSSP-vs-STRIDE agreement |
+| **CATH / SCOPe / ECOD** | Database lookups rather than local binaries | T15 | Query the web APIs, or cache per-domain assignments alongside the example datasets |
+| **PISA/PDBePISA** | No local build; PDBe web service covers it | T16 | <https://www.ebi.ac.uk/pdbe/pisa/> |
+| **DockQ** | Not yet needed — T16 has no runnable evaluation | T16 | `pip install DockQ` (<https://github.com/bjornwallner/DockQ>) |
+| **wwPDB NMR validation / PROCHECK-NMR / RPF** | No local install; wwPDB validation reports are fetched per entry | T17 | Fetch the deposited validation report; install PROCHECK-NMR only if T17 becomes a regression target |
 
 ## Quick activation snippets
 
@@ -56,6 +63,11 @@ Servalcat ships a no-REFMAC refinement mode (`refine_xtal_norefmac`, `refine_spa
 ```bash
 source /opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh
 conda activate cryst-oracles
+```
+
+**CCP4 (REFMAC5, ProSMART, aimless, ctruncate, pointless):**
+```bash
+source /Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/bin/ccp4.setup-sh
 ```
 
 **Richardson-lab tools on PATH:**
@@ -79,14 +91,21 @@ conda activate cryst-oracles && servalcat --version  # 0.4.131
 
 | Task | Primary PHENIX tool | Oracle (now installed) | Oracle (still missing) |
 |---|---|---|---|
-| T01 | `phenix.superpose_models` | TM-align, `gemmi align` | ChimeraX matchmaker, US-align |
-| T03 | `phenix.refine` | `servalcat refine_xtal_norefmac` | REFMAC5, BUSTER |
-| T05 | `phenix.holton_geometry_validation` | `probe` + `reduce` (std MolProbity), `gemmi validate` | wwPDB validation pipeline |
-| T06 | `phenix.model_vs_data` | `gemmi sfcalc`, `servalcat fsc`/`fofc`/`sigmaa` | CCP4 sfcheck |
+| T01 | `phenix.superpose_models` | TM-align, `gemmi align`, OpenStructure (`lddt`), CCP4 ProSMART | ChimeraX matchmaker, US-align |
+| T03 | `phenix.refine` | `servalcat refine_xtal_norefmac`, CCP4 REFMAC5 (`NCYC=0` for in-place R-factors) | BUSTER |
+| T05 | `phenix.holton_geometry_validation` | `probe` + `reduce` (std MolProbity), `gemmi validate`, CCP4 ProSMART | wwPDB validation pipeline |
+| T06 | `phenix.model_vs_data` | `gemmi sfcalc`, `servalcat fsc`/`fofc`/`sigmaa`, CCP4 REFMAC5 | CCP4 sfcheck |
 | T12 | `phenix.mtriage` | `servalcat fsc`, `servalcat localcc` | RELION postprocess, ResMap |
+| T13 | `phenix.model_vs_data` (completeness, resolution range) | CCP4 ctruncate (Wilson B, L-test twinning, ΔB aniso, tNCS, ice rings); CCP4 aimless when unmerged intensities exist; wrapper `scripts/t13_data_quality.py` | (CC½ / ⟨I/σ⟩ / Rmerge require unmerged intensities — gap when artefact ships merged-only) |
 | T14 | `phenix.reduce` | standalone `reduce` (Richardson lab — same binary, different build) | propka3, OpenBabel |
+| T15 | *(none — PHENIX has no fold/domain classifier)* | *(none installed)* | DSSP, STRIDE (secondary structure); CATH, SCOPe, ECOD (domain/fold) |
+| T16 | *(none — no PHENIX interface scorer)* | *(none installed)* | PISA/PDBePISA (buried surface area), DockQ (interface quality) |
+| T17 | *(none — no PHENIX NMR restraint validator)* | *(none installed)* | wwPDB NMR validation, PROCHECK-NMR, RPF |
 
-All tasks now have at least one **non-cctbx** oracle. The trust model is satisfied at minimum strength; CCP4/REFMAC will harden T03/T06.
+Every task that has an installed oracle is cross-checked by at least one **non-cctbx** tool, so the trust model holds for T01–T14. CCP4/REFMAC hardens T03/T06.
+
+**T15–T17 are oracle-only tasks with nothing installed yet.** They have no PHENIX implementation at all, so there is no PHENIX-grades-PHENIX risk — but there is also no measurement path until one of the listed oracles is installed. Treat their catalog entries as declared-but-not-yet-runnable; the synthetic fixture
+`data/examples/eval/EVAL_synth_quality_indicators_2026-05-04.yaml` exercises the schema and emitter routing, not real tools.
 
 ## Build notes (for reproducibility)
 

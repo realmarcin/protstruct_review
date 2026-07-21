@@ -498,3 +498,76 @@ tool_recommendations:
       completeness, ⟨I/σ⟩, and CC½ statistics. Catalog T13 oracle
       (catalog notes name it explicitly).
     as_of_date: '2026-04-30'
+
+  # --- T15-T17 (oracle-only tasks; no PHENIX implementation exists) ---------
+  # None of these oracles are installed locally yet (see ref/oracle_tools.md
+  # "Not installed"), so these are consensus recommendations, not empirical
+  # top_performing results within this harness.
+
+  - id: REC_T15_secondary_structure_agreement_top_considered
+    metric_definition_ref: T15_secondary_structure_agreement
+    tool_ref: DSSP
+    role: top_considered
+    rank: 1
+    justification: >-
+      DSSP is the reference implementation for secondary-structure
+      assignment. The gradeable T15 metric is three-state agreement
+      between two independent assigners, so DSSP is paired with STRIDE
+      rather than used alone.
+    as_of_date: '2026-07-20'
+
+  - id: REC_T15_secondary_structure_agreement_alternative
+    metric_definition_ref: T15_secondary_structure_agreement
+    tool_ref: STRIDE
+    role: alternative
+    rank: 2
+    justification: >-
+      STRIDE is the independent second assigner in the agreement pair.
+      It uses hydrogen-bond energy plus dihedral criteria, so it fails
+      differently from DSSP — which is what makes the agreement
+      informative rather than tautological.
+    as_of_date: '2026-07-20'
+
+  - id: REC_T15_fold_classification_top_considered
+    metric_definition_ref: T15_fold_classification
+    tool_ref: CATH
+    role: top_considered
+    rank: 1
+    justification: >-
+      CATH provides curated, versioned fold assignments for deposited
+      entries. Informational rather than gradeable — record the label,
+      and treat CATH/SCOPe/ECOD disagreement as the signal.
+    as_of_date: '2026-07-20'
+
+  - id: REC_T16_interface_dockq_score_top_considered
+    metric_definition_ref: T16_interface_dockq_score
+    tool_ref: DockQ
+    role: top_considered
+    rank: 1
+    justification: >-
+      DockQ is the community-standard continuous interface-quality
+      score and the basis of the CAPRI quality classes; CAPRI class is
+      recorded alongside it as the ordinal label.
+    as_of_date: '2026-07-20'
+
+  - id: REC_T16_interface_buried_surface_area_top_considered
+    metric_definition_ref: T16_interface_buried_surface_area
+    tool_ref: PISA/PDBePISA
+    role: top_considered
+    rank: 1
+    justification: >-
+      PDBePISA is the reference service for interface area and
+      biological-assembly inference, and is the source the deposited
+      assembly is judged against.
+    as_of_date: '2026-07-20'
+
+  - id: REC_T17_nmr_ensemble_precision_rmsd_top_considered
+    metric_definition_ref: T17_nmr_ensemble_precision_rmsd
+    tool_ref: wwPDB NMR validation
+    role: top_considered
+    rank: 1
+    justification: >-
+      The wwPDB NMR validation report is the deposition-grade source
+      for ensemble precision and restraint-violation statistics, and is
+      the gold standard named in the T17 catalog entry.
+    as_of_date: '2026-07-20'

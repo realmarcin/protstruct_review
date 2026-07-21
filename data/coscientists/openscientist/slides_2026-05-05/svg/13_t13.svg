@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">T13 — X-ray data-quality oracle (re-measured 2026-05-05, identical to 2026-05-04)</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">scripts/t13_data_quality.py · CCP4 ctruncate (with aimless attempted) · cross-tool gap remains closed</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-05</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-05</text>
+
+  <rect x="80" y="200" width="1760" height="48" fill="#1f4e8c"/>
+  <text x="94" y="230.66666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="start">Metric</text>
+  <text x="414" y="230.66666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="start">Tool</text>
+  <text x="614" y="230.66666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="start">Value</text>
+  <text x="1094" y="230.66666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="start">Verdict</text>
+  <rect x="80" y="248" width="1760" height="48" fill="#ffffff"/>
+  <text x="94" y="277.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">Wilson B</text>
+  <text x="414" y="277.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">ctruncate</text>
+  <text x="614" y="277.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">14.54 Å² (σ 21.12)</text>
+  <rect x="1080" y="248" width="760" height="48" fill="#1f4e8c"/>
+  <text x="1094" y="277.6666666666667" font-size="17" fill="#ffffff" text-anchor="start">informational · matches refined protein-mean B 16.0</text>
+  <rect x="80" y="296" width="1760" height="48" fill="#f7f8fb"/>
+  <text x="94" y="325.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">L-test twin fraction</text>
+  <text x="414" y="325.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">ctruncate</text>
+  <text x="614" y="325.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">0.03</text>
+  <rect x="1080" y="296" width="760" height="48" fill="#1f7a3f"/>
+  <text x="1094" y="325.6666666666667" font-size="17" fill="#ffffff" text-anchor="start">✓ &lt; 0.05 — untwinned</text>
+  <rect x="80" y="344" width="1760" height="48" fill="#ffffff"/>
+  <text x="94" y="373.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">Moments-based twin</text>
+  <text x="414" y="373.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">ctruncate</text>
+  <text x="614" y="373.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">0.02</text>
+  <rect x="1080" y="344" width="760" height="48" fill="#1f7a3f"/>
+  <text x="1094" y="373.6666666666667" font-size="17" fill="#ffffff" text-anchor="start">✓ untwinned (&lt;I²&gt;/&lt;I&gt;² = 1.997, expected 2.0)</text>
+  <rect x="80" y="392" width="1760" height="48" fill="#f7f8fb"/>
+  <text x="94" y="421.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">L statistic</text>
+  <text x="414" y="421.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">ctruncate</text>
+  <text x="614" y="421.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">0.505</text>
+  <rect x="1080" y="392" width="760" height="48" fill="#1f7a3f"/>
+  <text x="1094" y="421.6666666666667" font-size="17" fill="#ffffff" text-anchor="start">✓ untwinned (untwinned 0.500, perfect twin 0.375)</text>
+  <rect x="80" y="440" width="1760" height="48" fill="#ffffff"/>
+  <text x="94" y="469.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">First-principles twin operators</text>
+  <text x="414" y="469.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">ctruncate</text>
+  <text x="614" y="469.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">0</text>
+  <rect x="1080" y="440" width="760" height="48" fill="#1f7a3f"/>
+  <text x="1094" y="469.6666666666667" font-size="17" fill="#ffffff" text-anchor="start">✓ none found by lattice / symmetry search</text>
+  <rect x="80" y="488" width="1760" height="48" fill="#f7f8fb"/>
+  <text x="94" y="517.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">ΔB anisotropy</text>
+  <text x="414" y="517.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">ctruncate</text>
+  <text x="614" y="517.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">7.32 Å² (eigvals 10.56 / 17.88 / 14.63)</text>
+  <rect x="1080" y="488" width="760" height="48" fill="#1f7a3f"/>
+  <text x="1094" y="517.6666666666666" font-size="17" fill="#ffffff" text-anchor="start">✓ &lt; 20 Å² rule of thumb · mild but present</text>
+  <rect x="80" y="536" width="1760" height="48" fill="#ffffff"/>
+  <text x="94" y="565.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">tNCS (Patterson 4 Å)</text>
+  <text x="414" y="565.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">ctruncate</text>
+  <text x="614" y="565.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">false</text>
+  <rect x="1080" y="536" width="760" height="48" fill="#1f7a3f"/>
+  <text x="1094" y="565.6666666666666" font-size="17" fill="#ffffff" text-anchor="start">✓ no off-origin peaks &gt; 14 Å</text>
+  <rect x="80" y="584" width="1760" height="48" fill="#f7f8fb"/>
+  <text x="94" y="613.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">Ice rings</text>
+  <text x="414" y="613.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">ctruncate</text>
+  <text x="614" y="613.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">1 flagged at 3.44 Å (Z 5.21, completeness 1.00)</text>
+  <rect x="1080" y="584" width="760" height="48" fill="#5a6071"/>
+  <text x="1094" y="613.6666666666666" font-size="17" fill="#ffffff" text-anchor="start">⚪ informational · borderline · not a refinement blocker</text>
+  <rect x="80" y="632" width="1760" height="48" fill="#ffffff"/>
+  <text x="94" y="661.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">aimless (canonical T13)</text>
+  <text x="414" y="661.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">CCP4 aimless</text>
+  <text x="614" y="661.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">aborted</text>
+  <rect x="1080" y="632" width="760" height="48" fill="#5a6071"/>
+  <text x="1094" y="661.6666666666666" font-size="17" fill="#ffffff" text-anchor="start">⚪ MTZ has merged amplitudes only (no M/ISYM)</text>
+  <rect x="80" y="200" width="1760" height="480" fill="none" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="400" y1="200" x2="400" y2="680" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="600" y1="200" x2="600" y2="680" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="1080" y1="200" x2="1080" y2="680" stroke="#e3e6ee" stroke-width="1"/>
+
+  <rect x="80" y="700" width="880" height="280" rx="10" fill="#dff0e1" stroke="#1f7a3f" stroke-width="2"/>
+  <text x="100" y="745" font-size="24" font-weight="700" fill="#1f7a3f">Coverage now closed — every catalog task green</text>
+  <text x="100" y="785" font-size="18" fill="#1a1a2e">T13 was wired on 2026-05-04; values are bit-identical on 2026-05-05 re-run.</text>
+  <text x="100" y="818" font-size="18" fill="#1a1a2e">ctruncate (CCP4 / non-cctbx) supplies 5 metrics computable from merged F-obs.</text>
+  <text x="100" y="851" font-size="18" fill="#1a1a2e">Five findings now have ≥ 3 confirmations (R-free · Asn A 39 · RMSD bracket ·</text>
+  <text x="100" y="884" font-size="18" fill="#1a1a2e">ligand RSCC · Mg²⁺ exclusion); data quality has 1 cctbx + 1 non-cctbx.</text>
+  <text x="100" y="935" font-size="16" fill="#5a6071">Wrapper persists logs at data/coscientists/openscientist/t13_oracle_logs/</text>
+  <rect x="980" y="700" width="860" height="280" rx="10" fill="#fbeecb" stroke="#b07c00" stroke-width="2"/>
+  <text x="1000" y="745" font-size="24" font-weight="700" fill="#b07c00">aimless limitation — captured as provenance</text>
+  <text x="1000" y="785" font-size="18" fill="#1a1a2e">aimless requires unmerged intensities (M/ISYM column).</text>
+  <text x="1000" y="818" font-size="18" fill="#1a1a2e">1sar.mtz ships only F-obs / SIGF-obs → aimless aborts:</text>
+  <text x="1000" y="852" font-size="16" fill="#1a1a2e" font-family="monospace">hkl_unmerge_list::prepare - EMPTY</text>
+  <text x="1000" y="892" font-size="18" fill="#1a1a2e">CC½, ⟨I/σ⟩ outer, Rmerge / Rmeas remain unobtainable —</text>
+  <text x="1000" y="922" font-size="18" fill="#1a1a2e">data-availability gap, not an oracle failure.</text>
+  <text x="1000" y="958" font-size="16" fill="#5a6071">Documented in skill `Tool assumptions` for future artefacts.</text>
+</svg>

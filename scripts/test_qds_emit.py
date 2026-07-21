@@ -24,6 +24,8 @@ from __future__ import annotations
 
 import copy
 import sys
+import tempfile
+from collections.abc import Callable
 from pathlib import Path
 
 import yaml
@@ -36,6 +38,7 @@ import qds_emit  # noqa: E402
 
 EVAL_1SAR = REPO / "data/coscientists/openscientist/EVAL_1sar_cdba2c07_2026-04-24.yaml"
 EVAL_SYNTH = REPO / "data/examples/eval/EVAL_synth_active_site_2026-04-26.yaml"
+EVAL_QUALITY = REPO / "data/examples/eval/EVAL_synth_quality_indicators_2026-05-04.yaml"
 
 EXPECTED_GEOMETRY_SLOTS_1SAR = {
     "clashscore",
@@ -52,6 +55,28 @@ def _check(condition: bool, msg: str) -> None:
     if not condition:
         print(f"FAIL: {msg}", file=sys.stderr)
         sys.exit(1)
+
+
+def assert_raises_completeness(
+    fn: Callable[[], object], expected_fragments: list[str], what: str
+) -> None:
+    """Run `fn` and assert it fails the completeness check with context.
+
+    QdsCompletenessError subclasses SystemExit deliberately, so callers of the
+    emitter that only catch SystemExit still stop. Accept either here, and
+    require every fragment in `expected_fragments` to appear in the message.
+    """
+    try:
+        fn()
+    except SystemExit as e:  # covers QdsCompletenessError
+        msg = str(e)
+        for fragment in expected_fragments:
+            _check(
+                fragment in msg,
+                f"emitter failed but message lacks {fragment!r} context: {msg!r}",
+            )
+        return
+    _check(False, f"emit_qds did not fail when {what}")
 
 
 def test_1sar_geometry_slots_all_present() -> None:
@@ -110,38 +135,110 @@ def test_negative_site_scope_without_site_decl_fails() -> None:
         r["sites"] = []
         r["ligands"] = []
 
-    bad_path = REPO / "/tmp/eval_bad_no_sites.yaml"
-    bad_path.parent.mkdir(parents=True, exist_ok=True)
-    bad_path.write_text(yaml.safe_dump(bad, sort_keys=False))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bad_path = Path(tmpdir) / "eval_bad_no_sites.yaml"
+        bad_path.write_text(yaml.safe_dump(bad, sort_keys=False))
 
-    try:
-        qds_emit.emit_qds(
-            [bad_path], qds_id="QDS_bad_test", structure_id="synth1"
+        assert_raises_completeness(
+            lambda: qds_emit.emit_qds(
+                [bad_path], qds_id="QDS_bad_test", structure_id="synth1"
+            ),
+            ["scope=site", "site_qualities"],
+            "site-scope measurement had no Site declared",
         )
-    except qds_emit.QdsCompletenessError as e:
-        msg = str(e)
-        _check(
-            "scope=site" in msg or "site_qualities" in msg,
-            f"emitter raised but message lacks scope-site context: {msg!r}",
+    print("PASS  test_negative_site_scope_without_site_decl_fails")
+
+
+def test_quality_indicator_extensions_present() -> None:
+    qds = qds_emit.emit_qds(
+        [EVAL_QUALITY], qds_id="QDS_quality_test", structure_id="synth_quality"
+    )
+
+    geom = qds.get("geometry_summary") or {}
+    _check("ramachandran_z_score" in geom, "Rama-Z missing from geometry_summary")
+    _check("packing_z_score" in geom, "packing Z missing from geometry_summary")
+    _check("unsatisfied_buried_hbond_count" in geom, "buried H-bond count missing from geometry_summary")
+
+    packing = qds.get("packing_summary") or {}
+    _check("packing_z_score" in packing, "packing_summary.packing_z_score missing")
+    _check("unsatisfied_buried_hbond_count" in packing, "packing_summary.unsatisfied_buried_hbond_count missing")
+
+    refn = qds.get("refinement_summary") or {}
+    _check("diffraction_precision_index" in refn, "DPI missing from refinement_summary")
+
+    mp = qds.get("map_summary") or {}
+    _check("directional_resolution_anisotropy" in mp, "3DFSC anisotropy missing from map_summary")
+    _check("local_model_map_fsc_q" in mp, "local FSC-Q missing from map_summary")
+    _check("rscc_outlier_fraction" in mp, "RSCC outlier fraction missing from map_summary")
+
+    pred = qds.get("predicted_confidence_summary") or {}
+    _check("predicted_tm_score" in pred, "pTM missing from predicted_confidence_summary")
+    _check("interface_predicted_tm_score" in pred, "ipTM missing from predicted_confidence_summary")
+    _check("prediction_ensemble_convergence" in pred, "prediction convergence missing from predicted_confidence_summary")
+
+    prq = qds.get("per_residue_quality") or {}
+    _check(prq.get("rscc_per_residue"), "rscc_per_residue array missing")
+    _check(prq.get("b_factor_z_per_residue"), "b_factor_z_per_residue array missing")
+    _check(prq.get("secondary_structure_per_residue"), "secondary_structure_per_residue array missing")
+    _check(prq.get("fsc_q_per_residue"), "fsc_q_per_residue array missing")
+
+    cls = qds.get("classification_summary") or {}
+    _check("secondary_structure_agreement" in cls,
+           "secondary_structure_agreement (the gradeable T15 metric) missing from classification_summary")
+    ssa = cls.get("secondary_structure_agreement") or {}
+    _check(ssa.get("value_numeric") is not None,
+           "secondary_structure_agreement must carry a numeric value — it is the gradeable T15 metric")
+    _check(cls.get("secondary_structure_assignments"), "secondary_structure_assignments missing")
+    _check(cls.get("domain_assignments"), "domain_assignments missing")
+    _check("fold_classification" in cls, "fold_classification missing")
+
+    iface = qds.get("interface_quality_summary") or {}
+    _check(iface.get("interface_qualities"), "interface_qualities missing")
+    _check("interface_buried_surface_area" in iface, "interface BSA missing")
+    _check("interface_dockq_score" in iface, "DockQ score missing")
+    _check("capri_interface_quality_class" in iface, "CAPRI class missing")
+
+    pens = qds.get("prediction_ensemble_summary") or {}
+    _check(pens.get("prediction_ensemble_qualities"), "prediction ensemble rows missing")
+    _check("prediction_ensemble_convergence" in pens, "prediction ensemble convergence missing")
+
+    nmr = qds.get("nmr_validation_summary") or {}
+    _check(nmr.get("nmr_ensemble_qualities"), "NMR ensemble rows missing")
+    _check("nmr_restraint_violation_summary" in nmr, "NMR restraint summary missing")
+    _check("nmr_ensemble_precision_rmsd" in nmr, "NMR precision RMSD missing")
+
+    print("PASS  test_quality_indicator_extensions_present  (new scalar + structured blocks)")
+
+
+def test_negative_structured_scopes_without_rows_fail() -> None:
+    doc = yaml.safe_load(EVAL_QUALITY.read_text())
+    bad = copy.deepcopy(doc)
+    for r in bad["evaluation_runs"]:
+        r["domain_assignments"] = []
+        r["interface_qualities"] = []
+        r["prediction_ensemble_qualities"] = []
+        r["nmr_ensemble_qualities"] = []
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bad_path = Path(tmpdir) / "eval_bad_no_structured_scopes.yaml"
+        bad_path.write_text(yaml.safe_dump(bad, sort_keys=False))
+
+        assert_raises_completeness(
+            lambda: qds_emit.emit_qds(
+                [bad_path], qds_id="QDS_bad_structured_test", structure_id="synth_quality"
+            ),
+            ["scope=domain", "scope=interface", "scope=ensemble"],
+            "structured-scope rows were missing",
         )
-        print("PASS  test_negative_site_scope_without_site_decl_fails")
-        return
-    except SystemExit as e:
-        # QdsCompletenessError is a SystemExit subclass — accept either.
-        msg = str(e)
-        _check(
-            "scope=site" in msg or "site_qualities" in msg,
-            f"emitter exited but message lacks scope-site context: {msg!r}",
-        )
-        print("PASS  test_negative_site_scope_without_site_decl_fails")
-        return
-    _check(False, "emit_qds did not fail when site-scope measurement had no Site declared")
+    print("PASS  test_negative_structured_scopes_without_rows_fail")
 
 
 def main() -> int:
     test_1sar_geometry_slots_all_present()
     test_synth_local_blocks_present()
     test_negative_site_scope_without_site_decl_fails()
+    test_quality_indicator_extensions_present()
+    test_negative_structured_scopes_without_rows_fail()
     print("\nall qds_emit regression tests passed")
     return 0
 

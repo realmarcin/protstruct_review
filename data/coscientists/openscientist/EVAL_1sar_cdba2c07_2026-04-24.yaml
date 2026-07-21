@@ -888,6 +888,62 @@ evaluation_runs:
     pass_criterion: < 1 σ for well-refined model
     pass_status: pass
     notes: Closes the cctbx-only gap on angle RMSZ. zANGL 0.864 σ.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_servalcat_sigmaa_rwork
+    catalog_task_ref: T03
+    stage: final
+    scope: complex
+    metric_definition_ref: T03_r-work
+    oracle_tool_ref: Servalcat
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.149
+    oracle_measure:
+      value_numeric: 0.1705
+    delta:
+      value_numeric: 0.0215
+    pass_criterion: match within 0.005
+    pass_status: fail_by_oracle
+    notes: 'Servalcat 0.4.131 `sigmaa` per-bin Rwork from sigma-A weighting (Murshudov-group
+      code path, separate from REFMAC5 minimiser). Fourth independent R-work measurement:
+      0.156 (PHENIX) / 0.164 (gemmi) / 0.169 (REFMAC5) / 0.171 (Servalcat) — bracket
+      tightens around 0.16-0.17. Agent''s 0.149 is below all four. Re-run on 2026-05-05.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_servalcat_sigmaa_rfree
+    catalog_task_ref: T03
+    stage: final
+    scope: complex
+    metric_definition_ref: T03_r-free
+    oracle_tool_ref: Servalcat
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.199
+    oracle_measure:
+      value_numeric: 0.2209
+    delta:
+      value_numeric: 0.0219
+    pass_criterion: match within 0.005
+    pass_status: fail_by_oracle
+    notes: 'Servalcat 0.4.131 `sigmaa` per-bin Rfree (n_free=362). Fourth independent
+      R-free measurement: 0.211 (PHENIX) / 0.217 (gemmi) / 0.213 (REFMAC5) / 0.221
+      (Servalcat) — all four code paths above 0.21. Agent''s 0.199 is reproducibly
+      below the bracket. Re-run on 2026-05-05.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_servalcat_sigmaa_gap
+    catalog_task_ref: T03
+    stage: final
+    scope: complex
+    metric_definition_ref: T03_r-free_r-work_gap
+    oracle_tool_ref: Servalcat
+    oracle_family: non_cctbx
+    agent_claim:
+      value_numeric: 0.05
+    oracle_measure:
+      value_numeric: 0.0504
+    delta:
+      value_numeric: 0.0004
+    pass_criterion: gap < 0.05
+    pass_status: fail_by_oracle
+    notes: 'Servalcat sigmaa Rfree-Rwork gap = 0.0504. Catalog oracle of record (PHENIX)
+      reports 0.0552; gemmi 0.0526; REFMAC5 0.0435; Servalcat 0.0504 — three of four
+      code paths fail the < 0.05 criterion. Re-run on 2026-05-05.'
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_prosmart_global_rmsd
     catalog_task_ref: T01
     stage: final
@@ -1207,6 +1263,102 @@ evaluation_runs:
       bond. K⁺ has a tighter bond-length fit by oracle. Whether the buffer contained
       K⁺ is the open question; without that information, Na⁺ is the default and the
       modelling is consistent.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_t13_wilson_b
+    catalog_task_ref: T13
+    stage: all
+    metric_definition_ref: T13_wilson_b
+    oracle_tool_ref: ctruncate
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 14.542
+      unit: 'Å²'
+    pass_criterion: informational
+    pass_status: informational
+    notes: 'ctruncate Wilson scaling; sigma 21.119. Compare with refined-model
+      mean B (≈ 16 Å² protein, 21 Å² overall) — close, consistent with low-overall-B
+      well-behaved data.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_t13_twin_fraction_l
+    catalog_task_ref: T13
+    stage: all
+    metric_definition_ref: T13_l-test_twinning
+    oracle_tool_ref: ctruncate
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 0.03
+      unit: fraction
+    pass_criterion: < 0.05
+    pass_status: pass
+    notes: 'L statistic 0.505 (untwinned 0.5, perfect twin 0.375); moments-based
+      estimate 0.02; first-principles twin-operator search returned no operators.
+      <I^2>/<I>^2 = 1.997 (expected 2.0 for untwinned).'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_t13_delta_b_aniso
+    catalog_task_ref: T13
+    stage: all
+    metric_definition_ref: T13_anisotropy_δb_aniso
+    oracle_tool_ref: ctruncate
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_numeric: 7.319
+      unit: 'Å²'
+    pass_criterion: < 20 Å² (rule of thumb)
+    pass_status: pass
+    notes: 'ctruncate anisotropy eigenvalues [10.56, 17.88, 14.63]; ratios 0.83 / 1.00
+      / 0.92. ctruncate flag = some — mild but present, not a refinement blocker.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_t13_tncs_flag
+    catalog_task_ref: T13
+    stage: all
+    metric_definition_ref: T13_tncs_flag
+    oracle_tool_ref: ctruncate
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_text: 'false'
+    pass_criterion: 'false'
+    pass_status: pass
+    notes: ctruncate Patterson search at 4 Å resolution limit; no off-origin peaks
+      above 14 Å with significant Q-score.
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_t13_ice_ring_flags
+    catalog_task_ref: T13
+    stage: all
+    metric_definition_ref: T13_ice-ring_flags
+    oracle_tool_ref: ctruncate
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_text: '3.44Å'
+    pass_criterion: no flagged rings (Z > 5)
+    pass_status: informational
+    notes: 'ctruncate ice-ring summary: 4 ice-sensitive resolution bins scanned
+      (3.90, 3.67, 3.44, 2.67 Å). One flagged at 3.44 Å with Z-score 5.21 and
+      completeness 1.00 — borderline by the Z>5 cutoff but completeness is full
+      and intensity ratio is 1.17. Surface as informational, not a refinement
+      blocker.'
+  - id: EVAL_1sar_cdba2c07_2026-04-24_M_t13_aimless_attempt
+    catalog_task_ref: T13
+    stage: all
+    metric_definition_ref: T13_aimless_status
+    oracle_tool_ref: CCP4 aimless
+    oracle_family: non_cctbx
+    agent_claim:
+      is_not_applicable: true
+    oracle_measure:
+      value_text: aimless aborted (input is merged)
+    pass_criterion: informational
+    pass_status: informational
+    notes: 'CCP4 aimless was tried as the canonical T13 non-cctbx oracle but
+      requires unmerged intensities (M/ISYM column). The 1SAR artefact ships
+      only merged F-obs/SIGF-obs, so aimless aborts with hkl_unmerge_list::prepare
+      EMPTY. ctruncate is the merged-data fallback for the metrics it can
+      compute (Wilson B, twinning, anisotropy, tNCS, ice rings); CC½, ⟨I/σ⟩,
+      and Rmerge remain unobtainable without raw integration intensities.'
   headline_findings:
   - id: EVAL_1sar_cdba2c07_2026-04-24_H_001
     catalog_task_refs:

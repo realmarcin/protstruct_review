@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">Tool / framework assumptions — status delta</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">QDS assumptions_report grew from 33 → 36+ rows · two upgrades, four hardenings, two new mitigations</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-04</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-04</text>
+
+  <rect x="80" y="190" width="1760" height="46" fill="#1f4e8c"/>
+  <text x="94" y="219.66666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="start">Assumption</text>
+  <text x="894" y="219.66666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="start">Was</text>
+  <text x="1254" y="219.66666666666666" font-size="20" font-weight="700" fill="#ffffff" text-anchor="start">Now</text>
+  <rect x="80" y="236" width="1760" height="46" fill="#ffffff"/>
+  <text x="94" y="264.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">ASSUM_interp_ion_identity_no_anomalous</text>
+  <text x="894" y="264.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">known_violation</text>
+  <rect x="1240" y="236" width="600" height="46" fill="#1f7a3f"/>
+  <text x="1254" y="264.6666666666667" font-size="17" fill="#ffffff" text-anchor="start">mitigated (CheckMyMetal)</text>
+  <rect x="80" y="282" width="1760" height="46" fill="#f7f8fb"/>
+  <text x="94" y="310.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">ASSUM_phenix_refine_in_run_r_factors_use_internal_scaling</text>
+  <text x="894" y="310.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">known_violation</text>
+  <rect x="1240" y="282" width="600" height="46" fill="#b07c00"/>
+  <text x="1254" y="310.6666666666667" font-size="17" fill="#ffffff" text-anchor="start">known_violation (3-tool hardened)</text>
+  <rect x="80" y="328" width="1760" height="46" fill="#ffffff"/>
+  <text x="94" y="356.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">ASSUM_find_peaks_holes_cutoff_and_merging</text>
+  <text x="894" y="356.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">known_violation</text>
+  <rect x="1240" y="328" width="600" height="46" fill="#b07c00"/>
+  <text x="1254" y="356.6666666666667" font-size="17" fill="#ffffff" text-anchor="start">known_violation</text>
+  <rect x="80" y="374" width="1760" height="46" fill="#f7f8fb"/>
+  <text x="94" y="402.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">ASSUM_report_round_table_collapses_rounds</text>
+  <text x="894" y="402.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">known_violation</text>
+  <rect x="1240" y="374" width="600" height="46" fill="#b07c00"/>
+  <text x="1254" y="402.6666666666667" font-size="17" fill="#ffffff" text-anchor="start">known_violation (per-round oracle hardens)</text>
+  <rect x="80" y="420" width="1760" height="46" fill="#ffffff"/>
+  <text x="94" y="448.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">ASSUM_report_position_initial_not_final</text>
+  <text x="894" y="448.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">known_violation</text>
+  <rect x="1240" y="420" width="600" height="46" fill="#b07c00"/>
+  <text x="1254" y="448.6666666666667" font-size="17" fill="#ffffff" text-anchor="start">known_violation</text>
+  <rect x="80" y="466" width="1760" height="46" fill="#f7f8fb"/>
+  <text x="94" y="494.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">ASSUM_report_water_count_stage_drift</text>
+  <text x="894" y="494.6666666666667" font-size="17" fill="#1a1a2e" text-anchor="start">known_violation</text>
+  <rect x="1240" y="466" width="600" height="46" fill="#b07c00"/>
+  <text x="1254" y="494.6666666666667" font-size="17" fill="#ffffff" text-anchor="start">known_violation</text>
+  <rect x="80" y="512" width="1760" height="46" fill="#ffffff"/>
+  <text x="94" y="540.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">ASSUM_agg_zero_rama_rounds_one_outlier_to_zero</text>
+  <text x="894" y="540.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">mitigated</text>
+  <rect x="1240" y="512" width="600" height="46" fill="#1f7a3f"/>
+  <text x="1254" y="540.6666666666666" font-size="17" fill="#ffffff" text-anchor="start">mitigated (3-tool Asn A 39 hardens)</text>
+  <rect x="80" y="558" width="1760" height="46" fill="#f7f8fb"/>
+  <text x="94" y="586.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">ASSUM_checkmymetal_geometry_based</text>
+  <text x="894" y="586.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">—</text>
+  <rect x="1240" y="558" width="600" height="46" fill="#1f7a3f"/>
+  <text x="1254" y="586.6666666666666" font-size="17" fill="#ffffff" text-anchor="start">unchecked → mitigated by 1SAR run</text>
+  <rect x="80" y="604" width="1760" height="46" fill="#ffffff"/>
+  <text x="94" y="632.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">ASSUM_t13_oracle_pending  (new)</text>
+  <text x="894" y="632.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">open follow-up</text>
+  <rect x="1240" y="604" width="600" height="46" fill="#1f7a3f"/>
+  <text x="1254" y="632.6666666666666" font-size="17" fill="#ffffff" text-anchor="start">closed — ctruncate wired</text>
+  <rect x="80" y="650" width="1760" height="46" fill="#f7f8fb"/>
+  <text x="94" y="678.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">ASSUM_aimless_requires_unmerged_intensities  (new)</text>
+  <text x="894" y="678.6666666666666" font-size="17" fill="#1a1a2e" text-anchor="start">—</text>
+  <rect x="1240" y="650" width="600" height="46" fill="#1f7a3f"/>
+  <text x="1254" y="678.6666666666666" font-size="17" fill="#ffffff" text-anchor="start">mitigated — wrapper falls back to ctruncate</text>
+  <rect x="80" y="190" width="1760" height="506" fill="none" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="880" y1="190" x2="880" y2="696" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="1240" y1="190" x2="1240" y2="696" stroke="#e3e6ee" stroke-width="1"/>
+
+  <rect x="80" y="720" width="1760" height="240" rx="10" fill="#dce6f4" stroke="#1f4e8c" stroke-width="2"/>
+  <text x="100" y="765" font-size="26" font-weight="700" fill="#1a1a2e">Open assumption — K⁺ alternative</text>
+  <text x="100" y="805" font-size="20" fill="#1a1a2e">K⁺ alternative for both ions has the best raw bond-length fit but coordination is too low.</text>
+  <text x="100" y="838" font-size="20" fill="#1a1a2e">Will be added as an "unchecked" assumption if buffer content is investigated.</text>
+  <text x="100" y="888" font-size="20" fill="#1a1a2e">Trust model preserved: every load-bearing finding has ≥ 1 non-cctbx confirmation; 5 most consequential have ≥ 3.</text>
+  <text x="100" y="930" font-size="18" fill="#5a6071">Five findings with ≥ 3 confirmations: R-free · Asn A 39 · RMSD bracket · ligand RSCC · Mg²⁺ exclusion.</text>
+</svg>

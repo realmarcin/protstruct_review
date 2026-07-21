@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">T10 — Per-water audit (146 waters)</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">Three waters with RSCC &lt; 0.7 flagged as density_misfit · 143 / 146 are well-supported</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-04</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-04</text>
+
+  <rect x="80" y="200" width="700" height="320" rx="10" fill="#dce6f4" stroke="#1f4e8c" stroke-width="2"/>
+  <text x="100" y="250" font-size="26" font-weight="700" fill="#1a1a2e">Distribution statistics</text>
+  <text x="100" y="290" font-size="20" font-weight="700" fill="#1a1a2e">Mean B</text>
+  <text x="380" y="290" font-size="20" fill="#1a1a2e">20.76 Å² (above protein mean 15.98)</text>
+  <text x="100" y="330" font-size="20" font-weight="700" fill="#1a1a2e">Mean RSCC</text>
+  <text x="380" y="330" font-size="20" fill="#1a1a2e">0.867  (range 0.658–0.983)</text>
+  <text x="100" y="370" font-size="20" font-weight="700" fill="#1a1a2e">Waters with RSCC &lt; 0.7</text>
+  <text x="380" y="370" font-size="20" fill="#1a1a2e">3  (2.1%)</text>
+  <text x="100" y="410" font-size="20" font-weight="700" fill="#1a1a2e">Waters with B &gt; 50 Å²</text>
+  <text x="380" y="410" font-size="20" fill="#1a1a2e">1  (HOH S 724)</text>
+  <text x="100" y="450" font-size="20" font-weight="700" fill="#1a1a2e">Waters with B &gt; 60 Å²</text>
+  <text x="380" y="450" font-size="20" fill="#1a1a2e">0</text>
+  <text x="820" y="240" font-size="26" font-weight="700" fill="#a8201a">Three waters to re-evaluate</text>
+  <rect x="820" y="280" width="840" height="58" fill="#1f4e8c"/>
+  <text x="834" y="316.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="start">Residue</text>
+  <text x="1246" y="316.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="end">B (Å²)</text>
+  <text x="1426" y="316.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="end">RSCC</text>
+  <text x="1550.0" y="316.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="middle">Severity</text>
+  <rect x="820" y="338" width="840" height="58" fill="#ffffff"/>
+  <text x="834" y="374.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="start">HOH S 680</text>
+  <text x="1246" y="374.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">44.56</text>
+  <text x="1426" y="374.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.658</text>
+  <rect x="1440" y="338" width="220" height="58" fill="#a8201a"/>
+  <text x="1550.0" y="374.3333333333333" font-size="22" fill="#ffffff" text-anchor="middle">severe</text>
+  <rect x="820" y="396" width="840" height="58" fill="#f7f8fb"/>
+  <text x="834" y="432.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="start">HOH S 707</text>
+  <text x="1246" y="432.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">33.27</text>
+  <text x="1426" y="432.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.668</text>
+  <rect x="1440" y="396" width="220" height="58" fill="#b07c00"/>
+  <text x="1550.0" y="432.3333333333333" font-size="22" fill="#ffffff" text-anchor="middle">moderate</text>
+  <rect x="820" y="454" width="840" height="58" fill="#ffffff"/>
+  <text x="834" y="490.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="start">HOH S 729</text>
+  <text x="1246" y="490.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">48.75</text>
+  <text x="1426" y="490.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.691</text>
+  <rect x="1440" y="454" width="220" height="58" fill="#b07c00"/>
+  <text x="1550.0" y="490.3333333333333" font-size="22" fill="#ffffff" text-anchor="middle">moderate</text>
+  <rect x="820" y="280" width="840" height="232" fill="none" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="1060" y1="280" x2="1060" y2="512" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="1260" y1="280" x2="1260" y2="512" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="1440" y1="280" x2="1440" y2="512" stroke="#e3e6ee" stroke-width="1"/>
+
+  <text x="80" y="580" font-size="26" font-weight="700" fill="#1f4e8c">Water RSCC histogram (qualitative)</text>
+  <rect x="110" y="879.5121951219512" width="180" height="20.48780487804878" fill="#a8201a" rx="4"/>
+  <text x="200.0" y="871.5121951219512" font-size="18" fill="#1a1a2e" font-weight="700" text-anchor="middle">3</text>
+  <text x="200.0" y="930" font-size="16" fill="#1a1a2e" text-anchor="middle">&lt; 0.70</text>
+  <rect x="350" y="859.0243902439024" width="180" height="40.97560975609756" fill="#b07c00" rx="4"/>
+  <text x="440.0" y="851.0243902439024" font-size="18" fill="#1a1a2e" font-weight="700" text-anchor="middle">6</text>
+  <text x="440.0" y="930" font-size="16" fill="#1a1a2e" text-anchor="middle">0.70–0.75</text>
+  <rect x="590" y="804.390243902439" width="180" height="95.60975609756098" fill="#b07c00" rx="4"/>
+  <text x="680.0" y="796.390243902439" font-size="18" fill="#1a1a2e" font-weight="700" text-anchor="middle">14</text>
+  <text x="680.0" y="930" font-size="16" fill="#1a1a2e" text-anchor="middle">0.75–0.80</text>
+  <rect x="830" y="742.9268292682927" width="180" height="157.0731707317073" fill="#5a6071" rx="4"/>
+  <text x="920.0" y="734.9268292682927" font-size="18" fill="#1a1a2e" font-weight="700" text-anchor="middle">23</text>
+  <text x="920.0" y="930" font-size="16" fill="#1a1a2e" text-anchor="middle">0.80–0.85</text>
+  <rect x="1070" y="620.0" width="180" height="280.0" fill="#1f4e8c" rx="4"/>
+  <text x="1160.0" y="612.0" font-size="18" fill="#1a1a2e" font-weight="700" text-anchor="middle">41</text>
+  <text x="1160.0" y="930" font-size="16" fill="#1a1a2e" text-anchor="middle">0.85–0.90</text>
+  <rect x="1310" y="640.4878048780488" width="180" height="259.5121951219512" fill="#1f7a3f" rx="4"/>
+  <text x="1400.0" y="632.4878048780488" font-size="18" fill="#1a1a2e" font-weight="700" text-anchor="middle">38</text>
+  <text x="1400.0" y="930" font-size="16" fill="#1a1a2e" text-anchor="middle">0.90–0.95</text>
+  <rect x="1550" y="756.5853658536586" width="180" height="143.41463414634146" fill="#1f7a3f" rx="4"/>
+  <text x="1640.0" y="748.5853658536586" font-size="18" fill="#1a1a2e" font-weight="700" text-anchor="middle">21</text>
+  <text x="1640.0" y="930" font-size="16" fill="#1a1a2e" text-anchor="middle">&gt; 0.95</text>
+  <text x="920.0" y="962" font-size="16" fill="#5a6071" text-anchor="middle">RSCC bin · count of waters (146 total)</text>
+</svg>

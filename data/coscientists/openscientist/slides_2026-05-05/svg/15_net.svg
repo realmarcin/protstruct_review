@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">Net acceptance summary</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">Four reportable issues · one open question · cross-tool coverage closed</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-05</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-05</text>
+
+  <rect x="80" y="180" width="1760" height="160" rx="10" fill="#dff0e1" stroke="#1f7a3f" stroke-width="2"/>
+  <text x="100" y="230" font-size="32" font-weight="700" fill="#1f7a3f">Modelling decisions are defensible</text>
+  <text x="100" y="278" font-size="20" fill="#1a1a2e">Structure · geometry · ion identity (Mg²⁺ excluded) · water placement (143 / 146 well-supported) · disulfide bonds.</text>
+  <text x="100" y="312" font-size="18" fill="#5a6071">1SAR refinement is a real and substantial improvement over the deposited starting model.</text>
+  <rect x="80" y="380" width="417" height="220" rx="10" fill="#ffffff" stroke="#a8201a" stroke-width="2"/>
+  <circle cx="110" cy="414" r="22" fill="#a8201a"/>
+  <text x="110" y="422" font-size="22" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+  <text x="150" y="422" font-size="22" font-weight="700" fill="#1a1a2e">R-free under-stated</text>
+  <text x="98" y="470" font-size="18" fill="#a8201a" font-weight="700">≈ 0.012 below 4-tool consensus</text>
+  <text x="98" y="510" font-size="17" fill="#1a1a2e">Four code paths bracket R-free</text>
+  <text x="98" y="534" font-size="17" fill="#1a1a2e">0.211–0.221. Success-criterion</text>
+  <text x="98" y="558" font-size="17" fill="#1a1a2e">gap &lt; 0.05 fails 3 of 4.</text>
+  <rect x="527" y="380" width="417" height="220" rx="10" fill="#ffffff" stroke="#a8201a" stroke-width="2"/>
+  <circle cx="557" cy="414" r="22" fill="#a8201a"/>
+  <text x="557" y="422" font-size="22" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+  <text x="597" y="422" font-size="22" font-weight="700" fill="#1a1a2e">Round 7 ≮ Round 6</text>
+  <text x="545" y="470" font-size="18" fill="#a8201a" font-weight="700">0.212 vs 0.207 at oracle scaling</text>
+  <text x="545" y="510" font-size="17" fill="#1a1a2e">NCS-torsion-restraints</text>
+  <text x="545" y="534" font-size="17" fill="#1a1a2e">justification doesn’t</text>
+  <text x="545" y="558" font-size="17" fill="#1a1a2e">reproduce.</text>
+  <rect x="974" y="380" width="417" height="220" rx="10" fill="#ffffff" stroke="#a8201a" stroke-width="2"/>
+  <circle cx="1004" cy="414" r="22" fill="#a8201a"/>
+  <text x="1004" y="422" font-size="22" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+  <text x="1044" y="422" font-size="22" font-weight="700" fill="#1a1a2e">Asn A 39 outlier</text>
+  <text x="992" y="470" font-size="18" fill="#a8201a" font-weight="700">3-tool confirmed</text>
+  <text x="992" y="510" font-size="17" fill="#1a1a2e">Agent’s 0.00% Ramachandran</text>
+  <text x="992" y="534" font-size="17" fill="#1a1a2e">outliers headline rounds 1</text>
+  <text x="992" y="558" font-size="17" fill="#1a1a2e">outlier to zero.</text>
+  <rect x="1421" y="380" width="417" height="220" rx="10" fill="#ffffff" stroke="#a8201a" stroke-width="2"/>
+  <circle cx="1451" cy="414" r="22" fill="#a8201a"/>
+  <text x="1451" y="422" font-size="22" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+  <text x="1491" y="422" font-size="22" font-weight="700" fill="#1a1a2e">Peak inventory</text>
+  <text x="1439" y="470" font-size="18" fill="#a8201a" font-weight="700">5 peaks &gt; 5σ not reported</text>
+  <text x="1439" y="510" font-size="17" fill="#1a1a2e">23 + / 8 − peaks at 4σ; agent</text>
+  <text x="1439" y="534" font-size="17" fill="#1a1a2e">listed 9. Max +6.18σ.</text>
+  <text x="80" y="660" font-size="26" font-weight="700" fill="#b07c00">Open</text>
+  <rect x="80" y="680" width="865" height="200" rx="10" fill="#fbeecb" stroke="#b07c00" stroke-width="2"/>
+  <text x="100" y="720" font-size="22" font-weight="700" fill="#b07c00">Open question</text>
+  <text x="100" y="755" font-size="18" fill="#1a1a2e">K⁺ alternative for both ions</text>
+  <text x="100" y="790" font-size="17" fill="#1a1a2e">Best raw bond-length fit, but coordination number low and the protein is a known Ca²⁺ enzyme.</text>
+  <text x="100" y="822" font-size="17" fill="#1a1a2e">Needs crystallisation-buffer information.</text>
+  <rect x="975" y="680" width="865" height="200" rx="10" fill="#dff0e1" stroke="#1f7a3f" stroke-width="2"/>
+  <text x="995" y="720" font-size="22" font-weight="700" fill="#1f7a3f">Strengthened in this re-run (2026-05-05)</text>
+  <text x="995" y="755" font-size="18" fill="#1a1a2e">Servalcat sigmaa direct R-work/R-free → 4-tool R-free bracket</text>
+  <text x="995" y="790" font-size="17" fill="#1a1a2e">PHENIX 0.211 · gemmi 0.217 · REFMAC 0.213 · Servalcat 0.221 — agent 0.199 below all four.</text>
+  <text x="995" y="822" font-size="17" fill="#1a1a2e">Every 2026-05-04 finding reproduces deterministically against the same artefact.</text>
+  <text x="995" y="848" font-size="17" fill="#1a1a2e">Cross-tool coverage matrix fully green; T13 + T03 both have ≥ 4 oracles.</text>
+</svg>

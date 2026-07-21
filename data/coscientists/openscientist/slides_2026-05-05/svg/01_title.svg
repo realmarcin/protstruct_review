@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="240" fill="#1f4e8c"/>
+  <rect x="0" y="240" width="1920" height="14" fill="#dce6f4"/>
+  <text x="80" y="170" font-size="64" font-weight="700" fill="#ffffff">1SAR refinement — independent re-review</text>
+  <text x="80" y="220" font-size="28" font-weight="400" fill="#dce6f4">protstruct_review · openscientist artefact cdba2c07-daff-4f60-ae96-12452b3a5fbb</text>
+  <text x="80" y="370" font-size="34" font-weight="600" fill="#1a1a2e">Mostly pass · 2026-05-05 re-run · cross-tool coverage strengthened on T03</text>
+  <text x="80" y="420" font-size="22" fill="#5a6071">11 independent oracle code paths · 9 non-cctbx · all 2026-05-04 findings reproduce · Servalcat sigmaa adds 4th R-work/R-free pair</text>
+  <circle cx="100" cy="483" r="8" fill="#a8201a"/>
+  <text x="125" y="490" font-size="22" fill="#1a1a2e">R-free reproducibly ≈ 0.21, not 0.199 — 4 code paths now (PHENIX 0.211 · gemmi 0.217 · REFMAC 0.213 · Servalcat 0.221)</text>
+  <circle cx="100" cy="539" r="8" fill="#a8201a"/>
+  <text x="125" y="546" font-size="22" fill="#1a1a2e">Round 6 R-free 0.207 better than round 7 R-free 0.212 — claim reversed (re-measured)</text>
+  <circle cx="100" cy="595" r="8" fill="#a8201a"/>
+  <text x="125" y="602" font-size="22" fill="#1a1a2e">Asn A 39 is a Ramachandran outlier (3-tool confirmed)</text>
+  <circle cx="100" cy="651" r="8" fill="#a8201a"/>
+  <text x="125" y="658" font-size="22" fill="#1a1a2e">Density-peak inventory incomplete — oracle 23+ / 8− at 4σ; agent listed 9</text>
+  <circle cx="100" cy="707" r="8" fill="#1f7a3f"/>
+  <text x="125" y="714" font-size="22" fill="#1a1a2e">Mg²⁺ excluded for both ions by CheckMyMetal-style |Z| 14–16</text>
+  <circle cx="100" cy="763" r="8" fill="#1f7a3f"/>
+  <text x="125" y="770" font-size="22" fill="#1a1a2e">Ligand / metal density support confirmed (RSCC ≥ 0.96)</text>
+  <circle cx="100" cy="819" r="8" fill="#1f7a3f"/>
+  <text x="125" y="826" font-size="22" fill="#1a1a2e">T13 data quality clean — no twinning · no tNCS · ΔB aniso 7.3 Å²</text>
+  <text x="80" y="970" font-size="20" fill="#5a6071">Review issued 2026-05-05 · slide deck compiled 2026-05-05</text>
+  <text x="80" y="1010" font-size="18" fill="#5a6071">Trust model: cross-tool agreement, never PHENIX-grading-PHENIX</text>
+  <rect x="0" y="1050" width="1920" height="30" fill="#1f4e8c"/>
+</svg>

@@ -4,3 +4,12 @@ __pycache__/
 schemas/json-schema/
 .claude/scheduled_tasks.lock
 .claude/*.lock
+
+# Matt Pocock's engineering skills are installed as a user-scope Claude Code plugin
+# (mattpocock-skills@mattpocock), not vendored here. Install with:
+#   claude plugin marketplace add mattpocock/skills
+#   claude plugin install mattpocock-skills@mattpocock
+# docs/agents/ is that skill set's per-repo config (issue tracker, triage labels, domain
+# docs); CLAUDE.local.md is the pointer to it that the skills read. Both are machine-local.
+docs/agents/
+CLAUDE.local.md

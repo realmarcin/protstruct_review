@@ -7,9 +7,9 @@ across the EvaluationRuns it derives from, plus a `cross_tool_coverage`
 section, plus per-residue / site / ligand / pairwise / predicted-confidence /
 tool-recommendations blocks when the source eval carries that content.
 
-Routing is driven by an explicit `METRIC_TO_QDS_SLOT` table keyed on the
-canonical metric ids declared in `ref/catalog.yaml`. Substring matching is
-not used. Strongest-oracle picking (prefer non_cctbx; prefer numeric over
+Routing is driven by a single explicit `METRIC_TO_QDS_SLOT` table keyed on
+the canonical metric ids declared in `ref/catalog.yaml`. Substring matching
+is not used. Strongest-oracle picking (prefer non_cctbx; prefer numeric over
 text) is the tie-breaker when multiple measurements share a metric id.
 
 After building, a fail-hard consistency pass rejects QDS that would hide
@@ -48,9 +48,15 @@ TOOL_ASSUMPTIONS_PATH = REPO / "ref" / "tool_assumptions.yaml"
 # Every metric_definition_ref the harness records routes through this table.
 # Adding a new metric ⇒ add a new row here. Validated against the catalog
 # at startup so a typo is caught before a QDS is emitted.
+#
+# A row's value is one `(block, slot)` pair, or a list of them when a metric
+# deliberately lands in more than one block (a headline summary plus a newer
+# specialized block). The value is then emitted once per listed slot.
 # ---------------------------------------------------------------------------
 
-METRIC_TO_QDS_SLOT: dict[str, tuple[str, str]] = {
+QdsSlot = tuple[str, str]
+
+METRIC_TO_QDS_SLOT: dict[str, QdsSlot | list[QdsSlot]] = {
     # Geometry summary
     "T05_clashscore":              ("geometry_summary", "clashscore"),
     "T05_ramachandran_outlier":    ("geometry_summary", "ramachandran_outliers_pct"),
@@ -62,6 +68,16 @@ METRIC_TO_QDS_SLOT: dict[str, tuple[str, str]] = {
     "T05_bond-length_rmsz":        ("geometry_summary", "bond_rmsz"),
     "T05_bond-angle_rmsz":         ("geometry_summary", "angle_rmsz"),
     "T05_cbeta_outliers":          ("geometry_summary", "cbeta_deviations_count"),
+    "T05_rama_z_score":            ("geometry_summary", "ramachandran_z_score"),
+    "T05_packing_z_score":         [
+        ("geometry_summary", "packing_z_score"),
+        ("packing_summary", "packing_z_score"),
+    ],
+    "T05_unsatisfied_buried_hbond_count": [
+        ("geometry_summary", "unsatisfied_buried_hbond_count"),
+        ("packing_summary", "unsatisfied_buried_hbond_count"),
+    ],
+    "T05_b_factor_outlier_z":      ("packing_summary", "b_factor_outlier_z"),
 
     # Refinement summary (X-ray)
     "T03_r-work":                  ("refinement_summary", "r_work"),
@@ -69,6 +85,7 @@ METRIC_TO_QDS_SLOT: dict[str, tuple[str, str]] = {
     "T03_r-free_r-work_gap":       ("refinement_summary", "r_free_gap"),
     "T06_r-work":                  ("refinement_summary", "r_work"),
     "T06_r-free":                  ("refinement_summary", "r_free"),
+    "T06_diffraction_precision_index": ("refinement_summary", "diffraction_precision_index"),
 
     # Data-quality summary (X-ray)
     "T13_completeness_overall_outer": ("data_quality_summary", "completeness_overall_pct"),
@@ -86,6 +103,28 @@ METRIC_TO_QDS_SLOT: dict[str, tuple[str, str]] = {
     "T12_global_fsc_0143":         ("map_summary", "global_fsc_0143_a"),
     "T12_local_resolution_mean":   ("map_summary", "local_resolution_mean_a"),
     "T12_local_resolution_std":    ("map_summary", "local_resolution_std_a"),
+    "T12_directional_resolution_anisotropy": ("map_summary", "directional_resolution_anisotropy"),
+    "T12_local_model_map_fsc_q":   ("map_summary", "local_model_map_fsc_q"),
+    "T06_rscc_outlier_fraction":   ("map_summary", "rscc_outlier_fraction"),
+
+    # Predicted confidence summary
+    "T07_predicted_tm_score":      ("predicted_confidence_summary", "predicted_tm_score"),
+    "T07_interface_predicted_tm_score": ("predicted_confidence_summary", "interface_predicted_tm_score"),
+    "T07_prediction_ensemble_convergence": [
+        ("predicted_confidence_summary", "prediction_ensemble_convergence"),
+        ("prediction_ensemble_summary", "prediction_ensemble_convergence"),
+    ],
+
+    # Structured optional summary blocks
+    "T15_secondary_structure_agreement": ("classification_summary", "secondary_structure_agreement"),
+    "T15_secondary_structure_assignment": ("classification_summary", "secondary_structure_assignment"),
+    "T15_structural_domain_assignment": ("classification_summary", "structural_domain_assignment"),
+    "T15_fold_classification":     ("classification_summary", "fold_classification"),
+    "T16_interface_buried_surface_area": ("interface_quality_summary", "interface_buried_surface_area"),
+    "T16_interface_dockq_score":   ("interface_quality_summary", "interface_dockq_score"),
+    "T16_capri_interface_quality_class": ("interface_quality_summary", "capri_interface_quality_class"),
+    "T17_nmr_restraint_violation_summary": ("nmr_validation_summary", "nmr_restraint_violation_summary"),
+    "T17_nmr_ensemble_precision_rmsd": ("nmr_validation_summary", "nmr_ensemble_precision_rmsd"),
 }
 
 
@@ -93,7 +132,9 @@ METRIC_TO_QDS_SLOT: dict[str, tuple[str, str]] = {
 # `predicted_confidence_summary`. Predicted-model evals also typically have
 # `Structure.method == predicted_model`; either trigger fires the block.
 PREDICTED_MARKER_METRIC_IDS: set[str] = {
-    # Add canonical pLDDT / PAE metric ids when the catalog declares them.
+    "T07_predicted_tm_score",
+    "T07_interface_predicted_tm_score",
+    "T07_prediction_ensemble_convergence",
 }
 
 
@@ -117,7 +158,7 @@ def _validate_routing_table() -> None:
     bad = [mid for mid in METRIC_TO_QDS_SLOT if mid not in catalog_ids]
     if bad:
         raise SystemExit(
-            "qds_emit: METRIC_TO_QDS_SLOT references metric ids not in ref/catalog.yaml:\n  "
+            "qds_emit: QDS routing references metric ids not in ref/catalog.yaml:\n  "
             + "\n  ".join(bad)
         )
 
@@ -152,6 +193,12 @@ def _wrap_value(m: dict[str, Any] | None) -> dict[str, Any] | None:
 # ---------------------------------------------------------------------------
 
 
+def _slots_for(metric_id: str) -> list[QdsSlot]:
+    """Every (block, slot) this metric id routes to, in table order."""
+    entry = METRIC_TO_QDS_SLOT[metric_id]
+    return [entry] if isinstance(entry, tuple) else list(entry)
+
+
 def _route_measurements(measurements: list[dict[str, Any]]) -> dict[str, dict[str, dict[str, Any]]]:
     """Return {block_name: {slot_name: <strongest measurement>}}.
 
@@ -159,12 +206,13 @@ def _route_measurements(measurements: list[dict[str, Any]]) -> dict[str, dict[st
     `_strongest` selects across all measurements that route to the same
     slot via METRIC_TO_QDS_SLOT.
     """
-    by_slot: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    by_slot: dict[QdsSlot, list[dict[str, Any]]] = {}
     for m in measurements:
         mid = m.get("metric_definition_ref")
         if mid not in METRIC_TO_QDS_SLOT:
             continue
-        by_slot.setdefault(METRIC_TO_QDS_SLOT[mid], []).append(m)
+        for slot in _slots_for(mid):
+            by_slot.setdefault(slot, []).append(m)
 
     out: dict[str, dict[str, dict[str, Any]]] = {}
     for (block, slot), candidates in by_slot.items():
@@ -277,6 +325,10 @@ PER_RESIDUE_METRIC_TO_SLOT: dict[str, str] = {
     "T01_per_residue_displacement": "displacement_per_residue_a",
     "T05_per_residue_rsrz":         "rsrz_per_residue",
     "T05_ramachandran_z_per_residue": "ramachandran_z_per_residue",
+    "T06_residue_rscc":             "rscc_per_residue",
+    "T05_b_factor_outlier_z":       "b_factor_z_per_residue",
+    "T15_secondary_structure_assignment": "secondary_structure_per_residue",
+    "T12_local_model_map_fsc_q":    "fsc_q_per_residue",
 }
 
 
@@ -415,22 +467,77 @@ def build_predicted_confidence_summary(
 ) -> dict[str, Any] | None:
     """Emit when method is `predicted_model` or pLDDT/PAE metrics appear.
 
-    v0 stub: the catalog does not yet declare canonical pLDDT/PAE metric
-    ids, so this function returns None unless a future eval explicitly
-    populates a PredictedConfidenceSummary as a list. When that happens
-    the routing table is the right place to wire it.
+    The catalog now declares pTM/ipTM/convergence metric ids, so populate
+    those fields directly from final/all measurements instead of emitting an
+    id-only placeholder.
     """
-    has_predicted_metrics = any(
-        m.get("metric_definition_ref") in PREDICTED_MARKER_METRIC_IDS
+    measurements = [
+        m
         for r in eval_runs
         for m in r.get("measurements", []) or []
-    )
+        if m.get("stage") in ("final", "all")
+        and m.get("metric_definition_ref") in PREDICTED_MARKER_METRIC_IDS
+    ]
+    has_predicted_metrics = bool(measurements)
     if structure_method != "predicted_model" and not has_predicted_metrics:
         return None
-    # Stub: emit an empty block with id only so downstream tooling can
-    # detect that a predicted-model summary was expected. Full population
-    # awaits canonical pLDDT / PAE metric ids in ref/catalog.yaml.
-    return {"id": f"{qds_id}_predicted_confidence"}
+    routed = _route_measurements(measurements).get("predicted_confidence_summary")
+    block = _build_block_from_routed(qds_id, "predicted_confidence", routed)
+    if block:
+        return block
+    if structure_method == "predicted_model":
+        return {"id": f"{qds_id}_predicted_confidence"}
+    return None
+
+
+# NOTE: a block's (name, rows-key) association is repeated across three tables
+# below — this one (build), SCOPE_IMPLIED_ROWS (scope->block check), and
+# EVAL_ROWS_IMPLIED_BLOCKS (eval-rows check). They are deliberately kept
+# separate: each serves a different consumer with different fields, and the
+# `ensemble` scope is special-cased inline, so a single master table would be a
+# wide sparse config every consumer mostly ignores (see issue #5). If you rename
+# a block or its rows key, update all three tables together.
+#
+# Optional summary blocks that carry both routed scalar slots and row lists
+# copied straight off the eval runs: (QDS block name, block-id suffix,
+# row keys — same name on the EvaluationRun and on the QDS block).
+ROW_BEARING_SUMMARY_BLOCKS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
+    (
+        "classification_summary",
+        "classification",
+        ("secondary_structure_assignments", "domain_assignments"),
+    ),
+    ("interface_quality_summary", "interface_quality", ("interface_qualities",)),
+    (
+        "prediction_ensemble_summary",
+        "prediction_ensemble",
+        ("prediction_ensemble_qualities",),
+    ),
+    ("nmr_validation_summary", "nmr_validation", ("nmr_ensemble_qualities",)),
+)
+
+
+def build_row_bearing_summary(
+    qds_id: str,
+    id_suffix: str,
+    routed: dict[str, dict[str, Any]] | None,
+    eval_runs: list[dict[str, Any]],
+    row_keys: tuple[str, ...],
+) -> dict[str, Any] | None:
+    """Build one optional summary block: routed scalar slots plus row lists.
+
+    `row_keys` are gathered from every eval run under the same key they take
+    on the QDS block. Returns None when neither a routed slot nor a row list
+    is present, so the block is omitted rather than emitted id-only.
+    """
+    block = _build_block_from_routed(qds_id, id_suffix, routed) or {
+        "id": f"{qds_id}_{id_suffix}"
+    }
+    for key in row_keys:
+        rows = [x for r in eval_runs for x in (r.get(key) or [])]
+        if rows:
+            block[key] = rows
+    return block if len(block) > 1 else None
 
 
 def build_assumptions_report(eval_runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -525,6 +632,35 @@ class QdsCompletenessError(SystemExit):
     pass
 
 
+# A measurement carrying this scope implies the named rows list is populated
+# on the named QDS block: (scope, QDS block, rows key, row class name).
+SCOPE_IMPLIED_ROWS: tuple[tuple[str, str, str, str], ...] = (
+    ("domain", "classification_summary", "domain_assignments", "DomainAssignment"),
+    ("interface", "interface_quality_summary", "interface_qualities", "InterfaceQuality"),
+)
+
+# Row lists declared on an EvaluationRun that imply a QDS block:
+# (eval keys, QDS block, label used in the error message).
+EVAL_ROWS_IMPLIED_BLOCKS: tuple[tuple[tuple[str, ...], str, str], ...] = (
+    (
+        ("secondary_structure_assignments", "domain_assignments"),
+        "classification_summary",
+        "classification rows",
+    ),
+    (("interface_qualities",), "interface_quality_summary", "interface_qualities"),
+    (
+        ("prediction_ensemble_qualities",),
+        "prediction_ensemble_summary",
+        "prediction_ensemble_qualities",
+    ),
+    (("nmr_ensemble_qualities",), "nmr_validation_summary", "nmr_ensemble_qualities"),
+)
+
+
+def _rows_present(qds: dict[str, Any], block: str, rows_key: str) -> bool:
+    return bool((qds.get(block) or {}).get(rows_key))
+
+
 def _check_implied_blocks(qds: dict[str, Any], eval_runs: list[dict[str, Any]]) -> None:
     """Reject QDS that hide content the source eval implies must be present."""
     errors: list[str] = []
@@ -556,6 +692,47 @@ def _check_implied_blocks(qds: dict[str, Any], eval_runs: list[dict[str, Any]]) 
                 f"eval {r['id']}: {len(residue_scope_ms)} measurement(s) have scope=residue "
                 f"but the QDS has no per_residue_quality."
             )
+        # A scope implies the matching rows list on the matching QDS block.
+        for scope, block, rows_key, row_class in SCOPE_IMPLIED_ROWS:
+            scoped_ms = [m for m in (r.get("measurements") or []) if m.get("scope") == scope]
+            if scoped_ms and not _rows_present(qds, block, rows_key):
+                errors.append(
+                    f"eval {r['id']}: {len(scoped_ms)} measurement(s) have scope={scope} "
+                    f"but {block}.{rows_key} is absent. Declare "
+                    f"{row_class} rows or correct the scope."
+                )
+        # scope=ensemble implies an NMR or prediction ensemble row.
+        ensemble_scope_ms = [m for m in (r.get("measurements") or []) if m.get("scope") == "ensemble"]
+        prediction_ensemble_ms = [
+            m for m in ensemble_scope_ms if m.get("catalog_task_ref") == "T07"
+        ]
+        nmr_ensemble_ms = [
+            m for m in ensemble_scope_ms if m.get("catalog_task_ref") == "T17"
+        ]
+        other_ensemble_ms = [
+            m for m in ensemble_scope_ms if m.get("catalog_task_ref") not in ("T07", "T17")
+        ]
+        prediction_rows_present = _rows_present(
+            qds, "prediction_ensemble_summary", "prediction_ensemble_qualities"
+        )
+        nmr_rows_present = _rows_present(
+            qds, "nmr_validation_summary", "nmr_ensemble_qualities"
+        )
+        if prediction_ensemble_ms and not prediction_rows_present:
+            errors.append(
+                f"eval {r['id']}: {len(prediction_ensemble_ms)} T07 measurement(s) have "
+                f"scope=ensemble but prediction_ensemble_qualities is absent."
+            )
+        if nmr_ensemble_ms and not nmr_rows_present:
+            errors.append(
+                f"eval {r['id']}: {len(nmr_ensemble_ms)} T17 measurement(s) have "
+                f"scope=ensemble but nmr_ensemble_qualities is absent."
+            )
+        if other_ensemble_ms and not (prediction_rows_present or nmr_rows_present):
+            errors.append(
+                f"eval {r['id']}: {len(other_ensemble_ms)} measurement(s) have "
+                f"scope=ensemble but no ensemble quality row is present."
+            )
         # Residue-level lists on the eval imply PerResidueQuality.
         residue_content_present = any([
             r.get("residue_outliers"),
@@ -580,6 +757,12 @@ def _check_implied_blocks(qds: dict[str, Any], eval_runs: list[dict[str, Any]]) 
                 f"eval {r['id']}: sites declared ({[s['id'] for s in r['sites']]}) "
                 f"but the QDS has no site_qualities."
             )
+        # Row lists on the eval imply the QDS block that carries them.
+        for eval_keys, block, label in EVAL_ROWS_IMPLIED_BLOCKS:
+            if any(r.get(k) for k in eval_keys) and not qds.get(block):
+                errors.append(
+                    f"eval {r['id']}: {label} declared but absent from QDS."
+                )
 
     if errors:
         msg = "QDS completeness check failed:\n  - " + "\n  - ".join(errors)
@@ -612,6 +795,7 @@ def emit_qds(
     # Route every measurement once via METRIC_TO_QDS_SLOT.
     routed_final = _route_measurements(final_only)
     routed_all = _route_measurements(all_only)
+    routed_qds = _route_measurements(qds_measurements)
 
     qds: dict[str, Any] = {
         "id": qds_id,
@@ -631,6 +815,17 @@ def emit_qds(
     mp = _build_block_from_routed(qds_id, "map", routed_final.get("map_summary"))
     if mp:
         qds["map_summary"] = mp
+
+    packing = _build_block_from_routed(qds_id, "packing", routed_qds.get("packing_summary"))
+    if packing:
+        qds["packing_summary"] = packing
+
+    for block_name, id_suffix, row_keys in ROW_BEARING_SUMMARY_BLOCKS:
+        block = build_row_bearing_summary(
+            qds_id, id_suffix, routed_qds.get(block_name), runs, row_keys
+        )
+        if block:
+            qds[block_name] = block
 
     # Data-quality summary — dataset-wide measurements (stage=all).
     dq = _build_block_from_routed(qds_id, "data_quality", routed_all.get("data_quality_summary"))

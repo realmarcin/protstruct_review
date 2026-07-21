@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="Helvetica, Arial, sans-serif">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#1f4e8c"/>
+  <text x="80" y="86" font-size="44" font-weight="700" fill="#1a1a2e">T03 — Reciprocal-space R-factors · 3 tools converge</text>
+  <text x="80" y="128" font-size="22" font-weight="400" fill="#5a6071">Agent’s 0.199 R-free is 0.012 below the lower bound · catalog oracle (PHENIX) → R-free gap fails &lt; 0.05</text>
+  <line x1="80" y1="1020" x2="1840" y2="1020" stroke="#e3e6ee" stroke-width="1"/>
+  <text x="80" y="1050" font-size="16" fill="#5a6071">1SAR refinement review · openscientist artefact cdba2c07 · review 2026-05-04</text>
+  <text x="1840" y="1050" font-size="16" fill="#5a6071" text-anchor="end">protstruct_review · deck 2026-05-04</text>
+
+  <rect x="80" y="220" width="1030" height="58" fill="#1f4e8c"/>
+  <text x="94" y="256.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="start">Tool</text>
+  <text x="696" y="256.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="end">R-work</text>
+  <text x="896" y="256.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="end">R-free</text>
+  <text x="1096" y="256.3333333333333" font-size="22" font-weight="700" fill="#ffffff" text-anchor="end">Gap</text>
+  <rect x="80" y="278" width="1030" height="58" fill="#ffffff"/>
+  <text x="94" y="314.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="start">phenix.model_vs_data</text>
+  <text x="696" y="314.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.156</text>
+  <text x="896" y="314.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.211</text>
+  <text x="1096" y="314.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.055</text>
+  <rect x="80" y="336" width="1030" height="58" fill="#f7f8fb"/>
+  <text x="94" y="372.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="start">gemmi sfcalc + custom</text>
+  <text x="696" y="372.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.164</text>
+  <text x="896" y="372.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.217</text>
+  <text x="1096" y="372.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.053</text>
+  <rect x="80" y="394" width="1030" height="58" fill="#ffffff"/>
+  <text x="94" y="430.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="start">REFMAC5 (NCYC=0)</text>
+  <text x="696" y="430.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.169</text>
+  <text x="896" y="430.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.213</text>
+  <text x="1096" y="430.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.044</text>
+  <rect x="80" y="452" width="1030" height="58" fill="#f7f8fb"/>
+  <rect x="80" y="452" width="430" height="58" fill="#fbeecb"/>
+  <text x="94" y="488.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="start">Agent (reported)</text>
+  <rect x="510" y="452" width="200" height="58" fill="#fbeecb"/>
+  <text x="696" y="488.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.149</text>
+  <rect x="710" y="452" width="200" height="58" fill="#f5d6d4"/>
+  <text x="896" y="488.3333333333333" font-size="22" fill="#a8201a" text-anchor="end">0.199</text>
+  <rect x="910" y="452" width="200" height="58" fill="#fbeecb"/>
+  <text x="1096" y="488.3333333333333" font-size="22" fill="#1a1a2e" text-anchor="end">0.050</text>
+  <rect x="80" y="220" width="1030" height="290" fill="none" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="510" y1="220" x2="510" y2="510" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="710" y1="220" x2="710" y2="510" stroke="#e3e6ee" stroke-width="1"/>
+  <line x1="910" y1="220" x2="910" y2="510" stroke="#e3e6ee" stroke-width="1"/>
+
+  <text x="1180" y="240" font-size="22" font-weight="700" fill="#1f4e8c">R-free across oracles</text>
+  <line x1="1180" y1="360" x2="1780" y2="360" stroke="#1a1a2e" stroke-width="2"/>
+  <line x1="1180.0" y1="355" x2="1180.0" y2="365" stroke="#1a1a2e" stroke-width="1"/>
+  <text x="1180.0" y="385" font-size="14" fill="#5a6071" text-anchor="middle">0.195</text>
+  <line x1="1300.0000000000002" y1="355" x2="1300.0000000000002" y2="365" stroke="#1a1a2e" stroke-width="1"/>
+  <text x="1300.0000000000002" y="385" font-size="14" fill="#5a6071" text-anchor="middle">0.200</text>
+  <line x1="1419.9999999999995" y1="355" x2="1419.9999999999995" y2="365" stroke="#1a1a2e" stroke-width="1"/>
+  <text x="1419.9999999999995" y="385" font-size="14" fill="#5a6071" text-anchor="middle">0.205</text>
+  <line x1="1539.9999999999998" y1="355" x2="1539.9999999999998" y2="365" stroke="#1a1a2e" stroke-width="1"/>
+  <text x="1539.9999999999998" y="385" font-size="14" fill="#5a6071" text-anchor="middle">0.210</text>
+  <line x1="1660.0" y1="355" x2="1660.0" y2="365" stroke="#1a1a2e" stroke-width="1"/>
+  <text x="1660.0" y="385" font-size="14" fill="#5a6071" text-anchor="middle">0.215</text>
+  <line x1="1780.0" y1="355" x2="1780.0" y2="365" stroke="#1a1a2e" stroke-width="1"/>
+  <text x="1780.0" y="385" font-size="14" fill="#5a6071" text-anchor="middle">0.220</text>
+  <circle cx="1276.0" cy="360" r="9" fill="#a8201a" stroke="#ffffff" stroke-width="2"/>
+  <text x="1276.0" y="320" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">Agent 0.199</text>
+  <circle cx="1563.9999999999998" cy="360" r="9" fill="#1f4e8c" stroke="#ffffff" stroke-width="2"/>
+  <text x="1563.9999999999998" y="300" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">PHENIX 0.211</text>
+  <circle cx="1611.9999999999998" cy="360" r="9" fill="#1f7a3f" stroke="#ffffff" stroke-width="2"/>
+  <text x="1611.9999999999998" y="320" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">REFMAC5 0.213</text>
+  <circle cx="1708.0" cy="360" r="9" fill="#1f7a3f" stroke="#ffffff" stroke-width="2"/>
+  <text x="1708.0" y="300" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="700">gemmi 0.217</text>
+  <rect x="80" y="540" width="880" height="200" rx="10" fill="#f5d6d4" stroke="#a8201a" stroke-width="2"/>
+  <text x="100" y="585" font-size="24" font-weight="700" fill="#a8201a">R-free under-statement is reproducible</text>
+  <text x="100" y="625" font-size="18" fill="#1a1a2e">Three independent code paths converge on R-free ≈ 0.21.</text>
+  <text x="100" y="655" font-size="18" fill="#1a1a2e">Likely cause: <tspan font-weight="700">phenix.refine in-run scaling vs catalog-oracle scaling</tspan>.</text>
+  <text x="100" y="685" font-size="18" fill="#1a1a2e">Mitigation: report from phenix.model_vs_data, not from refine’s log.</text>
+  <text x="100" y="720" font-size="16" fill="#5a6071">ASSUM_phenix_refine_in_run_r_factors_use_internal_scaling — known_violation hardened.</text>
+  <rect x="980" y="540" width="860" height="200" rx="10" fill="#fbeecb" stroke="#b07c00" stroke-width="2"/>
+  <text x="1000" y="585" font-size="24" font-weight="700" fill="#b07c00">R-free gap criterion is scaling-dependent</text>
+  <text x="1000" y="625" font-size="18" fill="#1a1a2e">PHENIX gap 0.055 (✗) · gemmi 0.053 (✗) · REFMAC5 0.044 (✓)</text>
+  <text x="1000" y="660" font-size="18" fill="#1a1a2e">Catalog oracle of record = phenix.model_vs_data → fails &lt; 0.05.</text>
+  <text x="1000" y="700" font-size="18" fill="#1a1a2e">Reportable as a <tspan font-weight="700">scaling-sensitive failure</tspan>, not a raw R-free defect.</text>
+</svg>

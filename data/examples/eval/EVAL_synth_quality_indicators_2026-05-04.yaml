@@ -1,0 +1,302 @@
+# Synthetic eval covering protein-structure quality indicator extensions.
+
+evaluation_runs:
+- id: EVAL_synth_quality_indicators_2026-05-04
+  eval_filename_stem: EVAL_synth_quality_indicators_2026-05-04
+  structure_ref: synth_quality
+  artifact_ref: synth-quality-2026-05-04
+  run_date: '2026-05-04'
+  catalog_tasks_applied:
+    - T05
+    - T06
+    - T07
+    - T12
+    - T15
+    - T16
+    - T17
+  secondary_structure_assignments:
+    - id: synth_quality_ss_A_10_18
+      structure_ref: synth_quality
+      chain_id: A
+      residue_start: 10
+      residue_end: 18
+      assignment: helix
+      tool_ref: DSSP
+  domain_assignments:
+    - id: synth_quality_domain_A_1
+      structure_ref: synth_quality
+      chain_id: A
+      residue_start: 1
+      residue_end: 92
+      classification_scheme: CATH
+      classification_id: 1.10.8.10
+      fold_name: orthogonal bundle
+      domain_label: domain_A_1
+      tool_ref: CATH
+  interface_qualities:
+    - id: synth_quality_interface_A_B
+      structure_ref: synth_quality
+      interface_label: A:B
+      chain_id_1: A
+      chain_id_2: B
+      buried_surface_area:
+        value_numeric: 1420.0
+        unit: Å²
+      dockq_score:
+        value_numeric: 0.73
+      capri_quality_class:
+        value_text: acceptable
+      tool_ref: DockQ
+  prediction_ensemble_qualities:
+    - id: synth_quality_prediction_ensemble_001
+      structure_ref: synth_quality
+      ensemble_label: colabfold_seed_1_5
+      model_count: 5
+      convergence:
+        value_numeric: 0.91
+      tool_ref: QMEANDisCo
+  nmr_ensemble_qualities:
+    - id: synth_quality_nmr_ensemble_001
+      structure_ref: synth_quality
+      ensemble_label: deposited_models
+      model_count: 20
+      restraint_violation_summary:
+        value_text: 2 distance violations >0.5 Å
+      ensemble_precision_rmsd:
+        value_numeric: 0.48
+        unit: Å
+      tool_ref: wwPDB NMR validation
+  per_residue_values:
+    - id: synth_quality_rscc_A_10
+      residue_ref: synth_quality:A:10
+      metric_definition_ref: T06_residue_rscc
+      value:
+        value_numeric: 0.92
+      tool_ref: PDB-REDO
+    - id: synth_quality_bz_A_10
+      residue_ref: synth_quality:A:10
+      metric_definition_ref: T05_b_factor_outlier_z
+      value:
+        value_numeric: 1.8
+      tool_ref: ProSA
+    - id: synth_quality_ss_A_10
+      residue_ref: synth_quality:A:10
+      metric_definition_ref: T15_secondary_structure_assignment
+      value:
+        value_text: H
+      tool_ref: DSSP
+    - id: synth_quality_fscq_A_10
+      residue_ref: synth_quality:A:10
+      metric_definition_ref: T12_local_model_map_fsc_q
+      value:
+        value_numeric: 0.84
+      tool_ref: FSC-Q
+  measurements:
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_001
+      catalog_task_ref: T05
+      stage: final
+      scope: complex
+      metric_definition_ref: T05_rama_z_score
+      oracle_tool_ref: MolProbity (gold)
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: -0.42
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_002
+      catalog_task_ref: T05
+      stage: final
+      scope: complex
+      metric_definition_ref: T05_packing_z_score
+      oracle_tool_ref: RosettaHoles2
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: -1.1
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_003
+      catalog_task_ref: T05
+      stage: final
+      scope: complex
+      metric_definition_ref: T05_unsatisfied_buried_hbond_count
+      oracle_tool_ref: RosettaHoles2
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 3
+        unit: count
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_004
+      catalog_task_ref: T06
+      stage: final
+      scope: complex
+      metric_definition_ref: T06_rscc_outlier_fraction
+      oracle_tool_ref: PDB-REDO
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.04
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_005
+      catalog_task_ref: T06
+      stage: final
+      scope: complex
+      metric_definition_ref: T06_diffraction_precision_index
+      oracle_tool_ref: PDB-REDO
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.19
+        unit: Å
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_006
+      catalog_task_ref: T07
+      stage: final
+      scope: complex
+      metric_definition_ref: T07_predicted_tm_score
+      oracle_tool_ref: QMEANDisCo
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.88
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_007
+      catalog_task_ref: T07
+      stage: final
+      scope: interface
+      scope_selector: synth_quality_interface_A_B
+      metric_definition_ref: T07_interface_predicted_tm_score
+      oracle_tool_ref: QMEANDisCo
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.81
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_008
+      catalog_task_ref: T07
+      stage: final
+      scope: ensemble
+      scope_selector: synth_quality_prediction_ensemble_001
+      metric_definition_ref: T07_prediction_ensemble_convergence
+      oracle_tool_ref: QMEANDisCo
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.91
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_009
+      catalog_task_ref: T12
+      stage: final
+      scope: dataset
+      metric_definition_ref: T12_directional_resolution_anisotropy
+      oracle_tool_ref: 3DFSC
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.27
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_010
+      catalog_task_ref: T12
+      stage: final
+      scope: residue
+      scope_selector: synth_quality:A:10
+      metric_definition_ref: T12_local_model_map_fsc_q
+      oracle_tool_ref: FSC-Q
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.84
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_010b
+      catalog_task_ref: T15
+      stage: final
+      scope: complex
+      scope_selector: synth_quality
+      metric_definition_ref: T15_secondary_structure_agreement
+      oracle_tool_ref: STRIDE
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.94
+      pass_status: informational
+      notes: three-state DSSP vs STRIDE agreement over 92 assigned residues
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_011
+      catalog_task_ref: T15
+      stage: final
+      scope: residue
+      scope_selector: synth_quality:A:10-18
+      metric_definition_ref: T15_secondary_structure_assignment
+      oracle_tool_ref: DSSP
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_text: helix
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_012
+      catalog_task_ref: T15
+      stage: final
+      scope: domain
+      scope_selector: synth_quality_domain_A_1
+      metric_definition_ref: T15_structural_domain_assignment
+      oracle_tool_ref: CATH
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_text: A:1-92
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_013
+      catalog_task_ref: T15
+      stage: final
+      scope: domain
+      scope_selector: synth_quality_domain_A_1
+      metric_definition_ref: T15_fold_classification
+      oracle_tool_ref: CATH
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_text: 1.10.8.10 orthogonal bundle
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_014
+      catalog_task_ref: T16
+      stage: final
+      scope: interface
+      scope_selector: synth_quality_interface_A_B
+      metric_definition_ref: T16_interface_buried_surface_area
+      oracle_tool_ref: PISA/PDBePISA
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 1420.0
+        unit: Å²
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_015
+      catalog_task_ref: T16
+      stage: final
+      scope: interface
+      scope_selector: synth_quality_interface_A_B
+      metric_definition_ref: T16_interface_dockq_score
+      oracle_tool_ref: DockQ
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.73
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_016
+      catalog_task_ref: T16
+      stage: final
+      scope: interface
+      scope_selector: synth_quality_interface_A_B
+      metric_definition_ref: T16_capri_interface_quality_class
+      oracle_tool_ref: DockQ
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_text: acceptable
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_017
+      catalog_task_ref: T17
+      stage: final
+      scope: ensemble
+      scope_selector: synth_quality_nmr_ensemble_001
+      metric_definition_ref: T17_nmr_restraint_violation_summary
+      oracle_tool_ref: wwPDB NMR validation
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_text: 2 distance violations >0.5 Å
+      pass_status: informational
+    - id: EVAL_synth_quality_indicators_2026-05-04_M_018
+      catalog_task_ref: T17
+      stage: final
+      scope: ensemble
+      scope_selector: synth_quality_nmr_ensemble_001
+      metric_definition_ref: T17_nmr_ensemble_precision_rmsd
+      oracle_tool_ref: wwPDB NMR validation
+      oracle_family: non_cctbx
+      oracle_measure:
+        value_numeric: 0.48
+        unit: Å
+      pass_status: informational
+  headline_verdict: Synthetic eval for quality-indicator schema and QDS routing.
