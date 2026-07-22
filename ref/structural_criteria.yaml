@@ -33,7 +33,8 @@ criteria:
         recipe_language: bash
         recipe_notes: >-
           Richardson-lab standalone probe+reduce. H-build convention matters:
-          electron-cloud-center (X-ray) vs nuclear (neutron/NMR) shifts the score ~0.5.
+          electron-cloud-center (X-ray) vs nuclear (neutron/NMR) placement moves H
+          positions and can shift the score; magnitude is model-dependent, not a fixed value.
       - tool: mmtbx.validation_summary
         family: cctbx
         installed: true
@@ -64,7 +65,7 @@ criteria:
         source: "data/coscientists/openscientist/EVAL_1sar_cdba2c07_2026-04-24.yaml"
         verdict: normal
         interpretation: "11 clashes / 3027 atoms; in line with mmtbx 3.13 (Δ 0.5, within H-build noise)."
-    notes: "The ~0.5 H-build shift is the dominant caveat; both tools must use the same H model when compared."
+    notes: "The H-build shift is the dominant caveat (≈ 0.5 on this repo's 1SAR: 3.13 cctbx vs 3.63 standalone — an in-repo observation, not a general figure); both tools must use the same H model when compared."
 
   - id: T15_secondary_structure_agreement
     name: Secondary-structure assignment agreement (three-state)
