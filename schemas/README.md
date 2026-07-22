@@ -14,6 +14,7 @@ The denormalized TSVs (`ref/tasks_and_evaluations.tsv`, `EVAL_*_metrics.tsv`, `E
 |---|---|
 | `protstruct_review.yaml` | The schema itself. Single file at v0; split into `core.yaml` / `catalog.yaml` / `eval.yaml` once it grows past ~600 lines or a second consumer needs only a subset. |
 | `README.md` | This document. |
+| `structural_criteria.yaml` | A **second, standalone** schema (own tree_root `CriteriaCollection`) for self-describing per-criterion entries — definition, computation recipes, units, value ranges, agreement tolerance, worked examples. Instances live in `ref/structural_criteria.yaml`; validated separately in `scripts/validate.sh`. |
 
 ## Quick-start: validate
 

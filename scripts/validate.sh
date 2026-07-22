@@ -41,6 +41,14 @@ validate_one "${REPO_ROOT}/ref/catalog.yaml"
 validate_one "${REPO_ROOT}/ref/tool_recommendations.yaml"
 validate_one "${REPO_ROOT}/ref/tool_assumptions.yaml"
 
+# 1b. Structural-criteria registry against its own schema (separate schema).
+if ! out="$(linkml-validate --schema "${REPO_ROOT}/schemas/structural_criteria.yaml" \
+                            "${REPO_ROOT}/ref/structural_criteria.yaml" 2>&1)"; then
+  echo "${out}"; fail "ref/structural_criteria.yaml"
+fi
+if echo "${out}" | grep -qE '^\[(ERROR|WARN)\]'; then echo "${out}"; fail "ref/structural_criteria.yaml"; fi
+if [[ "${QUIET}" == "0" ]]; then echo "OK   ref/structural_criteria.yaml (structural_criteria schema)"; fi
+
 # 2. Every record under data/ — both synthetic test fixtures
 #    (data/examples/) and real per-artefact evals + QDS in
 #    data/<provider>/<system>/.
