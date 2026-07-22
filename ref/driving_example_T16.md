@@ -40,8 +40,10 @@ score against the reference, and its CAPRI class.
 
 Each bullet is pass/fail; all must pass for green.
 
-1. **DockQ reproduces.** The agent's DockQ score agrees with the harness DockQ within **± 0.05**, and
-   the **CAPRI class is identical**. `[template — DockQ score]`
+1. **DockQ reproduces.** With the **same chain mapping**, the agent's DockQ agrees with the harness
+   DockQ within **± 0.01** (same-implementation noise floor ≈ 0.004); the **CAPRI class matches**,
+   except it is not flagged when either score is within **± 0.03** of a class boundary
+   (0.23 / 0.49 / 0.80). `[template — DockQ score]`
 2. **Buried surface area agrees.** The agent's BSA agrees with the biotite-SASA (or PISA) value within
    **± 10 %**. `[template — interface buried surface area]`
 3. **CAPRI class matches the score.** The reported class is consistent with the DockQ score under the

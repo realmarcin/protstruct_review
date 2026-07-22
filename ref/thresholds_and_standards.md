@@ -66,11 +66,11 @@ agreement, not quality.
 | Ramachandran / rotamer outlier % | ± **0.5 pp** | same | `[template]` |
 | Bond-length RMSD | ± **0.003 Å** | PHENIX vs `gemmi validate` | `[template]` |
 | Bond-angle RMSD | **matched restraint library required**; ± **0.1°** when both tools use the same library, ± **0.4°** when they differ | PHENIX (CDL default since ~2016) vs `gemmi validate` (CCP4 monomer library / Engh & Huber) | `[template]` `[literature]` |
-| Wilson B | ± **5 Å²** (loosened from ±2: `xtriage` uses an ML anisotropy-aware estimate less sensitive to resolution truncation, `ctruncate`/`truncate` a classic straight-line Wilson plot; ML-vs-classic can differ by several Å², more at low resolution / under anisotropy — prefer like-method comparison) | `xtriage` (ML) vs `ctruncate` (classic) | `[template]` |
-| L-test ⟨\|L\|⟩ | ± **0.02**, same twin/no-twin call, **matched resolution range** (the auto-selected range differs between programs) | `xtriage` vs `ctruncate` | `[template]` |
+| Wilson B | ± **5 Å²** (loosened from ±2; **inference-only — no primary source on inter-program Wilson-B reproducibility survived verification, so this is provisional**). `xtriage` uses an ML anisotropy-aware estimate; `ctruncate`/`truncate` a classic straight-line Wilson plot, which can differ by several Å² — prefer like-method comparison | `xtriage` (ML) vs `ctruncate` (classic) | `[template]` |
+| L-test ⟨\|L\|⟩ | ± **0.02**, same twin/no-twin call, **matched resolution range** (auto-selected range differs between programs). Note the full scale is only 0.125 (untwinned 0.500 → perfect twin 0.375), so ±0.02 is ~16 % of range; and `xtriage`/`ctruncate` share the Padilla–Yeates *method*, so agreement checks consistent computation, not method-independence | `xtriage` vs `ctruncate` | `[template]` |
 | Completeness (overall) | ± **1 pp** vs deposition Table 1 | `xtriage` vs deposition | `[calibration]` |
 | Secondary-structure agreement | agent-vs-DSSP three-state ≥ **0.85** over DSSP-assigned residues; two independent assigners floor ≥ **0.80** on a well-ordered model | agent vs DSSP; DSSP vs biotite P-SEA (`t15_ss_agreement.py`) | `[template]` |
-| DockQ score | \|Δ\| ≤ **0.05** and identical CAPRI class, **after fixing/verifying the chain mapping** (DockQ is deterministic given a mapping; chain-mapping ambiguity in multimers is the only real variance) | agent vs `t16_interface_quality.py` (DockQ) | `[template]` |
+| DockQ score | **after fixing/verifying the chain mapping**, \|Δ\| ≤ **0.01** (same-implementation noise floor ≈ 0.004; the old ±0.05 was ~12× too loose). The CAPRI-class match is **waived within ±0.03 of a class boundary** (0.23 / 0.49 / 0.80) to avoid spurious boundary flips. Chain-mapping ambiguity is the presumed (not proven) main variance source in multimers | agent vs `t16_interface_quality.py` (DockQ) | `[template]` |
 | Interface buried surface area | \|Δ\| ≤ **10 %** (provisional — magnitude unbenchmarked; corroboration-only until a matched-configuration same-probe-radius / same-atom-selection comparison exists) | agent vs biotite SASA (`t16_interface_quality.py`); PISA when available | `[template]` |
 | NMR ensemble precision (mean Cα RMSF) | \|Δ\| ≤ **0.05 Å only on a matched ordered-core selection** (OLDERADO / PSVS FindCore); precision is dominated by the superposition selection, so a whole-chain mean must be reported *alongside* an ordered-core figure, not instead of it | agent vs `t17_nmr_ensemble.py` | `[template]` |
 | R-free vs deposited | \|Δ\| ≤ **0.02** (REFMAC re-refinement vs deposited/PHENIX) | REFMAC5 vs PHENIX vs deposited | `[catalog]` |
@@ -94,7 +94,10 @@ agreement, not quality.
 > (matched ordered-core), and the R offset (rationale corrected). Preconditions were added to CA RMSD
 > (same selection) and DockQ (fixed chain mapping); Wilson B was loosened to ±5 Å²; L-test, SS
 > agreement, bond-length, clashscore, and the Ramachandran/rotamer pp tolerances were kept.
-> Interface BSA ±10 % remains the one **provisional** value (mechanism real, magnitude unbenchmarked).
+> Two values remain **provisional** (mechanism real, magnitude unbenchmarked in the literature):
+> **interface BSA ±10 %** and **Wilson B ±5 Å²**. An independent verified research pass cross-checked
+> all seven of the second batch and confirmed these verdicts, additionally tightening **DockQ** to
+> ±0.01 (same-implementation noise floor ≈ 0.004).
 
 ## 4. Refinement Δ-tolerances (compare→refine flow)
 

@@ -186,6 +186,31 @@ defects, two need a matched-configuration precondition, one is likely too tight,
 5–6. **CA RMSD (1), DockQ (5)** — add matched-configuration preconditions.
 7. **L-test (4)** — fine; match resolution range.
 
+## Independent workflow cross-check (second batch)
+
+The automated deep-research workflow (which had failed on the first two attempts) completed on retry —
+91 agents, 0 errors — and **independently confirmed every direct-research verdict above** for the
+seven, with two quantitative refinements now folded into the registry:
+
+- **DockQ (5) — tightened.** With chain mapping fixed, the same-implementation noise floor is **≈ 0.004**
+  (DockQ v2 vs v1, R = 1.000 over 17,409 CASP15 models), so the kept ±0.05 was **~12× too loose**.
+  Tightened to **±0.01**. Also, the hard "identical CAPRI class" rule can spuriously flip at the fixed
+  0.23/0.49/0.80 boundaries, so the class match is **waived within ±0.03 of a boundary**. (Caveats the
+  cross-check flags: "chain-mapping dominates variance" is a reasonable but *unproven* premise — that
+  specific claim was refuted at verification; and v1→v2 is one author group's rewrite, a fair but
+  imperfect stand-in for two independent programs.)
+- **Wilson B (3) — downgraded to provisional.** No primary source on inter-program Wilson-B
+  reproducibility survived verification, so the ±5 Å² is inference-only. Marked provisional alongside
+  interface BSA.
+- **L-test (4) — kept, with a sharper caveat.** The full scale is only 0.125 (untwinned 0.500 →
+  perfect twin 0.375), so ±0.02 is ~16 % of range; and xtriage/ctruncate share the Padilla–Yeates
+  *method*, so agreement checks consistent computation, not method-independence.
+- **CA RMSD (1), aligned count (2), NMR RMSF (6), R offset (7)** — all confirmed as originally revised
+  (matched-configuration preconditions; unbenchmarked R-offset sign/magnitude).
+
+Two provisional values now stand (interface BSA, Wilson B), each needing a matched-configuration
+benchmark that does not yet exist in the literature.
+
 ## Time-sensitivity
 
 PHENIX has defaulted to CDL since ~2016 and gemmi now feeds Refmac5 restraints (2023), so the
