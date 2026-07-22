@@ -572,853 +572,811 @@ tool_recommendations:
       the gold standard named in the T17 catalog entry.
     as_of_date: '2026-07-20'
 
-  # --- Coverage completion (issue #4): task-primary oracle per uncovered metric.
-  # Assignments grounded in ref/oracle_tools.md per-task table; tune per-metric as needed.
+  # --- Coverage completion (issue #4), corrected per the Codex domain review of PR #7.
+  # Per-metric, capability-aware: each metric is assigned the tool that actually computes
+  # THAT quantity and is genuinely independent of PHENIX/cctbx (not merely its task default).
+  # Four metrics are DELIBERATELY omitted as having no independent oracle, rather than given
+  # a false one: T09_phaser_tfz and T09_llg (Phaser-specific MR scores with no external
+  # equivalent), T08_em_placement_llg (PHENIX em_placement-specific), and T09_time-to-solution
+  # (a process/timing metric, not a structural quantity). MR success is instead cross-checked
+  # at the outcome level via T09_translation_rotation (independent superposition to the
+  # deposited pose) and T09_post-mr_r-free (REFMAC5).
   - id: REC_T01_all-atom_rmsd_å_top_considered
     metric_definition_ref: T01_all-atom_rmsd_å
-    tool_ref: TM-align
+    tool_ref: PyMOL align/super/cealign
     role: top_considered
     rank: 1
-    justification: Sequence-independent superposition; community reference for pair-of-structures RMSD and
-      TM-score.
+    justification: All-atom structural superposition; independent all-atom RMSD not restricted to Cα.
     as_of_date: '2026-07-21'
   - id: REC_T01_aligned_residues_top_considered
     metric_definition_ref: T01_aligned_residues
     tool_ref: TM-align
     role: top_considered
     rank: 1
-    justification: Sequence-independent superposition; community reference for pair-of-structures RMSD and
-      TM-score.
+    justification: Sequence-independent Cα superposition; community reference for RMSD/TM-score and aligned
+      length.
     as_of_date: '2026-07-21'
   - id: REC_T01_gdt-ts_top_considered
     metric_definition_ref: T01_gdt-ts
-    tool_ref: TM-align
+    tool_ref: OpenStructure
     role: top_considered
     rank: 1
-    justification: Sequence-independent superposition; community reference for pair-of-structures RMSD and
-      TM-score.
+    justification: CASP-grade lDDT/TMScore/GDT-TS reference implementation, independent of cctbx.
     as_of_date: '2026-07-21'
   - id: REC_T01_per-residue_δca_top_considered
     metric_definition_ref: T01_per-residue_δca
-    tool_ref: TM-align
+    tool_ref: gemmi script
     role: top_considered
     rank: 1
-    justification: Sequence-independent superposition; community reference for pair-of-structures RMSD and
-      TM-score.
+    justification: Independent coordinate/B-factor parser for per-residue displacement, B-factor deltas,
+      ligand geometry.
     as_of_date: '2026-07-21'
   - id: REC_T02_per-residue_ramachandran_rotamer_outlier_diffs_top_considered
     metric_definition_ref: T02_per-residue_ramachandran_rotamer_outlier_diffs
-    tool_ref: ProSMART
+    tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Procrustes per-residue geometry comparison; non-cctbx per-residue oracle for T02.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T02_ss_agreement_top_considered
     metric_definition_ref: T02_ss_agreement
-    tool_ref: ProSMART
+    tool_ref: DSSP
     role: top_considered
     rank: 1
-    justification: Procrustes per-residue geometry comparison; non-cctbx per-residue oracle for T02.
+    justification: DSSP secondary-structure assignment for the SS-agreement metric.
     as_of_date: '2026-07-21'
   - id: REC_T02_b-factor_deltas_top_considered
     metric_definition_ref: T02_b-factor_deltas
-    tool_ref: ProSMART
+    tool_ref: gemmi script
     role: top_considered
     rank: 1
-    justification: Procrustes per-residue geometry comparison; non-cctbx per-residue oracle for T02.
+    justification: Independent coordinate/B-factor parser for per-residue displacement, B-factor deltas,
+      ligand geometry.
     as_of_date: '2026-07-21'
   - id: REC_T02_ligand_com_distance_top_considered
     metric_definition_ref: T02_ligand_com_distance
-    tool_ref: ProSMART
+    tool_ref: gemmi script
     role: top_considered
     rank: 1
-    justification: Procrustes per-residue geometry comparison; non-cctbx per-residue oracle for T02.
+    justification: Independent coordinate/B-factor parser for per-residue displacement, B-factor deltas,
+      ligand geometry.
     as_of_date: '2026-07-21'
   - id: REC_T02_omega_cis_trans_flips_top_considered
     metric_definition_ref: T02_omega_cis_trans_flips
-    tool_ref: ProSMART
+    tool_ref: gemmi validate
     role: top_considered
     rank: 1
-    justification: Procrustes per-residue geometry comparison; non-cctbx per-residue oracle for T02.
+    justification: Independent covalent-geometry parser (bond/angle/planarity/chirality/omega), non-cctbx.
     as_of_date: '2026-07-21'
   - id: REC_T02_his_protonation_diffs_top_considered
     metric_definition_ref: T02_his_protonation_diffs
-    tool_ref: ProSMART
+    tool_ref: reduce (standalone, Richardson)
     role: top_considered
     rank: 1
-    justification: Procrustes per-residue geometry comparison; non-cctbx per-residue oracle for T02.
+    justification: Richardson-lab standalone reduce; independent H-placement / protonation / flip oracle.
     as_of_date: '2026-07-21'
   - id: REC_T03_δr-free_vs_input_top_considered
     metric_definition_ref: T03_δr-free_vs_input
     tool_ref: REFMAC5 (CCP4)
     role: top_considered
     rank: 1
-    justification: Independent maximum-likelihood refiner; canonical second opinion on reciprocal-space
-      R-factors and geometry.
+    justification: Independent ML refiner; post-MR R-free and reciprocal-space refinement statistics.
     as_of_date: '2026-07-21'
   - id: REC_T03_bond_angle_rmsd_top_considered
     metric_definition_ref: T03_bond_angle_rmsd
-    tool_ref: REFMAC5 (CCP4)
+    tool_ref: gemmi validate
     role: top_considered
     rank: 1
-    justification: Independent maximum-likelihood refiner; canonical second opinion on reciprocal-space
-      R-factors and geometry.
+    justification: Independent covalent-geometry parser (bond/angle/planarity/chirality/omega), non-cctbx.
     as_of_date: '2026-07-21'
   - id: REC_T03_molprobity_score_top_considered
     metric_definition_ref: T03_molprobity_score
-    tool_ref: REFMAC5 (CCP4)
+    tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Independent maximum-likelihood refiner; canonical second opinion on reciprocal-space
-      R-factors and geometry.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T03_clashscore_top_considered
     metric_definition_ref: T03_clashscore
-    tool_ref: REFMAC5 (CCP4)
+    tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Independent maximum-likelihood refiner; canonical second opinion on reciprocal-space
-      R-factors and geometry.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T03_ramachandran_favored_top_considered
     metric_definition_ref: T03_ramachandran_favored
-    tool_ref: REFMAC5 (CCP4)
+    tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Independent maximum-likelihood refiner; canonical second opinion on reciprocal-space
-      R-factors and geometry.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T04_cc_mask_top_considered
     metric_definition_ref: T04_cc_mask
     tool_ref: Servalcat
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: Independent refinement / FSC / sigma-A oracle (installed); map and refinement metrics.
     as_of_date: '2026-07-21'
   - id: REC_T04_cc_box_top_considered
     metric_definition_ref: T04_cc_box
     tool_ref: Servalcat
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: Independent refinement / FSC / sigma-A oracle (installed); map and refinement metrics.
     as_of_date: '2026-07-21'
   - id: REC_T04_cc_peaks_top_considered
     metric_definition_ref: T04_cc_peaks
     tool_ref: Servalcat
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: Independent refinement / FSC / sigma-A oracle (installed); map and refinement metrics.
     as_of_date: '2026-07-21'
   - id: REC_T04_cc_volume_top_considered
     metric_definition_ref: T04_cc_volume
     tool_ref: Servalcat
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: Independent refinement / FSC / sigma-A oracle (installed); map and refinement metrics.
     as_of_date: '2026-07-21'
   - id: REC_T04_d_fsc_model_top_considered
     metric_definition_ref: T04_d_fsc_model
     tool_ref: Servalcat
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: Independent refinement / FSC / sigma-A oracle (installed); map and refinement metrics.
     as_of_date: '2026-07-21'
   - id: REC_T04_δcc_vs_input_top_considered
     metric_definition_ref: T04_δcc_vs_input
     tool_ref: Servalcat
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: Independent refinement / FSC / sigma-A oracle (installed); map and refinement metrics.
     as_of_date: '2026-07-21'
   - id: REC_T04_clashscore_top_considered
     metric_definition_ref: T04_clashscore
-    tool_ref: Servalcat
+    tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T04_ramachandran_favored_top_considered
     metric_definition_ref: T04_ramachandran_favored
-    tool_ref: Servalcat
+    tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T05_cbeta_outliers_top_considered
     metric_definition_ref: T05_cbeta_outliers
     tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Richardson-lab MolProbity is the community gold standard for stereochemical geometry
-      outliers.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T05_bond-length_rmsd_top_considered
     metric_definition_ref: T05_bond-length_rmsd
-    tool_ref: MolProbity (gold)
+    tool_ref: gemmi validate
     role: top_considered
     rank: 1
-    justification: Richardson-lab MolProbity is the community gold standard for stereochemical geometry
-      outliers.
+    justification: Independent covalent-geometry parser (bond/angle/planarity/chirality/omega), non-cctbx.
     as_of_date: '2026-07-21'
   - id: REC_T05_bond-angle_rmsd_top_considered
     metric_definition_ref: T05_bond-angle_rmsd
-    tool_ref: MolProbity (gold)
+    tool_ref: gemmi validate
     role: top_considered
     rank: 1
-    justification: Richardson-lab MolProbity is the community gold standard for stereochemical geometry
-      outliers.
+    justification: Independent covalent-geometry parser (bond/angle/planarity/chirality/omega), non-cctbx.
     as_of_date: '2026-07-21'
   - id: REC_T05_planarity_rmsd_top_considered
     metric_definition_ref: T05_planarity_rmsd
-    tool_ref: MolProbity (gold)
+    tool_ref: gemmi validate
     role: top_considered
     rank: 1
-    justification: Richardson-lab MolProbity is the community gold standard for stereochemical geometry
-      outliers.
+    justification: Independent covalent-geometry parser (bond/angle/planarity/chirality/omega), non-cctbx.
     as_of_date: '2026-07-21'
   - id: REC_T05_chirality_outliers_top_considered
     metric_definition_ref: T05_chirality_outliers
-    tool_ref: MolProbity (gold)
+    tool_ref: gemmi validate
     role: top_considered
     rank: 1
-    justification: Richardson-lab MolProbity is the community gold standard for stereochemical geometry
-      outliers.
+    justification: Independent covalent-geometry parser (bond/angle/planarity/chirality/omega), non-cctbx.
     as_of_date: '2026-07-21'
   - id: REC_T05_cablam_outliers_top_considered
     metric_definition_ref: T05_cablam_outliers
     tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Richardson-lab MolProbity is the community gold standard for stereochemical geometry
-      outliers.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T06_cc_work_top_considered
     metric_definition_ref: T06_cc_work
     tool_ref: gemmi sfcalc
     role: top_considered
     rank: 1
-    justification: Independent structure-factor calculation; non-cctbx cross-check for R-factors and correlation
-      coefficients.
+    justification: Independent structure-factor calculation for correlation coefficients.
     as_of_date: '2026-07-21'
   - id: REC_T06_cc_free_top_considered
     metric_definition_ref: T06_cc_free
     tool_ref: gemmi sfcalc
     role: top_considered
     rank: 1
-    justification: Independent structure-factor calculation; non-cctbx cross-check for R-factors and correlation
-      coefficients.
+    justification: Independent structure-factor calculation for correlation coefficients.
     as_of_date: '2026-07-21'
   - id: REC_T06_cc_top_considered
     metric_definition_ref: T06_cc
     tool_ref: gemmi sfcalc
     role: top_considered
     rank: 1
-    justification: Independent structure-factor calculation; non-cctbx cross-check for R-factors and correlation
-      coefficients.
+    justification: Independent structure-factor calculation for correlation coefficients.
     as_of_date: '2026-07-21'
   - id: REC_T06_map-model_fsc_global_per-shell_top_considered
     metric_definition_ref: T06_map-model_fsc_global_per-shell
     tool_ref: Servalcat
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: Independent refinement / FSC / sigma-A oracle (installed); map and refinement metrics.
     as_of_date: '2026-07-21'
   - id: REC_T06_overall_b_top_considered
     metric_definition_ref: T06_overall_b
     tool_ref: gemmi validate
     role: top_considered
     rank: 1
-    justification: Independent geometry parser for overall B and structural bookkeeping.
+    justification: Independent covalent-geometry parser (bond/angle/planarity/chirality/omega), non-cctbx.
     as_of_date: '2026-07-21'
   - id: REC_T06_wilson_b_top_considered
     metric_definition_ref: T06_wilson_b
-    tool_ref: gemmi sfcalc
+    tool_ref: ctruncate
     role: top_considered
     rank: 1
-    justification: Independent structure-factor calculation; non-cctbx cross-check for R-factors and correlation
-      coefficients.
+    justification: CCP4 ctruncate recovers Wilson B, L-test twinning, anisotropy, tNCS, ice rings from merged
+      amplitudes.
     as_of_date: '2026-07-21'
   - id: REC_T07_fraction_residues_retained_after_trim_top_considered
     metric_definition_ref: T07_fraction_residues_retained_after_trim
     tool_ref: biotite AF parsers
     role: top_considered
     rank: 1
-    justification: Independent AlphaFold-output parser for pLDDT reads and derived correlations.
+    justification: Independent AlphaFold-output parser for pLDDT, pTM/ipTM confidence fields, and derived
+      correlations.
     as_of_date: '2026-07-21'
   - id: REC_T07_mean_plddt_pre_post_top_considered
     metric_definition_ref: T07_mean_plddt_pre_post
     tool_ref: biotite AF parsers
     role: top_considered
     rank: 1
-    justification: Independent AlphaFold-output parser for pLDDT reads and derived correlations.
+    justification: Independent AlphaFold-output parser for pLDDT, pTM/ipTM confidence fields, and derived
+      correlations.
     as_of_date: '2026-07-21'
   - id: REC_T07_b-factor_1_plddt²_correlation_top_considered
     metric_definition_ref: T07_b-factor_1_plddt²_correlation
     tool_ref: biotite AF parsers
     role: top_considered
     rank: 1
-    justification: Independent AlphaFold-output parser for pLDDT reads and derived correlations.
+    justification: Independent AlphaFold-output parser for pLDDT, pTM/ipTM confidence fields, and derived
+      correlations.
     as_of_date: '2026-07-21'
   - id: REC_T07_domain_count_vs_pae_oracle_top_considered
     metric_definition_ref: T07_domain_count_vs_pae_oracle
     tool_ref: pae_to_domains.py (Croll/Tronrud)
     role: top_considered
     rank: 1
-    justification: PAE-matrix domain clustering; the independent oracle for predicted-model domain count.
+    justification: PAE-matrix domain clustering; independent oracle for predicted-model domain count.
     as_of_date: '2026-07-21'
   - id: REC_T07_rmsd_of_processed_model_vs_reference_experimental_top_considered
     metric_definition_ref: T07_rmsd_of_processed_model_vs_reference_experimental
-    tool_ref: QMEANDisCo
+    tool_ref: TM-align
     role: top_considered
     rank: 1
-    justification: Consensus single-model quality estimate for predicted models.
+    justification: Sequence-independent Cα superposition; community reference for RMSD/TM-score and aligned
+      length.
     as_of_date: '2026-07-21'
   - id: REC_T08_placement_cc_top_considered
     metric_definition_ref: T08_placement_cc
     tool_ref: ChimeraX fitmap
     role: top_considered
     rank: 1
-    justification: Independent rigid-body map fitting; cross-checks placement CC and pose for docking.
+    justification: Independent rigid-body map fitting; placement CC and delta-vs-random.
     as_of_date: '2026-07-21'
   - id: REC_T08_δcc_vs_random_top_considered
     metric_definition_ref: T08_δcc_vs_random
     tool_ref: ChimeraX fitmap
     role: top_considered
     rank: 1
-    justification: Independent rigid-body map fitting; cross-checks placement CC and pose for docking.
+    justification: Independent rigid-body map fitting; placement CC and delta-vs-random.
     as_of_date: '2026-07-21'
   - id: REC_T08_rmsd_to_deposited_position_top_considered
     metric_definition_ref: T08_rmsd_to_deposited_position
-    tool_ref: ChimeraX fitmap
+    tool_ref: gemmi align
     role: top_considered
     rank: 1
-    justification: Independent rigid-body map fitting; cross-checks placement CC and pose for docking.
+    justification: Independent superposition to a reference/deposited pose for RMSD and translation/rotation
+      error.
     as_of_date: '2026-07-21'
   - id: REC_T08_translation_rotation_error_top_considered
     metric_definition_ref: T08_translation_rotation_error
-    tool_ref: ChimeraX fitmap
+    tool_ref: gemmi align
     role: top_considered
     rank: 1
-    justification: Independent rigid-body map fitting; cross-checks placement CC and pose for docking.
-    as_of_date: '2026-07-21'
-  - id: REC_T08_em_placement_llg_top_considered
-    metric_definition_ref: T08_em_placement_llg
-    tool_ref: ChimeraX fitmap
-    role: top_considered
-    rank: 1
-    justification: Independent rigid-body map fitting; cross-checks placement CC and pose for docking.
-    as_of_date: '2026-07-21'
-  - id: REC_T09_phaser_tfz_top_considered
-    metric_definition_ref: T09_phaser_tfz
-    tool_ref: CCP4 Phaser standalone
-    role: top_considered
-    rank: 1
-    justification: Standalone Phaser for independent molecular-replacement TFZ / LLG / pose.
-    as_of_date: '2026-07-21'
-  - id: REC_T09_llg_top_considered
-    metric_definition_ref: T09_llg
-    tool_ref: CCP4 Phaser standalone
-    role: top_considered
-    rank: 1
-    justification: Standalone Phaser for independent molecular-replacement TFZ / LLG / pose.
+    justification: Independent superposition to a reference/deposited pose for RMSD and translation/rotation
+      error.
     as_of_date: '2026-07-21'
   - id: REC_T09_translation_rotation_top_considered
     metric_definition_ref: T09_translation_rotation
-    tool_ref: CCP4 Phaser standalone
+    tool_ref: gemmi align
     role: top_considered
     rank: 1
-    justification: Standalone Phaser for independent molecular-replacement TFZ / LLG / pose.
+    justification: Independent superposition to a reference/deposited pose for RMSD and translation/rotation
+      error.
     as_of_date: '2026-07-21'
   - id: REC_T09_post-mr_r-free_top_considered
     metric_definition_ref: T09_post-mr_r-free
-    tool_ref: CCP4 Phaser standalone
+    tool_ref: REFMAC5 (CCP4)
     role: top_considered
     rank: 1
-    justification: Standalone Phaser for independent molecular-replacement TFZ / LLG / pose.
-    as_of_date: '2026-07-21'
-  - id: REC_T09_time-to-solution_top_considered
-    metric_definition_ref: T09_time-to-solution
-    tool_ref: CCP4 Phaser standalone
-    role: top_considered
-    rank: 1
-    justification: Standalone Phaser for independent molecular-replacement TFZ / LLG / pose.
+    justification: Independent ML refiner; post-MR R-free and reciprocal-space refinement statistics.
     as_of_date: '2026-07-21'
   - id: REC_T10_ligand_rscc_top_considered
     metric_definition_ref: T10_ligand_rscc
-    tool_ref: Coot Find Ligand
+    tool_ref: edstats
     role: top_considered
     rank: 1
-    justification: Interactive real-space ligand fitting; independent RSCC / RSR / pose oracle.
+    justification: 'CCP4 edstats: per-residue/per-ligand real-space correlation (RSCC) and RSR, independent
+      of PHENIX.'
     as_of_date: '2026-07-21'
   - id: REC_T10_ligand_rsr_top_considered
     metric_definition_ref: T10_ligand_rsr
-    tool_ref: Coot Find Ligand
+    tool_ref: edstats
     role: top_considered
     rank: 1
-    justification: Interactive real-space ligand fitting; independent RSCC / RSR / pose oracle.
+    justification: 'CCP4 edstats: per-residue/per-ligand real-space correlation (RSCC) and RSR, independent
+      of PHENIX.'
     as_of_date: '2026-07-21'
   - id: REC_T10_ligand_b_vs_surroundings_top_considered
     metric_definition_ref: T10_ligand_b_vs_surroundings
-    tool_ref: Coot Find Ligand
+    tool_ref: gemmi script
     role: top_considered
     rank: 1
-    justification: Interactive real-space ligand fitting; independent RSCC / RSR / pose oracle.
+    justification: Independent coordinate/B-factor parser for per-residue displacement, B-factor deltas,
+      ligand geometry.
     as_of_date: '2026-07-21'
   - id: REC_T10_protein-ligand_hbond_count_top_considered
     metric_definition_ref: T10_protein-ligand_hbond_count
-    tool_ref: Coot Find Ligand
+    tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Interactive real-space ligand fitting; independent RSCC / RSR / pose oracle.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T10_rmsd_to_deposited_ligand_pose_top_considered
     metric_definition_ref: T10_rmsd_to_deposited_ligand_pose
-    tool_ref: Coot Find Ligand
+    tool_ref: gemmi align
     role: top_considered
     rank: 1
-    justification: Interactive real-space ligand fitting; independent RSCC / RSR / pose oracle.
+    justification: Independent superposition to a reference/deposited pose for RMSD and translation/rotation
+      error.
     as_of_date: '2026-07-21'
   - id: REC_T11_loop_rscc_top_considered
     metric_definition_ref: T11_loop_rscc
-    tool_ref: Coot Fit Loop (DB/Rama-search)
+    tool_ref: edstats
     role: top_considered
     rank: 1
-    justification: Database / Ramachandran loop search; independent rebuilt-loop geometry and density oracle.
+    justification: 'CCP4 edstats: per-residue/per-ligand real-space correlation (RSCC) and RSR, independent
+      of PHENIX.'
     as_of_date: '2026-07-21'
   - id: REC_T11_ramachandran_favored_within_loop_top_considered
     metric_definition_ref: T11_ramachandran_favored_within_loop
-    tool_ref: Coot Fit Loop (DB/Rama-search)
+    tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Database / Ramachandran loop search; independent rebuilt-loop geometry and density oracle.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T11_rmsd_rebuilt_vs_reference_loop_top_considered
     metric_definition_ref: T11_rmsd_rebuilt_vs_reference_loop
-    tool_ref: Coot Fit Loop (DB/Rama-search)
+    tool_ref: gemmi align
     role: top_considered
     rank: 1
-    justification: Database / Ramachandran loop search; independent rebuilt-loop geometry and density oracle.
+    justification: Independent superposition to a reference/deposited pose for RMSD and translation/rotation
+      error.
     as_of_date: '2026-07-21'
   - id: REC_T11_new_outliers_top_considered
     metric_definition_ref: T11_new_outliers
-    tool_ref: Coot Fit Loop (DB/Rama-search)
+    tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Database / Ramachandran loop search; independent rebuilt-loop geometry and density oracle.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T12_global_fsc_resolution_at_0.143_masked_unmasked_top_considered
     metric_definition_ref: T12_global_fsc_resolution_at_0.143_masked_unmasked
     tool_ref: RELION postprocess
     role: top_considered
     rank: 1
-    justification: RELION postprocess is the community reference for masked/unmasked global FSC resolution.
+    justification: 'RELION postprocess: community reference for masked/unmasked global FSC resolution.'
     as_of_date: '2026-07-21'
   - id: REC_T12_local_resolution_distribution_mean_stdev_10th_90th_top_considered
     metric_definition_ref: T12_local_resolution_distribution_mean_stdev_10th_90th
     tool_ref: ResMap
     role: top_considered
     rank: 1
-    justification: Local-resolution estimation independent of PHENIX for the per-voxel resolution distribution.
+    justification: Local-resolution estimation independent of PHENIX.
     as_of_date: '2026-07-21'
   - id: REC_T12_d_fsc_model_if_model_top_considered
     metric_definition_ref: T12_d_fsc_model_if_model
     tool_ref: RELION postprocess
     role: top_considered
     rank: 1
-    justification: RELION postprocess is the community reference for masked/unmasked global FSC resolution.
+    justification: 'RELION postprocess: community reference for masked/unmasked global FSC resolution.'
     as_of_date: '2026-07-21'
   - id: REC_T12_b-factor_sharpening_estimate_top_considered
     metric_definition_ref: T12_b-factor_sharpening_estimate
     tool_ref: RELION postprocess
     role: top_considered
     rank: 1
-    justification: RELION postprocess is the community reference for masked/unmasked global FSC resolution.
+    justification: 'RELION postprocess: community reference for masked/unmasked global FSC resolution.'
     as_of_date: '2026-07-21'
   - id: REC_T13_i_σ_i_top_considered
     metric_definition_ref: T13_i_σ_i
     tool_ref: CCP4 aimless
     role: top_considered
     rank: 1
-    justification: CCP4 aimless is the canonical data-processing oracle for CC-half, mean I/sigma, and R-merge/R-meas
-      (requires unmerged intensities).
+    justification: 'CCP4 aimless: canonical CC-half / mean I-over-sigma / R-merge from unmerged intensities.'
     as_of_date: '2026-07-21'
   - id: REC_T13_r-merge_r-meas_top_considered
     metric_definition_ref: T13_r-merge_r-meas
     tool_ref: CCP4 aimless
     role: top_considered
     rank: 1
-    justification: CCP4 aimless is the canonical data-processing oracle for CC-half, mean I/sigma, and R-merge/R-meas
-      (requires unmerged intensities).
+    justification: 'CCP4 aimless: canonical CC-half / mean I-over-sigma / R-merge from unmerged intensities.'
     as_of_date: '2026-07-21'
   - id: REC_T13_cc½_top_considered
     metric_definition_ref: T13_cc½
     tool_ref: CCP4 aimless
     role: top_considered
     rank: 1
-    justification: CCP4 aimless is the canonical data-processing oracle for CC-half, mean I/sigma, and R-merge/R-meas
-      (requires unmerged intensities).
+    justification: 'CCP4 aimless: canonical CC-half / mean I-over-sigma / R-merge from unmerged intensities.'
     as_of_date: '2026-07-21'
   - id: REC_T13_l-test_twinning_top_considered
     metric_definition_ref: T13_l-test_twinning
     tool_ref: ctruncate
     role: top_considered
     rank: 1
-    justification: CCP4 ctruncate recovers Wilson B, L-test twinning, anisotropy, tNCS, and ice rings from
-      merged amplitudes.
+    justification: CCP4 ctruncate recovers Wilson B, L-test twinning, anisotropy, tNCS, ice rings from merged
+      amplitudes.
     as_of_date: '2026-07-21'
   - id: REC_T13_anisotropy_δb_aniso_top_considered
     metric_definition_ref: T13_anisotropy_δb_aniso
     tool_ref: ctruncate
     role: top_considered
     rank: 1
-    justification: CCP4 ctruncate recovers Wilson B, L-test twinning, anisotropy, tNCS, and ice rings from
-      merged amplitudes.
+    justification: CCP4 ctruncate recovers Wilson B, L-test twinning, anisotropy, tNCS, ice rings from merged
+      amplitudes.
     as_of_date: '2026-07-21'
   - id: REC_T13_wilson_b_top_considered
     metric_definition_ref: T13_wilson_b
     tool_ref: ctruncate
     role: top_considered
     rank: 1
-    justification: CCP4 ctruncate recovers Wilson B, L-test twinning, anisotropy, tNCS, and ice rings from
-      merged amplitudes.
+    justification: CCP4 ctruncate recovers Wilson B, L-test twinning, anisotropy, tNCS, ice rings from merged
+      amplitudes.
     as_of_date: '2026-07-21'
   - id: REC_T13_tncs_flag_top_considered
     metric_definition_ref: T13_tncs_flag
     tool_ref: ctruncate
     role: top_considered
     rank: 1
-    justification: CCP4 ctruncate recovers Wilson B, L-test twinning, anisotropy, tNCS, and ice rings from
-      merged amplitudes.
+    justification: CCP4 ctruncate recovers Wilson B, L-test twinning, anisotropy, tNCS, ice rings from merged
+      amplitudes.
     as_of_date: '2026-07-21'
   - id: REC_T13_ice-ring_flags_top_considered
     metric_definition_ref: T13_ice-ring_flags
     tool_ref: ctruncate
     role: top_considered
     rank: 1
-    justification: CCP4 ctruncate recovers Wilson B, L-test twinning, anisotropy, tNCS, and ice rings from
-      merged amplitudes.
+    justification: CCP4 ctruncate recovers Wilson B, L-test twinning, anisotropy, tNCS, ice rings from merged
+      amplitudes.
     as_of_date: '2026-07-21'
   - id: REC_T13_aimless_status_top_considered
     metric_definition_ref: T13_aimless_status
     tool_ref: CCP4 aimless
     role: top_considered
     rank: 1
-    justification: CCP4 aimless is the canonical data-processing oracle for CC-half, mean I/sigma, and R-merge/R-meas
-      (requires unmerged intensities).
+    justification: 'CCP4 aimless: canonical CC-half / mean I-over-sigma / R-merge from unmerged intensities.'
     as_of_date: '2026-07-21'
   - id: REC_T14_h_added_top_considered
     metric_definition_ref: T14_h_added
     tool_ref: reduce (standalone, Richardson)
     role: top_considered
     rank: 1
-    justification: Richardson-lab standalone reduce; independent H-placement and flip oracle (same lineage
-      the PHENIX wrapper builds on).
+    justification: Richardson-lab standalone reduce; independent H-placement / protonation / flip oracle.
     as_of_date: '2026-07-21'
   - id: REC_T14_asn_gln_his_flips_proposed_top_considered
     metric_definition_ref: T14_asn_gln_his_flips_proposed
     tool_ref: reduce (standalone, Richardson)
     role: top_considered
     rank: 1
-    justification: Richardson-lab standalone reduce; independent H-placement and flip oracle (same lineage
-      the PHENIX wrapper builds on).
+    justification: Richardson-lab standalone reduce; independent H-placement / protonation / flip oracle.
     as_of_date: '2026-07-21'
   - id: REC_T14_clashscore_delta_pre_vs_post_top_considered
     metric_definition_ref: T14_clashscore_delta_pre_vs_post
     tool_ref: reduce (standalone, Richardson)
     role: top_considered
     rank: 1
-    justification: Richardson-lab standalone reduce; independent H-placement and flip oracle (same lineage
-      the PHENIX wrapper builds on).
+    justification: Richardson-lab standalone reduce; independent H-placement / protonation / flip oracle.
     as_of_date: '2026-07-21'
   - id: REC_T14_hbond-network_consistency_vs_standalone_reduce_top_considered
     metric_definition_ref: T14_hbond-network_consistency_vs_standalone_reduce
     tool_ref: reduce (standalone, Richardson)
     role: top_considered
     rank: 1
-    justification: Richardson-lab standalone reduce; independent H-placement and flip oracle (same lineage
-      the PHENIX wrapper builds on).
+    justification: Richardson-lab standalone reduce; independent H-placement / protonation / flip oracle.
     as_of_date: '2026-07-21'
   - id: REC_T03_overall_r_per_shell_weighted_top_considered
     metric_definition_ref: T03_overall_r_per_shell_weighted
     tool_ref: REFMAC5 (CCP4)
     role: top_considered
     rank: 1
-    justification: Independent maximum-likelihood refiner; canonical second opinion on reciprocal-space
-      R-factors and geometry.
+    justification: Independent ML refiner; post-MR R-free and reciprocal-space refinement statistics.
     as_of_date: '2026-07-21'
   - id: REC_T05_ramachandran_outliers_count_top_considered
     metric_definition_ref: T05_ramachandran_outliers_count
     tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Richardson-lab MolProbity is the community gold standard for stereochemical geometry
-      outliers.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T05_atoms_used_in_clashscore_calc_top_considered
     metric_definition_ref: T05_atoms_used_in_clashscore_calc
-    tool_ref: gemmi validators
+    tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: Independent structure parser; authoritative for atom/water counts and B-factor statistics
-      without cctbx.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T06_resolution_range_top_considered
     metric_definition_ref: T06_resolution_range
     tool_ref: Servalcat
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: Independent refinement / FSC / sigma-A oracle (installed); map and refinement metrics.
     as_of_date: '2026-07-21'
   - id: REC_T06_reflections_input_mtz_top_considered
     metric_definition_ref: T06_reflections_input_mtz
     tool_ref: Servalcat
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: Independent refinement / FSC / sigma-A oracle (installed); map and refinement metrics.
     as_of_date: '2026-07-21'
   - id: REC_T06_reflections_final_mtz_top_considered
     metric_definition_ref: T06_reflections_final_mtz
     tool_ref: Servalcat
     role: top_considered
     rank: 1
-    justification: Independent refinement / FSC / sigma-A oracle (installed); non-cctbx cross-check for
-      map and R metrics.
+    justification: Independent refinement / FSC / sigma-A oracle (installed); map and refinement metrics.
     as_of_date: '2026-07-21'
   - id: REC_T12_local_resolution_mean_top_considered
     metric_definition_ref: T12_local_resolution_mean
     tool_ref: ResMap
     role: top_considered
     rank: 1
-    justification: Local-resolution estimation independent of PHENIX for the per-voxel resolution distribution.
+    justification: Local-resolution estimation independent of PHENIX.
     as_of_date: '2026-07-21'
   - id: REC_T12_local_resolution_std_top_considered
     metric_definition_ref: T12_local_resolution_std
     tool_ref: ResMap
     role: top_considered
     rank: 1
-    justification: Local-resolution estimation independent of PHENIX for the per-voxel resolution distribution.
+    justification: Local-resolution estimation independent of PHENIX.
     as_of_date: '2026-07-21'
   - id: REC_T01_per_residue_displacement_top_considered
     metric_definition_ref: T01_per_residue_displacement
-    tool_ref: TM-align
+    tool_ref: gemmi script
     role: top_considered
     rank: 1
-    justification: Sequence-independent superposition; community reference for pair-of-structures RMSD and
-      TM-score.
+    justification: Independent coordinate/B-factor parser for per-residue displacement, B-factor deltas,
+      ligand geometry.
     as_of_date: '2026-07-21'
   - id: REC_T05_per_residue_rsrz_top_considered
     metric_definition_ref: T05_per_residue_rsrz
     tool_ref: wwPDB validation pipeline
     role: top_considered
     rank: 1
-    justification: The wwPDB validation report is the deposition-grade source for RSRZ, Ramachandran-Z,
-      and B-factor outlier statistics.
+    justification: Deposition-grade source for RSRZ, Ramachandran-Z, and B-factor-outlier statistics.
     as_of_date: '2026-07-21'
   - id: REC_T05_overall_b_mean_top_considered
     metric_definition_ref: T05_overall_b_mean
     tool_ref: gemmi validators
     role: top_considered
     rank: 1
-    justification: Independent structure parser; authoritative for atom/water counts and B-factor statistics
-      without cctbx.
+    justification: Independent structure parser for atom/water counts and B-factor statistics.
     as_of_date: '2026-07-21'
   - id: REC_T05_overall_b_factor_distribution_min_top_considered
     metric_definition_ref: T05_overall_b_factor_distribution_min
     tool_ref: gemmi validators
     role: top_considered
     rank: 1
-    justification: Independent structure parser; authoritative for atom/water counts and B-factor statistics
-      without cctbx.
+    justification: Independent structure parser for atom/water counts and B-factor statistics.
     as_of_date: '2026-07-21'
   - id: REC_T05_overall_b_factor_distribution_max_top_considered
     metric_definition_ref: T05_overall_b_factor_distribution_max
     tool_ref: gemmi validators
     role: top_considered
     rank: 1
-    justification: Independent structure parser; authoritative for atom/water counts and B-factor statistics
-      without cctbx.
+    justification: Independent structure parser for atom/water counts and B-factor statistics.
     as_of_date: '2026-07-21'
   - id: REC_T03_coordinate_error_ml_top_considered
     metric_definition_ref: T03_coordinate_error_ml
     tool_ref: REFMAC5 (CCP4)
     role: top_considered
     rank: 1
-    justification: Independent maximum-likelihood refiner; canonical second opinion on reciprocal-space
-      R-factors and geometry.
+    justification: Independent ML refiner; post-MR R-free and reciprocal-space refinement statistics.
     as_of_date: '2026-07-21'
   - id: REC_T03_data_to_parameter_ratio_nominal_top_considered
     metric_definition_ref: T03_data_to_parameter_ratio_nominal
     tool_ref: REFMAC5 (CCP4)
     role: top_considered
     rank: 1
-    justification: Independent maximum-likelihood refiner; canonical second opinion on reciprocal-space
-      R-factors and geometry.
+    justification: Independent ML refiner; post-MR R-free and reciprocal-space refinement statistics.
     as_of_date: '2026-07-21'
   - id: REC_T03_data_to_parameter_ratio_effective_top_considered
     metric_definition_ref: T03_data_to_parameter_ratio_effective
     tool_ref: REFMAC5 (CCP4)
     role: top_considered
     rank: 1
-    justification: Independent maximum-likelihood refiner; canonical second opinion on reciprocal-space
-      R-factors and geometry.
+    justification: Independent ML refiner; post-MR R-free and reciprocal-space refinement statistics.
     as_of_date: '2026-07-21'
   - id: REC_T03_ncs_torsion_restraints_count_top_considered
     metric_definition_ref: T03_ncs_torsion_restraints_count
     tool_ref: REFMAC5 (CCP4)
     role: top_considered
     rank: 1
-    justification: Independent maximum-likelihood refiner; canonical second opinion on reciprocal-space
-      R-factors and geometry.
+    justification: Independent ML refiner; post-MR R-free and reciprocal-space refinement statistics.
     as_of_date: '2026-07-21'
   - id: REC_T05_total_atoms_top_considered
     metric_definition_ref: T05_total_atoms
     tool_ref: gemmi validators
     role: top_considered
     rank: 1
-    justification: Independent structure parser; authoritative for atom/water counts and B-factor statistics
-      without cctbx.
+    justification: Independent structure parser for atom/water counts and B-factor statistics.
     as_of_date: '2026-07-21'
   - id: REC_T05_waters_count_top_considered
     metric_definition_ref: T05_waters_count
     tool_ref: gemmi validators
     role: top_considered
     rank: 1
-    justification: Independent structure parser; authoritative for atom/water counts and B-factor statistics
-      without cctbx.
+    justification: Independent structure parser for atom/water counts and B-factor statistics.
     as_of_date: '2026-07-21'
   - id: REC_T05_rama_z_score_top_considered
     metric_definition_ref: T05_rama_z_score
     tool_ref: wwPDB validation pipeline
     role: top_considered
     rank: 1
-    justification: The wwPDB validation report is the deposition-grade source for RSRZ, Ramachandran-Z,
-      and B-factor outlier statistics.
+    justification: Deposition-grade source for RSRZ, Ramachandran-Z, and B-factor-outlier statistics.
     as_of_date: '2026-07-21'
   - id: REC_T10_ligand_b_factor_mean_top_considered
     metric_definition_ref: T10_ligand_b_factor_mean
-    tool_ref: Coot Find Ligand
+    tool_ref: gemmi script
     role: top_considered
     rank: 1
-    justification: Interactive real-space ligand fitting; independent RSCC / RSR / pose oracle.
+    justification: Independent coordinate/B-factor parser for per-residue displacement, B-factor deltas,
+      ligand geometry.
     as_of_date: '2026-07-21'
   - id: REC_T05_packing_z_score_top_considered
     metric_definition_ref: T05_packing_z_score
     tool_ref: RosettaHoles2
     role: top_considered
     rank: 1
-    justification: Cavity/packing analysis; canonical source for a packing Z-score independent of cctbx.
+    justification: Rosetta cavity/packing analysis; independent packing Z-score.
     as_of_date: '2026-07-21'
   - id: REC_T05_unsatisfied_buried_hbond_count_top_considered
     metric_definition_ref: T05_unsatisfied_buried_hbond_count
-    tool_ref: wwPDB validation pipeline
+    tool_ref: MolProbity (gold)
     role: top_considered
     rank: 1
-    justification: The wwPDB validation report is the deposition-grade source for RSRZ, Ramachandran-Z,
-      and B-factor outlier statistics.
+    justification: 'Richardson-lab MolProbity: gold standard for clash/Ramachandran/rotamer/Cβ, probe-based
+      contacts and H-bonds.'
     as_of_date: '2026-07-21'
   - id: REC_T05_b_factor_outlier_z_top_considered
     metric_definition_ref: T05_b_factor_outlier_z
     tool_ref: wwPDB validation pipeline
     role: top_considered
     rank: 1
-    justification: The wwPDB validation report is the deposition-grade source for RSRZ, Ramachandran-Z,
-      and B-factor outlier statistics.
+    justification: Deposition-grade source for RSRZ, Ramachandran-Z, and B-factor-outlier statistics.
     as_of_date: '2026-07-21'
   - id: REC_T06_residue_rscc_top_considered
     metric_definition_ref: T06_residue_rscc
-    tool_ref: FSC-Q
+    tool_ref: edstats
     role: top_considered
     rank: 1
-    justification: Per-residue model-to-map agreement (RSCC / local FSC-Q) independent of PHENIX.
+    justification: 'CCP4 edstats: per-residue/per-ligand real-space correlation (RSCC) and RSR, independent
+      of PHENIX.'
     as_of_date: '2026-07-21'
   - id: REC_T06_rscc_outlier_fraction_top_considered
     metric_definition_ref: T06_rscc_outlier_fraction
-    tool_ref: FSC-Q
+    tool_ref: edstats
     role: top_considered
     rank: 1
-    justification: Per-residue model-to-map agreement (RSCC / local FSC-Q) independent of PHENIX.
+    justification: 'CCP4 edstats: per-residue/per-ligand real-space correlation (RSCC) and RSR, independent
+      of PHENIX.'
     as_of_date: '2026-07-21'
   - id: REC_T06_diffraction_precision_index_top_considered
     metric_definition_ref: T06_diffraction_precision_index
     tool_ref: PDB-REDO
     role: top_considered
     rank: 1
-    justification: Re-refinement pipeline reporting the diffraction-precision index alongside model-vs-data
-      statistics.
+    justification: Re-refinement pipeline reporting the diffraction-precision index.
     as_of_date: '2026-07-21'
   - id: REC_T07_predicted_tm_score_top_considered
     metric_definition_ref: T07_predicted_tm_score
-    tool_ref: ChimeraX alphafold
+    tool_ref: biotite AF parsers
     role: top_considered
     rank: 1
-    justification: ChimeraX AlphaFold tooling for predicted TM-score / interface confidence cross-checks.
+    justification: Independent AlphaFold-output parser for pLDDT, pTM/ipTM confidence fields, and derived
+      correlations.
     as_of_date: '2026-07-21'
   - id: REC_T07_interface_predicted_tm_score_top_considered
     metric_definition_ref: T07_interface_predicted_tm_score
-    tool_ref: ChimeraX alphafold
+    tool_ref: biotite AF parsers
     role: top_considered
     rank: 1
-    justification: ChimeraX AlphaFold tooling for predicted TM-score / interface confidence cross-checks.
+    justification: Independent AlphaFold-output parser for pLDDT, pTM/ipTM confidence fields, and derived
+      correlations.
     as_of_date: '2026-07-21'
   - id: REC_T07_prediction_ensemble_convergence_top_considered
     metric_definition_ref: T07_prediction_ensemble_convergence
-    tool_ref: QMEANDisCo
+    tool_ref: OpenStructure
     role: top_considered
     rank: 1
-    justification: Consensus single-model quality estimate for predicted models.
+    justification: CASP-grade lDDT/TMScore/GDT-TS reference implementation, independent of cctbx.
     as_of_date: '2026-07-21'
   - id: REC_T12_directional_resolution_anisotropy_top_considered
     metric_definition_ref: T12_directional_resolution_anisotropy
     tool_ref: 3DFSC
     role: top_considered
     rank: 1
-    justification: Directional FSC; the canonical measure of resolution anisotropy.
+    justification: Directional FSC; canonical resolution-anisotropy measure.
     as_of_date: '2026-07-21'
   - id: REC_T12_local_model_map_fsc_q_top_considered
     metric_definition_ref: T12_local_model_map_fsc_q
     tool_ref: FSC-Q
     role: top_considered
     rank: 1
-    justification: Per-residue model-to-map agreement (RSCC / local FSC-Q) independent of PHENIX.
+    justification: Per-residue model-to-map agreement independent of PHENIX.
     as_of_date: '2026-07-21'
   - id: REC_T15_secondary_structure_assignment_top_considered
     metric_definition_ref: T15_secondary_structure_assignment
     tool_ref: DSSP
     role: top_considered
     rank: 1
-    justification: DSSP is the reference secondary-structure assignment used in the DSSP-vs-STRIDE agreement
-      metric.
+    justification: DSSP secondary-structure assignment for the SS-agreement metric.
     as_of_date: '2026-07-21'
   - id: REC_T15_structural_domain_assignment_top_considered
     metric_definition_ref: T15_structural_domain_assignment
     tool_ref: CATH
     role: top_considered
     rank: 1
-    justification: CATH provides curated, versioned domain and fold assignments for deposited entries.
+    justification: Curated, versioned domain and fold assignments for deposited entries.
     as_of_date: '2026-07-21'
   - id: REC_T16_capri_interface_quality_class_top_considered
     metric_definition_ref: T16_capri_interface_quality_class
     tool_ref: DockQ
     role: top_considered
     rank: 1
-    justification: Canonical non-cctbx oracle for T16.
+    justification: Community-standard continuous interface-quality score.
     as_of_date: '2026-07-21'
   - id: REC_T17_nmr_restraint_violation_summary_top_considered
     metric_definition_ref: T17_nmr_restraint_violation_summary
     tool_ref: wwPDB NMR validation
     role: top_considered
     rank: 1
-    justification: The wwPDB NMR validation report is the deposition-grade source for restraint-violation
-      and ensemble statistics.
+    justification: Deposition-grade source for NMR restraint-violation and ensemble statistics.
     as_of_date: '2026-07-21'

@@ -107,6 +107,18 @@ Every task that has an installed oracle is cross-checked by at least one **non-c
 **T15–T17 are oracle-only tasks with nothing installed yet.** They have no PHENIX implementation at all, so there is no PHENIX-grades-PHENIX risk — but there is also no measurement path until one of the listed oracles is installed. Treat their catalog entries as declared-but-not-yet-runnable; the synthetic fixture
 `data/examples/eval/EVAL_synth_quality_indicators_2026-05-04.yaml` exercises the schema and emitter routing, not real tools.
 
+### Metrics with no independent oracle (deliberate gaps)
+
+A few metrics are **method-specific scores or process metrics with no external equivalent**, so
+`ref/tool_recommendations.yaml` deliberately carries no `top_considered` row for them — a false
+oracle would be worse than an honest gap:
+
+| Metric | Why no oracle |
+|---|---|
+| `T09_phaser_tfz`, `T09_llg` | Phaser translation-function Z / log-likelihood gain are Phaser-internal scores; MoRDa/MOLREP/ARCIMBOLDO produce their own, non-comparable scores. MR *success* is instead cross-checked at the outcome level via `T09_translation_rotation` (independent superposition to the deposited pose) and `T09_post-mr_r-free` (REFMAC5). |
+| `T08_em_placement_llg` | `phenix.em_placement` log-likelihood is PHENIX-specific; placement is cross-checked via `T08_placement_cc` (ChimeraX/Situs) and `T08_rmsd_to_deposited_position` instead. |
+| `T09_time-to-solution` | A wall-clock process metric measured directly by the harness, not a structural quantity to cross-check. |
+
 ## Build notes (for reproducibility)
 
 **TM-align** — single C++ source. `malloc.h` include must be commented out on macOS:
