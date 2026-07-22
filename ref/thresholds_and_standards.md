@@ -65,6 +65,10 @@ agreement, not quality.
 | Wilson B | ± **2 Å²** | `xtriage` vs `ctruncate` | `[template]` |
 | L-test ⟨\|L\|⟩ | ± **0.02**, same twin/no-twin call | `xtriage` vs `ctruncate` | `[template]` |
 | Completeness (overall) | ± **1 pp** vs deposition Table 1 | `xtriage` vs deposition | `[calibration]` |
+| Secondary-structure agreement | agent-vs-DSSP three-state ≥ **0.85** over DSSP-assigned residues; two independent assigners floor ≥ **0.80** on a well-ordered model | agent vs DSSP; DSSP vs biotite P-SEA (`t15_ss_agreement.py`) | `[template]` |
+| DockQ score | \|Δ\| ≤ **0.05** and identical CAPRI class | agent vs `t16_interface_quality.py` (DockQ) | `[template]` |
+| Interface buried surface area | \|Δ\| ≤ **10 %** | agent vs biotite SASA (`t16_interface_quality.py`); PISA when available | `[template]` |
+| NMR ensemble precision (mean Cα RMSF) | \|Δ\| ≤ **0.05 Å** | agent vs `t17_nmr_ensemble.py` | `[template]` |
 
 ## 4. Refinement Δ-tolerances (compare→refine flow)
 
