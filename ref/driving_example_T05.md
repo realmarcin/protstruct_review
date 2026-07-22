@@ -56,9 +56,10 @@ Each bullet is pass/fail; all must pass for green. Log the numeric delta that tr
    not a real geometry change. `[template check 7]`
 3. **Ramachandran / rotamer agreement.** Favored % agree within **±1.0 percentage point**; outlier
    % within **±0.5 pp**. `[template check 5, tolerance direction]`
-4. **Bond/angle RMSD agreement.** PHENIX vs `gemmi validate` bond-length RMSD within **±0.003 Å**
-   and bond-angle RMSD within **±0.1°** (both are direct geometry reads, so tolerance is tight).
-   `[template — direct-read metrics]`
+4. **Bond/angle RMSD agreement.** PHENIX vs `gemmi validate` bond-length RMSD within **±0.003 Å**.
+   Bond-**angle** RMSD is restraint-library-dependent: **±0.1° only if both tools use the same
+   library**, else **±0.4°** (PHENIX CDL vs gemmi Engh & Huber differ by 0.3–0.4° for library reasons
+   alone). Record the restraint-library + tool versions. `[template — bond-angle RMSD]`
 5. **Calibration on the clean baseline.** On `3NIR`, clashscore ≤ 2 and Ramachandran outliers = 0.
    A clean 0.48 Å structure scoring otherwise means the pipeline itself is miscalibrated, not the
    model. `[calibration — 3NIR ultra-high-res]`
