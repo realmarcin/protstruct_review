@@ -172,7 +172,7 @@ Local PHENIX docs are mirrored in `ref/phenix_docs/`; doc paths below assume tha
 
 - **PHENIX tool(s):** none — interface scoring is handled entirely by external oracles.
 - **Doc paths:** none
-- **Independent oracle(s):** PISA/PDBePISA (buried surface area, assembly prediction), DockQ (interface model quality)
+- **Independent oracle(s):** PISA/PDBePISA (buried surface area, assembly prediction), biotite SASA (buried surface area, installable Shrake-Rupley stand-in), DockQ (interface model quality)
 - **Typical inputs:** complex or assembly model (PDB/mmCIF)
 - **Metrics:** interface buried surface area (Å², per interface), interface DockQ score (per interface), CAPRI interface quality class (per interface, informational — the ordinal class label behind the DockQ score)
 - **Gold standard:** deposited biological assembly and CAPRI/DockQ class where available

@@ -39,7 +39,8 @@ for r in d['tool_recommendations']:
 | **OpenStructure (OST)** | 2.11.1 | conda env `cryst-oracles` (CLI `lddt`, Python `import ost`) | T01 (`lddt` — CASP15+ reference implementation, global + per-residue), T02 (per-residue Cα distance + structural comparison), T05 (Ramachandran φ/ψ extraction; outlier classification needs external Top8000 contour data), T07 (per-residue lDDT for predicted-vs-experimental) |
 | **CCP4 suite** (REFMAC5, ProSMART, aimless, ctruncate, pointless) | 9.0.015 | `/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/` (source `bin/ccp4.setup-sh` first) | T03 (REFMAC5 — independent refiner / R-factors), T05 (ProSMART — Procrustes per-residue geometry, non-cctbx Ramachandran-Z), T13 (ctruncate — Wilson B / twinning / anisotropy / tNCS / ice rings on merged data; aimless — canonical when unmerged intensities are available; pointless — space-group sanity) |
 | **DSSP** (`mkdssp`) | 4.6.1 | `/opt/homebrew/bin/mkdssp` (`brew install brewsci/bio/dssp`) | T15 (secondary-structure assignment; H-bond energetics half of the agreement metric) |
-| **biotite** | 1.7.1 | `pip install biotite` (base env) | T15 (P-SEA Cα-geometry secondary structure, `scripts/t15_ss_agreement.py`); T17 (ensemble Cα-RMSF precision, `scripts/t17_nmr_ensemble.py`) |
+| **biotite** | 1.7.1 | `pip install biotite` (base env) | T15 (P-SEA Cα-geometry secondary structure, `scripts/t15_ss_agreement.py`); T16 (Shrake-Rupley SASA buried surface area, `scripts/t16_interface_quality.py`); T17 (ensemble Cα-RMSF precision, `scripts/t17_nmr_ensemble.py`) |
+| **DockQ** | 2.1.3 | `pip install DockQ` (base env; pins numpy < 2) | T16 (interface DockQ score + CAPRI class via `scripts/t16_interface_quality.py`) |
 
 Together, `probe` + `reduce` constitute the standalone Richardson-lab MolProbity pipeline that the catalog calls "MolProbity standalone" — these are the same binaries the MolProbity web service runs.
 
@@ -55,8 +56,7 @@ For **T13** the practical layering is: **aimless** is the canonical recommendati
 | **MoRDa** | Specialised MR pipeline | T09 only | Install only if T09 becomes a regression target |
 | **STRIDE** | Homebrew no longer ships it; biotite P-SEA stands in as the second assigner (see Installed) | T15 | Optional: build from <https://webclu.bio.wzw.tum.de/stride/>. DSSP + biotite already give a runnable agreement metric. |
 | **CATH / SCOPe / ECOD** | Database lookups rather than local binaries | T15 | Query the web APIs, or cache per-domain assignments alongside the example datasets |
-| **PISA/PDBePISA** | No local build; PDBe web service covers it | T16 | <https://www.ebi.ac.uk/pdbe/pisa/> |
-| **DockQ** | Not yet needed — T16 has no runnable evaluation | T16 | `pip install DockQ` (<https://github.com/bjornwallner/DockQ>) |
+| **PISA/PDBePISA** | No local build; PDBe web service covers it | T16 (buried surface area only) | <https://www.ebi.ac.uk/pdbe/pisa/> |
 | **wwPDB NMR validation / PROCHECK-NMR / RPF** | No local install; wwPDB validation reports are fetched per entry | T17 | Fetch the deposited validation report; install PROCHECK-NMR only if T17 becomes a regression target |
 
 ## Quick activation snippets
@@ -101,7 +101,7 @@ conda activate cryst-oracles && servalcat --version  # 0.4.131
 | T13 | `phenix.model_vs_data` (completeness, resolution range) | CCP4 ctruncate (Wilson B, L-test twinning, ΔB aniso, tNCS, ice rings); CCP4 aimless when unmerged intensities exist; wrapper `scripts/t13_data_quality.py` | (CC½ / ⟨I/σ⟩ / Rmerge require unmerged intensities — gap when artefact ships merged-only) |
 | T14 | `phenix.reduce` | standalone `reduce` (Richardson lab — same binary, different build) | propka3, OpenBabel |
 | T15 | *(none — PHENIX has no fold/domain classifier)* | *(none installed)* | DSSP, STRIDE (secondary structure); CATH, SCOPe, ECOD (domain/fold) |
-| T16 | *(none — no PHENIX interface scorer)* | *(none installed)* | PISA/PDBePISA (buried surface area), DockQ (interface quality) |
+| T16 | *(none — no PHENIX interface scorer)* | DockQ (interface score + CAPRI class), biotite SASA (buried surface area) | PISA/PDBePISA (deposition-grade BSA reference) |
 | T17 | *(none — no PHENIX NMR restraint validator)* | *(none installed)* | wwPDB NMR validation, PROCHECK-NMR, RPF |
 
 Every task that has an installed oracle is cross-checked by at least one **non-cctbx** tool, so the trust model holds for T01–T14. CCP4/REFMAC hardens T03/T06.
@@ -116,15 +116,27 @@ model and reports the three-state (H/E/C) agreement fraction:
   which Homebrew no longer ships. Demonstrated: DSSP vs biotite on `data/pdb_mtz/1sar.pdb` →
   0.86 agreement over 191 residues.
 
+**T16 is fully runnable.** `scripts/t16_interface_quality.py` emits all three metrics:
+
+- `T16_interface_buried_surface_area` — always, from the model alone, via **biotite** Shrake-Rupley
+  SASA (ΣSASA(chains) − SASA(complex); an installable stand-in for the PISA web service).
+  Demonstrated: `1sar` A/B → 437.2 Å².
+- `T16_interface_dockq_score` + `T16_capri_interface_quality_class` — when a `--native` reference is
+  given, via **DockQ** (2.1.3), CAPRI class derived from the score (Basu & Wallner 2016 bands).
+  Identity calibration on `1sar` A/B → DockQ 1.000, class High.
+
+PISA/PDBePISA stays the `top_considered` oracle for buried surface area (the deposition-grade
+reference); biotite SASA is the installed `top_performing` stand-in.
+
+> **numpy pin:** DockQ requires `numpy < 2` and pip downgraded the base env to numpy 1.26.4. If a
+> future oracle needs numpy ≥ 2, isolate DockQ in its own venv/conda env rather than sharing base.
+
 **T17 is now runnable** for its gradeable metric. `scripts/t17_nmr_ensemble.py` computes
 `T17_nmr_ensemble_precision_rmsd` — the mean per-residue Cα RMSF about the ensemble mean — from a
 multi-model NMR PDB alone, via **biotite** (no restraints or wwPDB report needed). Demonstrated on
 `data/pdb_mtz/1d3z.pdb` (ubiquitin, 10 models) → 0.428 Å. The second metric,
 `T17_nmr_restraint_violation_summary` (informational), still needs the deposited restraints + the
-wwPDB NMR validation report and remains open.
-
-**T16** is made runnable in PR #10 (DockQ + biotite SASA). Both close out issue #3 alongside T15
-(already merged); the wwPDB-report route for T17 restraint summaries is the remaining piece.
+wwPDB NMR validation report and remains open — the last piece of issue #3.
 
 ### Metrics with no independent oracle (deliberate gaps)
 

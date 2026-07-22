@@ -75,6 +75,12 @@ if ! python3 "${REPO_ROOT}/scripts/test_t15_ss_agreement.py"; then
   fail "t15_ss_agreement unit tests"
 fi
 
+# 4c. T16 interface-quality pure-logic unit tests (CAPRI bands / DockQ-JSON
+#     extraction; no DockQ binary needed, so safe to run anywhere).
+if ! python3 "${REPO_ROOT}/scripts/test_t16_interface_quality.py"; then
+  fail "t16_interface_quality unit tests"
+fi
+
 # 4d. T17 NMR ensemble-precision pure-logic unit tests (mean-RMSF arithmetic;
 #     no biotite/ensemble needed, so safe to run anywhere).
 if ! python3 "${REPO_ROOT}/scripts/test_t17_nmr_ensemble.py"; then
