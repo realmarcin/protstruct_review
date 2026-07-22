@@ -47,6 +47,7 @@ Richardson-lab Top8000 reference set (high-resolution ≤ 2.0 Å structures).
 | CC½ resolution-cutoff floor | high-resolution shell is usable while **CC½ ≳ 0.3** | Karplus PA, Diederichs K. *Science* 2012; 336(6084):1030–1033. `[literature]` |
 | L-test twinning | untwinned ⟨\|L\|⟩ ≈ **0.5**; perfect twin ≈ **0.375** | Padilla JE, Yeates TO. *Acta Cryst.* D 2003; 59:1124–1130. `[literature]` |
 | CAPRI class from DockQ | High **≥ 0.80**; Medium **[0.49, 0.80)**; Acceptable **[0.23, 0.49)**; Incorrect **< 0.23** | Basu S, Wallner B. *PLOS ONE* 2016; 11(8):e0161879. `[literature]` |
+| Cryo-EM map resolution (FSC) | gold-standard FSC threshold **0.143** (half-maps); model-map FSC **0.5** | Rosenthal PB, Henderson R. *J. Mol. Biol.* 2003; 333(4):721–745. `[literature]` |
 
 ## 3. Cross-tool agreement tolerances
 
@@ -69,6 +70,9 @@ agreement, not quality.
 | DockQ score | \|Δ\| ≤ **0.05** and identical CAPRI class | agent vs `t16_interface_quality.py` (DockQ) | `[template]` |
 | Interface buried surface area | \|Δ\| ≤ **10 %** | agent vs biotite SASA (`t16_interface_quality.py`); PISA when available | `[template]` |
 | NMR ensemble precision (mean Cα RMSF) | \|Δ\| ≤ **0.05 Å** | agent vs `t17_nmr_ensemble.py` | `[template]` |
+| R-free vs deposited | \|Δ\| ≤ **0.02** (REFMAC re-refinement vs deposited/PHENIX) | REFMAC5 vs PHENIX vs deposited | `[catalog]` |
+| Independent-code-path R offset | `gemmi sfcalc` R-work runs **0.005–0.015 higher** than PHENIX on identical data (simpler bulk-solvent) — expected, not a defect | `gemmi sfcalc` vs `phenix.model_vs_data` | `[template]` |
+| H-placement agreement | H-atom count within **± 2 %**; same Asn/Gln/His flip set; clashscore delta within **± 1.0** | standalone `reduce` vs `phenix.reduce` | `[template]` |
 
 ## 4. Refinement Δ-tolerances (compare→refine flow)
 
