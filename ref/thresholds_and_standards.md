@@ -47,6 +47,9 @@ Richardson-lab Top8000 reference set (high-resolution ≤ 2.0 Å structures).
 | CC½ resolution-cutoff floor | high-resolution shell is usable while **CC½ ≳ 0.3** | Karplus PA, Diederichs K. *Science* 2012; 336(6084):1030–1033. `[literature]` |
 | L-test twinning | untwinned ⟨\|L\|⟩ ≈ **0.5**; perfect twin ≈ **0.375** | Padilla JE, Yeates TO. *Acta Cryst.* D 2003; 59:1124–1130. `[literature]` |
 | CAPRI class from DockQ | High **≥ 0.80**; Medium **[0.49, 0.80)**; Acceptable **[0.23, 0.49)**; Incorrect **< 0.23** | Basu S, Wallner B. *PLOS ONE* 2016; 11(8):e0161879. `[literature]` |
+| pLDDT confidence cutoff | per-residue **pLDDT ≥ 70** = confident (trim below); ≥ 90 = very high | Jumper J et al. *Nature* 2021; 596:583–589. `[literature]` |
+| Phaser MR solution | translation-function **TFZ > 8** = confident/definitely-solved; 5–8 ambiguous | McCoy AJ et al. *J. Appl. Cryst.* 2007; 40:658–674. `[literature]` |
+| Real-space correlation (ligand/loop) | **RSCC ≥ 0.8** acceptable fit to density; flag < 0.8 | Community convention (EDSTATS / wwPDB RSCC). `[template]` |
 | Cryo-EM map resolution (FSC) | gold-standard FSC threshold **0.143** (half-maps); model-map FSC **0.5** | Rosenthal PB, Henderson R. *J. Mol. Biol.* 2003; 333(4):721–745. `[literature]` |
 
 ## 3. Cross-tool agreement tolerances
