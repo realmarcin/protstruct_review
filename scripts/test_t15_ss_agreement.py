@@ -31,8 +31,8 @@ _DSSP_SAMPLE = """\
 
 def test_parse_dssp() -> None:
     parsed = t15._parse_dssp(_DSSP_SAMPLE)
-    _check(parsed == {("A", "1"): "C", ("A", "2"): "E", ("A", "8"): "H"},
-           f"_parse_dssp collapses to HEC by column (got {parsed})")
+    _check(parsed == {("A", "1", ""): "C", ("A", "2", ""): "E", ("A", "8", ""): "H"},
+           f"_parse_dssp collapses to HEC keyed on (chain,resnum,icode) (got {parsed})")
 
 
 def test_collapse_maps() -> None:
@@ -43,19 +43,32 @@ def test_collapse_maps() -> None:
 
 
 def test_agreement() -> None:
-    a = {("A", "1"): "C", ("A", "2"): "E", ("A", "3"): "H", ("A", "4"): "H"}
-    b = {("A", "1"): "C", ("A", "2"): "E", ("A", "3"): "C", ("A", "9"): "H"}
+    a = {("A", "1", ""): "C", ("A", "2", ""): "E", ("A", "3", ""): "H", ("A", "4", ""): "H"}
+    b = {("A", "1", ""): "C", ("A", "2", ""): "E", ("A", "3", ""): "C", ("A", "9", ""): "H"}
     r = t15.agreement(a, b)
-    # shared residues: 1,2,3 → 2 of 3 agree; residue 4/9 excluded (not shared).
+    # shared residues: 1,2,3 → 2 of 3 agree; residue 4 (dssp-only) and 9 (biotite-only) excluded.
     _check(r["n_scored"] == 3, f"agreement scores only shared residues (got {r['n_scored']})")
     _check(r["n_agree"] == 2 and r["fraction"] == round(2 / 3, 4),
            f"agreement fraction = 2/3 (got {r['fraction']})")
+    _check(r["n_dssp"] == 4 and r["n_biotite"] == 4 and r["n_dropped"] == 2,
+           f"per-assigner + dropped counts reported (got dssp={r['n_dssp']} "
+           f"biotite={r['n_biotite']} dropped={r['n_dropped']})")
+
+
+def test_insertion_code_not_conflated() -> None:
+    # 10 and 10A must be distinct residues, not merged.
+    a = {("A", "10", ""): "H", ("A", "10", "A"): "E"}
+    b = {("A", "10", ""): "H", ("A", "10", "A"): "E"}
+    r = t15.agreement(a, b)
+    _check(r["n_scored"] == 2 and r["n_agree"] == 2,
+           f"insertion code keeps 10 and 10A distinct (got n_scored={r['n_scored']})")
 
 
 def main() -> int:
     test_parse_dssp()
     test_collapse_maps()
     test_agreement()
+    test_insertion_code_not_conflated()
     print("\nall t15_ss_agreement unit tests passed")
     return 0
 

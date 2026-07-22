@@ -164,8 +164,8 @@ Local PHENIX docs are mirrored in `ref/phenix_docs/`; doc paths below assume tha
 - **Doc paths:** none
 - **Independent oracle(s):** DSSP, STRIDE, biotite P-SEA (secondary structure); CATH, SCOPe, ECOD (domain and fold classification)
 - **Typical inputs:** model (PDB/mmCIF)
-- **Metrics:** secondary-structure assignment agreement (three-state DSSP vs STRIDE, complex — the gradeable metric); secondary-structure assignment (per-residue labels, informational); structural domain assignment (per-domain boundaries, informational); fold classification (per-domain, informational)
-- **Gold standard:** CATH/SCOPe/ECOD consensus where available; DSSP/STRIDE agreement for secondary structure
+- **Metrics:** secondary-structure assignment agreement (three-state DSSP vs an independent second assigner — STRIDE preferred, biotite P-SEA the runnable fallback — complex scope, the gradeable metric); secondary-structure assignment (per-residue labels, informational); structural domain assignment (per-domain boundaries, informational); fold classification (per-domain, informational)
+- **Gold standard:** CATH/SCOPe/ECOD consensus where available; three-state agreement between DSSP and an independent second assigner (STRIDE preferred, biotite P-SEA the runnable fallback)
 - **Example dataset:** PDB `1AKE` (multi-domain, CATH-classified); PDB `2LYZ` (single-domain control)
 
 ### T16 — Interface and assembly quality

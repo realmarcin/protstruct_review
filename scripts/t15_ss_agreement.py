@@ -46,8 +46,16 @@ def _fail(msg: str) -> None:
     raise SystemExit(f"t15_ss_agreement: {msg}")
 
 
-def run_dssp(model: Path) -> dict[tuple[str, str], str]:
-    """Return {(chain, resnum): HEC} from DSSP. Requires `mkdssp` on PATH."""
+# A residue is keyed on (chain, resnum, insertion-code) so that e.g. 10 and 10A
+# are never conflated. Residue *name* is deliberately not part of the key: DSSP
+# reports a one-letter code and biotite a three-letter name, so cross-checking
+# names across the two formats is fragile; chain+num+icode uniquely locates the
+# residue within one model, which is what the alignment needs.
+ResKey = tuple[str, str, str]
+
+
+def run_dssp(model: Path) -> dict[ResKey, str]:
+    """Return {(chain, resnum, icode): HEC} from DSSP. Requires `mkdssp` on PATH."""
     exe = shutil.which("mkdssp")
     if exe is None:
         _fail("mkdssp not found on PATH — install DSSP (e.g. `brew install brewsci/bio/dssp`).")
@@ -65,7 +73,7 @@ def run_dssp(model: Path) -> dict[tuple[str, str], str]:
         out_path.unlink(missing_ok=True)
 
 
-def _parse_dssp(text: str) -> dict[tuple[str, str], str]:
+def _parse_dssp(text: str) -> dict[ResKey, str]:
     """Parse the legacy DSSP residue table (fixed-width columns)."""
     lines = text.splitlines()
     start = next(
@@ -74,21 +82,22 @@ def _parse_dssp(text: str) -> dict[tuple[str, str], str]:
     )
     if start is None:
         _fail("could not locate the DSSP residue table header.")
-    out: dict[tuple[str, str], str] = {}
+    out: dict[ResKey, str] = {}
     for ln in lines[start:]:
         if len(ln) < 17 or ln[13] == "!":  # chain-break marker
             continue
         resnum = ln[5:10].strip()
+        icode = ln[10].strip()  # insertion code column
         chain = ln[11].strip()
         if not resnum or not chain:
             continue
         ss = ln[16]
-        out[(chain, resnum)] = _DSSP_TO_HEC.get(ss, "C")
+        out[(chain, resnum, icode)] = _DSSP_TO_HEC.get(ss, "C")
     return out
 
 
-def run_biotite(model: Path) -> dict[tuple[str, str], str]:
-    """Return {(chain, resnum): HEC} from biotite annotate_sse (per chain)."""
+def run_biotite(model: Path) -> dict[ResKey, str]:
+    """Return {(chain, resnum, icode): HEC} from biotite annotate_sse (per chain)."""
     try:
         import biotite.structure as struc
         import biotite.structure.io.pdb as pdb
@@ -97,31 +106,37 @@ def run_biotite(model: Path) -> dict[tuple[str, str], str]:
     pdb_file = pdb.PDBFile.read(str(model))
     arr = pdb.get_structure(pdb_file, model=1)
     prot = arr[struc.filter_amino_acids(arr)]
-    out: dict[tuple[str, str], str] = {}
+    has_icode = "ins_code" in prot.get_annotation_categories()
+    out: dict[ResKey, str] = {}
     for chain_id in sorted(set(prot.chain_id)):
         chain = prot[prot.chain_id == chain_id]
         sse = struc.annotate_sse(chain)  # one 'a'/'b'/'c' per residue, in order
-        res_ids = struc.get_residues(chain)[0]
-        if len(sse) != len(res_ids):
+        starts = struc.get_residue_starts(chain)  # first-atom index per residue, in order
+        if len(sse) != len(starts):
             continue  # assignment/residue mismatch on this chain; skip rather than misalign
-        for res_id, code in zip(res_ids, sse):
-            out[(chain_id, str(res_id))] = _BIOTITE_TO_HEC.get(code, "C")
+        for idx, code in zip(starts, sse):
+            resnum = str(chain.res_id[idx])
+            icode = str(chain.ins_code[idx]).strip() if has_icode else ""
+            out[(chain_id, resnum, icode)] = _BIOTITE_TO_HEC.get(code, "C")
     return out
 
 
-def agreement(a: dict[tuple[str, str], str], b: dict[tuple[str, str], str]) -> dict[str, Any]:
+def agreement(a: dict[ResKey, str], b: dict[ResKey, str]) -> dict[str, Any]:
     """Three-state agreement fraction over residues both assigners scored."""
     shared = sorted(set(a) & set(b))
     if not shared:
         _fail("no residues in common between the two assigners — cannot compute agreement.")
     matches = sum(1 for k in shared if a[k] == b[k])
     per_residue = [
-        {"chain": c, "resnum": r, "dssp": a[(c, r)], "biotite": b[(c, r)],
-         "agree": a[(c, r)] == b[(c, r)]}
-        for (c, r) in shared
+        {"chain": c, "resnum": r, "icode": i, "dssp": a[k], "biotite": b[k], "agree": a[k] == b[k]}
+        for k in shared
+        for (c, r, i) in [k]
     ]
     return {
+        "n_dssp": len(a),
+        "n_biotite": len(b),
         "n_scored": len(shared),
+        "n_dropped": len(set(a) ^ set(b)),  # residues assigned by only one tool
         "n_agree": matches,
         "fraction": round(matches / len(shared), 4),
         "per_residue": per_residue,
@@ -137,14 +152,16 @@ def render_yaml(result: dict[str, Any], eval_id: str, model: Path) -> str:
         "scope": "complex",
         "scope_selector": model.stem,
         "metric_definition_ref": "T15_secondary_structure_agreement",
-        "oracle_tool_ref": "DSSP",
+        "oracle_tool_ref": "DSSP + biotite P-SEA",
         "oracle_family": "non_cctbx",
         "oracle_measure": {"value_numeric": result["fraction"]},
         "pass_status": "informational",
         "notes": (
-            f"three-state (H/E/C) DSSP vs biotite P-SEA agreement over "
-            f"{result['n_scored']} residues scored by both "
-            f"({result['n_agree']} concordant); independent non-cctbx assigners."
+            f"three-state (H/E/C) agreement between two independent non-cctbx assigners, "
+            f"DSSP (H-bond) and biotite P-SEA (Cα geometry): "
+            f"{result['n_agree']}/{result['n_scored']} concordant over residues scored by both "
+            f"(DSSP {result['n_dssp']}, biotite {result['n_biotite']}, "
+            f"{result['n_dropped']} scored by only one and excluded)."
         ),
     }
     return yaml.safe_dump([measurement], sort_keys=False, allow_unicode=True, width=100)
@@ -166,9 +183,10 @@ def main(argv: list[str] | None = None) -> int:
 
     print(render_yaml(result, args.eval_id, args.model))
     if args.per_residue:
-        print("# chain resnum dssp biotite agree")
+        print("# chain resnum icode dssp biotite agree")
         for r in result["per_residue"]:
-            print(f"#  {r['chain']:>2} {r['resnum']:>5} {r['dssp']}   {r['biotite']}    {r['agree']}")
+            print(f"#  {r['chain']:>2} {r['resnum']:>5} {r['icode'] or '-':>1} "
+                  f"{r['dssp']}   {r['biotite']}    {r['agree']}")
     return 0
 
 
