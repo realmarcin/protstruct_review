@@ -72,15 +72,51 @@ Three claims were killed in verification:
 - One specific Rosenthal quote grounding the 0.143↔0.5 pairing (0-3) — the pairing still holds via
   Scheres & Chen 2012, but not via that quote.
 
-## Coverage gap — ten tolerances left unassessed here
+## Coverage gap — ten tolerances left unassessed in the first pass
 
-No direct primary-source evidence was found in this pass for: CA RMSD between superposition tools;
-aligned-residue count; Wilson B agreement; L-test ⟨|L|⟩; secondary-structure H/E/C agreement; DockQ;
-interface BSA vs PISA; NMR ensemble RMSF; the gemmi-vs-PHENIX R offset; and RSCC/EDSTATS. These are
-**unassessed, not endorsed.** One extraction-phase lead worth chasing: Tickle 2012 (Acta Cryst.
-D68:454–467) reports RSR/RSCC varying by **>0.1** for an identical residue purely from map
-limiting-radius conventions, which would make a fixed ±0.05 RSCC agreement tolerance too tight. A
-follow-up research pass covers all ten; its findings will be appended here.
+No direct primary-source evidence was found in the first pass for: CA RMSD between superposition
+tools; aligned-residue count; Wilson B agreement; L-test ⟨|L|⟩; secondary-structure H/E/C agreement;
+DockQ; interface BSA vs PISA; NMR ensemble RMSF; the gemmi-vs-PHENIX R offset; and RSCC/EDSTATS.
+
+## Follow-up pass — the three highest-priority unassessed tolerances
+
+The automated follow-up research workflow failed twice on a transient infrastructure error (a
+StructuredOutput cap exceeded at the scope step, no progress cached), so the three highest-priority
+items were researched directly instead. The remaining seven (CA RMSD, aligned-residue count, Wilson
+B, L-test, DockQ, NMR RMSF, R offset) stay genuinely unassessed and provisional.
+
+### RSCC (tolerance 16) — DEFECT confirmed with primary source
+
+**Both the fixed RSCC ≥ 0.8 floor and the ±0.05 inter-program agreement tolerance are unsupportable.**
+Tickle 2012 (Acta Cryst. D68:454–467) states verbatim that *"for RSR and RSCC no sensible criterion
+for significance which is independent of B factor can be specified"*. RSCC mixes model accuracy and
+precision and correlates strongly with B-factor, and the limiting-atom-radius convention alone gives
+a 78 % difference in radius (MAPMAN fixed 1.50 Å vs SFALL 2.67 Å at B = 20 Å²), so RSR/RSCC *"vary
+wildly according to the software used."* The paper's program-independent alternatives are **RSZD**
+(real-space difference-density Z-score — a pure *accuracy* metric, significant at ±3σ) and **RSZO**
+(observed-density Z-score — a pure *precision* metric, floor ~1σ).
+**Fix applied:** demote RSCC to a corroboration-only signal that requires a **matched limiting-radius
+convention**, and point the accuracy judgement at RSZD (±3σ) / RSZO (1σ) instead of a fixed RSCC
+number. (Both are computed by EDSTATS and PDB-REDO `density-fitness`.)
+
+### Secondary-structure H/E/C agreement (tolerance 10) — defensible, boundary-caveated
+
+DSSP and STRIDE agree ~**94.7 %** on well-defined secondary structure (SCOPe benchmark); three-state
+Q3 is ~82–85 %; disagreement concentrates at **helix/strand ends**, while helix/strand middles agree
+strongly. The harness's ≥ 0.80 two-assigner floor and ≥ 0.85 agent-vs-DSSP are therefore defensible
+as *boundary-tolerant* floors sitting below the ~95 % ordered-region agreement. **Keep**, with the
+caveat that the floor is dominated by loop/turn and helix/strand-boundary disagreement, not by real
+structural error. *(Frishman & Argos 1995 STRIDE; DSSP-vs-STRIDE benchmark comparisons.)*
+
+### Interface BSA vs PISA (tolerance 12) — mechanism real, magnitude unvalidated
+
+No published PISA-vs-Shrake-Rupley reproducibility figure was found, so the ±10 % is **not grounded**.
+The mechanism is real: PISA uses a Lee & Richards (1971) accessible-surface definition with a 1.4 Å
+probe, and probe radius / point density / inclusion of waters and hetero atoms all shift SASA; PISA
+also reports *interface* area by its own definition, which is not identical to the harness's
+ΣSASA(chains) − SASA(complex). **Keep provisional**; treat BSA agreement as corroboration-only until a
+matched-configuration (same probe radius, same atom selection) benchmark exists. *(Krissinel & Henrick
+2007, J. Mol. Biol. 372:774–797; Lee & Richards 1971; Shrake & Rupley 1973.)*
 
 ## Time-sensitivity
 
