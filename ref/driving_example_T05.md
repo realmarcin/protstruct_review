@@ -64,7 +64,7 @@ Each bullet is pass/fail; all must pass for green. Log the numeric delta that tr
    A clean 0.48 Å structure scoring otherwise means the pipeline itself is miscalibrated, not the
    model. `[calibration — 3NIR ultra-high-res]`
 6. **H-build disclosure.** If clashscore is reported, the hydrogen-addition step (`reduce -build`
-   vs `phenix.reduce`) must be recorded, since clashscore shifts ~0.5 between builds. Absence of the
+   vs `phenix.reduce`) must be recorded, since clashscore can shift between builds (≈ 0.5 on 1SAR here — not a general figure). Absence of the
    disclosure is a fail. `[schema/handbook — MolProbity tool assumptions]`
 
 ## Notes
