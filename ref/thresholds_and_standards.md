@@ -44,7 +44,7 @@ Richardson-lab Top8000 reference set (high-resolution ≤ 2.0 Å structures).
 | Quantity | Threshold | Source |
 |---|---|---|
 | TM-score fold call | **> 0.5** ≈ same fold; **< 0.17** ≈ random pair | Xu J, Zhang Y. *Bioinformatics* 2010; 26(7):889–895. `[literature]` |
-| CC½ resolution-cutoff floor | high-resolution shell is usable while **CC½ ≳ 0.3** | Karplus PA, Diederichs K. *Science* 2012; 336(6084):1030–1033. `[literature]` |
+| CC½ resolution-cutoff floor | high-resolution shell is usable down to **CC½ ≈ 0.1–0.2** (significance is sample-size-dependent: CC > 0.3 significant at n > 100, CC > 0.08 at n > 1000 — prefer a per-shell significance test or paired refinement over a fixed floor) | CC½/CC\* definition: Karplus & Diederichs. *Science* 2012; 336(6084):1030–1033. Cutoff value: **Diederichs & Karplus. *Acta Cryst.* D 2013; 69(7):1215–1222** ("Better models by discarding data?"). `[literature]` |
 | L-test twinning | untwinned ⟨\|L\|⟩ ≈ **0.5**; perfect twin ≈ **0.375** | Padilla JE, Yeates TO. *Acta Cryst.* D 2003; 59:1124–1130. `[literature]` |
 | CAPRI class from DockQ | High **≥ 0.80**; Medium **[0.49, 0.80)**; Acceptable **[0.23, 0.49)**; Incorrect **< 0.23** | Basu S, Wallner B. *PLOS ONE* 2016; 11(8):e0161879. `[literature]` |
 | pLDDT confidence cutoff | per-residue **pLDDT ≥ 70** = confident (trim below); ≥ 90 = very high | Jumper J et al. *Nature* 2021; 596:583–589. `[literature]` |
@@ -65,7 +65,7 @@ agreement, not quality.
 | Ramachandran / rotamer favored % | ± **1.0 pp** | same | `[template]` |
 | Ramachandran / rotamer outlier % | ± **0.5 pp** | same | `[template]` |
 | Bond-length RMSD | ± **0.003 Å** | PHENIX vs `gemmi validate` | `[template]` |
-| Bond-angle RMSD | ± **0.1°** | same | `[template]` |
+| Bond-angle RMSD | **matched restraint library required**; ± **0.1°** when both tools use the same library, ± **0.4°** when they differ | PHENIX (CDL default since ~2016) vs `gemmi validate` (CCP4 monomer library / Engh & Huber) | `[template]` `[literature]` |
 | Wilson B | ± **2 Å²** | `xtriage` vs `ctruncate` | `[template]` |
 | L-test ⟨\|L\|⟩ | ± **0.02**, same twin/no-twin call | `xtriage` vs `ctruncate` | `[template]` |
 | Completeness (overall) | ± **1 pp** vs deposition Table 1 | `xtriage` vs deposition | `[calibration]` |
@@ -76,6 +76,22 @@ agreement, not quality.
 | R-free vs deposited | \|Δ\| ≤ **0.02** (REFMAC re-refinement vs deposited/PHENIX) | REFMAC5 vs PHENIX vs deposited | `[catalog]` |
 | Independent-code-path R offset | `gemmi sfcalc` R-work runs **0.005–0.015 higher** than PHENIX on identical data (simpler bulk-solvent) — expected, not a defect | `gemmi sfcalc` vs `phenix.model_vs_data` | `[template]` |
 | H-placement agreement | H-atom count within **± 2 %**; same Asn/Gln/His flip set; clashscore delta within **± 1.0** | standalone `reduce` vs `phenix.reduce` | `[template]` |
+
+> **Method-dependence preconditions (from the domain-expert review — see
+> `ref/research/template_tolerance_review.md`).** Two agreement tolerances only hold under a matched
+> tool configuration, and comparing without matching will fail for reasons unrelated to a real
+> disagreement:
+> - **Bond-angle RMSD** depends on the restraint library: PHENIX (CDL) vs gemmi (Engh & Huber / CCP4
+>   monomer library) differ by 0.3–0.4° for library reasons alone. Match the restraint library, or use
+>   the widened ±0.4° band. **Record the restraint-library and tool versions** with any geometry
+>   measurement.
+> - **Clashscore** requires a matched hydrogen-build convention (electron-cloud-center for X-ray vs
+>   nuclear for neutron/NMR); a mismatch systematically shifts the score by ~0.5.
+>
+> Ten tolerances (CA RMSD, aligned-residue count, Wilson B, L-test, SS agreement, DockQ, interface
+> BSA, NMR RMSF, the R offset, RSCC) were **not** grounded in the first review pass; a follow-up pass
+> is under way and its verdicts will be folded into `ref/research/template_tolerance_review.md`. Until
+> then, treat those `[template]` values as provisional.
 
 ## 4. Refinement Δ-tolerances (compare→refine flow)
 
