@@ -87,6 +87,12 @@ if ! python3 "${REPO_ROOT}/scripts/test_t17_nmr_ensemble.py"; then
   fail "t17_nmr_ensemble unit tests"
 fi
 
+# 4e. T17 restraint-summary pure-logic unit tests (wwPDB-report parsing;
+#     no network / real report needed, so safe to run anywhere).
+if ! python3 "${REPO_ROOT}/scripts/test_t17_restraint_summary.py"; then
+  fail "t17_restraint_summary unit tests"
+fi
+
 # 5. Published-view drift. ref/tasks_and_evaluations.{tsv,md} are views of
 #    ref/catalog.yaml. Nothing else here compares them, so a task added to the
 #    catalog alone used to ship silently (T15-T17 did exactly that).
