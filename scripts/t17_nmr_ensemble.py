@@ -46,6 +46,21 @@ def mean_precision(rmsf: list[float]) -> float:
     return round(sum(rmsf) / len(rmsf), 3)
 
 
+# Ordered-core cutoff: residues with per-residue Cα RMSF above this (Å) are
+# treated as flexible (termini / disordered loops) and excluded from the
+# ordered-core precision. The whole-chain mean is dominated by these, so it is
+# not comparable across tools (issue #20); the ordered-core figure is.
+_ORDERED_CORE_RMSF_CUTOFF = 2.0
+
+
+def ordered_core_precision(rmsf: list[float], cutoff: float = _ORDERED_CORE_RMSF_CUTOFF) -> tuple[float, int]:
+    """Mean RMSF over the ordered core (residues with RMSF ≤ cutoff). Returns (mean, n_core)."""
+    core = [v for v in rmsf if v <= cutoff]
+    if not core:
+        _fail(f"no residues below the ordered-core cutoff ({cutoff} Å) — ensemble is disordered.")
+    return round(sum(core) / len(core), 3), len(core)
+
+
 def run_precision(model: Path) -> dict[str, Any]:
     """Ensemble precision from a multi-model PDB via biotite superpose + RMSF."""
     try:
@@ -65,8 +80,11 @@ def run_precision(model: Path) -> dict[str, Any]:
         superposed, _ = struc.superimpose(ca[0], ca)          # onto model 1
         rmsf = struc.rmsf(struc.average(superposed), superposed)
         vals = [float(v) for v in rmsf if not np.isnan(v)]
+    core_mean, n_core = ordered_core_precision(vals)
     return {
-        "mean_rmsf": mean_precision(vals),
+        "core_rmsf": core_mean,          # the tool-comparable metric (ordered core)
+        "n_core": n_core,
+        "whole_chain_rmsf": mean_precision(vals),
         "min_rmsf": round(min(vals), 3),
         "max_rmsf": round(max(vals), 3),
         "n_models": int(ca.shape[0]),
@@ -85,12 +103,13 @@ def render_yaml(result: dict[str, Any], eval_id: str, model: Path) -> str:
         "metric_definition_ref": "T17_nmr_ensemble_precision_rmsd",
         "oracle_tool_ref": "biotite ensemble",
         "oracle_family": "non_cctbx",
-        "oracle_measure": {"value_numeric": result["mean_rmsf"], "unit": "Å"},
+        "oracle_measure": {"value_numeric": result["core_rmsf"], "unit": "Å"},
         "pass_status": "informational",
         "notes": (
-            f"mean per-residue Cα RMSF about the ensemble mean over {result['n_models']} models "
-            f"({result['n_ca']} residues; range {result['min_rmsf']}–{result['max_rmsf']} Å, "
-            f"flexible termini/loops raise the max)."
+            f"ordered-core mean Cα RMSF ({result['n_core']} of {result['n_ca']} residues with "
+            f"RMSF ≤ {_ORDERED_CORE_RMSF_CUTOFF} Å) about the ensemble mean over {result['n_models']} "
+            f"models — the tool-comparable figure. Whole-chain mean {result['whole_chain_rmsf']} Å "
+            f"(range {result['min_rmsf']}–{result['max_rmsf']} Å; flexible termini/loops raise it)."
         ),
     }
     return yaml.safe_dump([row], sort_keys=False, allow_unicode=True, width=100)

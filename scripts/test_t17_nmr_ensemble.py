@@ -24,7 +24,17 @@ def test_mean_precision() -> None:
     _check(t17.mean_precision([0.1, 0.2, 0.3]) == 0.2,
            f"mean precision of per-residue RMSF (got {t17.mean_precision([0.1, 0.2, 0.3])})")
     _check(t17.mean_precision([0.139, 5.927, 0.4]) == round((0.139 + 5.927 + 0.4) / 3, 3),
-           "flexible termini raise the mean")
+           "flexible termini raise the whole-chain mean")
+
+
+def test_ordered_core_precision() -> None:
+    # 5.9 Å flexible tail excluded (> 2 Å); core = the three ordered residues.
+    core_mean, n_core = t17.ordered_core_precision([0.14, 0.20, 0.30, 5.9])
+    _check(n_core == 3 and core_mean == round((0.14 + 0.20 + 0.30) / 3, 3),
+           f"ordered-core excludes flexible residues (got mean={core_mean}, n={n_core})")
+    # The core figure is insensitive to the flexible tail that dominates the whole-chain mean.
+    _check(t17.ordered_core_precision([0.2, 0.2, 8.0])[0] == 0.2,
+           "ordered-core is insensitive to a large flexible tail")
 
 
 def test_empty_fails() -> None:
@@ -39,6 +49,7 @@ def test_empty_fails() -> None:
 
 def main() -> int:
     test_mean_precision()
+    test_ordered_core_precision()
     test_empty_fails()
     print("\nall t17_nmr_ensemble unit tests passed")
     return 0
