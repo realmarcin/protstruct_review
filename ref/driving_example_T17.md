@@ -54,8 +54,9 @@ Each bullet is pass/fail; all must pass for green.
 
 ## Notes
 
-- Precision is computed from the ensemble alone, so the numeric metric runs today without the wwPDB
-  report. The **restraint-violation summary** does need the deposited restraints + report and is the
-  remaining T17 piece (issue #3).
+- Precision is computed from the ensemble alone (no report). The **restraint-violation summary** is
+  parsed from the deposited wwPDB validation report, which requires an entry whose report carries
+  restraint data — modern entries (2N54) do; older ones (1D3Z, 1998) predate it, and
+  `scripts/t17_restraint_summary.py` says so rather than emitting an empty summary.
 - Flexible termini dominate a naïve whole-chain RMSF (1D3Z: 0.14 Å core vs 5.9 Å tail). Always
   separate ordered-core precision from the disordered tails when reporting.

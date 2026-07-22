@@ -444,7 +444,7 @@ catalog_tasks:
   - T17_nmr_ensemble_precision_rmsd
   inputs_description: NMR ensemble model plus restraints where available
   gold_standard: wwPDB NMR validation report and deposited restraint files
-  example_dataset: PDB 1D3Z (ubiquitin NMR ensemble, deposited restraints + wwPDB NMR validation report)
+  example_dataset: PDB 1D3Z (ubiquitin NMR ensemble — precision metric); PDB 2N54 (deposited restraints + wwPDB validation report with restraint violations — restraint-summary metric)
 tools:
 - id: OpenStructure
   family: non_cctbx
