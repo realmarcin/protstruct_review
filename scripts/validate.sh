@@ -81,6 +81,12 @@ if ! python3 "${REPO_ROOT}/scripts/test_t16_interface_quality.py"; then
   fail "t16_interface_quality unit tests"
 fi
 
+# 4d. T17 NMR ensemble-precision pure-logic unit tests (mean-RMSF arithmetic;
+#     no biotite/ensemble needed, so safe to run anywhere).
+if ! python3 "${REPO_ROOT}/scripts/test_t17_nmr_ensemble.py"; then
+  fail "t17_nmr_ensemble unit tests"
+fi
+
 # 5. Published-view drift. ref/tasks_and_evaluations.{tsv,md} are views of
 #    ref/catalog.yaml. Nothing else here compares them, so a task added to the
 #    catalog alone used to ship silently (T15-T17 did exactly that).

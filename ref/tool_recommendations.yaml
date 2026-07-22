@@ -572,6 +572,18 @@ tool_recommendations:
       the gold standard named in the T17 catalog entry.
     as_of_date: '2026-07-20'
 
+  - id: REC_T17_nmr_ensemble_precision_rmsd_top_performing
+    metric_definition_ref: T17_nmr_ensemble_precision_rmsd
+    tool_ref: biotite ensemble
+    role: top_performing
+    rank: 1
+    justification: >-
+      Installed and runnable now (scripts/t17_nmr_ensemble.py): mean
+      per-residue Cα RMSF about the ensemble mean, computed from the
+      multi-model PDB alone via biotite — no restraints or wwPDB report
+      needed. 1d3z (ubiquitin, 10 models) → 0.428 Å.
+    as_of_date: '2026-07-22'
+
   - id: REC_T15_secondary_structure_agreement_top_performing
     metric_definition_ref: T15_secondary_structure_agreement
     tool_ref: biotite P-SEA

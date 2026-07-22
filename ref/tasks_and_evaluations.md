@@ -182,7 +182,7 @@ Local PHENIX docs are mirrored in `ref/phenix_docs/`; doc paths below assume tha
 
 - **PHENIX tool(s):** none — NMR restraint validation is handled by external oracles.
 - **Doc paths:** none
-- **Independent oracle(s):** wwPDB NMR validation pipeline, PROCHECK-NMR, RPF
+- **Independent oracle(s):** wwPDB NMR validation pipeline, PROCHECK-NMR, RPF, biotite ensemble (installable Cα-RMSF precision from the ensemble alone)
 - **Typical inputs:** NMR ensemble model plus deposited restraints where available
 - **Metrics:** NMR ensemble precision RMSD (Å, across accepted models); NMR restraint violation summary (per ensemble, informational)
 - **Gold standard:** wwPDB NMR validation report and deposited restraint files

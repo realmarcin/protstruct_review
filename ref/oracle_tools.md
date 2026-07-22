@@ -39,9 +39,8 @@ for r in d['tool_recommendations']:
 | **OpenStructure (OST)** | 2.11.1 | conda env `cryst-oracles` (CLI `lddt`, Python `import ost`) | T01 (`lddt` — CASP15+ reference implementation, global + per-residue), T02 (per-residue Cα distance + structural comparison), T05 (Ramachandran φ/ψ extraction; outlier classification needs external Top8000 contour data), T07 (per-residue lDDT for predicted-vs-experimental) |
 | **CCP4 suite** (REFMAC5, ProSMART, aimless, ctruncate, pointless) | 9.0.015 | `/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/` (source `bin/ccp4.setup-sh` first) | T03 (REFMAC5 — independent refiner / R-factors), T05 (ProSMART — Procrustes per-residue geometry, non-cctbx Ramachandran-Z), T13 (ctruncate — Wilson B / twinning / anisotropy / tNCS / ice rings on merged data; aimless — canonical when unmerged intensities are available; pointless — space-group sanity) |
 | **DSSP** (`mkdssp`) | 4.6.1 | `/opt/homebrew/bin/mkdssp` (`brew install brewsci/bio/dssp`) | T15 (secondary-structure assignment; H-bond energetics half of the agreement metric) |
-| **biotite** | 1.7.1 | `pip install biotite` (base env) | T15 (P-SEA Cα-geometry secondary structure; second independent assigner in `scripts/t15_ss_agreement.py`) |
+| **biotite** | 1.7.1 | `pip install biotite` (base env) | T15 (P-SEA Cα-geometry secondary structure, `scripts/t15_ss_agreement.py`); T16 (Shrake-Rupley SASA buried surface area, `scripts/t16_interface_quality.py`); T17 (ensemble Cα-RMSF precision, `scripts/t17_nmr_ensemble.py`) |
 | **DockQ** | 2.1.3 | `pip install DockQ` (base env; pins numpy < 2) | T16 (interface DockQ score + CAPRI class via `scripts/t16_interface_quality.py`) |
-| **biotite SASA** | 1.7.1 | `import biotite.structure.sasa` (base env) | T16 (interface buried surface area — Shrake-Rupley SASA, installable stand-in for PISA) |
 
 Together, `probe` + `reduce` constitute the standalone Richardson-lab MolProbity pipeline that the catalog calls "MolProbity standalone" — these are the same binaries the MolProbity web service runs.
 
@@ -132,10 +131,12 @@ reference); biotite SASA is the installed `top_performing` stand-in.
 > **numpy pin:** DockQ requires `numpy < 2` and pip downgraded the base env to numpy 1.26.4. If a
 > future oracle needs numpy ≥ 2, isolate DockQ in its own venv/conda env rather than sharing base.
 
-**T17 remains oracle-only with nothing installed** (issue #3): it needs the wwPDB NMR validation
-report route. Its catalog entry is declared-but-not-yet-runnable; the synthetic fixture
-`data/examples/eval/EVAL_synth_quality_indicators_2026-05-04.yaml` exercises schema and emitter
-routing, not a real tool.
+**T17 is now runnable** for its gradeable metric. `scripts/t17_nmr_ensemble.py` computes
+`T17_nmr_ensemble_precision_rmsd` — the mean per-residue Cα RMSF about the ensemble mean — from a
+multi-model NMR PDB alone, via **biotite** (no restraints or wwPDB report needed). Demonstrated on
+`data/pdb_mtz/1d3z.pdb` (ubiquitin, 10 models) → 0.428 Å. The second metric,
+`T17_nmr_restraint_violation_summary` (informational), still needs the deposited restraints + the
+wwPDB NMR validation report and remains open — the last piece of issue #3.
 
 ### Metrics with no independent oracle (deliberate gaps)
 
