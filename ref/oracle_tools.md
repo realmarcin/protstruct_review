@@ -131,12 +131,19 @@ reference); biotite SASA is the installed `top_performing` stand-in.
 > **numpy pin:** DockQ requires `numpy < 2` and pip downgraded the base env to numpy 1.26.4. If a
 > future oracle needs numpy ≥ 2, isolate DockQ in its own venv/conda env rather than sharing base.
 
-**T17 is now runnable** for its gradeable metric. `scripts/t17_nmr_ensemble.py` computes
-`T17_nmr_ensemble_precision_rmsd` — the mean per-residue Cα RMSF about the ensemble mean — from a
-multi-model NMR PDB alone, via **biotite** (no restraints or wwPDB report needed). Demonstrated on
-`data/pdb_mtz/1d3z.pdb` (ubiquitin, 10 models) → 0.428 Å. The second metric,
-`T17_nmr_restraint_violation_summary` (informational), still needs the deposited restraints + the
-wwPDB NMR validation report and remains open — the last piece of issue #3.
+**T17 is fully runnable.** Two scripts, two metrics:
+
+- `scripts/t17_nmr_ensemble.py` computes `T17_nmr_ensemble_precision_rmsd` — the mean per-residue Cα
+  RMSF about the ensemble mean — from a multi-model NMR PDB alone, via **biotite** (no restraints or
+  report needed). `data/pdb_mtz/1d3z.pdb` (ubiquitin, 10 models) → 0.428 Å.
+- `scripts/t17_restraint_summary.py` computes `T17_nmr_restraint_violation_summary` (informational)
+  by parsing the restraint-analysis section of the deposited **wwPDB validation report**. Needs an
+  entry whose report carries restraint data — older entries (1D3Z, 1998) predate it and the tool
+  says so loudly. Demonstrated on `data/pdb_mtz/2n54_validation.xml.gz` → 1301 distance + 108
+  dihedral restraints, violations by band.
+
+This closes the runnable side of issue #3: every gradeable T15/T16/T17 metric now has a real
+measurement path (only informational T16 BSA still prefers PISA over the biotite stand-in).
 
 ### Metrics with no independent oracle (deliberate gaps)
 

@@ -1417,3 +1417,15 @@ tool_recommendations:
     rank: 1
     justification: Deposition-grade source for NMR restraint-violation and ensemble statistics.
     as_of_date: '2026-07-21'
+
+  - id: REC_T17_nmr_restraint_violation_summary_top_performing
+    metric_definition_ref: T17_nmr_restraint_violation_summary
+    tool_ref: wwPDB NMR validation
+    role: top_performing
+    rank: 1
+    justification: >-
+      Runnable now (scripts/t17_restraint_summary.py): parses the restraint-
+      analysis section of the deposited wwPDB validation report. Needs an entry
+      whose report carries restraint data (e.g. 2N54: 1301 distance + 108
+      dihedral restraints); older entries (1D3Z) predate it and the tool says so.
+    as_of_date: '2026-07-22'
