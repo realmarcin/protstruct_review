@@ -422,34 +422,11 @@ tool_recommendations:
     as_of_date: '2026-04-30'
 
   # ----- CCP4 / REFMAC5 / ProSMART (closes cctbx-only gap on
-  # ----- Ramachandran outliers, rotamer outliers, MolProbity composite,
-  # ----- and adds T03 refinement second-opinion).
-
-  - id: REC_T05_ramachandran_outlier_top_performing
-    metric_definition_ref: T05_ramachandran_outlier
-    tool_ref: ProSMART
-    role: top_performing
-    rank: 1
-    justification: >-
-      ProSMART is non-cctbx (CCP4 stack, Murshudov-group code path).
-      It provides per-residue Ramachandran-Z scores against a
-      reference distribution, complementing MolProbity's Top8000
-      classification. Use ProSMART as the second confirmation when
-      the MolProbity tools split on a borderline residue.
-    evidence_refs:
-      - Joosten2012
-    as_of_date: '2026-04-30'
-
-  - id: REC_T05_rotamer_outlier_top_performing
-    metric_definition_ref: T05_rotamer_outlier
-    tool_ref: ProSMART
-    role: top_performing
-    rank: 1
-    justification: >-
-      ProSMART per-residue rotamer comparison is non-cctbx and runs
-      against any reference structure (typically the deposited model
-      or a higher-resolution comparator).
-    as_of_date: '2026-04-30'
+  # ----- MolProbity composite and adds T03 refinement second-opinion).
+  # ----- ProSMART's non-cctbx contribution is a Ramachandran-Z score, so it is
+  # ----- recommended for T05_rama_z_score (below), NOT for the discrete
+  # ----- Ramachandran/rotamer outlier percentages (which it does not classify —
+  # ----- MolProbity is the oracle for those).
 
   - id: REC_T05_bond_length_rmsz_top_performing
     metric_definition_ref: T05_bond-length_rmsz
@@ -1273,6 +1250,20 @@ tool_recommendations:
     rank: 1
     justification: Deposition-grade source for RSRZ, Ramachandran-Z, and B-factor-outlier statistics.
     as_of_date: '2026-07-21'
+  - id: REC_T05_rama_z_score_top_performing
+    metric_definition_ref: T05_rama_z_score
+    tool_ref: ProSMART
+    role: top_performing
+    rank: 1
+    justification: >-
+      ProSMART (CCP4 stack, Murshudov-group code path) computes a non-cctbx
+      per-residue Ramachandran-Z score — exactly this metric — giving an
+      independent second reading on Ramachandran-Z alongside the wwPDB
+      pipeline. Relocated here from the Ramachandran/rotamer outlier-percentage
+      metrics, which ProSMART does not classify.
+    evidence_refs:
+      - Nicholls2014
+    as_of_date: '2026-07-22'
   - id: REC_T10_ligand_b_factor_mean_top_considered
     metric_definition_ref: T10_ligand_b_factor_mean
     tool_ref: gemmi script
