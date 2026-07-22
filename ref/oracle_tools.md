@@ -39,7 +39,7 @@ for r in d['tool_recommendations']:
 | **OpenStructure (OST)** | 2.11.1 | conda env `cryst-oracles` (CLI `lddt`, Python `import ost`) | T01 (`lddt` — CASP15+ reference implementation, global + per-residue), T02 (per-residue Cα distance + structural comparison), T05 (Ramachandran φ/ψ extraction; outlier classification needs external Top8000 contour data), T07 (per-residue lDDT for predicted-vs-experimental) |
 | **CCP4 suite** (REFMAC5, ProSMART, aimless, ctruncate, pointless) | 9.0.015 | `/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/` (source `bin/ccp4.setup-sh` first) | T03 (REFMAC5 — independent refiner / R-factors), T05 (ProSMART — Procrustes per-residue geometry, non-cctbx Ramachandran-Z), T13 (ctruncate — Wilson B / twinning / anisotropy / tNCS / ice rings on merged data; aimless — canonical when unmerged intensities are available; pointless — space-group sanity) |
 | **DSSP** (`mkdssp`) | 4.6.1 | `/opt/homebrew/bin/mkdssp` (`brew install brewsci/bio/dssp`) | T15 (secondary-structure assignment; H-bond energetics half of the agreement metric) |
-| **biotite** | 1.7.1 | `pip install biotite` (base env) | T15 (P-SEA Cα-geometry secondary structure; second independent assigner in `scripts/t15_ss_agreement.py`) |
+| **biotite** | 1.7.1 | `pip install biotite` (base env) | T15 (P-SEA Cα-geometry secondary structure, `scripts/t15_ss_agreement.py`); T17 (ensemble Cα-RMSF precision, `scripts/t17_nmr_ensemble.py`) |
 
 Together, `probe` + `reduce` constitute the standalone Richardson-lab MolProbity pipeline that the catalog calls "MolProbity standalone" — these are the same binaries the MolProbity web service runs.
 
@@ -116,11 +116,15 @@ model and reports the three-state (H/E/C) agreement fraction:
   which Homebrew no longer ships. Demonstrated: DSSP vs biotite on `data/pdb_mtz/1sar.pdb` →
   0.86 agreement over 191 residues.
 
-**T16 and T17 remain oracle-only with nothing installed** (issue #3). T16 needs DockQ
-(`pip install DockQ`) and/or the PDBePISA web service; T17 needs the wwPDB NMR validation report
-route. Their catalog entries are declared-but-not-yet-runnable; the synthetic fixture
-`data/examples/eval/EVAL_synth_quality_indicators_2026-05-04.yaml` exercises schema and emitter
-routing for all three, not real tools.
+**T17 is now runnable** for its gradeable metric. `scripts/t17_nmr_ensemble.py` computes
+`T17_nmr_ensemble_precision_rmsd` — the mean per-residue Cα RMSF about the ensemble mean — from a
+multi-model NMR PDB alone, via **biotite** (no restraints or wwPDB report needed). Demonstrated on
+`data/pdb_mtz/1d3z.pdb` (ubiquitin, 10 models) → 0.428 Å. The second metric,
+`T17_nmr_restraint_violation_summary` (informational), still needs the deposited restraints + the
+wwPDB NMR validation report and remains open.
+
+**T16** is made runnable in PR #10 (DockQ + biotite SASA). Both close out issue #3 alongside T15
+(already merged); the wwPDB-report route for T17 restraint summaries is the remaining piece.
 
 ### Metrics with no independent oracle (deliberate gaps)
 

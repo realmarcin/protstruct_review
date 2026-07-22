@@ -437,6 +437,7 @@ catalog_tasks:
   - wwPDB NMR validation
   - PROCHECK-NMR
   - RPF
+  - biotite ensemble
   metric_definition_refs:
   - T17_nmr_restraint_violation_summary
   - T17_nmr_ensemble_precision_rmsd
@@ -936,6 +937,10 @@ tools:
   family: non_cctbx
   catalog_tasks_served:
   - T15
+- id: biotite ensemble
+  family: non_cctbx
+  catalog_tasks_served:
+  - T17
 - id: DSSP + biotite P-SEA
   family: non_cctbx
   catalog_tasks_served:
