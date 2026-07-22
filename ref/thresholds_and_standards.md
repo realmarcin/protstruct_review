@@ -59,22 +59,22 @@ agreement, not quality.
 
 | Metric | Tolerance | Tools | Provenance |
 |---|---|---|---|
-| CA RMSD | \|Δ\| ≤ **0.10 Å** | PHENIX `superpose_models` vs TM-align / ChimeraX / `gemmi align` | `[catalog]` `[template]` |
-| Aligned-residue count | ± **2 residues** | same | `[template]` |
+| CA RMSD | \|Δ\| ≤ **0.10 Å** **on the same residue selection** (RMSD is over aligned Cα pairs only; different aligners align different subsets, so match the selection first) | PHENIX `superpose_models` vs TM-align / ChimeraX / `gemmi align` | `[catalog]` `[template]` |
+| Aligned-residue count | ± **2 residues** **only within one aligner class** (both structure-based, or both sequence-based); **not comparable across classes** — TM-align/US-align drop distant Cα pairs by design while LSQ aligners keep the full alignment | same class only | `[template]` |
 | Clashscore | ± **1.0** | PHENIX vs MolProbity standalone | `[template]` |
 | Ramachandran / rotamer favored % | ± **1.0 pp** | same | `[template]` |
 | Ramachandran / rotamer outlier % | ± **0.5 pp** | same | `[template]` |
 | Bond-length RMSD | ± **0.003 Å** | PHENIX vs `gemmi validate` | `[template]` |
 | Bond-angle RMSD | **matched restraint library required**; ± **0.1°** when both tools use the same library, ± **0.4°** when they differ | PHENIX (CDL default since ~2016) vs `gemmi validate` (CCP4 monomer library / Engh & Huber) | `[template]` `[literature]` |
-| Wilson B | ± **2 Å²** | `xtriage` vs `ctruncate` | `[template]` |
-| L-test ⟨\|L\|⟩ | ± **0.02**, same twin/no-twin call | `xtriage` vs `ctruncate` | `[template]` |
+| Wilson B | ± **5 Å²** (loosened from ±2; **inference-only — no primary source on inter-program Wilson-B reproducibility survived verification, so this is provisional**). `xtriage` uses an ML anisotropy-aware estimate; `ctruncate`/`truncate` a classic straight-line Wilson plot, which can differ by several Å² — prefer like-method comparison | `xtriage` (ML) vs `ctruncate` (classic) | `[template]` |
+| L-test ⟨\|L\|⟩ | ± **0.02**, same twin/no-twin call, **matched resolution range** (auto-selected range differs between programs). Note the full scale is only 0.125 (untwinned 0.500 → perfect twin 0.375), so ±0.02 is ~16 % of range; and `xtriage`/`ctruncate` share the Padilla–Yeates *method*, so agreement checks consistent computation, not method-independence | `xtriage` vs `ctruncate` | `[template]` |
 | Completeness (overall) | ± **1 pp** vs deposition Table 1 | `xtriage` vs deposition | `[calibration]` |
 | Secondary-structure agreement | agent-vs-DSSP three-state ≥ **0.85** over DSSP-assigned residues; two independent assigners floor ≥ **0.80** on a well-ordered model | agent vs DSSP; DSSP vs biotite P-SEA (`t15_ss_agreement.py`) | `[template]` |
-| DockQ score | \|Δ\| ≤ **0.05** and identical CAPRI class | agent vs `t16_interface_quality.py` (DockQ) | `[template]` |
-| Interface buried surface area | \|Δ\| ≤ **10 %** | agent vs biotite SASA (`t16_interface_quality.py`); PISA when available | `[template]` |
-| NMR ensemble precision (mean Cα RMSF) | \|Δ\| ≤ **0.05 Å** | agent vs `t17_nmr_ensemble.py` | `[template]` |
+| DockQ score | **after fixing/verifying the chain mapping**, \|Δ\| ≤ **0.01** (same-implementation noise floor ≈ 0.004; the old ±0.05 was ~12× too loose). The CAPRI-class match is **waived within ±0.03 of a class boundary** (0.23 / 0.49 / 0.80) to avoid spurious boundary flips. Chain-mapping ambiguity is the presumed (not proven) main variance source in multimers | agent vs `t16_interface_quality.py` (DockQ) | `[template]` |
+| Interface buried surface area | \|Δ\| ≤ **10 %** (provisional — magnitude unbenchmarked; corroboration-only until a matched-configuration same-probe-radius / same-atom-selection comparison exists) | agent vs biotite SASA (`t16_interface_quality.py`); PISA when available | `[template]` |
+| NMR ensemble precision (mean Cα RMSF) | \|Δ\| ≤ **0.05 Å only on a matched ordered-core selection** (OLDERADO / PSVS FindCore); precision is dominated by the superposition selection, so a whole-chain mean must be reported *alongside* an ordered-core figure, not instead of it | agent vs `t17_nmr_ensemble.py` | `[template]` |
 | R-free vs deposited | \|Δ\| ≤ **0.02** (REFMAC re-refinement vs deposited/PHENIX) | REFMAC5 vs PHENIX vs deposited | `[catalog]` |
-| Independent-code-path R offset | `gemmi sfcalc` R-work runs **0.005–0.015 higher** than PHENIX on identical data (simpler bulk-solvent) — expected, not a defect | `gemmi sfcalc` vs `phenix.model_vs_data` | `[template]` |
+| Independent-code-path R offset | an independent R re-derivation may differ **by a small amount** from scaling / resolution-binning differences (magnitude **unbenchmarked**; gemmi uses the same flat-mask bulk-solvent + anisotropic scaling as PHENIX, so it is *not* categorically "simpler") | `gemmi sfcalc` vs `phenix.model_vs_data` | `[template]` |
 | H-placement agreement | H-atom count within **± 2 %**; same Asn/Gln/His flip set; clashscore delta within **± 1.0** | standalone `reduce` vs `phenix.reduce` | `[template]` |
 
 > **Method-dependence preconditions (from the domain-expert review — see
@@ -88,12 +88,16 @@ agreement, not quality.
 > - **Clashscore** requires a matched hydrogen-build convention (electron-cloud-center for X-ray vs
 >   nuclear for neutron/NMR); a mismatch systematically shifts the score by ~0.5.
 >
-> A follow-up pass assessed three more (see `ref/research/template_tolerance_review.md`): **RSCC** was
-> a confirmed defect and is fixed above (Tickle 2012 — use RSZD/RSZO, matched-radius RSCC only);
-> **SS agreement** ≥0.80/0.85 is kept (boundary-dominated); **interface BSA ±10 %** stays provisional
-> (mechanism real, magnitude unvalidated). **Seven remain genuinely unassessed** — CA RMSD,
-> aligned-residue count, Wilson B, L-test, DockQ, NMR RMSF, the R offset — so treat those `[template]`
-> values as provisional.
+> **All `[template]` tolerances have now been reviewed** (`ref/research/template_tolerance_review.md`).
+> Confirmed defects were fixed: bond-angle (library-conditional), CC½ (citation + 0.1–0.2 floor),
+> RSCC (RSZD/RSZO, matched-radius only), aligned-residue count (class-conditional), NMR RMSF
+> (matched ordered-core), and the R offset (rationale corrected). Preconditions were added to CA RMSD
+> (same selection) and DockQ (fixed chain mapping); Wilson B was loosened to ±5 Å²; L-test, SS
+> agreement, bond-length, clashscore, and the Ramachandran/rotamer pp tolerances were kept.
+> Two values remain **provisional** (mechanism real, magnitude unbenchmarked in the literature):
+> **interface BSA ±10 %** and **Wilson B ±5 Å²**. An independent verified research pass cross-checked
+> all seven of the second batch and confirmed these verdicts, additionally tightening **DockQ** to
+> ±0.01 (same-implementation noise floor ≈ 0.004).
 
 ## 4. Refinement Δ-tolerances (compare→refine flow)
 

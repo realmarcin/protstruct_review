@@ -135,7 +135,7 @@ reference); biotite SASA is the installed `top_performing` stand-in.
 
 - `scripts/t17_nmr_ensemble.py` computes `T17_nmr_ensemble_precision_rmsd` — the mean per-residue Cα
   RMSF about the ensemble mean — from a multi-model NMR PDB alone, via **biotite** (no restraints or
-  report needed). `data/pdb_mtz/1d3z.pdb` (ubiquitin, 10 models) → 0.428 Å.
+  report needed). Reports an **ordered-core** mean (the tool-comparable figure, residues with RMSF ≤ 2 Å) alongside the whole-chain mean — `data/pdb_mtz/1d3z.pdb` (ubiquitin, 10 models): core 0.316 Å, whole-chain 0.428 Å.
 - `scripts/t17_restraint_summary.py` computes `T17_nmr_restraint_violation_summary` (informational)
   by parsing the restraint-analysis section of the deposited **wwPDB validation report**. Needs an
   entry whose report carries restraint data — older entries (1D3Z, 1998) predate it and the tool

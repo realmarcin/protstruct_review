@@ -19,7 +19,7 @@ of restraint violations.
 - **Primary:** PDB `1D3Z` (ubiquitin, 10-model NMR ensemble, deposited restraints + wwPDB NMR
   validation report). Committed as `data/pdb_mtz/1d3z.pdb`.
 - **Demonstrated calibration:** `scripts/t17_nmr_ensemble.py data/pdb_mtz/1d3z.pdb` → mean Cα RMSF
-  **0.428 Å** over 10 models (range 0.139–5.927 Å; flexible termini raise the max).
+  ordered-core **0.316 Å** (74 of 76 residues ≤ 2 Å) vs whole-chain 0.428 Å over 10 models — the core figure is the tool-comparable one; the whole-chain mean is inflated by flexible termini.
 
 ## What the agent must do
 

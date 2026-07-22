@@ -45,14 +45,16 @@ with CCP4 `ctruncate` (and `aimless` when unmerged intensities exist) and checks
 
 Each bullet is pass/fail; all must pass for green.
 
-1. **Wilson B agreement.** `xtriage` and `ctruncate` Wilson B agree within **±2 Å²** on the same
-   reflections. `[calibration — same-data cross-tool]`
+1. **Wilson B agreement.** `xtriage` (ML) and `ctruncate` (classic straight-line Wilson plot) Wilson B
+   agree within **±5 Å²** on the same reflections — *provisional*, no literature benchmark; prefer a
+   like-method comparison. `[template — Wilson B]`
 2. **L-test twinning agreement.** Both tools' ⟨|L|⟩ agree within **±0.02**, and both make the same
    twin/no-twin call. (Untwinned ⟨|L|⟩ ≈ 0.5; perfect-twin ≈ 0.375 — Padilla & Yeates,
    *Acta Cryst.* D 2003.) `[literature]`
 3. **Resolution-cutoff honesty via CC½.** If a high-resolution cutoff is claimed, CC½ at that shell
-   must be significant (CC½ ≳ 0.3 is the community floor — Karplus & Diederichs, *Science* 2012).
-   A cutoff claimed where CC½ has fallen to noise is a fail. `[literature]`
+   must be significant. Data are usable down to **CC½ ≈ 0.1–0.2** (Diederichs & Karplus, *Acta Cryst.*
+   D 2013), and significance is sample-size-dependent (per-shell test preferred over a fixed floor);
+   a cutoff claimed where CC½ has fallen to noise is a fail. `[literature — CC½ resolution-cutoff floor]`
 4. **Merged-data honesty.** On a **merged-only** input, CC½, ⟨I/σ⟩-outer, and R-merge/R-meas are
    **not obtainable** — they require unmerged intensities. The agent must report them as
    unavailable, not fabricate them, and `T13_aimless_status` must record the `aimless` abort.

@@ -581,7 +581,7 @@ tool_recommendations:
       Installed and runnable now (scripts/t17_nmr_ensemble.py): mean
       per-residue Cα RMSF about the ensemble mean, computed from the
       multi-model PDB alone via biotite — no restraints or wwPDB report
-      needed. 1d3z (ubiquitin, 10 models) → 0.428 Å.
+      needed. Reports the ordered-core mean (tool-comparable) alongside the whole-chain mean — 1d3z (ubiquitin, 10 models): core 0.316 Å, whole-chain 0.428 Å.
     as_of_date: '2026-07-22'
 
   - id: REC_T15_secondary_structure_agreement_top_performing

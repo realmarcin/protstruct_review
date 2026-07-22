@@ -118,6 +118,99 @@ also reports *interface* area by its own definition, which is not identical to t
 matched-configuration (same probe radius, same atom selection) benchmark exists. *(Krissinel & Henrick
 2007, J. Mol. Biol. 372:774–797; Lee & Richards 1971; Shrake & Rupley 1973.)*
 
+## Second follow-up pass — the seven remaining tolerances
+
+Researched directly (the automated workflow having repeatedly failed at its scope step). Three are
+defects, two need a matched-configuration precondition, one is likely too tight, one is fine.
+
+### DEFECTS
+
+- **Aligned-residue count ± 2 residues (tolerance 2) — WRONG across aligner classes.** TM-align /
+  US-align re-establish the residue equivalences from structure and **drop distant Cα pairs by
+  design**; LSQ / sequence-based superposition keeps the full given alignment. Two aligners of
+  *different classes* legitimately differ by tens of residues, not ±2. **Fix:** ±2 only *within* an
+  aligner class (both structure-based, or both sequence-based); do not compare counts across classes.
+  *(Zhang & Skolnick 2005, TM-align, NAR 33:2302; US-align docs.)*
+- **NMR ensemble precision ± 0.05 Å (tolerance 13) — selection-dominated, unsupportable as-is.**
+  Ensemble precision is the average RMSD to the mean coordinate *after superposition*, and "the
+  well-defined positions used for superposition are often hand-picked, making the measure subjective
+  and dependent on the choices." The number is dominated by the ordered-core selection, not tool
+  noise. **Fix:** require a **matched ordered-core definition** (OLDERADO / PSVS FindCore) before any
+  ±0.05 Å comparison; the whole-chain mean the current wrapper computes is especially
+  selection-sensitive and should be reported alongside an ordered-core figure.
+  *(Vuister et al. 2014, J. Biomol. NMR; OLDERADO — Kelley et al. 1997; PSVS — Bhattacharya et al.)*
+- **gemmi-vs-PHENIX R offset "0.005–0.015 higher, gemmi is simpler" (tolerance 14) — rationale
+  mischaracterised, magnitude unbenchmarked.** REFMAC and PHENIX both use a flat mask-based
+  bulk-solvent model (Afonine 2013), and **gemmi implements the same flat-mask bulk solvent +
+  anisotropic scaling** (in its `Scaling` class) — so gemmi is *not* categorically "simpler," and no
+  benchmark supports the specific 0.005–0.015 magnitude or its sign. **Fix:** soften to "an
+  independent R re-derivation may differ by a small amount from scaling / resolution-binning
+  differences; magnitude unbenchmarked," and drop the "simpler bulk-solvent" claim.
+  *(Afonine et al. 2013, Acta D69:625–634; gemmi scattering docs.)*
+
+### Matched-configuration preconditions (keep the number, add the precondition)
+
+- **CA RMSD ± 0.10 Å (tolerance 1) — same-selection precondition.** RMSD is computed only over aligned
+  Cα pairs, and different aligners align different subsets, so ±0.10 Å is meaningful **only on the
+  same residue selection** (both structure-based re-alignment, or both on a fixed selection). Keep the
+  number; add the precondition. *(Zhang & Skolnick 2005.)*
+- **DockQ ± 0.05 (tolerance 5) — fixed-chain-mapping precondition.** DockQ is deterministic given a
+  chain mapping and reproduces the CAPRI classes; **chain-mapping ambiguity in multimers is the only
+  real variance source** (DockQ v2 permutes exhaustively but needs the correct mapping). Keep ±0.05;
+  require a fixed/verified chain mapping first (already a rule in `driving_example_T16.md`).
+  *(Basu & Wallner 2016; DockQ v2, Mirabello & Wallner 2024.)*
+
+### Likely too tight / method-conditional
+
+- **Wilson B ± 2 Å² (tolerance 3).** `xtriage` uses a maximum-likelihood, anisotropy-aware Wilson-B
+  estimate (Popov & Bourenkov 2004; Zwart et al. 2005) that is *less sensitive to resolution
+  truncation* than the classic straight-line Wilson plot in `truncate`/`ctruncate` (bin-choice
+  sensitive; the RSCALE bin control is "discouraged"). ML-vs-classic Wilson B can differ by more than
+  2 Å², especially at low resolution or under anisotropy. **Loosen** to ~± 5 Å², or compare
+  like-method to like-method. *(phenix.xtriage docs; CCP4 ctruncate/truncate docs.)*
+
+### Fine as set
+
+- **L-test ⟨|L|⟩ ± 0.02 (tolerance 4).** A robust statistic with theoretical values 0.5 (untwinned) /
+  0.375 (perfect twin), insensitive to anisotropy/pseudo-centering when Miller indices are partitioned
+  properly. The resolution range is auto-determined and differs slightly between programs, so **match
+  the resolution range** and keep the same twin/no-twin call requirement. **Keep ± 0.02.**
+  *(Padilla & Yeates 2003, Acta D59:1124–1130.)*
+
+### Prioritized shortlist (this pass)
+
+1. **Aligned-residue count (2)** — wrong across aligner classes; make class-conditional.
+2. **NMR RMSF (13)** — selection-dominated; require a matched ordered-core (OLDERADO/FindCore).
+3. **gemmi-vs-PHENIX R offset (14)** — rationale wrong, magnitude unbenchmarked; soften.
+4. **Wilson B (3)** — likely too tight; loosen to ~±5 Å² or match method.
+5–6. **CA RMSD (1), DockQ (5)** — add matched-configuration preconditions.
+7. **L-test (4)** — fine; match resolution range.
+
+## Independent workflow cross-check (second batch)
+
+The automated deep-research workflow (which had failed on the first two attempts) completed on retry —
+91 agents, 0 errors — and **independently confirmed every direct-research verdict above** for the
+seven, with two quantitative refinements now folded into the registry:
+
+- **DockQ (5) — tightened.** With chain mapping fixed, the same-implementation noise floor is **≈ 0.004**
+  (DockQ v2 vs v1, R = 1.000 over 17,409 CASP15 models), so the kept ±0.05 was **~12× too loose**.
+  Tightened to **±0.01**. Also, the hard "identical CAPRI class" rule can spuriously flip at the fixed
+  0.23/0.49/0.80 boundaries, so the class match is **waived within ±0.03 of a boundary**. (Caveats the
+  cross-check flags: "chain-mapping dominates variance" is a reasonable but *unproven* premise — that
+  specific claim was refuted at verification; and v1→v2 is one author group's rewrite, a fair but
+  imperfect stand-in for two independent programs.)
+- **Wilson B (3) — downgraded to provisional.** No primary source on inter-program Wilson-B
+  reproducibility survived verification, so the ±5 Å² is inference-only. Marked provisional alongside
+  interface BSA.
+- **L-test (4) — kept, with a sharper caveat.** The full scale is only 0.125 (untwinned 0.500 →
+  perfect twin 0.375), so ±0.02 is ~16 % of range; and xtriage/ctruncate share the Padilla–Yeates
+  *method*, so agreement checks consistent computation, not method-independence.
+- **CA RMSD (1), aligned count (2), NMR RMSF (6), R offset (7)** — all confirmed as originally revised
+  (matched-configuration preconditions; unbenchmarked R-offset sign/magnitude).
+
+Two provisional values now stand (interface BSA, Wilson B), each needing a matched-configuration
+benchmark that does not yet exist in the literature.
+
 ## Time-sensitivity
 
 PHENIX has defaulted to CDL since ~2016 and gemmi now feeds Refmac5 restraints (2023), so the
