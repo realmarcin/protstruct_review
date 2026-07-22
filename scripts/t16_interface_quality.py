@@ -7,19 +7,24 @@ non-cctbx and non-PHENIX; the deposited biological assembly is the reference,
 which is the trust model's tiebreaker for T16 (there is no PHENIX interface
 scorer, so this is oracle-only).
 
-Emits two pasteable EvaluationMeasurement rows:
-  - T16_interface_dockq_score        (value_numeric = DockQ, the gradeable metric)
+Emits pasteable EvaluationMeasurement rows:
+  - T16_interface_buried_surface_area (value_numeric, Å² — from the model alone)
+  - T16_interface_dockq_score         (value_numeric = DockQ, the gradeable metric —
+                                       only when a native reference is given)
   - T16_capri_interface_quality_class (value_text = High/Medium/Acceptable/Incorrect,
-                                       informational — derived from the score)
+                                       informational — derived from the DockQ score)
 
-Buried surface area (T16_interface_buried_surface_area) is NOT produced here; it
-needs PISA/PDBePISA or a SASA calculator and remains future work (issue #3).
+Buried surface area is a property of the model complex and needs no reference, so
+it is always emitted (via biotite's Shrake-Rupley SASA — an installable stand-in
+for the PISA web service). DockQ needs a native/deposited reference, so it and the
+CAPRI class are emitted only when `--native` is supplied.
 
-Degrades loudly: if the `DockQ` CLI is not on PATH, exits non-zero with a clear
-message rather than fabricating a score.
+Degrades loudly: if DockQ (with `--native`) or biotite is unavailable, exits
+non-zero with a clear message rather than fabricating a value.
 
 Usage:
-    python3 scripts/t16_interface_quality.py model.pdb native.pdb --eval-id EVAL_...
+    python3 scripts/t16_interface_quality.py model.pdb --native native.pdb --eval-id EVAL_...
+    python3 scripts/t16_interface_quality.py model.pdb            # BSA only
 """
 from __future__ import annotations
 
@@ -53,6 +58,34 @@ def capri_class(dockq: float) -> str:
         if dockq >= threshold:
             return label
     return "Incorrect"
+
+
+def buried_surface_area(complex_sasa: float, separated_sasa: float) -> float:
+    """Total interface area buried on complex formation: ΣSASA(chains) − SASA(complex)."""
+    return round(separated_sasa - complex_sasa, 1)
+
+
+def run_biotite_bsa(model: Path) -> dict[str, Any]:
+    """Compute buried surface area from the model via biotite Shrake-Rupley SASA."""
+    try:
+        import numpy as np
+        import biotite.structure as struc
+        import biotite.structure.io.pdb as pdb
+    except ImportError:
+        _fail("biotite not importable — install it (`pip install biotite`).")
+    prot = struc.filter_amino_acids
+    arr = pdb.get_structure(pdb.PDBFile.read(str(model)), model=1)
+    atoms = arr[prot(arr)]
+    chains = sorted(set(atoms.chain_id))
+    if len(chains) < 2:
+        _fail(f"model has < 2 protein chains ({chains}); no interface to measure.")
+    complex_sasa = float(np.nansum(struc.sasa(atoms)))
+    separated = sum(float(np.nansum(struc.sasa(atoms[atoms.chain_id == c]))) for c in chains)
+    return {
+        "bsa": buried_surface_area(complex_sasa, separated),
+        "chains": chains,
+        "complex_sasa": round(complex_sasa, 1),
+    }
 
 
 def run_dockq(model: Path, native: Path, mapping: str | None = None) -> dict[str, Any]:
@@ -128,21 +161,48 @@ def render_yaml(summary: dict[str, Any], eval_id: str, model: Path) -> str:
     return yaml.safe_dump([score_row, class_row], sort_keys=False, allow_unicode=True, width=100)
 
 
+def render_bsa_yaml(bsa: dict[str, Any], eval_id: str, model: Path) -> str:
+    """Emit the buried-surface-area measurement row."""
+    row = {
+        "id": f"{eval_id}_M_T16_bsa",
+        "catalog_task_ref": "T16",
+        "stage": "final",
+        "scope": "interface",
+        "scope_selector": f"{model.stem}:{'/'.join(bsa['chains'])}",
+        "metric_definition_ref": "T16_interface_buried_surface_area",
+        "oracle_tool_ref": "biotite SASA",
+        "oracle_family": "non_cctbx",
+        "oracle_measure": {"value_numeric": bsa["bsa"], "unit": "Å²"},
+        "pass_status": "informational",
+        "notes": (
+            f"total area buried on complex formation across chains {'/'.join(bsa['chains'])} "
+            f"(Shrake-Rupley SASA; ΣSASA(chains) − SASA(complex))."
+        ),
+    }
+    return yaml.safe_dump([row], sort_keys=False, allow_unicode=True, width=100)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("model", type=Path, help="model complex (PDB/mmCIF)")
-    ap.add_argument("native", type=Path, help="native / deposited reference complex")
+    ap.add_argument("--native", type=Path, default=None,
+                    help="native / deposited reference complex (enables DockQ + CAPRI)")
     ap.add_argument("--eval-id", default="EVAL_T16", help="eval id prefix for emitted rows")
     ap.add_argument("--mapping", default=None, help="DockQ chain map MODELCHAINS:NATIVECHAINS")
     args = ap.parse_args(argv)
 
-    for p in (args.model, args.native):
-        if not p.exists():
-            _fail(f"file not found: {p}")
+    if not args.model.exists():
+        _fail(f"file not found: {args.model}")
 
-    result = run_dockq(args.model, args.native, args.mapping)
-    summary = extract(result)
-    print(render_yaml(summary, args.eval_id, args.model))
+    # Buried surface area is a model-intrinsic property — always emitted.
+    print(render_bsa_yaml(run_biotite_bsa(args.model), args.eval_id, args.model), end="")
+
+    # DockQ needs a reference; emit its rows only when --native is supplied.
+    if args.native is not None:
+        if not args.native.exists():
+            _fail(f"file not found: {args.native}")
+        summary = extract(run_dockq(args.model, args.native, args.mapping))
+        print(render_yaml(summary, args.eval_id, args.model))
     return 0
 
 

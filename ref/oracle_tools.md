@@ -41,6 +41,7 @@ for r in d['tool_recommendations']:
 | **DSSP** (`mkdssp`) | 4.6.1 | `/opt/homebrew/bin/mkdssp` (`brew install brewsci/bio/dssp`) | T15 (secondary-structure assignment; H-bond energetics half of the agreement metric) |
 | **biotite** | 1.7.1 | `pip install biotite` (base env) | T15 (P-SEA Cα-geometry secondary structure; second independent assigner in `scripts/t15_ss_agreement.py`) |
 | **DockQ** | 2.1.3 | `pip install DockQ` (base env; pins numpy < 2) | T16 (interface DockQ score + CAPRI class via `scripts/t16_interface_quality.py`) |
+| **biotite SASA** | 1.7.1 | `import biotite.structure.sasa` (base env) | T16 (interface buried surface area — Shrake-Rupley SASA, installable stand-in for PISA) |
 
 Together, `probe` + `reduce` constitute the standalone Richardson-lab MolProbity pipeline that the catalog calls "MolProbity standalone" — these are the same binaries the MolProbity web service runs.
 
@@ -101,7 +102,7 @@ conda activate cryst-oracles && servalcat --version  # 0.4.131
 | T13 | `phenix.model_vs_data` (completeness, resolution range) | CCP4 ctruncate (Wilson B, L-test twinning, ΔB aniso, tNCS, ice rings); CCP4 aimless when unmerged intensities exist; wrapper `scripts/t13_data_quality.py` | (CC½ / ⟨I/σ⟩ / Rmerge require unmerged intensities — gap when artefact ships merged-only) |
 | T14 | `phenix.reduce` | standalone `reduce` (Richardson lab — same binary, different build) | propka3, OpenBabel |
 | T15 | *(none — PHENIX has no fold/domain classifier)* | *(none installed)* | DSSP, STRIDE (secondary structure); CATH, SCOPe, ECOD (domain/fold) |
-| T16 | *(none — no PHENIX interface scorer)* | DockQ (interface score + CAPRI class) | PISA/PDBePISA (buried surface area) |
+| T16 | *(none — no PHENIX interface scorer)* | DockQ (interface score + CAPRI class), biotite SASA (buried surface area) | PISA/PDBePISA (deposition-grade BSA reference) |
 | T17 | *(none — no PHENIX NMR restraint validator)* | *(none installed)* | wwPDB NMR validation, PROCHECK-NMR, RPF |
 
 Every task that has an installed oracle is cross-checked by at least one **non-cctbx** tool, so the trust model holds for T01–T14. CCP4/REFMAC hardens T03/T06.
@@ -116,13 +117,17 @@ model and reports the three-state (H/E/C) agreement fraction:
   which Homebrew no longer ships. Demonstrated: DSSP vs biotite on `data/pdb_mtz/1sar.pdb` →
   0.86 agreement over 191 residues.
 
-**T16 is now runnable** for its DockQ-based metrics. `scripts/t16_interface_quality.py` runs
-**DockQ** (2.1.3, `pip install DockQ`) on a model complex against a native/deposited reference and
-emits `T16_interface_dockq_score` (the gradeable metric) plus `T16_capri_interface_quality_class`
-(informational, derived from the score via the Basu & Wallner 2016 bands). Demonstrated: identity
-calibration on `data/pdb_mtz/1sar.pdb` (chains A/B) → DockQ 1.000, class High.
-`T16_interface_buried_surface_area` is **not** yet produced — it needs PISA/PDBePISA or a SASA
-calculator and remains open.
+**T16 is fully runnable.** `scripts/t16_interface_quality.py` emits all three metrics:
+
+- `T16_interface_buried_surface_area` — always, from the model alone, via **biotite** Shrake-Rupley
+  SASA (ΣSASA(chains) − SASA(complex); an installable stand-in for the PISA web service).
+  Demonstrated: `1sar` A/B → 437.2 Å².
+- `T16_interface_dockq_score` + `T16_capri_interface_quality_class` — when a `--native` reference is
+  given, via **DockQ** (2.1.3), CAPRI class derived from the score (Basu & Wallner 2016 bands).
+  Identity calibration on `1sar` A/B → DockQ 1.000, class High.
+
+PISA/PDBePISA stays the `top_considered` oracle for buried surface area (the deposition-grade
+reference); biotite SASA is the installed `top_performing` stand-in.
 
 > **numpy pin:** DockQ requires `numpy < 2` and pip downgraded the base env to numpy 1.26.4. If a
 > future oracle needs numpy ≥ 2, isolate DockQ in its own venv/conda env rather than sharing base.

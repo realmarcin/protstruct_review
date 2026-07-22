@@ -549,6 +549,18 @@ tool_recommendations:
       assembly is judged against.
     as_of_date: '2026-07-20'
 
+  - id: REC_T16_interface_buried_surface_area_top_performing
+    metric_definition_ref: T16_interface_buried_surface_area
+    tool_ref: biotite SASA
+    role: top_performing
+    rank: 1
+    justification: >-
+      Installed and runnable now (scripts/t16_interface_quality.py):
+      Shrake-Rupley SASA via biotite gives the buried area from the model
+      alone — ΣSASA(chains) − SASA(complex) — an installable stand-in for
+      the PISA web service. 1sar A/B → 437.2 Å².
+    as_of_date: '2026-07-22'
+
   - id: REC_T17_nmr_ensemble_precision_rmsd_top_considered
     metric_definition_ref: T17_nmr_ensemble_precision_rmsd
     tool_ref: wwPDB NMR validation

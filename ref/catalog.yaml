@@ -421,6 +421,7 @@ catalog_tasks:
   phenix_doc_paths: []
   oracle_tool_refs:
   - PISA/PDBePISA
+  - biotite SASA
   - DockQ
   metric_definition_refs:
   - T16_interface_buried_surface_area
@@ -936,6 +937,10 @@ tools:
   family: non_cctbx
   catalog_tasks_served:
   - T15
+- id: biotite SASA
+  family: non_cctbx
+  catalog_tasks_served:
+  - T16
 - id: DSSP + biotite P-SEA
   family: non_cctbx
   catalog_tasks_served:

@@ -46,9 +46,17 @@ def test_extract() -> None:
            "extract carries mapping + per-interface breakdown")
 
 
+def test_buried_surface_area() -> None:
+    # BSA = ΣSASA(chains) − SASA(complex); burial reduces exposed area.
+    _check(t16.buried_surface_area(10804.5, 11241.7) == 437.2,
+           f"BSA = separated − complex (got {t16.buried_surface_area(10804.5, 11241.7)})")
+    _check(t16.buried_surface_area(5000.0, 5000.0) == 0.0, "no burial -> BSA 0")
+
+
 def main() -> int:
     test_capri_bands()
     test_extract()
+    test_buried_surface_area()
     print("\nall t16_interface_quality unit tests passed")
     return 0
 
