@@ -237,8 +237,9 @@ Note the canonical order in the template: **compare baseline → refine → re-c
    only when it is *descriptive content* rather than the thing being graded. Such rows must carry
    `pass_status: informational`, and the task must still have a numeric metric alongside them.
    The usual move is to grade the *agreement* between two independent labellers rather than the
-   label: `T15_secondary_structure_agreement` (three-state DSSP vs STRIDE) is the gradeable metric
-   for T15, while the per-residue labels themselves ride along as informational content. That is
+   label: `T15_secondary_structure_agreement` (three-state DSSP vs an independent second assigner —
+   STRIDE preferred, biotite P-SEA the runnable fallback via `scripts/t15_ss_agreement.py`) is the
+   gradeable metric for T15, while the per-residue labels ride along as informational content. That is
    the trust model applied to categorical data — cross-tool agreement, expressed as a number.
 
 5. Add the metric definition(s) to `ref/catalog.yaml` and reference them from the task's

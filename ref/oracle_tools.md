@@ -38,6 +38,8 @@ for r in d['tool_recommendations']:
 | **Servalcat** | 0.4.131 | conda env `cryst-oracles` (`mamba activate cryst-oracles`) | T03 (`servalcat refine_xtal_norefmac`), T06 (`servalcat fsc`, `fofc`, `sigmaa`), T12 |
 | **OpenStructure (OST)** | 2.11.1 | conda env `cryst-oracles` (CLI `lddt`, Python `import ost`) | T01 (`lddt` — CASP15+ reference implementation, global + per-residue), T02 (per-residue Cα distance + structural comparison), T05 (Ramachandran φ/ψ extraction; outlier classification needs external Top8000 contour data), T07 (per-residue lDDT for predicted-vs-experimental) |
 | **CCP4 suite** (REFMAC5, ProSMART, aimless, ctruncate, pointless) | 9.0.015 | `/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/` (source `bin/ccp4.setup-sh` first) | T03 (REFMAC5 — independent refiner / R-factors), T05 (ProSMART — Procrustes per-residue geometry, non-cctbx Ramachandran-Z), T13 (ctruncate — Wilson B / twinning / anisotropy / tNCS / ice rings on merged data; aimless — canonical when unmerged intensities are available; pointless — space-group sanity) |
+| **DSSP** (`mkdssp`) | 4.6.1 | `/opt/homebrew/bin/mkdssp` (`brew install brewsci/bio/dssp`) | T15 (secondary-structure assignment; H-bond energetics half of the agreement metric) |
+| **biotite** | 1.7.1 | `pip install biotite` (base env) | T15 (P-SEA Cα-geometry secondary structure; second independent assigner in `scripts/t15_ss_agreement.py`) |
 
 Together, `probe` + `reduce` constitute the standalone Richardson-lab MolProbity pipeline that the catalog calls "MolProbity standalone" — these are the same binaries the MolProbity web service runs.
 
@@ -51,7 +53,7 @@ For **T13** the practical layering is: **aimless** is the canonical recommendati
 |---|---|---|---|
 | **ChimeraX** | Heavy GUI install; useful for `matchmaker` (T01) and `fitmap` (T08) | T01, T08 | <https://www.cgl.ucsf.edu/chimerax/download.html> |
 | **MoRDa** | Specialised MR pipeline | T09 only | Install only if T09 becomes a regression target |
-| **DSSP / STRIDE** | Not yet needed — T15 has no runnable evaluation | T15 | `brew install dssp`; STRIDE from <https://webclu.bio.wzw.tum.de/stride/> — install both, since the T15 gradeable metric is DSSP-vs-STRIDE agreement |
+| **STRIDE** | Homebrew no longer ships it; biotite P-SEA stands in as the second assigner (see Installed) | T15 | Optional: build from <https://webclu.bio.wzw.tum.de/stride/>. DSSP + biotite already give a runnable agreement metric. |
 | **CATH / SCOPe / ECOD** | Database lookups rather than local binaries | T15 | Query the web APIs, or cache per-domain assignments alongside the example datasets |
 | **PISA/PDBePISA** | No local build; PDBe web service covers it | T16 | <https://www.ebi.ac.uk/pdbe/pisa/> |
 | **DockQ** | Not yet needed — T16 has no runnable evaluation | T16 | `pip install DockQ` (<https://github.com/bjornwallner/DockQ>) |
@@ -104,8 +106,21 @@ conda activate cryst-oracles && servalcat --version  # 0.4.131
 
 Every task that has an installed oracle is cross-checked by at least one **non-cctbx** tool, so the trust model holds for T01–T14. CCP4/REFMAC hardens T03/T06.
 
-**T15–T17 are oracle-only tasks with nothing installed yet.** They have no PHENIX implementation at all, so there is no PHENIX-grades-PHENIX risk — but there is also no measurement path until one of the listed oracles is installed. Treat their catalog entries as declared-but-not-yet-runnable; the synthetic fixture
-`data/examples/eval/EVAL_synth_quality_indicators_2026-05-04.yaml` exercises the schema and emitter routing, not real tools.
+**T15 is now runnable** for its gradeable metric (`T15_secondary_structure_agreement`).
+`scripts/t15_ss_agreement.py` runs two independent, non-cctbx secondary-structure assigners on a
+model and reports the three-state (H/E/C) agreement fraction:
+
+- **DSSP** (`mkdssp` 4.6.1, `brew install brewsci/bio/dssp`) — Kabsch & Sander H-bond energetics.
+- **biotite P-SEA** (`pip install biotite`, 1.7.1) — Labesse Cα-geometry method; a different
+  algorithm family, so agreement is informative rather than tautological. Stands in for STRIDE,
+  which Homebrew no longer ships. Demonstrated: DSSP vs biotite on `data/pdb_mtz/1sar.pdb` →
+  0.86 agreement over 191 residues.
+
+**T16 and T17 remain oracle-only with nothing installed** (issue #3). T16 needs DockQ
+(`pip install DockQ`) and/or the PDBePISA web service; T17 needs the wwPDB NMR validation report
+route. Their catalog entries are declared-but-not-yet-runnable; the synthetic fixture
+`data/examples/eval/EVAL_synth_quality_indicators_2026-05-04.yaml` exercises schema and emitter
+routing for all three, not real tools.
 
 ### Metrics with no independent oracle (deliberate gaps)
 

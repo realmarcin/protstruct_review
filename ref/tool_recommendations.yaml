@@ -572,6 +572,17 @@ tool_recommendations:
       the gold standard named in the T17 catalog entry.
     as_of_date: '2026-07-20'
 
+  - id: REC_T15_secondary_structure_agreement_top_performing
+    metric_definition_ref: T15_secondary_structure_agreement
+    tool_ref: biotite P-SEA
+    role: top_performing
+    rank: 1
+    justification: >-
+      Installed and runnable now (scripts/t15_ss_agreement.py): DSSP vs
+      biotite P-SEA three-state agreement. biotite's Cα-geometry P-SEA is
+      a different algorithm family from DSSP's H-bond energetics, so the
+      agreement is informative rather than tautological. Stands in for
+      STRIDE, which is not currently installable via Homebrew.
   # --- Coverage completion (issue #4), corrected per the Codex domain review of PR #7.
   # Per-metric, capability-aware: each metric is assigned the tool that actually computes
   # THAT quantity and is genuinely independent of PHENIX/cctbx (not merely its task default).
