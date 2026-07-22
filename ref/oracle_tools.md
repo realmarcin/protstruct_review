@@ -116,11 +116,21 @@ model and reports the three-state (H/E/C) agreement fraction:
   which Homebrew no longer ships. Demonstrated: DSSP vs biotite on `data/pdb_mtz/1sar.pdb` →
   0.86 agreement over 191 residues.
 
-**T16 and T17 remain oracle-only with nothing installed** (issue #3). T16 needs DockQ
-(`pip install DockQ`) and/or the PDBePISA web service; T17 needs the wwPDB NMR validation report
-route. Their catalog entries are declared-but-not-yet-runnable; the synthetic fixture
+**T16 is now runnable** for its DockQ-based metrics. `scripts/t16_interface_quality.py` runs
+**DockQ** (2.1.3, `pip install DockQ`) on a model complex against a native/deposited reference and
+emits `T16_interface_dockq_score` (the gradeable metric) plus `T16_capri_interface_quality_class`
+(informational, derived from the score via the Basu & Wallner 2016 bands). Demonstrated: identity
+calibration on `data/pdb_mtz/1sar.pdb` (chains A/B) → DockQ 1.000, class High.
+`T16_interface_buried_surface_area` is **not** yet produced — it needs PISA/PDBePISA or a SASA
+calculator and remains open.
+
+> **numpy pin:** DockQ requires `numpy < 2` and pip downgraded the base env to numpy 1.26.4. If a
+> future oracle needs numpy ≥ 2, isolate DockQ in its own venv/conda env rather than sharing base.
+
+**T17 remains oracle-only with nothing installed** (issue #3): it needs the wwPDB NMR validation
+report route. Its catalog entry is declared-but-not-yet-runnable; the synthetic fixture
 `data/examples/eval/EVAL_synth_quality_indicators_2026-05-04.yaml` exercises schema and emitter
-routing for all three, not real tools.
+routing, not a real tool.
 
 ### Metrics with no independent oracle (deliberate gaps)
 

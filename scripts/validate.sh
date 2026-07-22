@@ -75,6 +75,12 @@ if ! python3 "${REPO_ROOT}/scripts/test_t15_ss_agreement.py"; then
   fail "t15_ss_agreement unit tests"
 fi
 
+# 4c. T16 interface-quality pure-logic unit tests (CAPRI bands / DockQ-JSON
+#     extraction; no DockQ binary needed, so safe to run anywhere).
+if ! python3 "${REPO_ROOT}/scripts/test_t16_interface_quality.py"; then
+  fail "t16_interface_quality unit tests"
+fi
+
 # 5. Published-view drift. ref/tasks_and_evaluations.{tsv,md} are views of
 #    ref/catalog.yaml. Nothing else here compares them, so a task added to the
 #    catalog alone used to ship silently (T15-T17 did exactly that).

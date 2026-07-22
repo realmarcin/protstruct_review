@@ -527,6 +527,17 @@ tool_recommendations:
       recorded alongside it as the ordinal label.
     as_of_date: '2026-07-20'
 
+  - id: REC_T16_interface_dockq_score_top_performing
+    metric_definition_ref: T16_interface_dockq_score
+    tool_ref: DockQ
+    role: top_performing
+    rank: 1
+    justification: >-
+      Installed and runnable now (scripts/t16_interface_quality.py, DockQ
+      2.1.3): scores a model complex against the deposited reference and
+      derives the CAPRI class. Identity calibration on 1sar A/B -> 1.000.
+    as_of_date: '2026-07-22'
+
   - id: REC_T16_interface_buried_surface_area_top_considered
     metric_definition_ref: T16_interface_buried_surface_area
     tool_ref: PISA/PDBePISA
