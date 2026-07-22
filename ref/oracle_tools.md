@@ -40,6 +40,7 @@ for r in d['tool_recommendations']:
 | **CCP4 suite** (REFMAC5, ProSMART, aimless, ctruncate, pointless) | 9.0.015 | `/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/` (source `bin/ccp4.setup-sh` first) | T03 (REFMAC5 — independent refiner / R-factors), T05 (ProSMART — Procrustes per-residue geometry, non-cctbx Ramachandran-Z), T13 (ctruncate — Wilson B / twinning / anisotropy / tNCS / ice rings on merged data; aimless — canonical when unmerged intensities are available; pointless — space-group sanity) |
 | **DSSP** (`mkdssp`) | 4.6.1 | `/opt/homebrew/bin/mkdssp` (`brew install brewsci/bio/dssp`) | T15 (secondary-structure assignment; H-bond energetics half of the agreement metric) |
 | **biotite** | 1.7.1 | `pip install biotite` (base env) | T15 (P-SEA Cα-geometry secondary structure; second independent assigner in `scripts/t15_ss_agreement.py`) |
+| **DockQ** | 2.1.3 | `pip install DockQ` (base env; pins numpy < 2) | T16 (interface DockQ score + CAPRI class via `scripts/t16_interface_quality.py`) |
 
 Together, `probe` + `reduce` constitute the standalone Richardson-lab MolProbity pipeline that the catalog calls "MolProbity standalone" — these are the same binaries the MolProbity web service runs.
 
@@ -55,8 +56,7 @@ For **T13** the practical layering is: **aimless** is the canonical recommendati
 | **MoRDa** | Specialised MR pipeline | T09 only | Install only if T09 becomes a regression target |
 | **STRIDE** | Homebrew no longer ships it; biotite P-SEA stands in as the second assigner (see Installed) | T15 | Optional: build from <https://webclu.bio.wzw.tum.de/stride/>. DSSP + biotite already give a runnable agreement metric. |
 | **CATH / SCOPe / ECOD** | Database lookups rather than local binaries | T15 | Query the web APIs, or cache per-domain assignments alongside the example datasets |
-| **PISA/PDBePISA** | No local build; PDBe web service covers it | T16 | <https://www.ebi.ac.uk/pdbe/pisa/> |
-| **DockQ** | Not yet needed — T16 has no runnable evaluation | T16 | `pip install DockQ` (<https://github.com/bjornwallner/DockQ>) |
+| **PISA/PDBePISA** | No local build; PDBe web service covers it | T16 (buried surface area only) | <https://www.ebi.ac.uk/pdbe/pisa/> |
 | **wwPDB NMR validation / PROCHECK-NMR / RPF** | No local install; wwPDB validation reports are fetched per entry | T17 | Fetch the deposited validation report; install PROCHECK-NMR only if T17 becomes a regression target |
 
 ## Quick activation snippets
@@ -101,7 +101,7 @@ conda activate cryst-oracles && servalcat --version  # 0.4.131
 | T13 | `phenix.model_vs_data` (completeness, resolution range) | CCP4 ctruncate (Wilson B, L-test twinning, ΔB aniso, tNCS, ice rings); CCP4 aimless when unmerged intensities exist; wrapper `scripts/t13_data_quality.py` | (CC½ / ⟨I/σ⟩ / Rmerge require unmerged intensities — gap when artefact ships merged-only) |
 | T14 | `phenix.reduce` | standalone `reduce` (Richardson lab — same binary, different build) | propka3, OpenBabel |
 | T15 | *(none — PHENIX has no fold/domain classifier)* | *(none installed)* | DSSP, STRIDE (secondary structure); CATH, SCOPe, ECOD (domain/fold) |
-| T16 | *(none — no PHENIX interface scorer)* | *(none installed)* | PISA/PDBePISA (buried surface area), DockQ (interface quality) |
+| T16 | *(none — no PHENIX interface scorer)* | DockQ (interface score + CAPRI class) | PISA/PDBePISA (buried surface area) |
 | T17 | *(none — no PHENIX NMR restraint validator)* | *(none installed)* | wwPDB NMR validation, PROCHECK-NMR, RPF |
 
 Every task that has an installed oracle is cross-checked by at least one **non-cctbx** tool, so the trust model holds for T01–T14. CCP4/REFMAC hardens T03/T06.
