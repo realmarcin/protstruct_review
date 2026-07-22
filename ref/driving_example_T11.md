@@ -34,8 +34,10 @@ report its fit, geometry, and (where a reference exists) RMSD to the true loop.
 
 Each bullet is pass/fail; all must pass for green.
 
-1. **Loop fits the density.** Loop RSCC **≥ 0.8**, agreeing with EDSTATS within **± 0.05**.
-   `[template — real-space correlation]`
+1. **Loop fits the density (accuracy).** EDSTATS real-space difference-density Z-score **RSZD** within
+   **±3σ** per loop residue and observed-density **RSZO** above **~1σ** — the B-factor-independent
+   metrics. RSCC/RSR carry no resolution-independent significance criterion, so if reported they are
+   corroboration-only and require a matched limiting-radius convention (Tickle 2012). `[literature — real-space density fit]`
 2. **Loop geometry is clean.** Ramachandran-favored within the loop meets the geometry Δ-tolerance
    (registry §4); MolProbity vs PHENIX clashscore agree within **± 1.0**. `[template]`
 3. **Correct rebuild vs reference.** Where a reference loop exists, RMSD of the rebuilt loop is within

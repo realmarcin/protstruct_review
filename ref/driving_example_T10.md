@@ -34,10 +34,13 @@ the ligand and report its fit and pose.
 
 Each bullet is pass/fail; all must pass for green.
 
-1. **Ligand fits the density.** Ligand RSCC **≥ 0.8**; below this the ligand is poorly supported and
-   must be flagged, not passed. `[template — real-space correlation]`
-2. **RSCC agrees.** PHENIX vs EDSTATS ligand RSCC agree within **± 0.05** (independent density-fit
-   codes on the same map). `[template]`
+1. **Ligand fits the density (accuracy).** EDSTATS real-space difference-density Z-score **RSZD**
+   is within **±3σ** (no significant misplaced-atom or unexplained-density outlier), and the
+   observed-density Z-score **RSZO** is above **~1σ**. These are the B-factor-independent metrics;
+   RSCC/RSR have no resolution-independent significance criterion (Tickle 2012). `[literature — real-space density fit]`
+2. **RSCC is corroboration-only.** If RSCC is reported alongside, it must be computed with a
+   **matched limiting-radius convention** between tools before any ±0.05 comparison is meaningful —
+   otherwise the radius convention alone can swing it. `[literature — real-space density fit]`
 3. **Correct pose vs deposited.** RMSD to the deposited ligand pose is within **± 0.10 Å** of an
    independent `gemmi` superposition. `[template — CA RMSD]`
 4. **B-factor sanity.** The ligand's mean B relative to its surroundings is recorded — a ligand B far
