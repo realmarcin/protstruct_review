@@ -46,6 +46,7 @@ Richardson-lab Top8000 reference set (high-resolution ≤ 2.0 Å structures).
 | TM-score fold call | **> 0.5** ≈ same fold; **< 0.17** ≈ random pair | Xu J, Zhang Y. *Bioinformatics* 2010; 26(7):889–895. `[literature]` |
 | CC½ resolution-cutoff floor | high-resolution shell is usable while **CC½ ≳ 0.3** | Karplus PA, Diederichs K. *Science* 2012; 336(6084):1030–1033. `[literature]` |
 | L-test twinning | untwinned ⟨\|L\|⟩ ≈ **0.5**; perfect twin ≈ **0.375** | Padilla JE, Yeates TO. *Acta Cryst.* D 2003; 59:1124–1130. `[literature]` |
+| CAPRI class from DockQ | High **≥ 0.80**; Medium **[0.49, 0.80)**; Acceptable **[0.23, 0.49)**; Incorrect **< 0.23** | Basu S, Wallner B. *PLOS ONE* 2016; 11(8):e0161879. `[literature]` |
 
 ## 3. Cross-tool agreement tolerances
 
