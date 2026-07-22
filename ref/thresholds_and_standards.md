@@ -86,7 +86,7 @@ agreement, not quality.
 >   the widened ±0.4° band. **Record the restraint-library and tool versions** with any geometry
 >   measurement.
 > - **Clashscore** requires a matched hydrogen-build convention (electron-cloud-center for X-ray vs
->   nuclear for neutron/NMR); a mismatch systematically shifts the score by ~0.5.
+>   nuclear for neutron/NMR); a mismatch shifts the score (≈ 0.5 on the repo's 1SAR: 3.13 cctbx vs 3.63 standalone — an in-repo observation, not a general benchmark).
 >
 > **All `[template]` tolerances have now been reviewed** (`ref/research/template_tolerance_review.md`).
 > Confirmed defects were fixed: bond-angle (library-conditional), CC½ (citation + 0.1–0.2 floor),
