@@ -1,0 +1,262 @@
+id: https://w3id.org/protstruct-review/structural-criteria
+name: structural_criteria
+title: Structural criteria — self-describing definitions of structural-biology criteria and measurements
+description: >-
+  A LinkML schema for self-describing entries, one per structural-biology
+  criterion or measurement the harness records. Each entry consolidates, in one
+  place, what the metric IS (text definition + citations), HOW it is computed
+  (tools, families, runnable recipes), its UNITS, its normal / anomalous /
+  expected value ranges (with resolution or method dependence noted), the
+  cross-tool AGREEMENT tolerance, and a worked EXAMPLE measurement taken from a
+  real structure in this repo. It is the human- and machine-readable companion
+  to ref/catalog.yaml (metric ids), ref/thresholds_and_standards.md (tolerances),
+  ref/tool_recommendations.yaml (oracles), and ref/oracle_tools.md (install).
+license: CC-BY-4.0
+prefixes:
+  protstruct: https://w3id.org/protstruct-review/schema/
+  criteria: https://w3id.org/protstruct-review/structural-criteria/
+  linkml: https://w3id.org/linkml/
+default_prefix: criteria
+default_range: string
+
+imports:
+  - linkml:types
+
+# ----------------------------------------------------------------------------
+# Enums
+# ----------------------------------------------------------------------------
+enums:
+
+  CriterionCategory:
+    description: The broad structural-biology domain the criterion belongs to.
+    permissible_values:
+      geometry:
+        description: "Stereochemistry / covalent geometry (clashscore, Ramachandran, bonds and angles)."
+      data_quality:
+        description: "Reflection-data statistics (completeness, CC-half, Wilson B, twinning)."
+      refinement:
+        description: "Model-vs-data agreement from refinement (R-work, R-free)."
+      map_quality:
+        description: "Cryo-EM / real-space map metrics (FSC resolution, CC_mask)."
+      density_fit:
+        description: "Local model-to-density agreement (RSCC, RSZD/RSZO)."
+      superposition:
+        description: "Structure comparison (RMSD, TM-score, aligned residues)."
+      interface:
+        description: "Interface / assembly quality (DockQ, buried surface area)."
+      ensemble:
+        description: "NMR-ensemble properties (precision, restraint violations)."
+      classification:
+        description: "Secondary-structure / domain / fold assignment."
+      prediction_confidence:
+        description: "Predicted-model confidence (pLDDT, pTM)."
+      hydrogen:
+        description: "Hydrogen placement / protonation."
+      ligand_fit:
+        description: "Ligand fitting and pose."
+
+  ToolFamily:
+    description: Source-code lineage of a computing tool. The trust model treats non_cctbx as independent of PHENIX.
+    permissible_values:
+      cctbx:
+        description: "Shares the cctbx/iotbx/mmtbx libraries (PHENIX, mmtbx.* CLIs)."
+      non_cctbx:
+        description: "Independent code base (MolProbity standalone, gemmi, CCP4, DSSP, DockQ, biotite)."
+      web_service:
+        description: "Remote service (PDBePISA, wwPDB validation, CATH)."
+
+  RecipeLanguage:
+    description: How the recipe is invoked.
+    permissible_values:
+      bash:
+      python:
+      url:
+        description: "A web endpoint / query, not a local command."
+
+  ValueVerdict:
+    description: Whether an example measurement falls in the normal or anomalous range.
+    permissible_values:
+      normal:
+      borderline:
+      anomalous:
+      informational:
+        description: "Descriptive value with no pass/fail meaning."
+
+  ProvenanceTag:
+    description: Change-policy tag for a tolerance, mirroring ref/thresholds_and_standards.md.
+    permissible_values:
+      schema:
+      MolProbity:
+      literature:
+      catalog:
+      template:
+      calibration:
+
+# ----------------------------------------------------------------------------
+# Classes
+# ----------------------------------------------------------------------------
+classes:
+
+  CriteriaCollection:
+    tree_root: true
+    description: Top-level container holding every structural-criterion entry.
+    attributes:
+      criteria:
+        range: StructuralCriterion
+        multivalued: true
+        inlined_as_list: true
+        required: true
+
+  StructuralCriterion:
+    description: >-
+      One self-describing structural-biology criterion or measurement: what it
+      is, how to compute it, its units and value ranges, its cross-tool
+      agreement tolerance, and a worked example from a repo structure.
+    attributes:
+      id:
+        identifier: true
+        required: true
+        description: Stable id; matches a ref/catalog.yaml metric id where one exists (e.g. `T05_clashscore`) or a bare name (e.g. `clashscore`).
+      name:
+        required: true
+        description: Human-readable name.
+      category:
+        range: CriterionCategory
+        required: true
+      catalog_task_refs:
+        multivalued: true
+        description: Catalog task ids this criterion serves (T01..T17).
+      unit:
+        required: true
+        description: Unit of the measured value (e.g. "clashes per 1000 atoms", "Å", "Å²", "%", "dimensionless").
+      is_gradeable:
+        range: boolean
+        required: true
+        description: True if the criterion yields a gradeable numeric value; false for informational / label-valued content.
+      definition:
+        required: true
+        description: Prose definition of the criterion — what it measures and how it is defined.
+      definition_refs:
+        range: Citation
+        multivalued: true
+        inlined_as_list: true
+        description: Primary-source citations for the definition / standard.
+      computations:
+        range: Computation
+        multivalued: true
+        inlined_as_list: true
+        required: true
+        description: Tools that can compute this criterion, with runnable recipes.
+      value_ranges:
+        range: ValueRanges
+        inlined: true
+        description: Normal, anomalous, and expected value ranges.
+      cross_tool_agreement:
+        range: AgreementTolerance
+        inlined: true
+        description: How close two independent tools must land to corroborate this measurement.
+      example_measurements:
+        range: ExampleMeasurement
+        multivalued: true
+        inlined_as_list: true
+        description: Worked measured values from real structures in this repo.
+      notes:
+        description: Assumptions, caveats, resolution/method dependence not captured elsewhere.
+
+  Computation:
+    description: A tool + runnable recipe that computes the criterion.
+    attributes:
+      tool:
+        required: true
+        description: Tool id (matches ref/catalog.yaml::tools where applicable, e.g. `MolProbity (gold)`, `gemmi validate`, `DockQ`).
+      family:
+        range: ToolFamily
+        required: true
+      installed:
+        range: boolean
+        description: Whether this tool is installed in the repo's environment (see ref/oracle_tools.md).
+      recipe:
+        required: true
+        description: A concrete command line or code snippet that computes the criterion.
+      recipe_language:
+        range: RecipeLanguage
+      recipe_notes:
+        description: Flags, assumptions, or preconditions for the recipe (e.g. H-build convention, probe radius, restraint library).
+
+  ValueRanges:
+    description: Normal / anomalous / expected value bands for the criterion.
+    attributes:
+      normal:
+        range: RangeSpec
+        inlined: true
+        description: Typical values for a good structure.
+      anomalous:
+        range: RangeSpec
+        inlined: true
+        description: Values that signal a problem.
+      expected:
+        range: RangeSpec
+        inlined: true
+        description: Context-conditional expectation (optional).
+      resolution_dependence:
+        description: How the ranges shift with resolution / method (single sentence).
+
+  RangeSpec:
+    description: A numeric band and/or a textual condition. Any subset of fields may be set.
+    attributes:
+      min_value:
+        range: float
+      max_value:
+        range: float
+      text:
+        description: Free-text band for non-numeric or conditional criteria (e.g. "≥ 0.8 acceptable"; "H/E/C label").
+      condition:
+        description: When this band applies (e.g. "at ≤ 2.0 Å", "ordered core only").
+
+  AgreementTolerance:
+    description: Cross-tool agreement tolerance, mirroring ref/thresholds_and_standards.md.
+    attributes:
+      tolerance:
+        required: true
+        description: The agreement band (e.g. "± 1.0", "|Δ| ≤ 0.10 Å", "± 0.4° when restraint libraries differ").
+      tools:
+        description: The tool pairing the tolerance applies to.
+      precondition:
+        description: Matched-configuration requirement (e.g. "matched H-build convention", "same residue selection", "fixed chain mapping").
+      provenance:
+        range: ProvenanceTag
+        multivalued: true
+      citation:
+        description: Source for the tolerance where one exists.
+      provisional:
+        range: boolean
+        description: True if the value is not yet grounded in a literature/benchmark source.
+
+  ExampleMeasurement:
+    description: A worked measured value taken from a real structure in this repo.
+    attributes:
+      structure_id:
+        required: true
+        description: Structure the value was measured on (e.g. `1sar`, `1d3z`, `2n54`).
+      value_numeric:
+        range: float
+      value_text:
+        description: For label-valued criteria (e.g. "High", "helix").
+      unit:
+      tool:
+        description: The tool that produced this value.
+      source:
+        description: Where the value came from (an EVAL file, a script run, or a repo doc).
+      verdict:
+        range: ValueVerdict
+      interpretation:
+        description: One-line reading of what the value means for this structure.
+
+  Citation:
+    description: A literature or standard reference.
+    attributes:
+      ref:
+        required: true
+        description: Short key or DOI (e.g. "Chen2010", "10.1107/S0907444911035918").
+      full:
+        description: Full citation text.

@@ -1,0 +1,266 @@
+# Structural-criteria registry — self-describing entries per criterion / measurement.
+# Schema: schemas/structural_criteria.yaml (class CriteriaCollection).
+# Validate: linkml-validate --schema schemas/structural_criteria.yaml ref/structural_criteria.yaml
+#
+# Each entry consolidates definition + computation recipes + units + value ranges
+# + cross-tool agreement + a worked example from a real repo structure. It is the
+# rich companion to ref/catalog.yaml, ref/thresholds_and_standards.md,
+# ref/tool_recommendations.yaml and ref/oracle_tools.md.
+
+criteria:
+
+  - id: T05_clashscore
+    name: MolProbity clashscore
+    category: geometry
+    catalog_task_refs:
+      - T05
+    unit: clashes per 1000 atoms
+    is_gradeable: true
+    definition: >-
+      Number of serious all-atom steric overlaps (van der Waals overlap ≥ 0.4 Å),
+      counted with the PROBE small-probe contact dot method over explicit hydrogens
+      added by REDUCE, normalised per 1000 atoms. Lower is better.
+    definition_refs:
+      - ref: Chen2010
+        full: "Chen VB et al. MolProbity: all-atom structure validation. Acta Cryst. D 2010; 66:12-21."
+      - ref: Williams2018
+        full: "Williams CJ et al. MolProbity: more and better reference data. Protein Sci. 2018; 27:293-315."
+    computations:
+      - tool: MolProbity (gold)
+        family: non_cctbx
+        installed: true
+        recipe: "reduce -build model.pdb > model_H.pdb && probe -u -condense -self 'all' model_H.pdb | ..."
+        recipe_language: bash
+        recipe_notes: >-
+          Richardson-lab standalone probe+reduce. H-build convention matters:
+          electron-cloud-center (X-ray) vs nuclear (neutron/NMR) shifts the score ~0.5.
+      - tool: mmtbx.validation_summary
+        family: cctbx
+        installed: true
+        recipe: "mmtbx.validation_summary model.pdb"
+        recipe_language: bash
+        recipe_notes: "cctbx wrapper of the same probe+reduce machinery; second opinion only (does not satisfy the trust model alone)."
+    value_ranges:
+      normal:
+        max_value: 5.0
+        text: "≲ 5 at ≤ 2.0 Å is unremarkable; well under 5 for high-resolution models"
+      anomalous:
+        min_value: 40.0
+        text: "≳ 40 signals severe packing / build errors"
+      resolution_dependence: "Clashscore percentile is resolution-graded; absolute counts rise at lower resolution."
+    cross_tool_agreement:
+      tolerance: "± 1.0"
+      tools: "PHENIX/mmtbx vs MolProbity standalone"
+      precondition: "matched hydrogen-build convention (electron-cloud vs nuclear)"
+      provenance:
+        - template
+      citation: "ref/thresholds_and_standards.md (Chen 2010; Williams 2018)"
+      provisional: false
+    example_measurements:
+      - structure_id: 1sar
+        value_numeric: 3.63
+        unit: clashes per 1000 atoms
+        tool: MolProbity (gold)
+        source: "data/coscientists/openscientist/EVAL_1sar_cdba2c07_2026-04-24.yaml"
+        verdict: normal
+        interpretation: "11 clashes / 3027 atoms; in line with mmtbx 3.13 (Δ 0.5, within H-build noise)."
+    notes: "The ~0.5 H-build shift is the dominant caveat; both tools must use the same H model when compared."
+
+  - id: T15_secondary_structure_agreement
+    name: Secondary-structure assignment agreement (three-state)
+    category: classification
+    catalog_task_refs:
+      - T15
+    unit: fraction
+    is_gradeable: true
+    definition: >-
+      Fraction of residues assigned the same three-state (H/E/C) secondary-structure
+      label by two independent assigners. The gradeable T15 metric; the per-residue
+      labels themselves are informational.
+    definition_refs:
+      - ref: Kabsch1983
+        full: "Kabsch W, Sander C. DSSP. Biopolymers 1983; 22:2577-2637."
+      - ref: Frishman1995
+        full: "Frishman D, Argos P. STRIDE. Proteins 1995; 23:566-579."
+    computations:
+      - tool: DSSP
+        family: non_cctbx
+        installed: true
+        recipe: "mkdssp --output-format dssp model.pdb out.dssp  # then collapse 8-state -> H/E/C"
+        recipe_language: bash
+        recipe_notes: "Kabsch-Sander H-bond energetics."
+      - tool: biotite P-SEA
+        family: non_cctbx
+        installed: true
+        recipe: "python: struc.annotate_sse(chain)  # Labesse P-SEA, Cα geometry; a/b/c -> H/E/C"
+        recipe_language: python
+        recipe_notes: "Cα-geometry method; a different algorithm family from DSSP, so agreement is non-tautological. scripts/t15_ss_agreement.py."
+    value_ranges:
+      normal:
+        min_value: 0.80
+        text: "≥ 0.80 two-assigner agreement on a well-ordered model"
+      anomalous:
+        max_value: 0.70
+        text: "< 0.70 indicates an unusually disordered model (or a bug)"
+      resolution_dependence: "Disagreement concentrates at helix/strand ends; DSSP-vs-STRIDE agree ~94.7% on well-ordered structure."
+    cross_tool_agreement:
+      tolerance: "agent-vs-DSSP ≥ 0.85; two-assigner floor ≥ 0.80"
+      tools: "DSSP vs biotite P-SEA (t15_ss_agreement.py)"
+      precondition: "disclose which assigner was used"
+      provenance:
+        - template
+      citation: "ref/thresholds_and_standards.md"
+      provisional: false
+    example_measurements:
+      - structure_id: 1sar
+        value_numeric: 0.86
+        unit: fraction
+        tool: DSSP + biotite P-SEA
+        source: "scripts/t15_ss_agreement.py run"
+        verdict: normal
+        interpretation: "165/191 residues concordant; DSSP 191 vs biotite 192 (1 residue scored by only one)."
+
+  - id: T16_interface_buried_surface_area
+    name: Interface buried surface area
+    category: interface
+    catalog_task_refs:
+      - T16
+    unit: "Å²"
+    is_gradeable: true
+    definition: >-
+      Total solvent-accessible surface area buried on complex formation,
+      ΣSASA(separated chains) − SASA(complex). A property of the model complex,
+      needing no reference.
+    definition_refs:
+      - ref: Krissinel2007
+        full: "Krissinel E, Henrick K. PISA. J. Mol. Biol. 2007; 372:774-797."
+      - ref: LeeRichards1971
+        full: "Lee B, Richards FM. Solvent-accessible surface area. J. Mol. Biol. 1971; 55:379-400."
+    computations:
+      - tool: biotite SASA
+        family: non_cctbx
+        installed: true
+        recipe: "python: sum(nansum(struc.sasa(chain)) for chain) - nansum(struc.sasa(complex))  # Shrake-Rupley, 1.4 Å probe"
+        recipe_language: python
+        recipe_notes: "Installable stand-in for PISA (scripts/t16_interface_quality.py). SASA depends on probe radius / point density / water & hetero inclusion."
+      - tool: PISA/PDBePISA
+        family: web_service
+        installed: false
+        recipe: "https://www.ebi.ac.uk/pdbe/pisa/  # deposition-grade reference"
+        recipe_language: url
+        recipe_notes: "Reports interface area by its own definition, not identical to ΣSASA(chains) − SASA(complex)."
+    value_ranges:
+      normal:
+        text: "transient interfaces ~400-800 Å²; obligate/large interfaces > 1500 Å²"
+      anomalous:
+        max_value: 200.0
+        text: "< ~200 Å² is a crystal-packing contact, not a biological interface"
+    cross_tool_agreement:
+      tolerance: "|Δ| ≤ 10 %"
+      tools: "biotite SASA vs PISA"
+      precondition: "matched probe radius (1.4 Å) and atom selection"
+      provenance:
+        - template
+      citation: "ref/thresholds_and_standards.md — PROVISIONAL, unbenchmarked (issue #18)"
+      provisional: true
+    example_measurements:
+      - structure_id: 1sar
+        value_numeric: 437.2
+        unit: "Å²"
+        tool: biotite SASA
+        source: "scripts/t16_interface_quality.py run (chains A/B)"
+        verdict: informational
+        interpretation: "Small A/B interface (218.6 Å² per side) — 1SAR's crystallographic dimer, a demonstration not a biological assembly."
+
+  - id: T13_wilson_b
+    name: Wilson B-factor
+    category: data_quality
+    catalog_task_refs:
+      - T13
+      - T06
+    unit: "Å²"
+    is_gradeable: true
+    definition: >-
+      Overall isotropic B-factor from the Wilson plot: the slope of ln⟨I⟩ vs
+      sin²θ/λ² in the high-resolution range, describing the average atomic
+      displacement / data fall-off.
+    definition_refs:
+      - ref: Wilson1949
+        full: "Wilson AJC. The probability distribution of X-ray intensities. Acta Cryst. 1949; 2:318-321."
+    computations:
+      - tool: phenix.xtriage
+        family: cctbx
+        installed: true
+        recipe: "phenix.xtriage data.mtz  # ML anisotropy-aware Wilson B (Popov & Bourenkov 2004; Zwart 2005)"
+        recipe_language: bash
+        recipe_notes: "ML estimate, less sensitive to resolution truncation than a straight-line plot."
+      - tool: ctruncate
+        family: non_cctbx
+        installed: true
+        recipe: "ctruncate -hklin data.mtz -colin '/*/*/[I,SIGI]'  # classic straight-line Wilson plot"
+        recipe_language: bash
+        recipe_notes: "Bin-choice sensitive (RSCALE control is discouraged)."
+    value_ranges:
+      normal:
+        text: "typically ~10-60 Å²; roughly tracks resolution (higher B at lower resolution)"
+      anomalous:
+        min_value: 100.0
+        text: "> ~100 Å² suggests very weak / low-resolution or radiation-damaged data"
+      resolution_dependence: "Wilson B correlates with resolution; comparison is only meaningful at matched resolution and method."
+    cross_tool_agreement:
+      tolerance: "± 5 Å²"
+      tools: "xtriage (ML) vs ctruncate (classic)"
+      precondition: "prefer like-method comparison; matched resolution range"
+      provenance:
+        - template
+      citation: "ref/thresholds_and_standards.md — PROVISIONAL, no inter-program benchmark (issue #19)"
+      provisional: true
+    example_measurements: []
+    notes: "±5 Å² is inference-only; no literature benchmark on xtriage-vs-ctruncate Wilson-B reproducibility survived review."
+
+  - id: T17_nmr_ensemble_precision_rmsd
+    name: NMR ensemble precision (ordered-core mean Cα RMSF)
+    category: ensemble
+    catalog_task_refs:
+      - T17
+    unit: "Å"
+    is_gradeable: true
+    definition: >-
+      Mean per-residue Cα root-mean-square fluctuation about the ensemble mean,
+      after superposing every model onto a reference model — computed over the
+      ordered core (residues with RMSF ≤ 2 Å), which is the tool-comparable figure.
+      The whole-chain mean is dominated by flexible termini and is reported alongside.
+    definition_refs:
+      - ref: Vuister2014
+        full: "Vuister GW et al. Tools for the validation of protein NMR structures. J. Biomol. NMR 2014."
+    computations:
+      - tool: biotite ensemble
+        family: non_cctbx
+        installed: true
+        recipe: "python: superimpose(ca[0], ca); rmsf(average, superposed); mean over residues ≤ 2 Å  # scripts/t17_nmr_ensemble.py"
+        recipe_language: python
+        recipe_notes: "Ordered-core selection (RMSF ≤ 2 Å) makes the value comparable across tools; whole-chain mean is selection-dominated."
+    value_ranges:
+      normal:
+        max_value: 1.0
+        text: "sub-Ångström ordered-core precision for a well-determined ensemble"
+      anomalous:
+        min_value: 2.0
+        text: "ordered-core > 2 Å indicates a poorly-determined ensemble"
+      resolution_dependence: "Selection alone can move whole-chain ensemble RMSD ~2×; always report the ordered-core figure."
+    cross_tool_agreement:
+      tolerance: "|Δ| ≤ 0.05 Å on a matched ordered-core selection"
+      tools: "biotite ensemble vs another RMSF tool"
+      precondition: "matched ordered-core definition (OLDERADO / PSVS FindCore)"
+      provenance:
+        - template
+      citation: "ref/thresholds_and_standards.md"
+      provisional: false
+    example_measurements:
+      - structure_id: 1d3z
+        value_numeric: 0.316
+        unit: "Å"
+        tool: biotite ensemble
+        source: "scripts/t17_nmr_ensemble.py run"
+        verdict: normal
+        interpretation: "Ordered core 74/76 residues; whole-chain mean 0.428 Å inflated by 2 flexible C-terminal residues (max 5.9 Å)."
