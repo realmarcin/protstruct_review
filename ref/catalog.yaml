@@ -403,6 +403,7 @@ catalog_tasks:
   oracle_tool_refs:
   - DSSP
   - STRIDE
+  - biotite P-SEA
   - CATH
   - SCOPe
   - ECOD
@@ -412,7 +413,7 @@ catalog_tasks:
   - T15_structural_domain_assignment
   - T15_fold_classification
   inputs_description: model (PDB/mmCIF)
-  gold_standard: CATH/SCOPe/ECOD consensus where available; DSSP/STRIDE agreement for secondary structure
+  gold_standard: CATH/SCOPe/ECOD consensus where available; three-state agreement between DSSP and an independent second assigner (STRIDE preferred, biotite P-SEA the runnable fallback)
   example_dataset: PDB 1AKE (multi-domain, CATH-classified); PDB 2LYZ (single-domain control)
 - id: T16
   task_name: Interface and assembly quality
@@ -928,6 +929,14 @@ tools:
   catalog_tasks_served:
   - T15
 - id: STRIDE
+  family: non_cctbx
+  catalog_tasks_served:
+  - T15
+- id: biotite P-SEA
+  family: non_cctbx
+  catalog_tasks_served:
+  - T15
+- id: DSSP + biotite P-SEA
   family: non_cctbx
   catalog_tasks_served:
   - T15
@@ -1682,7 +1691,8 @@ metric_definitions:
 - id: T15_secondary_structure_agreement
   name: secondary-structure assignment agreement
   description: Fraction of residues assigned the same secondary-structure state by two
-    independent assigners (e.g. DSSP vs STRIDE), collapsed to the three-state H/E/C
+    independent assigners — DSSP paired with a second assigner (STRIDE preferred,
+    biotite P-SEA the runnable fallback) — collapsed to the three-state H/E/C
     alphabet. The gradeable cross-tool metric for T15; the per-residue labels themselves
     are carried by T15_secondary_structure_assignment as informational content.
   applicable_task_refs:
