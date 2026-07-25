@@ -29,7 +29,7 @@ with Refmac). A PHENIX-vs-gemmi pairing therefore breaks ±0.1° for library rea
 disagreement (one benchmark measured a ~0.64° PHENIX-vs-REFMAC angle gap on identical data).
 **Fix applied:** require matched restraint libraries before comparing bond-angle RMSD; when libraries
 differ, widen the tolerance to ~**±0.4°**.
-*Sources: Moriarty, Tronrud, Adams & Karplus 2016 (Acta Cryst. D72, DOI 10.1107/S2059798315022408); Tronrud & Karplus 2011;
+*Sources: Moriarty NW, Tronrud DE, Adams PD & Karplus PA (2016), "A new default restraint library for the protein backbone in Phenix: a conformation-dependent geometry goes mainstream", Acta Cryst. D72(1):176–179, DOI 10.1107/S2059798315022408 — title, authors, volume/issue and page range verified against the Crossref API 2026-07-24 (IUCr blocks direct fetches); Tronrud & Karplus 2011;
 Touw & Vriend 2010 (Acta Cryst. D66); gemmi documentation; Wojdyr et al. 2023 (Acta Cryst. D).*
 
 ### 2. CC½ high-resolution floor — citation corrected + loosened (verified 3-0)

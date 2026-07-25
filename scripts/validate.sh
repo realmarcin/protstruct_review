@@ -101,6 +101,12 @@ if ! python3 "${REPO_ROOT}/scripts/test_t17_restraint_summary.py"; then
   fail "t17_restraint_summary unit tests"
 fi
 
+# 4f. Tolerance-benchmark pure-logic unit tests (summary statistics + xtriage /
+#     ctruncate log parsing; no network, PISA, PHENIX or CCP4 needed).
+if ! python3 "${REPO_ROOT}/scripts/test_bench_tolerances.py"; then
+  fail "bench tolerance unit tests"
+fi
+
 # 5. Published-view drift. ref/tasks_and_evaluations.{tsv,md} are views of
 #    ref/catalog.yaml. Nothing else here compares them, so a task added to the
 #    catalog alone used to ship silently (T15-T17 did exactly that).

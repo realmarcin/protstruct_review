@@ -14,10 +14,13 @@ Each entry names its **provenance**, which also says how freely it may be change
 | `[catalog]` | A value stated in `ref/catalog.yaml`. | Change with the catalog. |
 | `[template]` | A cross-tool **agreement tolerance** (how close two tools must land). | Safe to tune with evidence. |
 | `[calibration]` | A sanity check against a known-good case or a deposition. | Safe to tune with evidence. |
+| `[benchmark]` | An agreement tolerance **measured in this repo** by running both tools over a test set (audit trail under `ref/research/`, script under `scripts/bench_*.py`). | Change by re-running the benchmark, not by argument. |
 
 `[template]` and `[calibration]` values are engineering tolerances, not scientific claims — tune them
 as the harness accumulates evidence. `[schema]`, `[MolProbity]`, and `[literature]` values track
 external standards — change them only when the standard does, and update the citation.
+`[benchmark]` is the strongest tag available for a cross-tool tolerance: unlike `[template]`, the
+magnitude was observed rather than inferred.
 
 ---
 
@@ -66,12 +69,12 @@ agreement, not quality.
 | Ramachandran / rotamer outlier % | ± **0.5 pp** | same | `[template]` |
 | Bond-length RMSD | ± **0.003 Å** | PHENIX vs `gemmi validate` | `[template]` |
 | Bond-angle RMSD | **matched restraint library required**; ± **0.1°** when both tools use the same library, ± **0.4°** when they differ | PHENIX (CDL default since ~2016) vs `gemmi validate` (CCP4 monomer library / Engh & Huber) | `[template]` `[literature]` |
-| Wilson B | ± **5 Å²** (loosened from ±2; **inference-only — no primary source on inter-program Wilson-B reproducibility survived verification, so this is provisional**). `xtriage` uses an ML anisotropy-aware estimate; `ctruncate`/`truncate` a classic straight-line Wilson plot, which can differ by several Å² — prefer like-method comparison | `xtriage` (ML) vs `ctruncate` (classic) | `[template]` |
+| Wilson B | \|Δ\| ≤ **25 %** of the mean **or 2.5 Å², whichever is larger** — and **void when `xtriage` reports ΔB_cart ≥ 25 Å²** (strong anisotropy: the ML and straight-line estimators then diverge without bound and in either direction). Benchmarked on 24 datasets, same MTZ and same intensity columns: median \|Δ\| 13.7 %, p90 27 %. The retired ±**5 Å²** was the wrong *shape* — absolute disagreement scales with B itself (r = 0.81), so a fixed Å² band is vacuous below 1.5 Å (where B ≈ 5 Å²) and violated by 8/24 datasets overall. Treat as **weak corroboration**; for a precise value compare like-method or use the deposition's Table 1 | `xtriage` (ML) vs `ctruncate` (classic) | `[benchmark]` (`ref/research/tolerance_benchmark_wilson_b.md`) |
 | L-test ⟨\|L\|⟩ | ± **0.02**, same twin/no-twin call, **matched resolution range** (auto-selected range differs between programs). Note the full scale is only 0.125 (untwinned 0.500 → perfect twin 0.375), so ±0.02 is ~16 % of range; and `xtriage`/`ctruncate` share the Padilla–Yeates *method*, so agreement checks consistent computation, not method-independence | `xtriage` vs `ctruncate` | `[template]` |
 | Completeness (overall) | ± **1 pp** vs deposition Table 1 | `xtriage` vs deposition | `[calibration]` |
 | Secondary-structure agreement | agent-vs-DSSP three-state ≥ **0.85** over DSSP-assigned residues; two independent assigners floor ≥ **0.80** on a well-ordered model | agent vs DSSP; DSSP vs biotite P-SEA (`t15_ss_agreement.py`) | `[template]` |
 | DockQ score | **after fixing/verifying the chain mapping**, \|Δ\| ≤ **0.01** (same-implementation noise floor ≈ 0.004; the old ±0.05 was ~12× too loose). The CAPRI-class match is **waived within ±0.03 of a class boundary** (0.23 / 0.49 / 0.80) to avoid spurious boundary flips. Chain-mapping ambiguity is the presumed (not proven) main variance source in multimers | agent vs `t16_interface_quality.py` (DockQ) | `[template]` |
-| Interface buried surface area | \|Δ\| ≤ **10 %** (provisional — magnitude unbenchmarked; corroboration-only until a matched-configuration same-probe-radius / same-atom-selection comparison exists) | agent vs biotite SASA (`t16_interface_quality.py`); PISA when available | `[template]` |
+| Interface buried surface area | \|Δ\| ≤ **3 %** of the mean **or 60 Å², whichever is larger**, with matched 1.4 Å probe, protein-only atom selection, and **PISA's per-side `interface_area` doubled** (biotite reports both sides). Measured on 26 interfaces / 14 entries: median \|Δ\| 1.3 %, p90 3.6 %. The disagreement is **one-sided** — biotite reads high in 26/26 — so a *negative* Δ is off-distribution and worth investigating. Relative error is size-driven (median 1.0 % above 1200 Å² total vs 3.2 % below), which is why the absolute floor exists | agent vs biotite SASA (`t16_interface_quality.py`); PISA via the PDBe API | `[benchmark]` (`ref/research/tolerance_benchmark_interface_bsa.md`) |
 | NMR ensemble precision (mean Cα RMSF) | \|Δ\| ≤ **0.05 Å only on a matched ordered-core selection** (OLDERADO / PSVS FindCore); precision is dominated by the superposition selection, so a whole-chain mean must be reported *alongside* an ordered-core figure, not instead of it | agent vs `t17_nmr_ensemble.py` | `[template]` |
 | R-free vs deposited | \|Δ\| ≤ **0.02** (REFMAC re-refinement vs deposited/PHENIX) | REFMAC5 vs PHENIX vs deposited | `[catalog]` |
 | Independent-code-path R offset | an independent R re-derivation may differ **by a small amount** from scaling / resolution-binning differences (magnitude **unbenchmarked**; gemmi uses the same flat-mask bulk-solvent + anisotropic scaling as PHENIX, so it is *not* categorically "simpler") | `gemmi sfcalc` vs `phenix.model_vs_data` | `[template]` |
@@ -94,10 +97,17 @@ agreement, not quality.
 > (matched ordered-core), and the R offset (rationale corrected). Preconditions were added to CA RMSD
 > (same selection) and DockQ (fixed chain mapping); Wilson B was loosened to ±5 Å²; L-test, SS
 > agreement, bond-length, clashscore, and the Ramachandran/rotamer pp tolerances were kept.
-> Two values remain **provisional** (mechanism real, magnitude unbenchmarked in the literature):
-> **interface BSA ±10 %** and **Wilson B ±5 Å²**. An independent verified research pass cross-checked
-> all seven of the second batch and confirmed these verdicts, additionally tightening **DockQ** to
-> ±0.01 (same-implementation noise floor ≈ 0.004).
+> An independent verified research pass cross-checked all seven of the second batch and confirmed
+> these verdicts, additionally tightening **DockQ** to ±0.01 (same-implementation noise floor ≈ 0.004).
+>
+> **No tolerance is provisional any more.** The two that were — interface BSA and Wilson B — could
+> only be settled by running the tools, and now have been (`scripts/bench_t16_bsa_vs_pisa.py`,
+> `scripts/bench_t13_wilson_b.py`; audit trails under `ref/research/`). Both changed *shape*, not just
+> magnitude: each is now a relative band with an absolute floor, because in both cases the
+> disagreement scales with the quantity being measured. **Interface BSA ±10 % → max(3 %, 60 Å²)**
+> (~3× tighter on real interfaces; the disagreement is one-sided, biotite high in 26/26).
+> **Wilson B ±5 Å² → max(25 %, 2.5 Å²), void under strong anisotropy** — the old band was vacuous
+> below 1.5 Å resolution and violated by 8/24 datasets overall.
 
 ## 4. Refinement Δ-tolerances (compare→refine flow)
 

@@ -146,10 +146,10 @@ criteria:
         recipe_notes: "Installable stand-in for PISA (scripts/t16_interface_quality.py). SASA depends on probe radius / point density / water & hetero inclusion."
       - tool: PISA/PDBePISA
         family: web_service
-        installed: false
-        recipe: "https://www.ebi.ac.uk/pdbe/pisa/  # deposition-grade reference"
+        installed: true
+        recipe: "https://www.ebi.ac.uk/pdbe/api/pisa/interfaces/<pdb_id>/1  # PDBe REST API, assembly 1"
         recipe_language: url
-        recipe_notes: "Reports interface area by its own definition, not identical to ΣSASA(chains) − SASA(complex)."
+        recipe_notes: "`interface_area` is the area buried on ONE side; the harness metric is both sides, so compare against 2 × interface_area. PISA also uses a Lee & Richards surface and counts ligand/hetero atoms in the molecule surface. Symmetry-mate interfaces cannot be reproduced from ASU coordinates alone."
     value_ranges:
       normal:
         text: "transient interfaces ~400-800 Å²; obligate/large interfaces > 1500 Å²"
@@ -157,13 +157,13 @@ criteria:
         max_value: 200.0
         text: "< ~200 Å² is a crystal-packing contact, not a biological interface"
     cross_tool_agreement:
-      tolerance: "|Δ| ≤ 10 %"
-      tools: "biotite SASA vs PISA"
-      precondition: "matched probe radius (1.4 Å) and atom selection"
+      tolerance: "|Δ| ≤ 3 % of the mean, or 60 Å², whichever is larger"
+      tools: "biotite SASA vs PISA (PDBe API)"
+      precondition: "matched probe radius (1.4 Å), protein-only atom selection, and PISA's per-side interface_area doubled; one-sided — biotite read high in 26/26 benchmark interfaces, so a negative Δ is off-distribution"
       provenance:
-        - template
-      citation: "ref/thresholds_and_standards.md — PROVISIONAL, unbenchmarked (issue #18)"
-      provisional: true
+        - benchmark
+      citation: "ref/research/tolerance_benchmark_interface_bsa.md — 26 interfaces / 14 entries, median |Δ| 1.3 %, p90 3.6 % (scripts/bench_t16_bsa_vs_pisa.py, issue #18)"
+      provisional: false
     example_measurements:
       - structure_id: 1sar
         value_numeric: 437.2
@@ -172,6 +172,27 @@ criteria:
         source: "scripts/t16_interface_quality.py run (chains A/B)"
         verdict: informational
         interpretation: "Small A/B interface (218.6 Å² per side) — 1SAR's crystallographic dimer, a demonstration not a biological assembly."
+      - structure_id: 1brs
+        value_numeric: 1569.1
+        unit: "Å²"
+        tool: biotite SASA
+        source: "scripts/bench_t16_bsa_vs_pisa.py (chains A/D; PISA 778.5 Å² per side = 1557.0 total, Δ +0.8 %)"
+        verdict: normal
+        interpretation: "Barnase-barstar, the canonical transient interface; the two oracles agree to within 12 Å²."
+      - structure_id: 1dfj
+        value_numeric: 2622.6
+        unit: "Å²"
+        tool: biotite SASA
+        source: "scripts/bench_t16_bsa_vs_pisa.py (chains E/I; PISA 1284.7 Å² per side = 2569.5 total, Δ +2.1 %)"
+        verdict: normal
+        interpretation: "RNase A-RNase inhibitor, a very large obligate interface; the 3 % relative term binds here, not the 60 Å² floor."
+      - structure_id: 1cho
+        value_numeric: 472.9
+        unit: "Å²"
+        tool: biotite SASA
+        source: "scripts/bench_t16_bsa_vs_pisa.py (chains E/G; PISA 215.9 Å² per side = 431.9 total, Δ +9.1 %)"
+        verdict: borderline
+        interpretation: "Worst benchmark disagreement, and the smallest interface measured (216 Å² per side) — just above the ~200 Å² crystal-contact threshold. Small interfaces are where relative agreement is worst and the measurement means least; the 60 Å² absolute floor covers this case."
 
   - id: T13_wilson_b
     name: Wilson B-factor
@@ -209,15 +230,36 @@ criteria:
         text: "> ~100 Å² suggests very weak / low-resolution or radiation-damaged data"
       resolution_dependence: "Wilson B correlates with resolution; comparison is only meaningful at matched resolution and method."
     cross_tool_agreement:
-      tolerance: "± 5 Å²"
+      tolerance: "|Δ| ≤ 25 % of the mean, or 2.5 Å², whichever is larger"
       tools: "xtriage (ML) vs ctruncate (classic)"
-      precondition: "prefer like-method comparison; matched resolution range"
+      precondition: "same reflection file and same intensity columns; VOID when xtriage reports anisotropy spread ΔB_cart ≥ 25 Å²; prefer like-method comparison or the deposition's Table 1 when a precise value is needed"
       provenance:
-        - template
-      citation: "ref/thresholds_and_standards.md — PROVISIONAL, no inter-program benchmark (issue #19)"
-      provisional: true
-    example_measurements: []
-    notes: "±5 Å² is inference-only; no literature benchmark on xtriage-vs-ctruncate Wilson-B reproducibility survived review."
+        - benchmark
+      citation: "ref/research/tolerance_benchmark_wilson_b.md — 24 datasets, median |Δ| 13.7 %, p90 27 % (scripts/bench_t13_wilson_b.py, issue #19)"
+      provisional: false
+    example_measurements:
+      - structure_id: 9plb
+        value_numeric: 5.33
+        unit: "Å²"
+        tool: phenix.xtriage
+        source: "scripts/bench_t13_wilson_b.py (d_min 0.88 Å; ctruncate 3.98 Å², Δ +1.35 Å² = +28.9 %)"
+        verdict: normal
+        interpretation: "Sub-Å data: the whole Wilson B is 5.3 Å², so the retired ±5 Å² band would have permitted a ~100 % error. The 2.5 Å² floor is what covers this regime."
+      - structure_id: 9rwi
+        value_numeric: 130.62
+        unit: "Å²"
+        tool: phenix.xtriage
+        source: "scripts/bench_t13_wilson_b.py (d_min 3.45 Å; ctruncate 109.19 Å², Δ +21.44 Å² = +17.9 %)"
+        verdict: anomalous
+        interpretation: "Largest absolute disagreement in the benchmark, and > 100 Å² — weak low-resolution data. Within the 25 % band despite a 21 Å² gap; a fixed ±5 Å² would have flagged it spuriously."
+      - structure_id: 28sx
+        value_numeric: 28.64
+        unit: "Å²"
+        tool: phenix.xtriage
+        source: "scripts/bench_t13_wilson_b.py (d_min 2.59 Å, ΔB_cart 47.8 Å²; ctruncate 38.84 Å², Δ −10.20 Å² = −30.2 %)"
+        verdict: informational
+        interpretation: "Strongly anisotropic — the void condition applies. xtriage's ML estimate models the anisotropy, ctruncate's isotropic plot averages over it, so the two are not answering the same question and the comparison is skipped rather than failed."
+    notes: "Benchmarked 2026-07: absolute disagreement scales with B itself (r = 0.81), so the tolerance is relative with an absolute floor, not a fixed Å² band. Fit ranges were not matched between programs, so the measured spread is an upper bound on pure estimator divergence."
 
   - id: T17_nmr_ensemble_precision_rmsd
     name: NMR ensemble precision (ordered-core mean Cα RMSF)

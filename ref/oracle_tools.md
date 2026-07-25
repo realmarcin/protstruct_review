@@ -56,7 +56,7 @@ For **T13** the practical layering is: **aimless** is the canonical recommendati
 | **MoRDa** | Specialised MR pipeline | T09 only | Install only if T09 becomes a regression target |
 | **STRIDE** | Homebrew no longer ships it; biotite P-SEA stands in as the second assigner (see Installed) | T15 | Optional: build from <https://webclu.bio.wzw.tum.de/stride/>. DSSP + biotite already give a runnable agreement metric. |
 | **CATH / SCOPe / ECOD** | Database lookups rather than local binaries | T15 | Query the web APIs, or cache per-domain assignments alongside the example datasets |
-| **PISA/PDBePISA** | No local build; PDBe web service covers it | T16 (buried surface area only) | <https://www.ebi.ac.uk/pdbe/pisa/> |
+| **PISA/PDBePISA** | No local build — but the **PDBe REST API** serves the same PISA 2.0 result machine-readably, so T16 BSA is no longer web-form-blocked | T16 (buried surface area only) | `https://www.ebi.ac.uk/pdbe/api/pisa/interfaces/<pdb_id>/1` (assembly 1). `interface_area` is **per side** — double it to compare with ΣSASA(chains) − SASA(complex). Used by `scripts/bench_t16_bsa_vs_pisa.py` |
 | **wwPDB NMR validation / PROCHECK-NMR / RPF** | No local install; wwPDB validation reports are fetched per entry | T17 | Fetch the deposited validation report; install PROCHECK-NMR only if T17 becomes a regression target |
 
 ## Quick activation snippets
@@ -126,7 +126,9 @@ model and reports the three-state (H/E/C) agreement fraction:
   Identity calibration on `1sar` A/B → DockQ 1.000, class High.
 
 PISA/PDBePISA stays the `top_considered` oracle for buried surface area (the deposition-grade
-reference); biotite SASA is the installed `top_performing` stand-in.
+reference); biotite SASA is the installed `top_performing` stand-in. The two have now been
+benchmarked head-to-head over 26 interfaces — biotite runs **1.3 % high (median), one-sided in
+26/26** — so the stand-in is quantified, not assumed: `ref/research/tolerance_benchmark_interface_bsa.md`.
 
 > **numpy pin:** DockQ requires `numpy < 2` and pip downgraded the base env to numpy 1.26.4. If a
 > future oracle needs numpy ≥ 2, isolate DockQ in its own venv/conda env rather than sharing base.

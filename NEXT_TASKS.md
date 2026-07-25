@@ -3,65 +3,52 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-## Tolerance benchmarks (from the domain-expert `[template]` review)
+## Tolerance benchmarks (from the domain-expert `[template]` review) — DONE
 
-Two agreement tolerances in `ref/thresholds_and_standards.md` are marked **provisional**: no
-published inter-program reproducibility figure exists, so they can only be settled by *running the
-tools on a structured test set*. Both are structural-biology harness work, not a literature pass.
+Both provisional agreement tolerances have been benchmarked by running the tools on a structured
+test set. **No tolerance in `ref/thresholds_and_standards.md` is provisional any more.** Both changed
+*shape*, not just magnitude: each is now a relative band with an absolute floor, because in both
+cases the disagreement scales with the quantity being measured. The new `[benchmark]` provenance tag
+marks a tolerance whose magnitude was **measured in this repo** rather than inferred.
 
-### [ ] Benchmark interface BSA: biotite SASA vs PISA — GitHub #18
+### [x] Benchmark interface BSA: biotite SASA vs PISA — GitHub #18
 
-De-provisionalize `Interface buried surface area | |Δ| ≤ 10 %` (and the
-`T16_interface_buried_surface_area` entry in `ref/structural_criteria.yaml`).
+`|Δ| ≤ 10 %` (provisional) → **`|Δ| ≤ 3 % of the mean, or 60 Å², whichever is larger`**.
 
-**Why provisional:** PISA uses a Lee & Richards surface with a 1.4 Å probe; biotite Shrake–Rupley
-differs in point density and water/hetero handling; PISA also defines *interface* area differently
-from ΣSASA(chains) − SASA(complex). The ±10 % is unmeasured.
+- Script: `scripts/bench_t16_bsa_vs_pisa.py`. Audit trail:
+  `ref/research/tolerance_benchmark_interface_bsa.md`.
+- 26 protein–protein interfaces across 14 entries (216 → 2853 Å² per side). PISA came from the
+  **PDBe REST API** (`/pdbe/api/pisa/interfaces/<id>/1`), not the web form — machine-readable, same
+  PISA 2.0 computation, so this is no longer web-blocked.
+- Median |Δ| 1.3 %, p90 3.6 %, max 9.1 %. **One-sided: biotite reads high in 26/26.**
+- Two traps now documented in `ref/structural_criteria.yaml`: PISA's `interface_area` is **per side**
+  (the harness metric is both sides — a factor of 2), and symmetry-mate interfaces cannot be
+  reproduced from ASU coordinates.
 
-**Execute:**
-1. Pick a test set of ~10–15 deposited complexes spanning interface sizes: e.g. `1BRS`
-   (barnase–barstar), `2SIC` (subtilisin–SSI), plus a few obligate dimers and a large multimer.
-   Fetch coordinates with `curl -sL https://files.rcsb.org/download/<ID>.pdb`.
-2. For each, compute BSA two ways with the **same probe radius (1.4 Å) and matched atom selection**
-   (protein-only, no waters/hetero):
-   - biotite: `python3 scripts/t16_interface_quality.py <model>.pdb` (reads the BSA row).
-   - PISA: PDBePISA interface area from <https://www.ebi.ac.uk/pdbe/pisa/> (web; the deposition-grade
-     reference). Record PISA's *interface area* definition explicitly.
-3. Tabulate `|Δ| / mean` per complex; report the distribution (median, 90th percentile).
-4. Replace the provisional ±10 % in `ref/thresholds_and_standards.md` and the
-   `T16_interface_buried_surface_area` entry in `ref/structural_criteria.yaml` with the empirical
-   noise floor (or confirm ±10 %), flip `provisional: false`, and add an `example_measurement` per
-   complex. Note any systematic offset from the differing interface-area definitions.
+### [x] Benchmark Wilson B: phenix.xtriage vs CCP4 ctruncate — GitHub #19
 
-**Blocked on:** PISA web access (or a local `pisa`/CCP4 install).
+`± 5 Å²` (provisional) → **`|Δ| ≤ 25 % of the mean, or 2.5 Å², whichever is larger`, void when
+`xtriage` reports ΔB_cart ≥ 25 Å²**.
 
-### [ ] Benchmark Wilson B: phenix.xtriage vs CCP4 ctruncate — GitHub #19
+- Script: `scripts/bench_t13_wilson_b.py`. Audit trail: `ref/research/tolerance_benchmark_wilson_b.md`.
+- 24 datasets, six resolution bins, 0.88 → 3.50 Å; both programs on the **same MTZ and the same
+  intensity columns**.
+- Median |Δ| 13.7 %, p90 27 %, max 30.2 %. Absolute disagreement scales with B itself (r = 0.81);
+  relative disagreement is flat across resolution (r = −0.02). The old ±5 Å² was vacuous below 1.5 Å
+  and violated by 8/24 datasets.
+- Wilson-B cross-tool agreement is now explicitly **weak corroboration**: for a precise value,
+  compare like-method or use the deposition's Table 1.
 
-De-provisionalize `Wilson B | ± 5 Å²` (and the `T13_wilson_b` entry in
-`ref/structural_criteria.yaml`).
-
-**Why provisional:** `xtriage` uses an ML anisotropy-aware Wilson-B estimate; `ctruncate`/`truncate`
-a classic straight-line Wilson plot (bin-choice sensitive). The two can differ by several Å², more
-at low resolution / under anisotropy. The ±5 Å² is inference-only — no literature benchmark survived
-the review.
-
-**Execute:**
-1. Assemble a **resolution- and anisotropy-stratified** set of ~15–20 deposited datasets with public
-   reflection files (PDB-REDO supplies MTZs): low (~3.0 Å), mid (~2.0 Å), high (~1.2 Å), plus a
-   couple with known anisotropy.
-2. For each, on the **same reflection file**, run:
-   - `phenix.xtriage data.mtz` → Wilson B (ML).
-   - `ctruncate -hklin data.mtz -colin '/*/*/[I,SIGI]'` → Wilson B (classic).
-3. Tabulate `|Δ|` per dataset, stratified by resolution and anisotropy; report the spread.
-4. Set the tolerance to the empirical floor (possibly **resolution-conditional** — the review
-   predicts a larger gap at low resolution), or confirm ±5 Å². Update
-   `ref/thresholds_and_standards.md` and the `T13_wilson_b` entry, flip `provisional: false`, and add
-   `example_measurement`s.
-
-**Blocked on:** PHENIX + CCP4 both on the same reflection files (both installed locally per
-`ref/oracle_tools.md`).
+**Known residual confound (not blocking):** the two programs' Wilson-plot fit *ranges* were not
+matched — ctruncate does not report the range it used. The measured 13.7 % is therefore an upper
+bound on pure estimator divergence. Tightening this would need a ctruncate build that reports (or
+accepts) an explicit fit range.
 
 ## Other tracked work
 
 - **GitHub #2** *(closed — informational)*: driving examples complete (17/17).
 - **GitHub #3** *(closed — informational)*: T15/T16/T17 runnable; only web/report-blocked pieces remain.
+
+## Open
+
+- Nothing tracked. The backlog is empty; new work starts as a GitHub issue.
