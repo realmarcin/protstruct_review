@@ -32,6 +32,7 @@ import argparse
 import json
 import statistics
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -44,10 +45,19 @@ RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 # Test set spanning interface size and complex type: protease-inhibitor and other
 # transient complexes (~600-900 Å² per side), antibody-antigen, obligate/large
 # interfaces (> 1500 Å²), and a multi-interface oligomer (4HHB, haemoglobin).
+#
+# 1CHO is deliberately absent: its α-chymotrypsin is deposited as three fragments
+# (E 1-10, F 16-146, G 149-245), so every pair it contributes is either
+# intramolecular or half of a split interface. The `fragment_pairs` guard catches
+# the intramolecular ones automatically; the entry is dropped outright because the
+# remaining pairs are partial interfaces.
 DEFAULT_SET = [
     "1brs",  # barnase-barstar (transient, the canonical case)
     "2ptc",  # trypsin-BPTI
-    "1cho",  # alpha-chymotrypsin-OMTKY3
+    "1ppf",  # leukocyte elastase-OMTKY3
+    "1cse",  # subtilisin Carlsberg-eglin c
+    "2sni",  # subtilisin novo-chymotrypsin inhibitor 2
+    "1tgs",  # trypsinogen-pancreatic secretory trypsin inhibitor
     "3sgb",  # S. griseus protease B-OMTKY3
     "2sic",  # subtilisin-SSI
     "1avx",  # trypsin-soybean trypsin inhibitor
@@ -85,6 +95,60 @@ def pisa_interfaces(pdb_id: str, cache: Path) -> list[dict[str, Any]]:
     return payload.get("assembly", {}).get("interfaces", []) or []
 
 
+def fragment_pairs(model: Path) -> set[frozenset[str]]:
+    """Chain pairs that are fragments of ONE molecule, not an interface.
+
+    A cleaved protein deposited as several chains (1CHO's α-chymotrypsin is chains
+    E 1-10, F 16-146, G 149-245, held together by disulfides) presents chain pairs
+    that PISA lists as interfaces but which are intramolecular contacts. Buried area
+    across them is not interface area, and PISA's own `number_disulfide_bonds` field
+    reads 0 for exactly these pairs, so it cannot serve as the filter.
+
+    Test: the two chains are in the same covalent (SSBOND) component **and** their
+    residue-number ranges are disjoint. Both halves matter — a Fab light/heavy pair
+    is disulfide-linked too, but its chains both number from 1, so overlapping
+    ranges keep it in as the genuine two-molecule interface it is.
+    """
+    bonds: list[tuple[str, str]] = []
+    spans: dict[str, list[int]] = {}
+    for line in model.read_text(errors="ignore").splitlines():
+        if line.startswith("SSBOND") and len(line) > 35:
+            a, b = line[15], line[29]
+            if a != b:
+                bonds.append((a, b))
+        elif line.startswith("ATOM"):
+            spans.setdefault(line[21], []).append(int(line[22:26]))
+
+    # Connected components of the inter-chain covalent graph (chain counts are tiny,
+    # so a plain BFS is clearer than union-find and just as fast).
+    adjacent: dict[str, set[str]] = {}
+    for a, b in bonds:
+        adjacent.setdefault(a, set()).add(b)
+        adjacent.setdefault(b, set()).add(a)
+    component: dict[str, str] = {}
+    for start in adjacent:
+        if start in component:
+            continue
+        queue = [start]
+        while queue:
+            chain = queue.pop()
+            if chain in component:
+                continue
+            component[chain] = start
+            queue.extend(adjacent.get(chain, ()))
+
+    pairs = set()
+    for a in spans:
+        for b in spans:
+            if a >= b or a not in component or component[a] != component.get(b):
+                continue
+            lo_a, hi_a = min(spans[a]), max(spans[a])
+            lo_b, hi_b = min(spans[b]), max(spans[b])
+            if hi_a < lo_b or hi_b < lo_a:  # disjoint numbering
+                pairs.add(frozenset((a, b)))
+    return pairs
+
+
 def biotite_bsa(model: Path, chain_a: str, chain_b: str) -> float | None:
     """Total buried area for the `chain_a`/`chain_b` pair, by the t16 script's recipe.
 
@@ -120,6 +184,7 @@ def collect(pdb_ids: list[str], cache: Path, pause: float = 0.5) -> list[dict[st
         except urllib.error.HTTPError as exc:
             print(f"  ! RCSB {exc.code} for {pdb_id} — skipped", file=sys.stderr)
             continue
+        intramolecular = fragment_pairs(model)
         for iface in interfaces:
             mols = iface.get("molecules", [])
             if len(mols) != 2 or any(m.get("molecule_class") != "Protein" for m in mols):
@@ -127,6 +192,10 @@ def collect(pdb_ids: list[str], cache: Path, pause: float = 0.5) -> list[dict[st
             ca, cb = mols[0].get("chain_id"), mols[1].get("chain_id")
             if not ca or not cb or ca == cb:
                 continue  # symmetry mate — not reproducible from the ASU alone
+            if frozenset((ca, cb)) in intramolecular:
+                print(f"  ! {pdb_id} {ca}/{cb}: fragments of one molecule — skipped",
+                      file=sys.stderr)
+                continue
             bsa = biotite_bsa(model, ca, cb)
             if bsa is None:
                 print(f"  ! {pdb_id} {ca}/{cb}: chain missing from ASU — skipped", file=sys.stderr)
@@ -183,7 +252,10 @@ def main() -> int:
     ap.add_argument("--json", dest="json_out", default=None, help="write full results here")
     args = ap.parse_args()
 
-    cache = Path(args.cache) if args.cache else Path.cwd() / ".bench_cache_t16"
+    # Default outside the working tree: the no-argument invocation downloads a few
+    # hundred MB of coordinates, and dropping that wherever the user happens to be
+    # standing is one `git add -A` away from committing it.
+    cache = Path(args.cache) if args.cache else Path(tempfile.gettempdir()) / "bench_cache_t16"
     rows = collect(args.pdb_ids or DEFAULT_SET, cache)
     summary = summarize(rows)
     out = {"rows": rows, "summary": summary}

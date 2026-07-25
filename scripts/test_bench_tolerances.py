@@ -59,6 +59,55 @@ check("t16 abs median survives sign cancellation", mixed["abs_median_pct"], 3.0)
 check("t16 empty input reports n=0", t16.summarize([]), {"n": 0})
 
 
+# --- T16: the fragment guard (issue #25) ----------------------------------------
+# A cleaved molecule deposited as several chains presents intramolecular pairs that
+# PISA lists as interfaces. Counting them as interfaces loosened the tolerance once
+# already, so pin both halves of the rule.
+
+def pdb(ssbonds: list[tuple[str, str]], chains: dict[str, tuple[int, int]]) -> str:
+    lines = []
+    for a, b in ssbonds:
+        # PDB SSBOND is fixed-column: the two chain ids sit at columns 15 and 29
+        # (0-based). Place them explicitly rather than counting spaces in an
+        # f-string — miscounting here would silently weaken the test.
+        record = list("SSBOND   1 CYS  " + " " * 54)
+        record[15], record[29] = a, b
+        lines.append("".join(record))
+    for chain, (lo, hi) in chains.items():
+        for resi in (lo, hi):
+            lines.append(f"ATOM      1  CA  ALA {chain}{resi:>4}      0.000   0.000   0.000")
+    return "\n".join(lines) + "\n"
+
+
+def fragments(text: str, tmp_name: str) -> set:
+    path = Path(f"/tmp/{tmp_name}.pdb")
+    path.write_text(text)
+    try:
+        return {tuple(sorted(pair)) for pair in t16.fragment_pairs(path)}
+    finally:
+        path.unlink(missing_ok=True)
+
+
+# 1CHO shape: E-F and F-G disulfides, three disjoint residue ranges. E/G has no
+# direct bond but reaches G through F, so component-wise reachability must catch it.
+check("cleaved chain: all three fragment pairs flagged, including the indirect one",
+      fragments(pdb([("E", "F"), ("F", "G")],
+                    {"E": (1, 10), "F": (16, 146), "G": (149, 245)}), "test_frag_cleaved"),
+      {("E", "F"), ("E", "G"), ("F", "G")})
+
+# Fab shape: light/heavy are disulfide-linked but both number from 1 — a genuine
+# two-molecule interface that must survive.
+check("disulfide-linked chains with overlapping numbering are kept",
+      fragments(pdb([("L", "H")], {"L": (1, 214), "H": (1, 215)}), "test_frag_fab"),
+      set())
+
+# Disjoint numbering alone is not enough: two uncleaved molecules can be numbered
+# in different ranges and still form a real interface.
+check("disjoint numbering without a covalent link is kept",
+      fragments(pdb([], {"A": (1, 100), "B": (200, 300)}), "test_frag_disjoint"),
+      set())
+
+
 # --- T13: Wilson-B stratification -----------------------------------------------
 
 def t13_row(delta: float, d_min: float, aniso: float) -> dict:

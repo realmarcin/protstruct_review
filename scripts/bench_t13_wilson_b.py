@@ -95,6 +95,19 @@ def screen(pdb_ids: list[str]) -> list[str]:
     return eligible
 
 
+def count_blocks(sf: Path) -> int:
+    """Number of `data_` blocks in the sf-cif.
+
+    `cif2mtz` converts the FIRST block only. Both estimators then read that same
+    MTZ, so a multi-block entry stays internally consistent — but the row's `d_min`
+    would describe whichever block happened to be converted, which may not be the
+    dataset the entry's stated resolution refers to. Multi-block entries are skipped
+    loudly rather than silently benchmarked on an arbitrary crystal.
+    """
+    with sf.open(errors="ignore") as fh:
+        return sum(1 for line in fh if line.startswith("data_"))
+
+
 def to_mtz(sf: Path, work: Path) -> tuple[Path, str] | None:
     """cif2mtz the sf file and return (mtz, colin_spec) for the merged intensities."""
     mtz = work / (sf.stem.replace("-sf", "") + ".mtz")
@@ -171,6 +184,12 @@ def collect(pdb_ids: list[str], cache: Path) -> tuple[list[dict[str, Any]], list
         if not has_intensities(sf):
             print("  ! amplitudes only — skipped", file=sys.stderr)
             skipped.append({"pdb_id": pdb_id, "reason": "amplitudes only (no intensity_meas)"})
+            continue
+        blocks = count_blocks(sf)
+        if blocks > 1:
+            print(f"  ! {blocks} data blocks — skipped (cif2mtz converts the first only)",
+                  file=sys.stderr)
+            skipped.append({"pdb_id": pdb_id, "reason": f"multi-block sf-cif ({blocks} blocks)"})
             continue
         converted = to_mtz(sf, cache)
         if converted is None:

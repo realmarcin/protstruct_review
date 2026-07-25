@@ -11,19 +11,21 @@ test set. **No tolerance in `ref/thresholds_and_standards.md` is provisional any
 cases the disagreement scales with the quantity being measured. The new `[benchmark]` provenance tag
 marks a tolerance whose magnitude was **measured in this repo** rather than inferred.
 
-### [x] Benchmark interface BSA: biotite SASA vs PISA — GitHub #18
+### [x] Benchmark interface BSA: biotite SASA vs PISA — GitHub #18 (corrected per #25)
 
-`|Δ| ≤ 10 %` (provisional) → **`|Δ| ≤ 3 % of the mean, or 60 Å², whichever is larger`**.
+`|Δ| ≤ 10 %` (provisional) → **`|Δ| ≤ 3 % of the mean, or 30 Å², whichever is larger`**.
 
 - Script: `scripts/bench_t16_bsa_vs_pisa.py`. Audit trail:
   `ref/research/tolerance_benchmark_interface_bsa.md`.
-- 26 protein–protein interfaces across 14 entries (216 → 2853 Å² per side). PISA came from the
+- 25 protein–protein interfaces across 17 entries (275 → 1839 Å² per side). PISA came from the
   **PDBe REST API** (`/pdbe/api/pisa/interfaces/<id>/1`), not the web form — machine-readable, same
   PISA 2.0 computation, so this is no longer web-blocked.
-- Median |Δ| 1.3 %, p90 3.6 %, max 9.1 %. **One-sided: biotite reads high in 26/26.**
-- Two traps now documented in `ref/structural_criteria.yaml`: PISA's `interface_area` is **per side**
-  (the harness metric is both sides — a factor of 2), and symmetry-mate interfaces cannot be
-  reproduced from ASU coordinates.
+- Median |Δ| 1.2 %, p90 2.4 %, max 3.7 %. **One-sided: biotite reads high in 25/25.**
+- Three traps now documented in `ref/structural_criteria.yaml` and guarded in the script: PISA's
+  `interface_area` is **per side** (the harness metric is both sides — a factor of 2), symmetry-mate
+  interfaces cannot be reproduced from ASU coordinates, and **chain pairs that are fragments of one
+  cleaved molecule are not interfaces** (#25 — the first run counted three such pairs in 1CHO, which
+  loosened the floor to 60 Å²).
 
 ### [x] Benchmark Wilson B: phenix.xtriage vs CCP4 ctruncate — GitHub #19
 

@@ -123,6 +123,12 @@ against the value in the deposition's Table 1, which is the harness tiebreaker.
   divergence — which is the right direction for a tolerance, but means the number should not be cited
   as "ML vs straight-line disagree by 14 %" in isolation.
 - Merged intensities only. Entries depositing amplitudes are out of scope by construction.
+- **Single-block sf-cifs only.** `cif2mtz` converts the first `data_` block, so a multi-block entry
+  (several crystals, or native/derivative datasets) would be benchmarked on an arbitrary block and
+  its `d_min` might not describe the dataset the entry's stated resolution refers to. The script now
+  skips such entries loudly ([#27](https://github.com/realmarcin/protstruct_review/issues/27)).
+  Checked retroactively: **none of the 24 datasets above is multi-block**, so the guard did not
+  change any published number.
 - One version pair: PHENIX 2.0-5936 (xtriage) and CCP4 9.0.015 (ctruncate).
 - 24 datasets, sampled newest-first per resolution bin from entries with released experimental data.
   Recent depositions may under-represent older processing pipelines.

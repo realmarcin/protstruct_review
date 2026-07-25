@@ -157,12 +157,12 @@ criteria:
         max_value: 200.0
         text: "< ~200 Å² is a crystal-packing contact, not a biological interface"
     cross_tool_agreement:
-      tolerance: "|Δ| ≤ 3 % of the mean, or 60 Å², whichever is larger"
+      tolerance: "|Δ| ≤ 3 % of the mean, or 30 Å², whichever is larger"
       tools: "biotite SASA vs PISA (PDBe API)"
-      precondition: "matched probe radius (1.4 Å), protein-only atom selection, and PISA's per-side interface_area doubled; one-sided — biotite read high in 26/26 benchmark interfaces, so a negative Δ is off-distribution"
+      precondition: "matched probe radius (1.4 Å), protein-only atom selection, and PISA's per-side interface_area doubled; chain pairs that are fragments of one molecule must be excluded first (they are not interfaces); one-sided — biotite read high in 25/25 benchmark interfaces, so a negative Δ is off-distribution"
       provenance:
         - benchmark
-      citation: "ref/research/tolerance_benchmark_interface_bsa.md — 26 interfaces / 14 entries, median |Δ| 1.3 %, p90 3.6 % (scripts/bench_t16_bsa_vs_pisa.py, issue #18)"
+      citation: "ref/research/tolerance_benchmark_interface_bsa.md — 25 interfaces / 17 entries, median |Δ| 1.2 %, p90 2.4 % (scripts/bench_t16_bsa_vs_pisa.py, issues #18 and #25)"
       provisional: false
     example_measurements:
       - structure_id: 1sar
@@ -185,14 +185,14 @@ criteria:
         tool: biotite SASA
         source: "scripts/bench_t16_bsa_vs_pisa.py (chains E/I; PISA 1284.7 Å² per side = 2569.5 total, Δ +2.1 %)"
         verdict: normal
-        interpretation: "RNase A-RNase inhibitor, a very large obligate interface; the 3 % relative term binds here, not the 60 Å² floor."
-      - structure_id: 1cho
-        value_numeric: 472.9
+        interpretation: "RNase A-RNase inhibitor, a very large obligate interface; the 3 % relative term binds here, not the 30 Å² floor."
+      - structure_id: 1vfb
+        value_numeric: 697.6
         unit: "Å²"
         tool: biotite SASA
-        source: "scripts/bench_t16_bsa_vs_pisa.py (chains E/G; PISA 215.9 Å² per side = 431.9 total, Δ +9.1 %)"
+        source: "scripts/bench_t16_bsa_vs_pisa.py (chains A/C; PISA 336.2 Å² per side = 672.4 total, Δ +3.7 %)"
         verdict: borderline
-        interpretation: "Worst benchmark disagreement, and the smallest interface measured (216 Å² per side) — just above the ~200 Å² crystal-contact threshold. Small interfaces are where relative agreement is worst and the measurement means least; the 60 Å² absolute floor covers this case."
+        interpretation: "Worst relative disagreement in the benchmark, on one of its smallest interfaces (336 Å² per side) — but only 25.2 Å² absolute. Small interfaces are where relative agreement is worst and the measurement means least; the 30 Å² floor is what covers this case."
 
   - id: T13_wilson_b
     name: Wilson B-factor
