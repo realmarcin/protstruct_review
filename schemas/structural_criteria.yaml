@@ -91,6 +91,7 @@ enums:
       catalog:
       template:
       calibration:
+      benchmark:
 
 # ----------------------------------------------------------------------------
 # Classes

@@ -1,6 +1,15 @@
 .DS_Store
 __pycache__/
 *.pyc
+
+# Benchmark download/work caches (scripts/bench_*.py). These hold deposited PDB,
+# PISA JSON and reflection files — re-downloadable, and large. Both scripts now
+# default outside the working tree, but an explicit `--cache .` should still not
+# be committable.
+.bench_cache_t16/
+bench_cache_t16/
+.bench_cache_t13/
+bench_cache_t13/
 schemas/json-schema/
 .claude/scheduled_tasks.lock
 .claude/*.lock
