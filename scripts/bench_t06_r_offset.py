@@ -46,7 +46,6 @@ from typing import Any
 RCSB_SF = "https://files.rcsb.org/download/{pdb_id}-sf.cif"
 RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 RCSB_CIF = "https://files.rcsb.org/download/{pdb_id}.cif"
-CCP4_SETUP = "/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/bin/ccp4.setup-sh"
 MODEL_VS_DATA = str(Path.home() / "phenix-2.0-5936" / "phenix_bin" / "phenix.model_vs_data")
 
 _R_WORK = re.compile(r"^\s*r_work:\s*([\d.]+)\s*$", re.M)
@@ -55,12 +54,6 @@ _RESO = re.compile(r"Resolution range:\s*([\d.]+)\s+([\d.]+)")
 
 # Amplitude column names cif2mtz may produce, in preference order.
 _F_PAIRS = (("FP", "SIGFP"), ("F", "SIGF"), ("FOBS", "SIGFOBS"))
-
-
-def sh(cmd: str, timeout: int = 3600) -> subprocess.CompletedProcess:
-    """Run `cmd` under bash with the CCP4 environment sourced."""
-    return subprocess.run(["bash", "-c", f"source {CCP4_SETUP} >/dev/null 2>&1; {cmd}"],
-                          capture_output=True, text=True, timeout=timeout)
 
 
 def fetch(url: str, dest: Path) -> Path | None:
@@ -143,7 +136,18 @@ def to_mtz(sf: Path, work: Path) -> tuple[Path, tuple[str, str], str] | None:
 
 
 def run_model_vs_data(model: Path, mtz: Path, work: Path) -> dict[str, Any] | None:
-    """PHENIX r_work / r_free and the resolution range it used."""
+    """PHENIX r_work / r_free and the resolution range it used.
+
+    `model_vs_data` emits **two** result blocks: the first over the data as given, the
+    second re-run inside the resolution limits recorded in the model header. On 28JJ
+    those give r_work 0.2424 (64.79-2.10 Å) and 0.2231 (64.79-2.30 Å), and the second
+    block reports the 26047 excluded reflections as "F-obs outliers".
+
+    The **first** block is the one to read: the gemmi side is run at the `d_min` parsed
+    from that same block, so both cover the same range. `.search()` returning the first
+    match is therefore load-bearing, not incidental — switching to the last match would
+    silently change the comparison by up to 0.02 in R, the whole width of the tolerance.
+    """
     log = work / f"mvd_{model.stem}.log"
     if not log.exists() or not _R_WORK.search(log.read_text(errors="ignore")):
         subprocess.run(["bash", "-c", f"cd {work} && {MODEL_VS_DATA} {model} {mtz} > {log} 2>&1"],

@@ -30,21 +30,35 @@ this pairing is inside the class.
 the **first chain only**, while `phenix.superpose_models` matches all chains. Both settings are run
 so the effect is measured rather than assumed.
 
-Test set: 12 pairs of independently deposited structures — same protein re-deposited, same protein
-in a different state, and one homolog pair (hen vs human lysozyme, ~60 % identity). Two pairs failed
-and are reported below rather than dropped silently.
+Test set: 22 pairs of independently deposited structures — same protein re-deposited, same protein
+in a different state, and **homolog / cross-species pairs** (lysozymes, papain vs actinidin, trypsin
+vs tonin, barnase vs binase). The homologs matter: re-depositions of one protein leave the aligners
+almost no room to disagree, so a floor measured only on those would be optimistic
+([#30](https://github.com/realmarcin/protstruct_review/issues/30)). Two pairs failed and are
+reported below rather than dropped silently.
 
 ## Results
 
-TM-align with `-ter 0`; ΔRMSD and ΔN are PHENIX − TM-align.
+TM-align with `-ter 0`; ΔRMSD and ΔN are PHENIX − TM-align. Last column is ΔN with TM-align's
+default (first chain only), for comparison.
 
-| Pair | TM-score | TM-align RMSD / N | PHENIX RMSD / N | ΔRMSD (Å) | ΔN | ΔN, TM-align default |
+| Pair | TM-score | TM-align RMSD / N | PHENIX RMSD / N | ΔRMSD (Å) | ΔN | ΔN (default) |
 |---|---:|---|---|---:|---:|---:|
-| 1A2P/1BNI | 0.993 | 1.08 / 324 | 1.58 / 293 | +0.50 | −31 | +185 |
-| 4INS/1ZNI | 0.435 | 1.65 / 97 | 1.50 / 82 | −0.15 | −15 | +61 |
+| 1TON/2PTN | 0.932 | 1.72 / 221 | 1.06 / 186 | −0.66 | −35 | −35 |
+| 1A2P/1BNI | 0.974 | 1.08 / 324 | 1.58 / 293 | +0.50 | −31 | +185 |
+| 4INS/1ZNI | 0.851 | 1.65 / 97 | 1.50 / 82 | −0.15 | −15 | +61 |
+| 1EST/1BRU | 0.980 | 0.78 / 240 | 0.69 / 236 | −0.09 | −4 | −4 |
+| 2ACT/9PAP | 0.971 | 0.97 / 210 | 0.86 / 212 | −0.11 | +2 | +2 |
 | 1MBN/1MBO | 0.987 | 0.61 / 153 | 0.46 / 152 | −0.15 | −1 | −1 |
+| 1PPN/9PAP | 0.997 | 0.29 / 211 | 0.29 / 212 | +0.00 | +1 | +1 |
 | 1UBQ/1UBI | 0.999 | 0.09 / 76 | 0.09 / 76 | +0.00 | 0 | 0 |
 | 1LYZ/1LZ1 | 0.962 | 0.76 / 129 | 0.78 / 129 | +0.02 | 0 | 0 |
+| 4LYZ/1LZ1 | 0.965 | 0.72 / 129 | 0.74 / 129 | +0.02 | 0 | 0 |
+| 2LYZ/1LZ1 | 0.970 | 0.66 / 129 | 0.67 / 129 | +0.01 | 0 | 0 |
+| 1AKI/1LZ1 | 0.973 | 0.62 / 129 | 0.62 / 129 | +0.00 | 0 | 0 |
+| 1LZ1/1LZ4 | 0.997 | 0.23 / 130 | 0.23 / 130 | +0.00 | 0 | 0 |
+| 1BNI/1RNB | 0.979 | 0.46 / 108 | 0.47 / 108 | +0.01 | 0 | 0 |
+| 2CI2/1YPA | 0.965 | 0.54 / 64 | 0.54 / 64 | +0.00 | 0 | 0 |
 | 2PTN/1TPO | 1.000 | 0.09 / 223 | 0.09 / 223 | +0.00 | 0 | 0 |
 | 7RSA/5RSA | 0.999 | 0.15 / 124 | 0.15 / 124 | +0.00 | 0 | 0 |
 | 1CA2/2CBA | 0.992 | 0.17 / 256 | 0.17 / 256 | +0.00 | 0 | 0 |
@@ -53,8 +67,8 @@ TM-align with `-ter 0`; ΔRMSD and ΔN are PHENIX − TM-align.
 
 | Subset | n | median \|ΔRMSD\| | max \|ΔRMSD\| |
 |---|---:|---:|---:|
-| Same selection (ΔN = 0) | 7 | 0.00 | **0.02** |
-| Different selection (ΔN ≠ 0) | 3 | 0.15 | **0.50** |
+| Same selection (ΔN = 0) | 13 | 0.00 | **0.02** |
+| Different selection (ΔN ≠ 0) | 7 | 0.15 | **0.66** |
 
 Failures, both PHENIX-side: **4PTI/5PTI** — `phenix.superpose_models` rejects 4PTI's
 `HETATM ... UNK UNX` records for lacking an element in columns 77–78; **2TRX/1XOB** —
@@ -64,14 +78,18 @@ TM-align handled both pairs.
 ## Findings
 
 **1. On a matched selection the two aligners agree to 0.02 Å — the ±0.10 Å tolerance is 5× looser
-than the tools require.** Seven pairs land on identical residue counts, and six of those give
-identical RMSD to two decimals. This is a genuine noise floor, not a coincidence of easy pairs: it
-holds across RMSDs from 0.09 to 0.78 Å and across 76–256 aligned residues.
+than the tools require.** Thirteen pairs land on identical residue counts and none disagrees by more
+than 0.02 Å. This is not an artefact of easy pairs: it holds across RMSDs from 0.09 to 0.78 Å, across
+64–256 aligned residues, and — the point of adding them — across genuine homolog pairs
+(hen vs human lysozyme at ~60 % identity, barnase vs binase, papain vs actinidin) as well as
+re-depositions of one protein. The three largest matched-selection disagreements (0.02 Å) are all
+homolog pairs, so the floor does rise with structural divergence; it just rises very little.
 
-**2. Off a matched selection the tolerance is meaningless.** Three pairs disagree on which residues
-to align, and their ΔRMSD runs to 0.50 Å — 5× the tolerance. Note **1MBN/1MBO**: a difference of a
-**single residue** (153 vs 152) moved the RMSD by 0.15 Å. Selection is not a second-order correction
-to this measurement; it dominates it, and one residue is enough.
+**2. Off a matched selection the tolerance is meaningless.** Seven pairs disagree on which residues
+to align, and their ΔRMSD runs to **0.66 Å** — 22× the new tolerance. A **single-residue** difference
+can be enough: 1MBN/1MBO (153 vs 152) moved the RMSD by 0.15 Å. It is not always enough — 1PPN/9PAP
+also differs by one residue and agrees to 0.00 Å — but there is no way to tell which case you are in
+without comparing the counts, which is exactly why the count is a gate rather than a hint.
 
 **3. Most of the selection disagreement is chain multiplicity, and it is configurable.** With
 TM-align's default (first chain only), ΔN reaches **185** residues on 1A2P/1BNI — PHENIX matched all
@@ -79,19 +97,22 @@ three barnase chains, TM-align one. With `-ter 0` the same pair drops to ΔN = 3
 real alignment difference; the 185 was a settings artefact, and it is the kind that reads as a
 catastrophic disagreement when nothing is actually wrong.
 
-**4. ±2 residues holds where it can hold.** Seven of ten pairs agree exactly and one differs by 1.
-The two failures (−15, −31) are multi-chain, multi-copy cases where the aligners genuinely choose
-different subsets — not noise to be absorbed by widening the tolerance.
+**4. ±2 residues holds where it can hold.** Thirteen of twenty pairs agree exactly, two differ by
+one and one by two — all inside ±2. The four that fail it (−4, −15, −31, −35) are multi-chain or
+multi-copy cases where the aligners genuinely choose different subsets, plus 1TON/2PTN where
+TM-align aligns 35 more residues of a 221-residue chain than PHENIX does. These are real
+disagreements about the alignment, not noise to be absorbed by widening the tolerance.
 
 ## Applied tolerances
 
 > **CA RMSD: |Δ| ≤ 0.03 Å, and only when the two aligners report the same aligned-residue count.**
 > If the counts differ — even by one — the RMSDs are over different atom sets and must not be
-> compared; report both with their counts instead. Observed: 0.02 Å max on matched selections,
-> 0.50 Å max on unmatched.
+> compared; report both with their counts instead. Observed: 0.02 Å max on matched selections
+> (13/20 pairs), 0.66 Å max on unmatched.
 >
 > **Aligned-residue count: ± 2 residues**, within one aligner class, **with matched chain handling**
-> (`TMalign -ter 0` against a multi-chain-matching aligner). Confirmed: 7/10 exact, 1 pair off by 1.
+> (`TMalign -ter 0` against a multi-chain-matching aligner). Confirmed: 13/20 exact, 2 off by one,
+> 1 off by two; the 4 that exceed ±2 are multi-chain or multi-copy cases.
 > A larger difference is a real disagreement about the alignment, and is the signal to inspect it,
 > not to widen the band.
 
@@ -101,8 +122,8 @@ and gains the chain-handling precondition.
 
 ## Scope limits
 
-- 10 pairs, all X-ray, all single-domain or small multimers, TM-score 0.44–1.00. Remote homologs
-  (TM-score < 0.4) and large multi-domain assemblies are unmeasured; the same-count condition is
+- 20 pairs, all X-ray, all single-domain or small multimers, TM-score 0.85–1.00. **Remote** homologs
+  (TM-score < 0.5) and large multi-domain assemblies are unmeasured; the same-count condition is
   expected to fail far more often there, which pushes those comparisons into the "report both"
   branch rather than into a wrong number.
 - Only one aligner from each side. `gemmi align`, ChimeraX `matchmaker` and US-align are documented

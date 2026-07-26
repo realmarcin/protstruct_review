@@ -471,7 +471,7 @@ criteria:
       precondition: "VOID unless both aligners report the same aligned-residue count — a difference of even ONE residue moved the RMSD by 0.15 Å (1MBN/1MBO); when counts differ, report both RMSDs with their counts instead of a Δ. Also requires morph=False trim=False on the PHENIX side and -ter 0 on the TM-align side"
       provenance:
         - benchmark
-      citation: "ref/research/tolerance_benchmark_superposition.md — 10 pairs; matched-selection max |Δ| 0.02 Å (7/10 pairs), unmatched up to 0.50 Å (scripts/bench_t01_superposition.py)"
+      citation: "ref/research/tolerance_benchmark_superposition.md — 20 pairs incl. homologs; matched-selection max |Δ| 0.02 Å (13/20 pairs), unmatched up to 0.66 Å (scripts/bench_t01_superposition.py, issue #30)"
       provisional: false
     example_measurements:
       - structure_id: 1lyz
@@ -480,7 +480,7 @@ criteria:
         tool: phenix.superpose_models
         source: "scripts/bench_t01_superposition.py (vs 1LZ1; TM-align 0.76 Å over the same 129 residues, Δ +0.02)"
         verdict: normal
-        interpretation: "Hen vs human lysozyme, ~60 % identity — the largest matched-selection disagreement in the benchmark, and still well inside 0.03 Å."
+        interpretation: "Hen vs human lysozyme, ~60 % identity — tied for the largest matched-selection disagreement in the benchmark (with 4LYZ/1LZ1), and still well inside 0.03 Å. The three largest matched disagreements are all homolog pairs, so the floor rises with divergence — but only to 0.02 Å."
       - structure_id: 1mbn
         value_numeric: 0.46
         unit: "Å"

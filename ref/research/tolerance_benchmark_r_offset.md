@@ -31,7 +31,7 @@ Test set: 15 X-ray entries, 1.20–2.92 Å, R_work 0.127–0.255, work sets of 4
 drawn resolution-stratified from RCSB and filtered to entries that deposited **amplitudes** with a
 free-flag column.
 
-### Two traps that cost more than the effect being measured
+### Three traps, each worth more than the effect being measured
 
 - **Free-flag convention.** Getting it backwards computes R-free and calls it R-work — worth about
   **+0.06** in R, four times the offset being measured. Two conventions occur and both appear in
@@ -45,6 +45,11 @@ free-flag column.
   on a symmetry mismatch. `gemmi cif2mtz` preserves the deposited setting. The MTZ is also stripped
   to H K L + amplitudes + free flags, because depositions carrying FC/PHIC make model_vs_data abort
   with "Multiple equally suitable arrays of observed xray data found".
+- **Which PHENIX number.** `model_vs_data` emits two result blocks — the first over the data as
+  given, the second re-run inside the resolution limits in the model header. On 28JJ these differ by
+  0.019 in R (0.2424 over 64.79–2.10 Å vs 0.2231 over 64.79–2.30 Å), which is the entire width of
+  the tolerance, and the second block reports the 26047 excluded reflections as "F-obs outliers".
+  The **first** block is used, matched by the `d_min` the gemmi side is run at.
 
 ## Results
 
@@ -108,4 +113,9 @@ scaling freedom by design.
   since the conversion would add a code path under test.
 - `gemmi sfcalc` offers no per-bin scaling, so the offset cannot be reduced by configuring gemmi
   differently — it is structural to the comparison.
+- **Outlier rejection is asymmetric.** PHENIX excludes its own F-obs outliers from `r_work` (3–31
+  reflections per entry in the first block); the gemmi-side sum here rejects nothing. At worst that
+  is 31/10166 ≈ 0.3 % of reflections, and the affected entries are not the ones with the largest
+  offsets, but it is part of the measured offset. Reproducing PHENIX's rejection criterion on the
+  gemmi side was rejected as a fix: it would import the code path under test.
 - One version pair: PHENIX 2.0-5936 and gemmi 0.7.5.

@@ -64,6 +64,19 @@ DEFAULT_PAIRS = [
     ("4INS", "1ZNI"),  # insulin
     ("1HEW", "1HEL"),  # lysozyme, complex vs free
     ("3EST", "1EST"),  # elastase
+    # Homologs and cross-species pairs. Re-depositions of one protein leave the
+    # aligners almost no room to disagree, so a floor measured only on those would be
+    # optimistic; these span TM-score 0.93-1.00 at RMSD 0.23-1.7 Å (issue #30).
+    ("1LZ1", "1LZ4"),  # human lysozyme, two forms
+    ("2LYZ", "1LZ1"),  # hen vs human lysozyme
+    ("1AKI", "1LZ1"),  # hen vs human lysozyme, different crystal form
+    ("4LYZ", "1LZ1"),  # hen vs human lysozyme, different crystal form
+    ("1BNI", "1RNB"),  # barnase vs binase
+    ("2CI2", "1YPA"),  # chymotrypsin inhibitor 2
+    ("1TON", "2PTN"),  # tonin vs trypsin
+    ("1EST", "1BRU"),  # elastase, two forms
+    ("1PPN", "9PAP"),  # papain
+    ("2ACT", "9PAP"),  # actinidin vs papain
 ]
 
 
