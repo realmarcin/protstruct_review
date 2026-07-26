@@ -116,12 +116,19 @@ published**.
   matched-convention clashscore residual (median 0.115): it cannot be H placement, so it is the
   clash-counting step.
 - **Restraint library vs implementation**: isolating the library inside PHENIX (CDL vs Engh & Huber)
-  shows it accounts for only **9 %** of the bond-length gap — PR #28 attributed it to the library by
-  analogy with bond angles. Corrected. For **angles** the framing does hold (51 %; median 0.265°,
-  an in-repo confirmation of the 0.3–0.4° literature figure). Matched-library bond floor: 0.006 Å,
-  barely tighter than the cross-library 0.008 Å.
+  shows it accounts for only **21 %** of the bond-length gap on valid (matched-bond-count) models —
+  PR #28 attributed it to the library by analogy with bond angles. Corrected. For **angles** the
+  framing does hold (51 %; median 0.265°, an in-repo confirmation of the 0.3–0.4° literature figure).
+  Matched-library bond floor: 0.006 Å, barely tighter than the cross-library 0.008 Å.
+- **H-atom count** (found while closing the flip gap): PR #28's ±0.1 % was measured on *one builder
+  in two conventions*, not on the two builders the tolerance names. On the right pair, protein-only
+  models agree **exactly** but ligand-bearing ones diverge up to **3.96 %** — the two distributions
+  ship different **het dictionaries** (`USER  MOD` header: 30TW `std=5902` vs `std=5155`). Three
+  models exceed even the original ±2 %. Tolerance corrected to "identical for protein-only; void when
+  non-water hetero is present unless the het dictionaries match".
 - **L-test ⟨|L|⟩**: median |Δ| 0.006, 25/27 inside ±0.02, twin call agreed **27/27**. The
-  "matched resolution range" precondition held in **0/27** — ctruncate restricts the L-test by a
+  "matched resolution range" precondition held in **0 of the 18** datasets where ctruncate reported
+  its range (9 unknown) — it restricts the L-test by a
   median 0.46 Å and exposes no flag to change it, so the precondition is unachievable and is now
   stated as a caveat.
 

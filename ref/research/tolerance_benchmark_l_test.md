@@ -31,7 +31,7 @@ method independence. The scale is narrow: the whole physical range is 0.500 (unt
 | exceeding ±0.02 | **2 / 27** (30IZ +0.030, 9PLC −0.047) |
 | same twin/no-twin call | **27 / 27** |
 | max \|Δ\| as a fraction of the full 0.125 scale | 37.6 % |
-| **datasets where the resolution ranges matched** | **0 / 27** |
+| resolution ranges **matched** | **0 / 18** (9 more: ctruncate printed no range) |
 
 The worst cases:
 
@@ -46,7 +46,10 @@ The worst cases:
 ## Findings
 
 **1. The tolerance's own precondition is never satisfied.** "Matched resolution range" held in
-**0 of 27** datasets. `ctruncate` deliberately restricts the L-test to a lower-resolution subset —
+**0 of the 18 datasets where the range is known**; ctruncate printed no range for the other 9, and
+those are recorded as *unknown* rather than counted as mismatches.
+
+`ctruncate` deliberately restricts the L-test to a lower-resolution subset —
 by a median of **0.46 Å** relative to the data's d_min — while `xtriage` analyses the full range.
 Neither program's installed build exposes a flag to force the other's range (`ctruncate`'s usage
 line offers only `-mtzin/-mtzout/-colin/-colano`). So the tolerance as written has never been, and
@@ -68,8 +71,9 @@ badly overstate the precision; the denominator is 0.125, not 1.
 ## Applied tolerance
 
 > **⟨|L|⟩: |Δ| ≤ 0.02, and the same twin/no-twin call** — `xtriage` vs `ctruncate`. The
-> **"matched resolution range" precondition is unachievable with default builds** (0/27 datasets;
-> ctruncate restricts the L-test by a median 0.46 Å and exposes no flag to change it), so it is
+> **"matched resolution range" precondition is unachievable with default builds** (matched in 0 of
+> the 18 datasets where ctruncate reported its range, 9 more unknown; it restricts the L-test by a
+> median 0.46 Å and exposes no flag to change it), so it is
 > restated as a **caveat**: expect the ranges to differ, and expect ~2 in 27 datasets to exceed
 > ±0.02 for that reason alone. **The twin call is the load-bearing half** — it agreed 27/27 — and
 > a numeric mismatch with an agreeing call is not a finding. Both programs implement Padilla–Yeates,
@@ -80,9 +84,10 @@ badly overstate the precision; the denominator is 0.125, not 1.
 
 - Same-method comparison by construction; a genuinely independent twinning test (e.g. the
   Britton/H-test family) is not benchmarked here.
-- `ctruncate` did not report its analysis range for 9 of 27 datasets, so the range mismatch could
-  only be quantified on 18 — but since it matched in none of those, treating all 27 as
-  off-precondition is the conservative reading.
+- `ctruncate` did not report its analysis range for 9 of 27 datasets. Those are tracked as a third
+  state (`unknown`), not folded into "mismatched": the claim is 0/18, and the remaining 9 are
+  unmeasured. Their |Δ| distribution (median 0.004, max 0.030) is indistinguishable from the
+  mismatched group's, which is consistent with — but not proof of — their also being mismatched.
 - Only one dataset in the set is anywhere near the twinning boundary, so the "same call" result is
   weak evidence about *borderline* twinning, which is exactly where a call would matter most.
 - One version pair: PHENIX 2.0-5936, CCP4 9.0.015.

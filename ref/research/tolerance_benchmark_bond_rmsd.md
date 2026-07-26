@@ -71,7 +71,8 @@ tolerance is exceeded by the *typical* case, not the tail. The direction is fixe
 `tolerance_benchmark_restraint_library.md`.** This section originally attributed the gap to the
 restraint library, by analogy with the review's bond-angle finding. A follow-up benchmark isolated
 the library inside a single implementation (PHENIX with CDL vs Engh & Huber) and found it accounts
-for only **9 %** of the gap — median 0.00042 Å of 0.00478 Å. The remaining ~91 % is implementation:
+for **21 %** of the gap on matched-bond-count models (median 0.00085 of 0.00405 Å; 9 % across all
+17, deflated by the count-mismatched models). The rest is implementation:
 how the two tools enumerate and sum bond restraints. The tolerance below is unaffected; its
 *explanation* was wrong, which matters because "match the libraries" is useless advice when the
 library is not the problem. For bond **angles** the library-conditional framing does hold (51 % of
@@ -87,7 +88,7 @@ mismatch means the two RMSDs are sums over different restraint populations and a
 
 > **|Δ| ≤ 0.008 Å, and only when both tools restrain the same number of bonds.** With **matched
 > restraint libraries** the tolerance is **|Δ| ≤ 0.006 Å** — barely tighter, because the library is
-> only ~9 % of the disagreement (`tolerance_benchmark_restraint_library.md`). Expect gemmi/CCP4-library figures to read
+> only ~21 % of the disagreement (`tolerance_benchmark_restraint_library.md`). Expect gemmi/CCP4-library figures to read
 > **high** against PHENIX/CDL; a negative Δ is off-distribution. When the bond counts differ (11/17
 > here), the comparison is **void**: report both figures with their counts rather than a Δ.
 

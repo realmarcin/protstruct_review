@@ -18,6 +18,11 @@ category are compared, because an `X`-vs-`K` disagreement is a weaker signal tha
 `F`-vs-`K`: the first is two builders hedging differently on an ambiguous residue,
 the second is a genuine conflict about the model.
 
+It also compares the **H-atom count** between the two builders, which is the other
+half of the H-placement tolerance and the comparison that tolerance actually names.
+(PR #28 measured H count between two *conventions* of one builder instead, which is
+a different quantity — see `ref/research/tolerance_benchmark_flip_sets.md`.)
+
 Usage:
     python3 scripts/bench_t14_flip_sets.py 1ABC 2DEF --cache DIR --json out.json
     python3 scripts/bench_t14_flip_sets.py --ids-file ids.json --cache DIR
@@ -27,6 +32,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import statistics
 import subprocess
 import sys
 import tempfile
@@ -46,6 +52,18 @@ _FLIP = re.compile(
     r"(?P<category>[A-Z])\(")
 
 FLIPPABLE = {"ASN", "GLN", "HIS"}
+
+
+def hydrogen_count(model_h: Path) -> int:
+    """Hydrogens in a built model (element column, not name heuristics)."""
+    return sum(1 for line in model_h.read_text(errors="ignore").splitlines()
+               if line.startswith(("ATOM", "HETATM")) and line[76:78].strip() == "H")
+
+
+def het_components(model: Path) -> set[str]:
+    """Non-water hetero components present — the ones a het dictionary must cover."""
+    return {line[17:20].strip() for line in model.read_text(errors="ignore").splitlines()
+            if line.startswith("HETATM") and line[17:20].strip() != "HOH"}
 
 
 def fetch(pdb_id: str, cache: Path) -> Path | None:
@@ -106,6 +124,8 @@ def collect(pdb_ids: list[str], cache: Path) -> tuple[list[dict], list[dict]]:
         if phx is None or std is None:
             skipped.append({"pdb_id": pdb_id, "reason": "an H builder failed"})
             continue
+        n_h_phx, n_h_std = hydrogen_count(phx), hydrogen_count(std)
+        het = het_components(model)
         a, b = flip_calls(phx), flip_calls(std)
         if not a and not b:
             print("  ! no flippable residues with USER MOD records — skipped", file=sys.stderr)
@@ -124,6 +144,11 @@ def collect(pdb_ids: list[str], cache: Path) -> tuple[list[dict], list[dict]]:
             "n_only_standalone": len(set(b) - set(a)),
             "n_flipped_phenix": sum(1 for v in a.values() if v[0]),
             "n_flipped_standalone": sum(1 for v in b.values() if v[0]),
+            "n_h_phenix": n_h_phx,
+            "n_h_standalone": n_h_std,
+            "h_count_delta_pct": round(100.0 * (n_h_phx - n_h_std) / n_h_std, 3) if n_h_std else None,
+            "het_components": sorted(het),
+            "has_het": bool(het),
             "n_decision_disagreements": len(decision_diffs),
             "n_category_only_disagreements": len(category_diffs),
             "decision_disagreements": [f"{c}{r} {n}" for c, r, n in decision_diffs],
@@ -132,8 +157,9 @@ def collect(pdb_ids: list[str], cache: Path) -> tuple[list[dict], list[dict]]:
         })
         print(f"  {len(shared)} shared residues, {rows[-1]['n_flipped_phenix']}/"
               f"{rows[-1]['n_flipped_standalone']} flipped, "
-              f"{len(decision_diffs)} decision diffs, {len(category_diffs)} category-only diffs",
-              file=sys.stderr)
+              f"{len(decision_diffs)} decision diffs, {len(category_diffs)} category-only diffs"
+              f" | H {n_h_phx}/{n_h_std} ({rows[-1]['h_count_delta_pct']:+.3f} %)"
+              f"{' het:' + ','.join(sorted(het)) if het else ''}", file=sys.stderr)
     return rows, skipped
 
 
@@ -142,8 +168,22 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     if not rows:
         return {"n": 0}
     shared = sum(r["n_shared"] for r in rows)
+
+    def h_stats(subset: list[dict]) -> dict[str, Any]:
+        values = sorted(abs(r["h_count_delta_pct"]) for r in subset
+                        if r["h_count_delta_pct"] is not None)
+        if not values:
+            return {"n": 0}
+        idx = min(len(values) - 1, max(0, round(0.9 * (len(values) - 1))))
+        return {"n": len(values), "abs_median": round(statistics.median(values), 3),
+                "abs_p90": round(values[idx], 3), "abs_max": round(values[-1], 3),
+                "n_exceeding_0.1_pct": sum(1 for v in values if v > 0.1)}
+
     return {
         "n_models": len(rows),
+        "h_count_all": h_stats(rows),
+        "h_count_protein_only": h_stats([r for r in rows if not r["has_het"]]),
+        "h_count_with_het": h_stats([r for r in rows if r["has_het"]]),
         "n_flippable_residues_compared": shared,
         "n_models_identical": sum(1 for r in rows if r["identical"]),
         "total_decision_disagreements": sum(r["n_decision_disagreements"] for r in rows),

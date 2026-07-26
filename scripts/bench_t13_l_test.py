@@ -70,9 +70,15 @@ def collect(cache: Path) -> tuple[list[dict], list[dict]]:
         xt_dmin = float(xt_reso.group(2)) if xt_reso else None
         ct_dmin = float(ct_range.group(2)) if ct_range else None
         # ctruncate reports the range it used for the analysis; xtriage reports the
-        # range of the data it read. A mismatch is the precondition failing.
-        range_matched = (xt_dmin is not None and ct_dmin is not None
-                         and abs(xt_dmin - ct_dmin) < 0.05)
+        # range of the data it read. Tri-state on purpose: ctruncate does not always
+        # print its range, and recording "unknown" as "mismatched" would silently
+        # inflate the headline claim about the precondition.
+        if xt_dmin is None or ct_dmin is None:
+            range_state = "unknown"
+        elif abs(xt_dmin - ct_dmin) < 0.05:
+            range_state = "matched"
+        else:
+            range_state = "mismatched"
 
         delta = xt_value - ct_value
         rows.append({
@@ -83,7 +89,7 @@ def collect(cache: Path) -> tuple[list[dict], list[dict]]:
             "abs_delta": round(abs(delta), 4),
             "xtriage_d_min": xt_dmin,
             "ctruncate_d_min": ct_dmin,
-            "resolution_range_matched": range_matched,
+            "resolution_range_state": range_state,
             "xtriage_call": twin_call(xt_value),
             "ctruncate_call": twin_call(ct_value),
             "same_call": twin_call(xt_value) == twin_call(ct_value),
@@ -92,7 +98,7 @@ def collect(cache: Path) -> tuple[list[dict], list[dict]]:
         })
         print(f"  {stem.upper():8} xtriage {xt_value:.3f}  ctruncate {ct_value:.3f}  "
               f"Δ {delta:+.4f}  d_min {xt_dmin}/{ct_dmin}  "
-              f"{'matched' if range_matched else 'RANGE MISMATCH'}", file=sys.stderr)
+              f"range {range_state}", file=sys.stderr)
     return rows, skipped
 
 
@@ -114,12 +120,13 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
             "abs_max": round(ordered[-1], 4),
         }
 
-    matched = [r for r in rows if r["resolution_range_matched"]]
+    by_state = {s: [r for r in rows if r["resolution_range_state"] == s]
+                for s in ("matched", "mismatched", "unknown")}
     return {
         "overall": stats(rows),
-        "matched_resolution_range": stats(matched),
-        "mismatched_resolution_range": stats([r for r in rows
-                                              if not r["resolution_range_matched"]]),
+        "matched_resolution_range": stats(by_state["matched"]),
+        "mismatched_resolution_range": stats(by_state["mismatched"]),
+        "unknown_resolution_range": stats(by_state["unknown"]),
         "same_twin_call": sum(1 for r in rows if r["same_call"]),
         "n_possibly_twinned_either": sum(1 for r in rows if "possibly_twinned"
                                          in (r["xtriage_call"], r["ctruncate_call"])),

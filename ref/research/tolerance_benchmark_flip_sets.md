@@ -44,15 +44,23 @@ builder's records — among the 634 **shared** residues there is not a single de
 
 ## Findings
 
-**1. The two builders are the same program.** Version strings are identical:
+**1. Same program, *different chemical dictionaries*.** Version strings are identical:
 
 ```
 $ phenix.reduce -version   → reduce.4.16.250520
 $ reduce -version          → reduce.4.16.250520
 ```
 
-`phenix.reduce` is the Richardson `reduce` binary, redistributed. The flip sets agree perfectly
-because there is only one implementation being run twice.
+`phenix.reduce` is the Richardson `reduce` binary, redistributed — so the flip *logic* is one
+implementation run twice. But the two distributions do **not** ship the same het dictionary, and the
+`USER  MOD` header records it:
+
+```
+30TW  phenix.reduce  ... std=5902, adj=71
+30TW  standalone     ... std=5155, adj=53
+```
+
+That difference is invisible on protein residues and decisive on ligands — see finding 4.
 
 **2. So the "same flip set" clause checks nothing for this tool pair.** A tolerance clause that is
 satisfied by construction gives false assurance: it reads as cross-tool corroboration and provides
@@ -68,9 +76,24 @@ convention, and left the cause open. Since both paths build hydrogens with the *
 `scripts/bench_t05_clashscore_h.py`). The H-build convention still dominates when it is
 *mismatched* (median 9.95); it is the matched-case residual that is now attributed correctly.
 
-**4. Flips are rare in deposited models, which limits the test.** Only 7 of 17 models had any flips
-at all, and one model (24MR) contributes 49 of the 56. Most deposited structures have already been
-flip-optimised before deposition, so a set of deposited coordinates under-samples exactly the
+**4. The H-count half of the tolerance was measured on the wrong pair, and fails on the right one.**
+PR #28 set "H-atom count within ± 0.1 %" from a comparison of *one builder in two conventions*
+(standalone `reduce` electron-cloud vs nuclear). The tolerance names a different pair — standalone
+`reduce` vs `phenix.reduce` — and on that pair:
+
+| Subset | n | median \|Δ\| | p90 | max | exceeding 0.1 % |
+|---|---:|---:|---:|---:|---:|
+| Protein-only models | 4 | 0.000 % | 0.000 % | **0.000 %** | 0 |
+| Models with non-water hetero | 13 | 0.058 % | 2.467 % | **3.955 %** | 6 |
+
+Protein hydrogens agree **exactly** — 12 of 18 models are identical to the atom. Every model that
+diverges is ligand-bearing (37AP/37AS: ADP, AMP, PEG, PG4; 37BG: ZN, BTB, SAM; 28SZ: NA, DXC;
+24MR: CA, GAL, NDG), and the divergence traces to the het-dictionary difference in finding 1. Three
+models exceed even the *original* ±2 %.
+
+**5. Flips are rare in deposited models, which limits the flip half of the test.** Only 7 of 17
+models had any flips at all, and one (24MR) contributes 49 of the 56. Most deposited structures have
+already been flip-optimised before deposition, so deposited coordinates under-sample exactly the
 residues this tolerance is about.
 
 ## Applied
@@ -80,6 +103,12 @@ residues this tolerance is about.
 > (reduce.4.16.250520)**. Treat this clause as a same-implementation identity check, not as cross-tool
 > corroboration. A meaningful flip-set comparison requires a genuinely independent H builder
 > (e.g. `reduce2`), which is not yet benchmarked here.
+>
+> **H-atom count: identical (Δ = 0) for protein-only models.** When non-water hetero components are
+> present the two distributions' het dictionaries differ and the count diverges by up to **3.96 %**,
+> so the comparison is **void unless both builders use the same het dictionary**. This replaces the
+> ± 0.1 % from PR #28, which was measured on one builder in two conventions rather than on the two
+> builders the tolerance names.
 
 ## Scope limits
 
@@ -88,6 +117,11 @@ residues this tolerance is about.
 - Deposited models are flip-optimised before deposition, so the 634 residues include few genuinely
   ambiguous cases. A perturbed or freshly-built model set would exercise the decision boundary much
   harder.
-- 6 residues appeared in only one builder's records; the cause was not investigated (most likely
-  altloc or occupancy handling at the record-writing stage).
+- 6 residues appeared in only one builder's records, in 3 ligand-bearing models (30TW, 24MR, 28SV).
+  This is the same het-dictionary difference: the distributions build different numbers of hydrogens
+  on hetero groups, which changes which nearby residues get a `USER  MOD` record. It is also where
+  the "56 vs 54 flipped" difference comes from — among *shared* residues there is not one
+  disagreement.
+- The flip-record parser keys on `(chain, resseq, resname)` and **ignores insertion codes**, so
+  models using them could mis-key. None of the 6 discrepancies traced to this, but it is untested.
 - One version: reduce 4.16.250520 on both sides.
