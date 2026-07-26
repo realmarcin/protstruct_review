@@ -89,6 +89,9 @@ def run_precision(model: Path) -> dict[str, Any]:
         "max_rmsf": round(max(vals), 3),
         "n_models": int(ca.shape[0]),
         "n_ca": len(vals),
+        # Raw per-residue values, so the ordered-core cutoff can be varied without
+        # recomputing the superposition (scripts/bench_t17_ordered_core.py).
+        "rmsf_values": vals,
     }
 
 

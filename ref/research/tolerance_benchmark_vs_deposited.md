@@ -1,0 +1,113 @@
+# Tolerance benchmark — four tolerances against the wwPDB validation report
+
+Settles, in one pass, `Ramachandran outlier %`, `Rotamer outlier %`, `R-free vs deposited` and
+`Completeness (overall)` from `ref/thresholds_and_standards.md`.
+
+```bash
+python3 scripts/bench_vs_deposited.py --ids-file <ids.json> --cache <dir> \
+    --mvd-cache <bench_t06 cache> --json <out.json>
+```
+
+## Configuration
+
+The reference is the **wwPDB validation report**, which the trust model already names as the
+tiebreaker:
+
+| Quantity | Local | Reference |
+|---|---|---|
+| Ramachandran outlier % | `phenix.ramalyze` | `key_validation_stats` → `protein_ramachandran` |
+| Rotamer outlier % | `phenix.rotalyze` | `key_validation_stats` → `protein_sidechains` |
+| R-free | `phenix.model_vs_data` | validation XML → `PDB-Rfree` (deposited) **and** `DCC_Rfree` (wwPDB-recomputed) |
+| Completeness | `phenix.model_vs_data` | validation XML → `DataCompleteness` |
+
+This is a **pipeline** comparison, not a method-independent one — wwPDB's geometry percentages are
+MolProbity-derived, as are PHENIX's. What it tests is whether a local run reproduces the deposited
+reference, which is exactly what these tolerances claim.
+
+**Completeness was reported as data-blocked and is not.** The PDBe *experiment* API exposes a
+`completeness` field that was null for all 10 entries checked; the validation report XML carries
+`DataCompleteness` for every entry tested.
+
+**One parsing trap.** The report's `<Entry>` attributes are hyphenated and prefixed —
+`DCC_Rfree`, `absolute-percentile-DCC_Rfree`, `high-resol-relative-percentile-DCC_Rfree`. A
+`(\w+)="..."` scan matches the *tail* of the prefixed ones and silently returns a percentile (1.36)
+where an R-free (0.2358) was wanted. `entry_attribute()` anchors on a non-name character.
+
+Test set: 18 entries with validation reports (of 24 attempted; 6 are mmCIF-only). R-free and
+completeness are available for the 9 that also have a `model_vs_data` run.
+
+## Results
+
+| Tolerance | n | median \|Δ\| | p90 | max | current band |
+|---|---:|---:|---:|---:|---|
+| Ramachandran outlier % | 17 | **0.00 pp** | 0.00 | **0.00 pp** | ± 0.5 pp |
+| Rotamer outlier % | 17 | 0.00 pp | 0.00 | **0.34 pp** | ± 0.5 pp |
+| R-free vs **deposited** | 9 | 0.0020 | 0.0097 | **0.0128** | ≤ 0.02 |
+| R-free vs **wwPDB-recomputed** | 9 | **0.0000** | 0.0033 | 0.0067 | — |
+| Completeness | 9 | 0.05 pp | 0.10 | **0.11 pp** | ± 1 pp |
+
+Per-entry R-free and completeness:
+
+| Entry | PHENIX R-free | deposited | wwPDB DCC | Δ vs deposited | completeness (PHENIX / wwPDB) |
+|---|---:|---:|---:|---:|---|
+| 12LO | 0.2360 | 0.2340 | 0.2358 | +0.0020 | 98.46 / 98.50 |
+| 30TW | 0.1916 | 0.2044 | 0.1949 | **−0.0128** | 99.69 / 99.61 |
+| 9LK0 | 0.2474 | 0.2456 | 0.2474 | +0.0018 | 99.98 / 99.97 |
+| 30IZ | 0.2381 | 0.2423 | 0.2381 | −0.0042 | 62.00 / 62.05 |
+| 37AP | 0.2001 | 0.1940 | 0.2001 | +0.0061 | 100.00 / 99.98 |
+| 24MR | 0.2710 | 0.2705 | 0.2707 | +0.0005 | 99.96 / 99.94 |
+| 11AF | 0.2679 | 0.2776 | 0.2746 | −0.0097 | 99.23 / 99.13 |
+| 28SW | 0.2951 | 0.2950 | 0.2951 | +0.0001 | 99.78 / 99.71 |
+| 28SX | 0.2851 | 0.2850 | 0.2851 | +0.0001 | 99.44 / 99.33 |
+
+## Findings
+
+**1. Ramachandran outlier % is reproduced exactly.** Zero difference on 17 of 17 entries — not
+"within 0.5 pp", *identical*. The ± 0.5 pp band is not a tolerance, it is unlimited headroom. Any
+non-zero difference against a wwPDB report is a signal worth investigating, not noise to absorb.
+
+**2. Rotamer outlier % is nearly exact**, with two exceptions: 30IZ (0.70 vs 0.50) and 9HW2 (0.87 vs
+1.21), max 0.34 pp. The ± 0.5 pp band is about right here, and it is the looser of the two geometry
+percentages for a reason — rotamer classification depends on the sidechain completeness and altloc
+handling that differ slightly between pipelines.
+
+**3. A local PHENIX run reproduces wwPDB's *recomputed* R-free almost exactly (median 0.0000, max
+0.0067) but differs from the *deposited* value by up to 0.0128.** Those are two different references
+and should not be conflated: `DCC_Rfree` is wwPDB re-deriving R-free from the deposited model and
+data — the same thing `model_vs_data` does — while `PDB-Rfree` is whatever the depositor's own
+refinement produced, with their software, their test set and their bulk-solvent treatment. Five of
+nine entries match DCC to four decimal places. The ± 0.02 band is correct for the deposited
+reference and roughly 3× too loose for the recomputed one.
+
+**4. Completeness agrees to 0.11 pp.** The ± 1 pp band is ~10× too loose. Note 30IZ at 62 % —
+agreement holds at low completeness too, so the tightening is not an artefact of easy cases.
+
+**5. Third-source corroboration for clashscore.** The validation XML also carries wwPDB's clashscore.
+Against the cctbx values measured in PR #28, over the 10 shared models: median |Δ| **0.00**, max
+0.16 (12LO 1.18/1.18, 37AP 2.49/2.49, 11AF 6.65/6.65, 28SZ 9.64/9.64 exact). Three independent
+pipelines — cctbx, standalone probe, wwPDB — now agree on clashscore far inside the ±1.0 band.
+
+## Applied tolerances
+
+> **Ramachandran outlier %: exact match expected (Δ = 0)** against a wwPDB validation report;
+> investigate any difference. Observed 0.00 pp on 17/17.
+>
+> **Rotamer outlier %: ± 0.5 pp** — confirmed, max observed 0.34 pp.
+>
+> **R-free: |Δ| ≤ 0.02 vs the deposited value** (max observed 0.0128), but **|Δ| ≤ 0.01 vs
+> `DCC_Rfree`**, the wwPDB-recomputed figure (max observed 0.0067, median 0.0000). State which
+> reference is being used — they differ by more than the tolerance.
+>
+> **Completeness: ± 0.2 pp** vs the validation report's `DataCompleteness` (max observed 0.11 pp),
+> replacing ± 1 pp.
+
+## Scope limits
+
+- MolProbity-derived on both sides for the geometry percentages, so this measures pipeline
+  reproducibility, not method independence.
+- R-free and completeness rest on 9 entries — the ones with both a validation report and a local
+  `model_vs_data` run. The geometry percentages rest on 17.
+- 6 of 24 candidate entries are mmCIF-only and were skipped; the benchmark does not yet read mmCIF
+  coordinates.
+- Recent depositions only, so all reports come from a current wwPDB pipeline version. Older entries
+  were validated by older pipelines and may agree less well.

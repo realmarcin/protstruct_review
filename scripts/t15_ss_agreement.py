@@ -61,9 +61,10 @@ def run_dssp(model: Path) -> dict[ResKey, str]:
         _fail("mkdssp not found on PATH — install DSSP (e.g. `brew install brewsci/bio/dssp`).")
     with tempfile.NamedTemporaryFile(suffix=".dssp", delete=False) as tmp:
         out_path = Path(tmp.name)
+    normalised = _normalise_for_dssp(model)
     try:
         proc = subprocess.run(
-            [exe, "--output-format", "dssp", str(model), str(out_path)],
+            [exe, "--output-format", "dssp", str(normalised), str(out_path)],
             capture_output=True, text=True,
         )
         if proc.returncode != 0 and not out_path.stat().st_size:
@@ -71,6 +72,34 @@ def run_dssp(model: Path) -> dict[ResKey, str]:
         return _parse_dssp(out_path.read_text())
     finally:
         out_path.unlink(missing_ok=True)
+        if normalised != model:
+            normalised.unlink(missing_ok=True)
+
+
+def _normalise_for_dssp(model: Path) -> Path:
+    """Rewrite the model through `gemmi convert` so mkdssp will read it.
+
+    mkdssp 4.x sniffs the input format and gets it wrong on PDB files downloaded
+    from RCSB — it tries to parse them as mmCIF and dies with "This file does not
+    seem to be an mmCIF file", followed by a cif-validator error naming a category
+    from the entry's own header. It is not specific to one entry: 1UBQ, 12LO and
+    every other RCSB `.pdb` tested fails, while the same coordinates rewritten by
+    `gemmi convert` are accepted. This script previously only ever ran on a
+    PHENIX-written file in `data/`, which is why the failure went unnoticed.
+
+    Falls back to the original path when gemmi is unavailable, so the failure mode
+    is mkdssp's own error rather than a missing-tool error from here.
+    """
+    if shutil.which("gemmi") is None:
+        return model
+    with tempfile.NamedTemporaryFile(suffix=".pdb", delete=False) as tmp:
+        converted = Path(tmp.name)
+    proc = subprocess.run(["gemmi", "convert", str(model), str(converted)],
+                          capture_output=True, text=True)
+    if proc.returncode != 0 or not converted.stat().st_size:
+        converted.unlink(missing_ok=True)
+        return model
+    return converted
 
 
 def _parse_dssp(text: str) -> dict[ResKey, str]:
