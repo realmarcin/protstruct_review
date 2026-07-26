@@ -73,6 +73,9 @@ Three specific gaps:
   refinement, so the false-negative side is unknown.
 - **One refinement protocol** (`phenix.refine`, 3 macro-cycles, default weights). REFMAC5/servalcat
   as a second refiner would show how much of the null spread is protocol-specific.
+- **Clashscore Δ is currently ungated** (issue #40): its null-case range is −2.70 to +10.39, so no
+  useful band exists. A larger set would show whether the +10.39 outlier is representative or a
+  one-off, and whether the even 4-up/4-down split holds.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

@@ -47,12 +47,16 @@ restraints). EM set: 2 entries (3 attempted; 13GH's `real_space_refine` failed).
 | 28SW | 0.1056 | 11.53 → **13.27** | 96.13 → **94.72** | 0.00 → **3.60** |
 | 11AF | 0.1067 | 6.65 → 6.46 | 93.45 → 93.45 | 6.64 → 4.55 |
 
-| Quantity | median Δ | p90 | max |
-|---|---:|---:|---:|
-| Cα shift | **0.072 Å** | 0.106 | **0.107 Å** |
-| clashscore | **+1.87** | +3.82 | **+10.39** |
-| Ramachandran favored | +0.23 pp | +1.28 | −1.41 pp (worst drop) |
-| rotamer outliers | +0.28 pp | +2.85 | **+3.60 pp** |
+| Quantity | signed median | worsened / improved | signed range |
+|---|---:|---:|---|
+| Cα shift | **0.072 Å** | n/a (a magnitude) | 0.008 → **0.107 Å** |
+| clashscore | **+0.78** | **4 / 4** | −2.70 → **+10.39** |
+| Ramachandran favored | 0.00 pp | 2 / 3 | **−1.41** → +1.28 pp |
+| rotamer outliers | 0.00 pp | 2 / 3 | −2.85 → **+3.60 pp** |
+
+Signed statistics are reported deliberately. An earlier revision quoted |Δ| medians — "clashscore
+median +1.87" — which reads as a systematic worsening when the split is in fact even (4 up, 4 down,
+signed median +0.78). For a degradation check the direction is the whole question.
 
 **How often a null re-refinement fails the tolerance as written:**
 
@@ -77,12 +81,16 @@ its own data moves it by a median of **0.072 Å** and up to **0.107 Å** — 5 o
 band without any modelling change at all. The band is tighter than the reproducibility of the
 refinement program it is meant to police.
 
-**2. Clashscore systematically *worsens* on re-refinement** — median **+1.87**, worst +10.39
-(28SX: 4.24 → 14.63). This is the opposite of the assumption behind a "did not degrade" check. The
-likely mechanism is that `phenix.refine` optimises a target in which the nonbonded term is one
-weighted contributor, while clashscore counts all-atom overlaps after H placement; a small
-coordinate shift that improves the refinement target can add contacts. Whatever the cause, a plain
-re-refinement fails this clause on 3 of 8 deposited structures.
+**2. Clashscore moves in both directions and its worst excursion is unbounded by any useful band.**
+The split is even — 4 of 8 worsened, 4 improved, signed median **+0.78** — but the range is −2.70 to
+**+10.39** (28SX: 4.24 → 14.63). The likely mechanism is that `phenix.refine` optimises a target in
+which the nonbonded term is one weighted contributor, while clashscore counts all-atom overlaps
+after H placement; a small coordinate shift that improves the refinement target can add contacts.
+
+The consequence for the tolerance is sharper than "widen the band". A Δ band that covers +10.39
+would permit a clashscore to quadruple, which is not a check; a tighter band is breached by a null
+re-refinement, which is the defect this benchmark exists to catch. **So clashscore Δ should not be
+gated at all** — see the applied section.
 
 **3. The absolute floors are quality bars, not refinement checks — and half the sample fails them at
 deposition.** Of the 8 deposited models, only **4/8** have clashscore ≤ 4, **4/8** have favored
@@ -110,16 +118,19 @@ apparent "Δ +0.12 Å, band exceeded" into "not measured".
 > correct refinements as degradation.
 >
 > **Geometry did not degrade — split the Δ from the floor.**
-> - Δ clause: **`clashscore_post ≤ clashscore_pre + 4`**, **`favored_post ≥ favored_pre − 1.5 pp`**,
->   **`rotamer outliers_post ≤ outliers_pre + 4 pp`**. These cover the observed null-refinement
->   spread (max +10.39 clashscore is the one outlier a Δ band cannot absorb — see below).
+> - Δ clause: **`favored_post ≥ favored_pre − 1.5 pp`** (worst null drop 1.41 pp) and
+>   **`rotamer outliers_post ≤ outliers_pre + 4 pp`** (worst null rise 3.60 pp). Both cover the
+>   observed null-refinement spread on 8/8 entries.
+> - **No clashscore Δ gate.** Its null-case range is −2.70 to +10.39: any band covering that would
+>   permit a clashscore to quadruple, and any tighter band is breached by a refinement that changed
+>   nothing. Report the clashscore Δ as informational.
 > - The absolute floors (clashscore ≤ 4, favored ≥ 97 %, rotamer outliers ≤ 2 %) are **quality bars,
 >   not refinement checks**. Half the deposited sample fails them. They should be evaluated and
 >   reported separately against §2's literature thresholds (Chen 2010 / Williams 2018), never used
 >   to excuse a degradation.
-> - **Clashscore is a poor degradation signal for X-ray refinement**: it worsened in 6 of 8 null
->   re-refinements. Treat a clashscore rise on its own as informational; require a second signal
->   (Ramachandran favored or rotamer outliers) before calling a refinement degrading.
+> - **Clashscore is a poor degradation signal for X-ray refinement**: it moved in both directions on
+>   a null re-refinement (4 up, 4 down) with a worst excursion of +10.39. Never call a refinement
+>   degrading on a clashscore rise alone; require Ramachandran favored or rotamer outliers to agree.
 >
 > **Map-model fit: `CC_mask_post ≥ CC_mask_pre − 0.01` retained**, with the caveat that a null
 > refinement already consumed 65 % of that band on one of two entries — revisit with a larger set.

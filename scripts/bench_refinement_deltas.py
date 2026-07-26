@@ -172,14 +172,29 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     if not rows:
         return {"n": 0}
 
-    def stats(key: str, signed: bool = False) -> dict[str, Any]:
+    def stats(key: str) -> dict[str, Any]:
+        """Signed AND absolute statistics.
+
+        For a degradation check the signed direction is the point — an absolute
+        median cannot distinguish "refinement systematically worsens this" from
+        "refinement moves it both ways". Reporting only |Δ| once made an even
+        4-up/4-down split read as a systematic +1.87 worsening.
+        """
         values = [r[key] for r in rows if r.get(key) is not None]
         if not values:
             return {"n": 0}
-        ordered = sorted(values if signed else (abs(v) for v in values))
-        idx = min(len(ordered) - 1, max(0, round(0.9 * (len(ordered) - 1))))
-        return {"n": len(values), "median": round(statistics.median(ordered), 4),
-                "p90": round(ordered[idx], 4), "max": round(ordered[-1], 4)}
+        absolute = sorted(abs(v) for v in values)
+        idx = min(len(absolute) - 1, max(0, round(0.9 * (len(absolute) - 1))))
+        return {
+            "n": len(values),
+            "signed_median": round(statistics.median(values), 4),
+            "n_worsened": sum(1 for v in values if v > 0),
+            "n_improved": sum(1 for v in values if v < 0),
+            "abs_median": round(statistics.median(absolute), 4),
+            "abs_p90": round(absolute[idx], 4),
+            "signed_min": round(min(values), 4),
+            "signed_max": round(max(values), 4),
+        }
 
     return {
         "n_entries": len(rows),
