@@ -411,7 +411,7 @@ criteria:
     cross_tool_agreement:
       tolerance: "|Δ| ≤ 0.008 Å"
       tools: "phenix.model_statistics (CDL) vs gemmi rmsz (CCP4 monomer library)"
-      precondition: "applies to DIFFERING restraint libraries; both tools must restrain the same number of bonds (only 6/17 benchmark models did — where counts differ, often ~2× from alternate-conformation handling, the comparison is VOID: report both figures with their counts). With MATCHED libraries the floor is far tighter and is not measured by this benchmark"
+      precondition: "both tools must restrain the same number of bonds (only 6/17 benchmark models did — where counts differ, often ~2× from alternate-conformation handling, the comparison is VOID: report both figures with their counts). With MATCHED libraries use |Δ| ≤ 0.006 Å — barely tighter, because the restraint library accounts for only ~21 % of the disagreement for bond LENGTHS on matched-count models (9 % across all models, deflated by count-mismatched ones; unlike bond angles, where it is a stable ~51 %)"
       provenance:
         - benchmark
       citation: "ref/research/tolerance_benchmark_bond_rmsd.md — 17 models; matched-count subset median |Δ| 0.0040 Å, max 0.0070 Å (scripts/bench_t05_bond_rmsd.py)"
@@ -431,7 +431,7 @@ criteria:
         source: "scripts/bench_t05_bond_rmsd.py (gemmi 0.0810 Å over 9544 bonds vs PHENIX's 4677, Δ +0.0667)"
         verdict: anomalous
         interpretation: "Bond counts differ by ~2×, so the two RMSDs sum over different restraint populations and the Δ is meaningless — the void condition applies."
-    notes: "Same mechanism the review already confirmed for bond angles: a model refined in PHENIX is optimised toward CDL targets, so scoring it against the CCP4 monomer library necessarily reports larger deviations. The direction is fixed, not random."
+    notes: "The direction is fixed, not random — gemmi read high in 17/17. The cause is NOT mainly the restraint library: isolating the library inside one implementation (PHENIX CDL vs Engh & Huber) moves bond RMSD by a median of only 0.00085 Å on matched-count models, 21 % of the cross-library gap (9 % across all 17), so the majority is implementation. This corrects an earlier attribution by analogy with bond angles, where the library IS about half the gap (median 0.265°). See ref/research/tolerance_benchmark_restraint_library.md."
 
   - id: T01_ca_rmsd
     name: Cα RMSD between superposed models

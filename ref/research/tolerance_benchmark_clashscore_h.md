@@ -66,7 +66,11 @@ disagreement is 17 % of the value. A clashscore of 30 compared to a tolerance of
 demand; that is tighter than these implementations support.
 
 **3. The H-count tolerance is ~150× too loose, and it checks the wrong thing.** Observed H-count
-differences are **0.013 % at worst** against an allowed 2 %. The count is essentially always
+differences are **0.013 % at worst** against an allowed 2 %. **Correction:** this compares one
+builder in two conventions, not the two builders the tolerance names — see
+`tolerance_benchmark_flip_sets.md`, where the correct pair diverges by up to 3.96 % on
+ligand-bearing models because the two distributions ship different het dictionaries. The
+observation below still holds for the convention question; it is the wrong basis for the tolerance. The count is essentially always
 identical because both builders place the same *number* of hydrogens on the same residues — what
 differs is *where* they put them. A ±2 % H-count check therefore passes even when the two models
 have systematically different H positions, giving false assurance. The clashscore delta is the check
@@ -78,8 +82,9 @@ that actually sees the difference.
 > standalone, **with a matched H-build convention**. Under a mismatched convention (nuclear vs
 > electron-cloud) expect 6–23 units of disagreement; that comparison is void, not failed.
 >
-> **H-placement: H-atom count within ± 0.1 %** (observed max 0.013 %), same Asn/Gln/His flip set, and
-> clashscore delta within the clashscore tolerance above. **H-count agreement does not imply
+> **H-placement: superseded** by `tolerance_benchmark_flip_sets.md` — the ± 0.1 % below was measured
+> on one builder in two conventions. The two builders the tolerance names agree **exactly** on
+> protein-only models and diverge up to 3.96 % when hetero components are present. **H-count agreement does not imply
 > H-position agreement** — it is nearly insensitive to the convention that dominates the score, so
 > it must not be reported as evidence that two H builds match.
 
@@ -91,8 +96,14 @@ being held to an unreasonably tight absolute band.
 - 10 models, clashscore 1.18–13.61. Severely clashing models (≳ 40, the registry's "anomalous"
   band) are not represented; the 20 % relative term is an extrapolation there.
 - The Asn/Gln/His **flip set** part of the H-placement tolerance is not measured here — only H count
-  and the resulting clashscore. Comparing flip sets needs the flip records from both builders, which
-  `phenix.clashscore` does not emit.
+  and the resulting clashscore. It was measured separately in `tolerance_benchmark_flip_sets.md`,
+  using `reduce`'s own `USER  MOD` records: 0 disagreements over 634 residues, because
+  `phenix.reduce` **is** the standalone Richardson binary (identical version strings).
+- That identity also **re-attributes the matched-convention residual measured above**. Since both
+  paths build hydrogens with the same binary, the median 0.115 clashscore difference cannot come from
+  H placement; it comes from the clash-counting step (`phenix.clashscore`'s internal analysis vs the
+  `probe` summation here). The mismatched-convention result (median 9.95) is unaffected — that
+  comparison deliberately changes the H geometry.
 - Standalone clashscore is summed by this script from probe output rather than by MolProbity's own
   `clashscore` wrapper (not installed); it was validated against `phenix.clashscore` on 1SAR to
   within 0.34 units.
