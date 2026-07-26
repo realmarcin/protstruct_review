@@ -105,15 +105,92 @@ confirmed for bond angles.
 - Registry entries added for `T06_r_factor_offset`, `T05_bond_length_rmsd`, `T01_ca_rmsd`, which
   previously lived only in the prose table.
 
-## Open
+## Open — remaining tolerances and the two gaps round 2 opened
 
-- **Remaining `[template]` tolerances**: Ramachandran/rotamer favoured and outlier %, L-test ⟨|L|⟩,
-  secondary-structure agreement, DockQ, NMR ensemble precision, R-free vs deposited, completeness.
-  Each needs the same treatment; the pattern and the tooling now exist.
-- **Asn/Gln/His flip-set agreement** (part of the H-placement tolerance) is still unmeasured —
-  `phenix.clashscore` does not emit the flip records, so it needs a different cctbx entry point.
-- **Matched-library bond RMSD floor**: this round measured only the cross-library case. The
-  matched-library tolerance (PHENIX vs PHENIX, gemmi vs REFMAC) will be much tighter and is unknown.
+Every item below has its oracle pair verified runnable on this machine (2026-07-25). Ordered by
+priority: the first two are debt from PR #28, then the cheap wins, then the ones needing new design.
+
+### [ ] Asn/Gln/His flip-set agreement — a gap PR #28 opened
+
+The H-placement tolerance requires "same Asn/Gln/His flip set" but PR #28 measured only H count and
+clashscore, because `phenix.clashscore` does not emit flip records. **`reduce` does**: both
+`phenix.reduce` and standalone `reduce` write `USER  MOD ... :FLIP  amide:` records into the output
+PDB, so the flip sets can be diffed directly.
+
+**Execute:** run both builders over the PR #28 model set, parse `USER  MOD` lines into
+{chain, resseq, resname, flip-decision} sets, report exact-match rate and the residues that differ.
+Also record the flip *category* (`K`=keep, `C`=clashes, `X`=uncertain, `F`=flip) — an `X` on one side
+and a `K` on the other is a weaker disagreement than `F` vs `K`. Expect near-identity if
+`phenix.reduce` wraps the same binary; **if so, say that plainly** — the tolerance would then be
+checking nothing, and the real flip-set risk lies between reduce and a *different* H builder.
+
+### [ ] Matched-library bond-RMSD floor — the other gap PR #28 opened
+
+PR #28 measured bond RMSD only **across** libraries (PHENIX/CDL vs gemmi/CCP4) and set ± 0.008 Å.
+The matched-library floor is unknown and will be much tighter.
+
+**Execute:** `gemmi rmsz` vs **REFMAC5** (`refmac5 NCYC=0`), both against the CCP4 monomer library —
+same library, different implementations. Report the floor and add it to the bond-RMSD row as the
+matched-library branch, so the ± 0.008 Å is explicitly the cross-library case.
+
+### [ ] L-test ⟨|L|⟩ — nearly free, the logs already exist
+
+`xtriage` reports `<|L|> : 0.483`; `ctruncate` reports `L statistic = 0.497`. Both were already
+produced for every dataset in the Wilson-B benchmark, so this needs parsing, not re-running.
+
+**Execute:** parse both from the cached `bench_t13` logs. The tolerance's stated precondition is a
+**matched resolution range**, and ctruncate prints the range it used (`Data has used to 40.01 - 1.69
+A`) while xtriage prints its own — so for once the precondition can actually be *checked* rather
+than assumed. Report the spread with and without a range mismatch. Note the two share the
+Padilla-Yeates method, so this measures consistent computation, not method independence — say so.
+
+### [ ] Ramachandran / rotamer outlier % and R-free vs deposited — one pass, three tolerances
+
+The **PDBe validation API** returns the wwPDB-computed values per entry:
+`https://www.ebi.ac.uk/pdbe/api/validation/global-percentiles/entry/<id>` →
+`percent-rama-outliers`, `percent-rota-outliers`, `DCC_Rfree`, `clashscore` (all `rawvalue`).
+This is the harness's documented tiebreaker, and it is a different *pipeline* from a local PHENIX run
+even though it is also MolProbity-derived — state that limit rather than claiming independence.
+
+**Execute:** `phenix.ramalyze` / `phenix.rotalyze` / `phenix.model_vs_data` against those values over
+a stratified entry set. Bonus check already observed on 12LO: PDBe clashscore 1.18 exactly matches
+the cctbx clashscore measured in PR #28 — worth confirming across the set, since it would corroborate
+the clashscore tolerance from a third source.
+
+### [ ] Secondary-structure agreement — script already exists
+
+`scripts/t15_ss_agreement.py` runs DSSP (H-bond energetics) against biotite P-SEA (Cα geometry) and
+emits a three-state agreement fraction. The tolerance is "two independent assigners floor ≥ 0.80 on a
+well-ordered model" and has never been run over a set.
+
+**Execute:** run it over ~20 models spanning resolution and fold class; report the agreement
+distribution and whether the ≥ 0.80 floor holds. Genuinely method-independent — different physics on
+each side — so this is one of the few tolerances where cross-tool agreement means what it says.
+
+### [ ] Completeness (overall) vs deposition — partially data-blocked
+
+`phenix.model_vs_data` reports completeness; the deposited value should come from the entry's
+Table 1. The PDBe experiment API exposes a `completeness` field but it returned **null** for 12LO, so
+coverage needs checking before this is worth running. If PDBe coverage is poor, the value must be
+scraped from the wwPDB validation report XML instead.
+
+### [ ] DockQ ± 0.01 — needs a different design
+
+The current tolerance compares an agent against `scripts/t16_interface_quality.py`, i.e. DockQ
+against itself, so a cross-tool benchmark is not available (no second DockQ implementation is
+installed). What *is* measurable is the documented dominant variance source: **chain-mapping
+ambiguity in multimers**.
+
+**Execute:** run DockQ over multi-chain complexes with every plausible `--mapping`, and report the
+score spread. That bounds what "fixing the chain mapping" is worth, which is what the precondition
+asserts without a number.
+
+### [ ] NMR ensemble precision ± 0.05 Å — needs a different design
+
+Same situation: no second implementation. The documented dominant factor is the **ordered-core
+selection**, so measure that: run `scripts/t17_nmr_ensemble.py` over several ensembles while varying
+the ordered-core RMSF cutoff, and report how much the mean Cα RMSF moves. That turns "precision is
+dominated by the superposition selection" into a magnitude.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 
