@@ -137,7 +137,8 @@ published**.
 All six remaining items addressed: five measured, one blocked with evidence. **Every measured
 tolerance moved**, and two were wrong by a wide margin.
 
-- **Ramachandran outlier %** → **exact match (Δ = 0)**, reproduced on 17/17 entries against wwPDB.
+- **Ramachandran outlier %** → **exact match (Δ = 0)** against wwPDB on 17/17 entries — though 13 of
+  those compare 0.00 to 0.00, so the informative evidence is the 4 with nonzero outliers.
   ±0.5 pp was unlimited headroom.
 - **Rotamer outlier %** → ±0.5 pp **confirmed** (max 0.34 pp).
 - **R-free** → the reference must be stated: ≤ **0.02** vs the *deposited* value (max 0.0128),
@@ -145,10 +146,12 @@ tolerance moved**, and two were wrong by a wide margin.
 - **Completeness** → ± **0.2 pp**, not ±1 pp (max 0.11 pp). **Not data-blocked after all**: the PDBe
   experiment API's field is null everywhere, but the validation report XML carries
   `DataCompleteness` for every entry.
-- **SS agreement** → two-assigner floor **0.65, not 0.80**. The 0.80 floor **failed on 12 of 16**
-  well-ordered structures (ubiquitin, lysozyme, trypsin…); it had been generalised from 1SAR, which
-  scores higher than every entry in the benchmark. Agreement is fold-class dependent (α-rich
-  0.80–0.85, β-rich 0.68–0.72).
+- **SS agreement** → **no agreement floor can work**: the metric is degenerate at the bad end.
+  Perturbing 1UBQ *raises* its score (0.75 → 0.88 at 1 Å noise → **1.00 at 2 Å**, where both
+  assigners label every residue coil and agree perfectly). The gate is now **DSSP H+E content
+  ≥ 0.20** (well-ordered 0.46–0.78, wreckage 0.00–0.11) with agreement ≥ 0.65 given that. The old
+  0.80 floor failed 12/16 good structures *while passing the 1 Å and 2 Å wreckage*; it had been
+  generalised from 1SAR, which scores higher than every entry in the benchmark.
 - **DockQ chain mapping** → presumption **proven**: a plausible mis-mapping moves the score
   1.00 → 0.21, ~**79×** the ±0.01 band, i.e. CAPRI *High* → *Incorrect*.
 - **NMR ordered core** → the cutoff alone moves precision by up to **0.84 Å** (17× the ±0.05 band);

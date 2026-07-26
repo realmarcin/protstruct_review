@@ -69,12 +69,47 @@ are α-rich or small (1MBN myoglobin 0.850, 2CI2 0.846, 1CRN crambin 0.826, 9PAP
 infers strands from Cα geometry alone and DSSP from backbone H-bonds; they diverge most where strand
 register and edge strands are ambiguous. A single floor across fold classes is the wrong shape.
 
+## Does the floor discriminate? No — the metric is degenerate at the bad end
+
+A floor that nothing fails is not a check, so the same measurement was run on models that *should*
+score badly: the first model of a disordered NMR ensemble (2JZ4, the one that failed T17's
+ordered-core test), and 1UBQ with Gaussian coordinate noise at 0.5, 1.0 and 2.0 Å.
+
+| Model | agreement | SS content (DSSP H+E) | DSSP assignment |
+|---|---:|---:|---|
+| 16 well-ordered structures | 0.679 – 0.850 | **0.458 – 0.784** | real H/E/C mix |
+| 2JZ4 model 1 (disordered NMR) | 0.7625 | 0.371 | C 188, E 111 |
+| 1UBQ + 0.5 Å noise | 0.7368 | 0.105 | C 68, E 8 |
+| 1UBQ + 1.0 Å noise | **0.8816** | 0.026 | C 74, E 2 |
+| 1UBQ + 2.0 Å noise | **1.0000** | 0.000 | C 76 |
+
+**The agreement metric is anti-correlated with quality at the bad end.** Destroying 1UBQ's backbone
+*raises* its score: 0.75 intact → 0.88 at 1 Å noise → **1.00 at 2 Å**. The mechanism is plain in the
+last column — as the model degrades both assigners stop finding secondary structure, and once both
+label every residue `C` they agree perfectly. Three-state agreement saturates at 1.0 on a structure
+with no structure.
+
+So **no floor on agreement can work**. The degraded models span 0.74–1.00, overlapping the entire
+well-ordered range and exceeding 14 of the 16 good structures. The old 0.80 floor would have passed
+the 1 Å and 2 Å wreckage while failing ubiquitin, lysozyme and trypsin.
+
+**What does discriminate is the SS content itself**: 0.458–0.784 for well-ordered structures versus
+0.000–0.105 for the perturbed ones — a clean separation with no overlap. The disordered NMR model
+sits between at 0.371, which is the right answer for a model that genuinely does contain β strands.
+
 ## Applied tolerance
 
-> **Two independent assigners (DSSP vs biotite P-SEA): three-state agreement ≥ 0.65**, not 0.80.
-> Measured across 16 well-ordered structures: median 0.753, minimum **0.679**. Expect **α-rich folds
-> ~0.80–0.85 and β-rich folds ~0.68–0.72** — agreement below ~0.65 indicates a genuinely disordered
-> or mis-built model rather than normal method divergence.
+> **Two independent assigners (DSSP vs biotite P-SEA): report agreement together with the DSSP
+> secondary-structure content, and gate on the content, not on the agreement.**
+>
+> - **SS content (fraction of residues DSSP assigns H or E) must be ≥ 0.20** for the agreement number
+>   to mean anything. Well-ordered structures run 0.46–0.78; coordinate-perturbed wreckage runs
+>   0.00–0.11.
+> - **Given adequate content, expect agreement ≥ 0.65** (16 well-ordered structures: median 0.753,
+>   min 0.679), fold-class dependent — **α-rich ~0.80–0.85, β-rich ~0.68–0.72**.
+> - **High agreement with low SS content is a failure signal, not a pass.** A model with no
+>   secondary structure scores **1.0** because both assigners label everything coil. Never report the
+>   agreement alone.
 >
 > The agent-vs-DSSP clause (≥ 0.85 three-state over DSSP-assigned residues) is **not** measured here
 > and is unchanged: that compares an agent against one assigner, not two assigners against each
@@ -82,9 +117,10 @@ register and edge strands are ambiguous. A single floor across fold classes is t
 
 ## Scope limits
 
-- 16 models, all X-ray, all well-ordered by construction — the floor is for the *easy* case. A
-  disordered or low-resolution model would score lower, which is the point of a floor, but the
-  benchmark does not establish where the "genuinely bad" boundary sits.
+- The 16 reference models are all X-ray and well-ordered by construction. The bad end is probed with
+  4 degraded models (one disordered NMR, three noise levels), which is enough to show the metric
+  saturates but not enough to calibrate where the SS-content gate should sit precisely; 0.20 is
+  placed in the observed gap between 0.105 and 0.371, not fitted.
 - One implementation of each method. STRIDE (a third assigner) is not installed, so "P-SEA is the
   outlier" versus "DSSP is" cannot be distinguished.
 - The fold-class split is by inspection of 16 structures, not a controlled comparison over a

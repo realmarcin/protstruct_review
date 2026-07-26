@@ -62,9 +62,22 @@ Per-entry R-free and completeness:
 
 ## Findings
 
-**1. Ramachandran outlier % is reproduced exactly.** Zero difference on 17 of 17 entries — not
-"within 0.5 pp", *identical*. The ± 0.5 pp band is not a tolerance, it is unlimited headroom. Any
-non-zero difference against a wwPDB report is a signal worth investigating, not noise to absorb.
+**1. Ramachandran outlier % is reproduced exactly — on n = 4 informative comparisons.** Zero
+difference on 17 of 17 entries, but **13 of those are `0.00` vs `0.00`**: both pipelines agreeing a
+good structure has no outliers, which cannot distinguish "they compute the same thing" from "there
+was nothing to compute". The four entries with a nonzero value are the evidence:
+
+| Entry | PHENIX | wwPDB |
+|---|---:|---:|
+| 24MR | 1.03 | 1.03 |
+| 28SW | 1.06 | 1.06 |
+| 28SZ | 0.70 | 0.70 |
+| 9PN7 | 0.09 | 0.09 |
+
+Agreeing to two decimal places on both the outlier count and the denominator is not luck, so the
+tightening is justified — but it rests on four structures, and "exact" means *at the reported
+precision*: both sources round to 2 dp, so sub-0.01 pp differences are invisible either way.
+Rotamer is better evidenced: 12 of 17 nonzero, 10 exact, 2 differing.
 
 **2. Rotamer outlier % is nearly exact**, with two exceptions: 30IZ (0.70 vs 0.50) and 9HW2 (0.87 vs
 1.21), max 0.34 pp. The ± 0.5 pp band is about right here, and it is the looser of the two geometry
@@ -90,7 +103,9 @@ pipelines — cctbx, standalone probe, wwPDB — now agree on clashscore far ins
 ## Applied tolerances
 
 > **Ramachandran outlier %: exact match expected (Δ = 0)** against a wwPDB validation report;
-> investigate any difference. Observed 0.00 pp on 17/17.
+> investigate any difference. Observed 0.00 pp on 17/17 — but **13 of those compare 0.00 to 0.00**,
+> so the informative evidence is the 4 entries with nonzero outliers, all exact. At 2 dp reported
+> precision.
 >
 > **Rotamer outlier %: ± 0.5 pp** — confirmed, max observed 0.34 pp.
 >
@@ -106,7 +121,10 @@ pipelines — cctbx, standalone probe, wwPDB — now agree on clashscore far ins
 - MolProbity-derived on both sides for the geometry percentages, so this measures pipeline
   reproducibility, not method independence.
 - R-free and completeness rest on 9 entries — the ones with both a validation report and a local
-  `model_vs_data` run. The geometry percentages rest on 17.
+  `model_vs_data` run. The geometry percentages rest on 17 entries but only 4 (Ramachandran) and 12
+  (rotamer) of those carry a nonzero value; the rest are 0.00-vs-0.00.
+- Both sources report percentages to 2 dp, so every "exact" claim here means exact at that
+  precision.
 - 6 of 24 candidate entries are mmCIF-only and were skipped; the benchmark does not yet read mmCIF
   coordinates.
 - Recent depositions only, so all reports come from a current wwPDB pipeline version. Older entries

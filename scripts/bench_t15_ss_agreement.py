@@ -36,6 +36,11 @@ T15 = REPO / "scripts" / "t15_ss_agreement.py"
 _AGREEMENT = re.compile(r"value_numeric:\s*([\d.]+)")
 _COUNTS = re.compile(r"(\d+)/(\d+)\s+concordant")
 
+# Minimum fraction of residues DSSP assigns to H or E for the agreement number to
+# mean anything. Below this there is no secondary structure to agree *about*, and the
+# metric saturates towards 1.0 — see `ss_content` and the write-up.
+MIN_SS_CONTENT = 0.20
+
 # Well-known, well-ordered structures spanning fold class: all-α, all-β, α/β, α+β.
 DEFAULT_SET = [
     "1UBQ", "1LYZ", "1LZ1", "2PTN", "7RSA", "1CA2", "1MBN", "3EST",
@@ -55,6 +60,28 @@ def fetch(pdb_id: str, cache: Path) -> Path | None:
     except urllib.error.HTTPError:
         return None
     return dest
+
+
+def ss_content(model: Path) -> float | None:
+    """Fraction of residues DSSP assigns to H or E.
+
+    Three-state agreement is degenerate when neither assigner finds any secondary
+    structure: both label everything C and the metric reads 1.0. A destroyed model
+    therefore scores HIGHER than a good one, so the agreement number is only
+    interpretable alongside how much structure there was to agree about.
+    """
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("t15", T15)
+    t15 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(t15)
+    try:
+        labels = t15.run_dssp(model)
+    except SystemExit:
+        return None
+    if not labels:
+        return None
+    return round(sum(1 for v in labels.values() if v in ("H", "E")) / len(labels), 4)
 
 
 def run_t15(model: Path, cache: Path) -> dict[str, Any] | None:
@@ -94,10 +121,14 @@ def collect(pdb_ids: list[str], cache: Path) -> tuple[list[dict], list[dict]]:
             print("  ! t15_ss_agreement failed", file=sys.stderr)
             skipped.append({"pdb_id": pdb_id, "reason": "t15_ss_agreement failed"})
             continue
+        content = ss_content(model)
         rows.append({"pdb_id": pdb_id, **result,
+                     "ss_content": content,
+                     "interpretable": content is not None and content >= MIN_SS_CONTENT,
                      "meets_0_80_floor": result["agreement"] >= 0.80})
-        print(f"  agreement {result['agreement']:.4f} over {result['n_scored']} residues"
-              f"  {'OK' if result['agreement'] >= 0.80 else 'BELOW 0.80 FLOOR'}", file=sys.stderr)
+        flag = "" if (content or 0) >= MIN_SS_CONTENT else "  <- DEGENERATE (little/no SS)"
+        print(f"  agreement {result['agreement']:.4f} over {result['n_scored']} residues,"
+              f" SS content {content}{flag}", file=sys.stderr)
     return rows, skipped
 
 
@@ -115,6 +146,8 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
         "max": round(values[-1], 4),
         "n_meeting_0_80_floor": sum(1 for r in rows if r["meets_0_80_floor"]),
         "below_floor": [r["pdb_id"] for r in rows if not r["meets_0_80_floor"]],
+        "n_degenerate_low_ss_content": sum(1 for r in rows if not r["interpretable"]),
+        "degenerate": [r["pdb_id"] for r in rows if not r["interpretable"]],
     }
 
 
