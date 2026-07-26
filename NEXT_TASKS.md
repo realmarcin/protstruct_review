@@ -105,12 +105,32 @@ confirmed for bond angles.
 - Registry entries added for `T06_r_factor_offset`, `T05_bond_length_rmsd`, `T01_ca_rmsd`, which
   previously lived only in the prose table.
 
-## Open — remaining tolerances and the two gaps round 2 opened
+## Tolerance benchmarks, round 3 — DONE 2026-07-25, PR #32
+
+Three items closed, including both debt items from PR #28. One of them **corrected a claim PR #28
+published**.
+
+- **Asn/Gln/His flip sets**: 0 disagreements over 634 residues — because `phenix.reduce` **is** the
+  standalone Richardson binary (both `reduce.4.16.250520`). The tolerance clause is a
+  same-implementation identity check, not corroboration. This also re-attributes PR #28's
+  matched-convention clashscore residual (median 0.115): it cannot be H placement, so it is the
+  clash-counting step.
+- **Restraint library vs implementation**: isolating the library inside PHENIX (CDL vs Engh & Huber)
+  shows it accounts for only **9 %** of the bond-length gap — PR #28 attributed it to the library by
+  analogy with bond angles. Corrected. For **angles** the framing does hold (51 %; median 0.265°,
+  an in-repo confirmation of the 0.3–0.4° literature figure). Matched-library bond floor: 0.006 Å,
+  barely tighter than the cross-library 0.008 Å.
+- **L-test ⟨|L|⟩**: median |Δ| 0.006, 25/27 inside ±0.02, twin call agreed **27/27**. The
+  "matched resolution range" precondition held in **0/27** — ctruncate restricts the L-test by a
+  median 0.46 Å and exposes no flag to change it, so the precondition is unachievable and is now
+  stated as a caveat.
+
+## Open — remaining tolerances
 
 Every item below has its oracle pair verified runnable on this machine (2026-07-25). Ordered by
 priority: the first two are debt from PR #28, then the cheap wins, then the ones needing new design.
 
-### [ ] Asn/Gln/His flip-set agreement — a gap PR #28 opened
+### [x] Asn/Gln/His flip-set agreement — DONE 2026-07-25, PR #32
 
 The H-placement tolerance requires "same Asn/Gln/His flip set" but PR #28 measured only H count and
 clashscore, because `phenix.clashscore` does not emit flip records. **`reduce` does**: both
@@ -124,7 +144,7 @@ and a `K` on the other is a weaker disagreement than `F` vs `K`. Expect near-ide
 `phenix.reduce` wraps the same binary; **if so, say that plainly** — the tolerance would then be
 checking nothing, and the real flip-set risk lies between reduce and a *different* H builder.
 
-### [ ] Matched-library bond-RMSD floor — the other gap PR #28 opened
+### [x] Matched-library bond-RMSD floor — DONE 2026-07-25, PR #32
 
 PR #28 measured bond RMSD only **across** libraries (PHENIX/CDL vs gemmi/CCP4) and set ± 0.008 Å.
 The matched-library floor is unknown and will be much tighter.
@@ -133,7 +153,7 @@ The matched-library floor is unknown and will be much tighter.
 same library, different implementations. Report the floor and add it to the bond-RMSD row as the
 matched-library branch, so the ± 0.008 Å is explicitly the cross-library case.
 
-### [ ] L-test ⟨|L|⟩ — nearly free, the logs already exist
+### [x] L-test ⟨|L|⟩ — DONE 2026-07-25, PR #32
 
 `xtriage` reports `<|L|> : 0.483`; `ctruncate` reports `L statistic = 0.497`. Both were already
 produced for every dataset in the Wilson-B benchmark, so this needs parsing, not re-running.
@@ -166,6 +186,16 @@ well-ordered model" and has never been run over a set.
 **Execute:** run it over ~20 models spanning resolution and fold class; report the agreement
 distribution and whether the ≥ 0.80 floor holds. Genuinely method-independent — different physics on
 each side — so this is one of the few tolerances where cross-tool agreement means what it says.
+
+### [ ] Flip-set agreement against a genuinely independent H builder — a gap round 3 opened
+
+Round 3 established that `phenix.reduce` and standalone `reduce` are the same binary, so the
+flip-set clause currently checks nothing. `mmtbx.reduce2` / `phenix.reduce2` (the cctbx
+reimplementation) is installed and *is* independent.
+
+**Execute:** re-run `scripts/bench_t14_flip_sets.py` with reduce2 on one side. Also worth perturbing
+inputs: deposited models are flip-optimised before deposition, so only 7 of 17 had any flips at all
+and the decision boundary is barely exercised.
 
 ### [ ] Completeness (overall) vs deposition — partially data-blocked
 

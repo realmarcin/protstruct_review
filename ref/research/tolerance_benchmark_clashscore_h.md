@@ -91,8 +91,14 @@ being held to an unreasonably tight absolute band.
 - 10 models, clashscore 1.18–13.61. Severely clashing models (≳ 40, the registry's "anomalous"
   band) are not represented; the 20 % relative term is an extrapolation there.
 - The Asn/Gln/His **flip set** part of the H-placement tolerance is not measured here — only H count
-  and the resulting clashscore. Comparing flip sets needs the flip records from both builders, which
-  `phenix.clashscore` does not emit.
+  and the resulting clashscore. It was measured separately in `tolerance_benchmark_flip_sets.md`,
+  using `reduce`'s own `USER  MOD` records: 0 disagreements over 634 residues, because
+  `phenix.reduce` **is** the standalone Richardson binary (identical version strings).
+- That identity also **re-attributes the matched-convention residual measured above**. Since both
+  paths build hydrogens with the same binary, the median 0.115 clashscore difference cannot come from
+  H placement; it comes from the clash-counting step (`phenix.clashscore`'s internal analysis vs the
+  `probe` summation here). The mismatched-convention result (median 9.95) is unaffected — that
+  comparison deliberately changes the H geometry.
 - Standalone clashscore is summed by this script from probe output rather than by MolProbity's own
   `clashscore` wrapper (not installed); it was validated against `phenix.clashscore` on 1SAR to
   within 0.34 units.

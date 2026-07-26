@@ -205,4 +205,45 @@ check("phenix superpose final line parsed",
 check("a superpose log that crashed yields no match — never a default RMSD",
       t01._PHENIX_FINAL.search("AttributeError: 'NoneType' object has no attribute"), None)
 
+
+
+# --- Round 3: L-test, flip-record and restraint-library parsing ------------------
+
+t13l = load("bench_t13_l_test")
+t14 = load("bench_t14_flip_sets")
+t05lib = load("bench_t05_restraint_library")
+
+check("xtriage <|L|> parsed",
+      float(t13l._XT_L.search("  <|L|>       : 0.483  (untwinned: 0.500; perfect twin: 0.375)"
+                              ).group(1)), 0.483)
+check("ctruncate L statistic parsed",
+      float(t13l._CT_L.search("L statistic =  0.497  (untwinned 0.5 perfect twin 0.375)"
+                              ).group(1)), 0.497)
+check("ctruncate analysis range parsed",
+      t13l._CT_RANGE.search("Data has used to  40.01 -   1.69 A resolution").groups(),
+      ("40.01", "1.69"))
+# The twin call is the load-bearing half of this tolerance, so pin the boundary.
+check("untwinned call", t13l.twin_call(0.497), "untwinned")
+check("twinned call", t13l.twin_call(0.400), "possibly_twinned")
+
+FLIPPED = "USER  MOD Single : A  32 GLN     :FLIP  amide:sc=   0.435  F(o=-0.2,f=0.44)"
+KEPT = "USER  MOD Single : A   2 GLN     :      amide:sc=   1.61   X(o=1.6,f=1.2)"
+m = t14._FLIP.match(FLIPPED)
+check("flip record: residue identified", (m.group("chain"), int(m.group("resseq")),
+                                          m.group("resname")), ("A", 32, "GLN"))
+check("flip record: FLIP decision and category", (m.group("decision").strip(),
+                                                  m.group("category")), ("FLIP", "F"))
+m2 = t14._FLIP.match(KEPT)
+check("non-flip record: empty decision, X category", (m2.group("decision").strip(),
+                                                      m2.group("category")), ("", "X"))
+check("a non-USER-MOD line does not parse as a flip", t14._FLIP.match("ATOM      1  N   MET A   1"),
+      None)
+
+check("phenix bond+count parsed for library toggle",
+      t05lib._PHENIX_BOND.search("  covalent geometry    : bond        0.00510 (  440)").groups(),
+      ("0.00510", "440"))
+check("gemmi bond and angle rmsD parsed together",
+      t05lib._GEMMI_RMSD.search("Model rmsD: bond: 0.020, angle: 2.134, torsion: 27.1").groups(),
+      ("0.020", "2.134"))
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
