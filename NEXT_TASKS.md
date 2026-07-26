@@ -8,9 +8,9 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Four rounds of benchmarking have replaced inferred magnitudes with measured ones. **17 of the 21**
-tolerances in `ref/thresholds_and_standards.md` now carry `[benchmark]` provenance; **4 do not**,
-and they are the open work below.
+Five rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
+in `ref/thresholds_and_standards.md` now carries `[benchmark]` provenance** (21 rows), with two
+named exceptions recorded below where no reference exists to measure against.
 
 | Round | PR | Settled |
 |---|---|---|
@@ -18,60 +18,36 @@ and they are the open work below.
 | 2 | [#28](https://github.com/realmarcin/protstruct_review/pull/28) (2026-07-26) | R offset, clashscore, H-placement, CA RMSD, aligned-residue count, bond-length RMSD |
 | 3 | [#32](https://github.com/realmarcin/protstruct_review/pull/32) (2026-07-26) | restraint-library decomposition, Asn/Gln/His flip sets, L-test |
 | 4 | [#36](https://github.com/realmarcin/protstruct_review/pull/36) (2026-07-26) | Ramachandran/rotamer outlier %, R-free, completeness, SS agreement, DockQ mapping, NMR ordered core |
+| 5 | [#39](https://github.com/realmarcin/protstruct_review/pull/39) (2026-07-26) | the §4 refinement Δ-tolerances (X-ray + cryo-EM), Ramachandran favored % |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-Pattern worth carrying into the remaining work: **five tolerances measured so far had been
-generalised from a single observation** — clashscore ±1.0 from one 1SAR pair; H-count ±0.1 % from
-one builder in two conventions; the SS floor ≥0.80 from 1SAR alone; the bond-length attribution by
-analogy with bond angles; the DockQ and NMR preconditions asserted with no magnitude at all. Every
-one moved when measured, three by more than an order of magnitude, and one (SS agreement) turned out
-to be the wrong *shape* of check entirely. Assume the remaining four are in the same state.
+The pattern held to the end. Tolerances generalised from a single observation — clashscore ±1.0 from
+one 1SAR pair; H-count ±0.1 % from one builder in two conventions; the SS floor ≥0.80 from 1SAR
+alone; the bond-length attribution by analogy with bond angles; the DockQ and NMR preconditions
+asserted with no magnitude at all — **every one moved when measured**. Three moved by more than an
+order of magnitude; one (SS agreement) was the wrong *shape* of check entirely; and the §4 bands in
+round 5 were breached by re-refining a deposited model against its own data, with no modelling
+change at all.
+
+Carry the same suspicion into anything added next: a tolerance that has never been run is a
+hypothesis, and in this repo the hypothesis lost 21 times out of 21.
 
 ## Open
 
-### [ ] Ramachandran / rotamer **favored** % — ± 1.0 pp, never measured
+### [ ] Rotamer **favored** % — no reference exists
 
-Round 4 measured the **outlier** percentages and left the **favored** row untouched
-(`ref/thresholds_and_standards.md` §3, still `[template]`). They are separate rows and separate
-quantities, and the favored row was missed rather than deliberately deferred.
+Round 5 measured the Ramachandran favored % (± 1.0 pp → ± 0.2 pp) but could not measure the rotamer
+half. The wwPDB validation report's `rota=` attribute holds the rotamer **name** (`m-10`, `mp`,
+`mt-10`, …) with no favored/allowed classification and no `OUTLIER` value, so there is no reference
+figure to compare a local `phenix.rotalyze` run against. `phenix.rotalyze` also prints only an
+outlier SUMMARY line, not a favored one.
 
-**Why it looked blocked and is not:** the PDBe `key_validation_stats` endpoint reports only outlier
-counts, so there is no entry-level favored % to compare against. But the validation report **XML**
-carries per-residue `rama="Favored" | "Allowed" | "OUTLIER"` attributes, so the favored fraction can
-be counted directly. Verified on 12LO: 53 Favored + 1 Allowed = 54 → **98.15 %**, exactly what
-`phenix.ramalyze` reports.
-
-**Execute:** extend `scripts/bench_vs_deposited.py` to count per-residue `rama=` (and the rotamer
-equivalent) from the XML, compare against `phenix.ramalyze` / `phenix.rotalyze` favored percentages
-over the same 17-entry set, and re-derive the ±1.0 pp band. Expect the same shape as the outlier
-rows — near-exact agreement — with one advantage: favored % has no 0.00-vs-0.00 degeneracy, so
-unlike the Ramachandran *outlier* result (informative on only 4 of 17 entries, see #37) the evidence
-will be informative on all 17.
-
-### [ ] Refinement Δ-tolerances (§4) — a different class, never benchmarked
-
-Three tolerances govern the compare→refine flow and all remain `[template]`:
-
-- **ΔRMSD sanity** — `RMSD_post ≤ RMSD_pre + 0.05 Å`
-- **Geometry did not degrade** — `clashscore_post ≤ max(clashscore_pre, 4)`; `favored_post ≥ min(favored_pre, 97 %)`; `rotamer outliers_post ≤ max(outliers_pre, 2 %)`
-- **Map-model fit did not degrade** — `CC_mask_post ≥ CC_mask_pre − 0.01`; `d_FSC_model_post ≤ d_FSC_model_pre + 0.05 Å`
-
-These are **not cross-tool agreement tolerances**, so the machinery from rounds 1–4 does not
-transfer. They assert how far a *refinement* may move a quantity before it counts as degradation,
-which needs a refine→re-measure loop rather than two tools on one file.
-
-**Execute:** run `phenix.refine` (plus `servalcat` or REFMAC5 for a non-cctbx second opinion) over
-deposited model+data pairs, measure each quantity before and after, and characterise the Δ
-distribution for refinements that did *not* degrade the model; the bands follow from that. Note each
-tolerance mixes a **Δ band** with an **absolute floor** (`4`, `97 %`, `2 %`) — two different claims.
-Only the Δ is measurable this way; the floors are quality bars and should be split out and cited
-separately, the way §2's literature thresholds are.
-
-**Blocked on nothing.** PHENIX, CCP4 and reflection data for ~15 entries are already cached by
-`scripts/bench_t06_r_offset.py`. This is the largest remaining piece of work in the file.
+**Execute:** needs a different oracle — MolProbity's own rotamer classification, or counting
+per-residue rotamer verdicts from a full MolProbity run rather than the wwPDB report. Until then the
+clause stays unmeasured; `bench_vs_deposited.py` returns `None` for it rather than a confident 0 %.
 
 ### [ ] Flip sets vs an independent H builder — BLOCKED on reduce2's output
 
@@ -81,8 +57,22 @@ Round 3 established that `phenix.reduce` and standalone `reduce` are the **same 
 zero occurrences of "flip" in its `.txt` log and no `USER  MOD` records in its output PDB, so flip
 calls cannot be extracted.
 
-Re-check on the next PHENIX upgrade. Until then the clause stays labelled as a same-implementation
-identity check rather than corroboration.
+Re-check on the next PHENIX upgrade.
+
+### [ ] Widen the §4 refinement benchmark
+
+Round 5 settled §4 on **8 X-ray entries and 2 cryo-EM entries** — enough to show the old bands failed
+on a null re-refinement (5/8 breached ΔRMSD, 3/8 clashscore), but thin for the EM half in particular.
+Three specific gaps:
+
+- **`d_FSC_model` is ungateable without half-maps.** `phenix.mtriage`'s model-map FSC crossings are
+  degenerate (27WR: FSC = 0.5 at 29.79 Å for a 2.7 Å map) and `resolution=` does not fix it. EMDB
+  serves half-maps separately; fetching them would make the second map-model clause measurable.
+- **Null case only.** The benchmark calibrates the false-positive side of each band — what a
+  refinement that should change nothing actually does. It never tests a genuinely *degrading*
+  refinement, so the false-negative side is unknown.
+- **One refinement protocol** (`phenix.refine`, 3 macro-cycles, default weights). REFMAC5/servalcat
+  as a second refiner would show how much of the null spread is protocol-specific.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

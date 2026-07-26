@@ -50,8 +50,17 @@ PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
 _RAMA_OUT = re.compile(r"SUMMARY:\s*([\d.]+)%\s*outliers")
 _RAMA_FAV = re.compile(r"SUMMARY:\s*([\d.]+)%\s*favored")
 _ROTA_OUT = re.compile(r"SUMMARY:\s*([\d.]+)%\s*outliers")
+_ROTA_FAV = re.compile(r"SUMMARY:\s*([\d.]+)%\s*favored")
 _MVD_RFREE = re.compile(r"^\s*r_free:\s*([\d.]+)\s*$", re.M)
 _MVD_COMPLETENESS = re.compile(r"Completeness in resolution range:\s*([\d.]+)")
+# Per-residue verdicts in the validation report. There is no entry-level "favored %"
+# attribute — only outlier counts — so the Ramachandran favored fraction is counted
+# from `rama="Favored|Allowed|OUTLIER"`. NOTE the rotamer attribute is NOT a verdict:
+# `rota="m-10"`, `rota="mp"` etc. name the rotamer the residue adopts, with no
+# favored/allowed classification and no OUTLIER value present, so the rotamer favored %
+# cannot be obtained this way and is left unmeasured.
+_RES_RAMA = re.compile(r'\brama="([^"]+)"')
+_RES_ROTA = re.compile(r'\brota="([^"]+)"')
 
 
 def entry_attribute(xml: str, name: str) -> float | None:
@@ -70,6 +79,28 @@ def entry_attribute(xml: str, name: str) -> float | None:
         return float(match.group(1))
     except ValueError:
         return None
+
+
+def favored_pct(xml: str, pattern: re.Pattern) -> float | None:
+    """Percentage of residues the report calls "Favored", counted per residue.
+
+    `key_validation_stats` exposes outlier counts only, which is why the favored
+    tolerance went unmeasured; the report XML carries a per-residue verdict instead.
+    Verified against `phenix.ramalyze` on 12LO: 53 Favored + 1 Allowed = 54 → 98.15 %,
+    exactly the SUMMARY line.
+    """
+    verdicts = pattern.findall(xml)
+    if not verdicts:
+        return None
+    # Only count a real verdict vocabulary. The rotamer attribute holds rotamer NAMES
+    # ("m-10", "mp"), and counting those would return a confident 0.0 % favored — a
+    # number indistinguishable from a measurement. Require the values to look like
+    # verdicts before believing them.
+    vocabulary = {"favored", "allowed", "outlier"}
+    if not {v.lower() for v in verdicts} & vocabulary:
+        return None
+    favored = sum(1 for v in verdicts if v.lower() == "favored")
+    return round(100.0 * favored / len(verdicts), 2)
 
 
 def fetch_text(url: str, dest: Path) -> str | None:
@@ -158,6 +189,10 @@ def collect(pdb_ids: list[str], cache: Path, mvd_cache: Path | None) -> tuple[li
         }
         fav = _RAMA_FAV.search(rama_log)
         row["phenix_rama_favored_pct"] = float(fav.group(1)) if fav else None
+        row["wwpdb_rama_favored_pct"] = favored_pct(xml, _RES_RAMA)
+        row["wwpdb_rota_favored_pct"] = favored_pct(xml, _RES_ROTA)
+        rota_fav = _ROTA_FAV.search(rota_log)
+        row["phenix_rota_favored_pct"] = float(rota_fav.group(1)) if rota_fav else None
 
         # R-free and completeness come from a model_vs_data run; reuse the R-offset
         # benchmark's cache when one is supplied rather than repeating a slow job.
@@ -176,6 +211,8 @@ def collect(pdb_ids: list[str], cache: Path, mvd_cache: Path | None) -> tuple[li
 
         for local, dep, name in (
             ("phenix_rama_outlier_pct", "wwpdb_rama_outlier_pct", "rama_outlier_delta_pp"),
+            ("phenix_rama_favored_pct", "wwpdb_rama_favored_pct", "rama_favored_delta_pp"),
+            ("phenix_rota_favored_pct", "wwpdb_rota_favored_pct", "rota_favored_delta_pp"),
             ("phenix_rota_outlier_pct", "wwpdb_rota_outlier_pct", "rota_outlier_delta_pp"),
             # Two different references, and they are not interchangeable: PDB-Rfree is
             # the depositor's own refinement result, DCC_Rfree is wwPDB re-deriving it
@@ -211,6 +248,8 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     return {
         "n_entries": len(rows),
         "rama_outlier_pp": stats("rama_outlier_delta_pp"),
+        "rama_favored_pp": stats("rama_favored_delta_pp"),
+        "rota_favored_pp": stats("rota_favored_delta_pp"),
         "rota_outlier_pp": stats("rota_outlier_delta_pp"),
         "r_free_vs_deposited": stats("r_free_delta"),
         "r_free_vs_wwpdb_recomputed": stats("r_free_delta_vs_dcc"),

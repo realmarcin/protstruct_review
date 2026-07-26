@@ -298,4 +298,59 @@ check("hetero-complex: no ambiguity to measure",
       t16map.plausible_mappings({"A": "AAAA", "B": "BBBB"}), [("AB", "AB")])
 check("single chain: nothing to map", t16map.plausible_mappings({"A": "AAAA"}), [])
 
+
+
+# --- Round 5: refinement deltas and the favored-% counting ------------------------
+
+refdel = load("bench_refinement_deltas")
+refem = load("bench_refinement_deltas_em")
+
+# Cα shift is deliberately computed WITHOUT superposition — refinement preserves the
+# frame, so superposing first would absorb part of what is being measured.
+import tempfile as _tf
+
+
+def _pdb(coords):
+    lines = []
+    for i, (chain, resseq, x, y, z) in enumerate(coords, 1):
+        lines.append(
+            f"ATOM  {i:5d}  CA  ALA {chain}{resseq:>4}    "
+            f"{x:8.3f}{y:8.3f}{z:8.3f}  1.00 20.00           C")
+    path = Path(_tf.mkstemp(suffix=".pdb")[1])
+    path.write_text("\n".join(lines) + "\n")
+    return path
+
+
+a = _pdb([("A", 1, 0.0, 0.0, 0.0), ("A", 2, 1.0, 0.0, 0.0)])
+b = _pdb([("A", 1, 0.0, 0.0, 0.0), ("A", 2, 1.0, 0.0, 0.0)])
+c = _pdb([("A", 1, 3.0, 0.0, 0.0), ("A", 2, 4.0, 0.0, 0.0)])   # rigid 3 Å translation
+try:
+    check("identical models give zero shift", refdel.ca_shift_rmsd(a, b), (0.0, 2))
+    # A rigid translation must NOT be superposed away: it is real movement.
+    check("a rigid 3 Å translation is reported, not superposed away",
+          refdel.ca_shift_rmsd(a, c), (3.0, 2))
+    check("no shared residues yields None", refdel.ca_shift_rmsd(a, _pdb([("B", 9, 0., 0., 0.)])),
+          (None, 0))
+finally:
+    for path in (a, b, c):
+        path.unlink(missing_ok=True)
+
+check("phenix.refine R-factor pair parsed",
+      refdel._R_WORK.search("r_work=0.1740 r_free=0.2360").groups(), ("0.1740", "0.2360"))
+check("mtriage d_FSC_model(0.143) masked column parsed",
+      refem._D_FSC_MODEL.search(
+          "    FSC(map,model map)=0.143       :     2.62    29.79").groups(), ("2.62", "29.79"))
+check("map_correlations CC_mask parsed",
+      float(refem._CC_MASK.search("  CC_mask  : 0.8071").group(1)), 0.8071)
+
+# The favored-% counter: the report has no entry-level figure, and the rotamer
+# attribute is a rotamer NAME, not a verdict — so it must yield None rather than a
+# number that would look like a measurement.
+RAMA_XML = ' rama="Favored" rama="Favored" rama="Allowed" rama="OUTLIER" '
+check("Ramachandran favored % counted from per-residue verdicts",
+      dep.favored_pct(RAMA_XML, dep._RES_RAMA), 50.0)
+check("rotamer names are not verdicts — None, not a confident 0.0 %",
+      dep.favored_pct(' rota="m-10" rota="mp" rota="mt-10" ', dep._RES_ROTA), None)
+check("no verdicts at all yields None", dep.favored_pct("<Entry/>", dep._RES_RAMA), None)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

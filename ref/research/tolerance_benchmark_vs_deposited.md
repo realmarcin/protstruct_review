@@ -79,6 +79,17 @@ tightening is justified — but it rests on four structures, and "exact" means *
 precision*: both sources round to 2 dp, so sub-0.01 pp differences are invisible either way.
 Rotamer is better evidenced: 12 of 17 nonzero, 10 exact, 2 differing.
 
+**1b. Ramachandran *favored* % agrees to 0.16 pp.** Measured separately (and later — it was missed
+in the first pass) by counting per-residue `rama="Favored" | "Allowed" | "OUTLIER"` verdicts in the
+report XML, since `key_validation_stats` exposes outlier counts only. Median **0.00 pp**, p90 0.02,
+max **0.16 pp** over all 17 entries. This evidence is stronger than the outlier row's: favored % sits
+between 89 % and 100 % on real structures, so there is no 0.00-vs-0.00 degeneracy and all 17
+comparisons are informative. The ± 1.0 pp band is ~6× too loose.
+
+The **rotamer** favored % could not be measured the same way: the report's `rota=` attribute holds
+the rotamer *name* (`m-10`, `mp`, `mt-10`, …) with no favored/allowed classification, and no
+`rota="OUTLIER"` values appear at all. That half of the tolerance still has no wwPDB reference.
+
 **2. Rotamer outlier % is nearly exact**, with two exceptions: 30IZ (0.70 vs 0.50) and 9HW2 (0.87 vs
 1.21), max 0.34 pp. The ± 0.5 pp band is about right here, and it is the looser of the two geometry
 percentages for a reason — rotamer classification depends on the sidechain completeness and altloc
@@ -108,6 +119,9 @@ pipelines — cctbx, standalone probe, wwPDB — now agree on clashscore far ins
 > precision.
 >
 > **Rotamer outlier %: ± 0.5 pp** — confirmed, max observed 0.34 pp.
+>
+> **Ramachandran favored %: ± 0.2 pp** (max observed 0.16 pp over 17 entries), replacing ± 1.0 pp.
+> **Rotamer favored % remains unmeasured** — no wwPDB reference exists for it.
 >
 > **R-free: |Δ| ≤ 0.02 vs the deposited value** (max observed 0.0128), but **|Δ| ≤ 0.01 vs
 > `DCC_Rfree`**, the wwPDB-recomputed figure (max observed 0.0067, median 0.0000). State which
