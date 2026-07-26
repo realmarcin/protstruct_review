@@ -112,21 +112,42 @@ criteria:
         text: "< 0.70 indicates an unusually disordered model (or a bug)"
       resolution_dependence: "Disagreement concentrates at helix/strand ends; DSSP-vs-STRIDE agree ~94.7% on well-ordered structure."
     cross_tool_agreement:
-      tolerance: "agent-vs-DSSP ≥ 0.85; two-assigner floor ≥ 0.80"
+      tolerance: "agent-vs-DSSP ≥ 0.85; two-assigner: DSSP H+E content ≥ 0.20 AND agreement ≥ 0.65"
       tools: "DSSP vs biotite P-SEA (t15_ss_agreement.py)"
-      precondition: "disclose which assigner was used"
+      precondition: "disclose which assigner was used. GATE ON SS CONTENT, NOT AGREEMENT: three-state agreement is degenerate at the bad end — a model with no secondary structure scores 1.0 because both assigners label everything coil, so perturbing 1UBQ raises its agreement from 0.75 to 1.00 at 2 Å noise. High agreement with low SS content is a FAILURE signal. Given adequate content the agreement floor is fold-class dependent — expect α-rich ~0.80-0.85 and β-rich ~0.68-0.72, because P-SEA infers strands from Cα geometry and DSSP from backbone H-bonds"
       provenance:
-        - template
-      citation: "ref/thresholds_and_standards.md"
+        - benchmark
+      citation: "ref/research/tolerance_benchmark_ss_agreement.md — 16 well-ordered structures (agreement 0.679-0.850, SS content 0.46-0.78) plus 4 degraded models (agreement 0.74-1.00, SS content 0.00-0.37); the previous 0.80 floor failed on 12/16 good structures while passing the 1 Å and 2 Å wreckage (scripts/bench_t15_ss_agreement.py, issue #38)"
       provisional: false
     example_measurements:
       - structure_id: 1sar
         value_numeric: 0.86
         unit: fraction
         tool: DSSP + biotite P-SEA
-        source: "scripts/t15_ss_agreement.py run"
+        source: "scripts/t15_ss_agreement.py run (0.8646 after the gemmi-convert input fix)"
         verdict: normal
-        interpretation: "165/191 residues concordant; DSSP 191 vs biotite 192 (1 residue scored by only one)."
+        interpretation: "165/191 residues concordant; DSSP 191 vs biotite 192 (1 residue scored by only one). NOT typical: 1SAR scores higher than every one of the 16 well-ordered structures in the benchmark, and the retired 0.80 floor was generalised from this single value."
+      - structure_id: 3est
+        value_numeric: 0.6792
+        unit: fraction
+        tool: DSSP + biotite P-SEA
+        source: "scripts/bench_t15_ss_agreement.py (163/240 concordant)"
+        verdict: normal
+        interpretation: "Lowest agreement in the benchmark, on a well-ordered β-rich protease — the regime where P-SEA's Cα-geometry strand calls diverge most from DSSP's H-bond ones. This is the case that sets the 0.65 floor. Its SS content is 0.483, well inside the interpretable range."
+      - structure_id: 1ubq_perturbed_2A
+        value_numeric: 1.0
+        unit: fraction
+        tool: DSSP + biotite P-SEA
+        source: "scripts/bench_t15_ss_agreement.py (1UBQ with 2 Å Gaussian coordinate noise; DSSP assigns all 76 residues coil, SS content 0.000)"
+        verdict: anomalous
+        interpretation: "PERFECT agreement on a destroyed model — both assigners find no secondary structure and so agree on every residue. The case that shows an agreement floor cannot work and the gate must be on SS content."
+      - structure_id: 1mbn
+        value_numeric: 0.8497
+        unit: fraction
+        tool: DSSP + biotite P-SEA
+        source: "scripts/bench_t15_ss_agreement.py (130/153 concordant)"
+        verdict: normal
+        interpretation: "Highest agreement in the benchmark, on an all-α fold — the opposite end of the fold-class dependence from 3EST."
 
   - id: T16_interface_buried_surface_area
     name: Interface buried surface area

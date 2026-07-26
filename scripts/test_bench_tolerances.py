@@ -246,4 +246,56 @@ check("gemmi bond and angle rmsD parsed together",
       t05lib._GEMMI_RMSD.search("Model rmsD: bond: 0.020, angle: 2.134, torsion: 27.1").groups(),
       ("0.020", "2.134"))
 
+
+
+# --- Round 4: validation-report parsing, and the hyphenated-attribute trap ---------
+
+dep = load("bench_vs_deposited")
+
+ENTRY = ('<Entry DCC_R="0.1739" DCC_Rfree="0.2358" PDB-Rfree="0.2340" '
+         'absolute-percentile-DCC_Rfree="47.6" high-resol-relative-percentile-DCC_Rfree="1.36" '
+         'clashscore="1.18" absolute-percentile-clashscore="95.0" DataCompleteness="98.50">')
+
+# The trap: a (\w+)="..." scan matches the TAIL of the prefixed attributes and returns
+# a percentile where an R-free was wanted. These pin the exact-name behaviour.
+check("DCC_Rfree read exactly, not the percentile variant",
+      dep.entry_attribute(ENTRY, "DCC_Rfree"), 0.2358)
+check("PDB-Rfree (deposited) read separately from DCC_Rfree",
+      dep.entry_attribute(ENTRY, "PDB-Rfree"), 0.2340)
+check("clashscore not confused with its percentile",
+      dep.entry_attribute(ENTRY, "clashscore"), 1.18)
+check("DataCompleteness read", dep.entry_attribute(ENTRY, "DataCompleteness"), 98.50)
+check("a missing attribute yields None, never a stray match",
+      dep.entry_attribute(ENTRY, "Rwork"), None)
+
+check("ramalyze outlier SUMMARY parsed",
+      float(dep._RAMA_OUT.search("SUMMARY: 0.00% outliers (Goal: < 0.2%)").group(1)), 0.0)
+check("ramalyze favored SUMMARY parsed",
+      float(dep._RAMA_FAV.search("SUMMARY: 98.15% favored (Goal: > 98%)").group(1)), 98.15)
+check("model_vs_data completeness parsed",
+      float(dep._MVD_COMPLETENESS.search("  Completeness in resolution range: 0.984612"
+                                         ).group(1)), 0.984612)
+
+
+# --- Round 4: SS-agreement and DockQ-mapping helpers ------------------------------
+
+t15b = load("bench_t15_ss_agreement")
+t16map = load("bench_t16_dockq_mapping")
+
+check("t15 agreement value parsed", float(t15b._AGREEMENT.search("    value_numeric: 0.7500"
+                                                                 ).group(1)), 0.75)
+check("t15 concordant counts parsed",
+      t15b._COUNTS.search("57/76 concordant over residues").groups(), ("57", "76"))
+
+# Only same-sequence chains may be swapped: a different sequence is an error, not
+# ambiguity, and scoring it would inflate the measured mapping cost.
+HOMO = {"A": "AAAA", "B": "BBBB", "C": "AAAA", "D": "BBBB"}
+maps = t16map.plausible_mappings(HOMO)
+check("homo-oligomer: identity mapping is offered first", maps[0], ("ABCD", "ABCD"))
+check("homo-oligomer: only same-sequence swaps are enumerated",
+      all(all(HOMO[m] == HOMO[n] for m, n in zip(*pair)) for pair in maps), True)
+check("hetero-complex: no ambiguity to measure",
+      t16map.plausible_mappings({"A": "AAAA", "B": "BBBB"}), [("AB", "AB")])
+check("single chain: nothing to map", t16map.plausible_mappings({"A": "AAAA"}), [])
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
