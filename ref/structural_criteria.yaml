@@ -50,12 +50,12 @@ criteria:
         text: "≳ 40 signals severe packing / build errors"
       resolution_dependence: "Clashscore percentile is resolution-graded; absolute counts rise at lower resolution."
     cross_tool_agreement:
-      tolerance: "± 1.0"
-      tools: "PHENIX/mmtbx vs MolProbity standalone"
-      precondition: "matched hydrogen-build convention (electron-cloud vs nuclear)"
+      tolerance: "|Δ| ≤ 1.0, or 20 % of the mean, whichever is larger"
+      tools: "PHENIX/cctbx vs MolProbity standalone (reduce + probe)"
+      precondition: "matched hydrogen-build convention (electron-cloud vs nuclear); a mismatched convention gives 6-23 units of disagreement and VOIDS the comparison rather than failing it"
       provenance:
-        - template
-      citation: "ref/thresholds_and_standards.md (Chen 2010; Williams 2018)"
+        - benchmark
+      citation: "ref/research/tolerance_benchmark_clashscore_h.md — 10 models, matched median |Δ| 0.115, max 2.27; mismatched median 9.95, max 22.97 (scripts/bench_t05_clashscore_h.py)"
       provisional: false
     example_measurements:
       - structure_id: 1sar
@@ -64,8 +64,15 @@ criteria:
         tool: MolProbity (gold)
         source: "data/coscientists/openscientist/EVAL_1sar_cdba2c07_2026-04-24.yaml"
         verdict: normal
-        interpretation: "11 clashes / 3027 atoms; in line with mmtbx 3.13 (Δ 0.5, within H-build noise)."
-    notes: "The H-build shift is the dominant caveat (≈ 0.5 on this repo's 1SAR: 3.13 cctbx vs 3.63 standalone — an in-repo observation, not a general figure); both tools must use the same H model when compared."
+        interpretation: "11 clashes / 3027 atoms; in line with mmtbx 3.13 (Δ 0.5). Note the benchmark's matched-convention floor is 0.115, so this Δ is larger than implementation noise alone."
+      - structure_id: 24mr
+        value_numeric: 13.61
+        unit: clashes per 1000 atoms
+        tool: mmtbx.validation_summary
+        source: "scripts/bench_t05_clashscore_h.py (standalone electron-cloud 11.34, Δ -2.27 = 17 %; standalone nuclear 28.54, Δ +14.93)"
+        verdict: normal
+        interpretation: "Worst matched-convention disagreement in the benchmark, and the reason the tolerance carries a 20 % relative term: 2.27 units is 17 % of a clashscore of 13.6. The same model under a mismatched H convention differs by 14.9 units."
+    notes: "The H-build convention is not a caveat but the dominant term: benchmarked, a nuclear-vs-electron-cloud mismatch shifts the score by a median of 9.95 units (max 22.97), while a matched convention agrees to a median of 0.115. The earlier in-repo 1SAR figure (≈ 0.5) understated this by an order of magnitude because it compared two electron-cloud builds. H-atom COUNT agreement (benchmarked max 0.013 %) does not imply H-position agreement and must not be cited as evidence that two H builds match."
 
   - id: T15_secondary_structure_agreement
     name: Secondary-structure assignment agreement (three-state)
@@ -307,3 +314,178 @@ criteria:
         source: "scripts/t17_nmr_ensemble.py run"
         verdict: normal
         interpretation: "Ordered core 74/76 residues; whole-chain mean 0.428 Å inflated by 2 flexible C-terminal residues (max 5.9 Å)."
+
+  - id: T06_r_factor_offset
+    name: Independent-code-path R offset
+    category: data_quality
+    catalog_task_refs:
+      - T06
+    unit: dimensionless
+    is_gradeable: true
+    definition: >-
+      Difference between the crystallographic R-work reported by PHENIX and the same
+      quantity re-derived from an independent structure-factor calculation,
+      R = Σ||F_obs| − |F_calc|| / Σ|F_obs| over the work set. Bounds how far an
+      independent re-derivation may land from PHENIX before the difference means
+      something about the model rather than about the two implementations.
+    definition_refs:
+      - ref: Brunger1992
+        full: "Brünger AT. Free R value: a novel statistical quantity for assessing the accuracy of crystal structures. Nature 1992; 355:472-475."
+    computations:
+      - tool: phenix.model_vs_data
+        family: cctbx
+        installed: true
+        recipe: "phenix.model_vs_data model.pdb data.mtz  # r_work"
+        recipe_language: bash
+        recipe_notes: "Refits k_iso / k_aniso / k_mask PER RESOLUTION BIN, so its R is systematically the lower of the two."
+      - tool: gemmi sfcalc
+        family: non_cctbx
+        installed: true
+        recipe: "gemmi sfcalc --dmin=<d_min> --radii-set=cctbx --scale-to=data.mtz:FP:SIGFP --to-mtz=calc.mtz model.pdb"
+        recipe_language: bash
+        recipe_notes: "Same flat-mask bulk-solvent + anisotropic scaling model as PHENIX — NOT a simplified code path — but one GLOBAL scale rather than per-bin. Sum R outside the program. --radii-set=cctbx is required: gemmi's default vdw mask adds a further median +0.0043 (max +0.014)."
+    value_ranges:
+      normal:
+        text: "R_work ~0.13-0.26 for the deposited entries benchmarked; the offset itself is ~0.007"
+      anomalous:
+        text: "a NEGATIVE offset (gemmi below PHENIX) is off-distribution — gemmi read high in 15/15 — and indicates a configuration problem, most often a free-flag convention error"
+    cross_tool_agreement:
+      tolerance: "|Δ R| ≤ 0.02"
+      tools: "gemmi sfcalc vs phenix.model_vs_data"
+      precondition: "same model, same MTZ, same work set, and matched mask radii (--radii-set=cctbx); the free-flag test value must be determined per file (two-valued flags = minority is the test set; CCP4 multi-bin flags = bin 0 is the test set) — inverting it computes R-free and calls it R-work, worth about +0.06"
+      provenance:
+        - benchmark
+      citation: "ref/research/tolerance_benchmark_r_offset.md — 15 entries, 1.20-2.92 Å, median |Δ| 0.0069, p90 0.0116, max 0.0151 (scripts/bench_t06_r_offset.py)"
+      provisional: false
+    example_measurements:
+      - structure_id: 12lo
+        value_numeric: 0.0046
+        unit: dimensionless
+        tool: gemmi sfcalc
+        source: "scripts/bench_t06_r_offset.py (PHENIX 0.1740, gemmi 0.1786, 11025 work reflections at 1.37 Å)"
+        verdict: normal
+        interpretation: "Typical offset; the gemmi work-set size matched PHENIX's Nwork exactly, confirming the free-flag convention was read correctly."
+      - structure_id: 11mq
+        value_numeric: 0.0151
+        unit: dimensionless
+        tool: gemmi sfcalc
+        source: "scripts/bench_t06_r_offset.py (PHENIX 0.2331, gemmi 0.2482 at 2.38 Å; mask-convention effect +0.0140)"
+        verdict: borderline
+        interpretation: "Largest offset in the benchmark, and the one with the largest mask-convention sensitivity — nearly all of it disappears under a matched mask. CCP4 multi-bin free flags (bin 0 = test), verified against PHENIX's Nfree of 517."
+    notes: "The offset is one-sided by construction: per-bin scaling cannot fit worse than global scaling on the same data, so PHENIX's R is always the lower number. Neither value is 'the true R'."
+
+  - id: T05_bond_length_rmsd
+    name: Bond-length RMSD
+    category: geometry
+    catalog_task_refs:
+      - T05
+    unit: "Å"
+    is_gradeable: true
+    definition: >-
+      Root-mean-square deviation of modelled bond lengths from their restraint-library
+      target values, over the covalent-geometry bond population.
+    definition_refs:
+      - ref: EnghHuber1991
+        full: "Engh RA, Huber R. Accurate bond and angle parameters for X-ray protein structure refinement. Acta Cryst. A 1991; 47:392-400."
+      - ref: Moriarty2016
+        full: "Moriarty NW, Tronrud DE, Adams PD, Karplus PA. A new default restraint library for the protein backbone in Phenix: a conformation-dependent geometry goes mainstream. Acta Cryst. D 2016; 72(1):176-179."
+    computations:
+      - tool: phenix.model_statistics
+        family: cctbx
+        installed: true
+        recipe: "phenix.model_statistics model.pdb  # 'covalent geometry : bond' line"
+        recipe_language: bash
+        recipe_notes: "Scores against the conformation-dependent library (CDL), PHENIX's default since ~2016. Use the covalent-geometry line, not the headline Bond: line, which also includes SS-bond and link restraints."
+      - tool: gemmi rmsz
+        family: non_cctbx
+        installed: true
+        recipe: "source ccp4.setup-sh && gemmi rmsz -q model.pdb  # 'Model rmsD: bond' line"
+        recipe_language: bash
+        recipe_notes: "The subcommand is `rmsz`, NOT `validate` (no such gemmi subcommand). It prints rmsZ (unitless) and rmsD (Å) on separate lines; only rmsD is comparable to a PHENIX RMSD. Scores against the CCP4 monomer library via $CLIBD_MON."
+    value_ranges:
+      normal:
+        max_value: 0.02
+        text: "~0.002-0.018 Å across the benchmarked deposited models"
+      anomalous:
+        text: "a NEGATIVE Δ (gemmi below PHENIX) is off-distribution — gemmi read high in 17/17 against PHENIX/CDL"
+    cross_tool_agreement:
+      tolerance: "|Δ| ≤ 0.008 Å"
+      tools: "phenix.model_statistics (CDL) vs gemmi rmsz (CCP4 monomer library)"
+      precondition: "applies to DIFFERING restraint libraries; both tools must restrain the same number of bonds (only 6/17 benchmark models did — where counts differ, often ~2× from alternate-conformation handling, the comparison is VOID: report both figures with their counts). With MATCHED libraries the floor is far tighter and is not measured by this benchmark"
+      provenance:
+        - benchmark
+      citation: "ref/research/tolerance_benchmark_bond_rmsd.md — 17 models; matched-count subset median |Δ| 0.0040 Å, max 0.0070 Å (scripts/bench_t05_bond_rmsd.py)"
+      provisional: false
+    example_measurements:
+      - structure_id: 30iz
+        value_numeric: 0.0038
+        unit: "Å"
+        tool: phenix.model_statistics
+        source: "scripts/bench_t05_bond_rmsd.py (gemmi 0.0080 Å over the same 9513 bonds, Δ +0.0042)"
+        verdict: normal
+        interpretation: "Matched bond count, and the disagreement still exceeds the retired ±0.003 Å tolerance — the library difference alone accounts for it."
+      - structure_id: 30tw
+        value_numeric: 0.0143
+        unit: "Å"
+        tool: phenix.model_statistics
+        source: "scripts/bench_t05_bond_rmsd.py (gemmi 0.0810 Å over 9544 bonds vs PHENIX's 4677, Δ +0.0667)"
+        verdict: anomalous
+        interpretation: "Bond counts differ by ~2×, so the two RMSDs sum over different restraint populations and the Δ is meaningless — the void condition applies."
+    notes: "Same mechanism the review already confirmed for bond angles: a model refined in PHENIX is optimised toward CDL targets, so scoring it against the CCP4 monomer library necessarily reports larger deviations. The direction is fixed, not random."
+
+  - id: T01_ca_rmsd
+    name: Cα RMSD between superposed models
+    category: geometry
+    catalog_task_refs:
+      - T01
+    unit: "Å"
+    is_gradeable: true
+    definition: >-
+      Root-mean-square deviation over Cα pairs that a superposition tool has aligned,
+      after rigid-body superposition. Defined only relative to the set of residues the
+      aligner chose, which is why the aligned-residue count must accompany it.
+    definition_refs:
+      - ref: Zhang2005
+        full: "Zhang Y, Skolnick J. TM-align: a protein structure alignment algorithm based on the TM-score. Nucleic Acids Res. 2005; 33:2302-2309."
+    computations:
+      - tool: phenix.superpose_models
+        family: cctbx
+        installed: true
+        recipe: "phenix.superpose_models fixed.pdb moving.pdb morph=False trim=False  # 'Final ... RMSD: <r> N: <n> of <m>'"
+        recipe_language: bash
+        recipe_notes: "morph and trim default to True and DEFORM the moving model to improve the fit; both must be off to compare against a rigid-body aligner."
+      - tool: TM-align
+        family: non_cctbx
+        installed: true
+        recipe: "TMalign fixed.pdb moving.pdb -ter 0  # 'Aligned length= <n>, RMSD= <r>'"
+        recipe_language: bash
+        recipe_notes: "-ter 0 is required for multi-chain files: by default TM-align stops at the first TER and aligns the FIRST CHAIN ONLY, which on 1A2P/1BNI inflates the aligned-count difference from 31 to 185 residues."
+    value_ranges:
+      normal:
+        text: "0.09-1.6 Å across the benchmarked deposited pairs"
+      anomalous:
+        text: "an RMSD difference over ~0.03 Å between aligners on the SAME aligned-residue count indicates a configuration difference (morphing left on, different atom selection), not a real disagreement"
+    cross_tool_agreement:
+      tolerance: "|Δ| ≤ 0.03 Å"
+      tools: "phenix.superpose_models vs TM-align"
+      precondition: "VOID unless both aligners report the same aligned-residue count — a difference of even ONE residue moved the RMSD by 0.15 Å (1MBN/1MBO); when counts differ, report both RMSDs with their counts instead of a Δ. Also requires morph=False trim=False on the PHENIX side and -ter 0 on the TM-align side"
+      provenance:
+        - benchmark
+      citation: "ref/research/tolerance_benchmark_superposition.md — 20 pairs incl. homologs; matched-selection max |Δ| 0.02 Å (13/20 pairs), unmatched up to 0.66 Å (scripts/bench_t01_superposition.py, issue #30)"
+      provisional: false
+    example_measurements:
+      - structure_id: 1lyz
+        value_numeric: 0.78
+        unit: "Å"
+        tool: phenix.superpose_models
+        source: "scripts/bench_t01_superposition.py (vs 1LZ1; TM-align 0.76 Å over the same 129 residues, Δ +0.02)"
+        verdict: normal
+        interpretation: "Hen vs human lysozyme, ~60 % identity — tied for the largest matched-selection disagreement in the benchmark (with 4LYZ/1LZ1), and still well inside 0.03 Å. The three largest matched disagreements are all homolog pairs, so the floor rises with divergence — but only to 0.02 Å."
+      - structure_id: 1mbn
+        value_numeric: 0.46
+        unit: "Å"
+        tool: phenix.superpose_models
+        source: "scripts/bench_t01_superposition.py (vs 1MBO; TM-align 0.61 Å over 153 residues vs PHENIX's 152, Δ -0.15)"
+        verdict: anomalous
+        interpretation: "A one-residue selection difference produced a 0.15 Å RMSD gap — 5× the tolerance. This is the case that makes the same-count condition a gate rather than advice."
+    notes: "Selection dominates this measurement. On matched selections the two aligners agree to 0.02 Å; off them they diverge to 0.50 Å, so the aligned-residue count must always be reported alongside the RMSD."
