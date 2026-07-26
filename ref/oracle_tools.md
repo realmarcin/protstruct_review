@@ -31,7 +31,7 @@ for r in d['tool_recommendations']:
 
 | Oracle | Version | Path | Catalog tasks served |
 |---|---|---|---|
-| **gemmi** | 0.7.5 | `/opt/homebrew/bin/gemmi` (brew tap `brewsci/bio`) | T01 (`gemmi align`), T06 (`gemmi sfcalc`), T14 (`gemmi h`), T05 (`gemmi validate`) |
+| **gemmi** | 0.7.5 | `/opt/homebrew/bin/gemmi` (brew tap `brewsci/bio`) | T01 (`gemmi align`), T06 (`gemmi sfcalc`), T14 (`gemmi h`), T05 (**`gemmi rmsz`** — there is no `gemmi validate` subcommand) |
 | **TM-align** | 20220412 | `$HOME/tools/tmalign/TMalign` | T01 (TM-score, sequence-independent superposition) |
 | **probe** (Richardson lab) | 2.26.021123 | `$HOME/tools/probe-src/probe` | T05 (clash detection — feeds clashscore) |
 | **reduce** (Richardson lab) | 4.16.250520 | `$HOME/tools/reduce-src/build/reduce_src/reduce` | T14 (H-atom placement); T05 (input prep for clashscore) |
@@ -82,7 +82,7 @@ export PATH="$HOME/tools/probe-src:$HOME/tools/reduce-src/build/reduce_src:$HOME
 ## Verifying after install
 
 ```bash
-gemmi --version            # 0.7.5
+gemmi --version            # 0.7.5  (needs zlib-ng: `brew install zlib-ng`, else dyld fails to load libz-ng)
 TMalign | head -2          # TM-align Version 20220412
 probe -version             # probe.2.26.021123
 reduce -version            # reduce.4.16.250520
@@ -95,7 +95,7 @@ conda activate cryst-oracles && servalcat --version  # 0.4.131
 |---|---|---|---|
 | T01 | `phenix.superpose_models` | TM-align, `gemmi align`, OpenStructure (`lddt`), CCP4 ProSMART | ChimeraX matchmaker, US-align |
 | T03 | `phenix.refine` | `servalcat refine_xtal_norefmac`, CCP4 REFMAC5 (`NCYC=0` for in-place R-factors) | BUSTER |
-| T05 | `phenix.holton_geometry_validation` | `probe` + `reduce` (std MolProbity), `gemmi validate`, CCP4 ProSMART | wwPDB validation pipeline |
+| T05 | `phenix.holton_geometry_validation` | `probe` + `reduce` (std MolProbity), `gemmi rmsz`, CCP4 ProSMART | wwPDB validation pipeline |
 | T06 | `phenix.model_vs_data` | `gemmi sfcalc`, `servalcat fsc`/`fofc`/`sigmaa`, CCP4 REFMAC5 | CCP4 sfcheck |
 | T12 | `phenix.mtriage` | `servalcat fsc`, `servalcat localcc` | RELION postprocess, ResMap |
 | T13 | `phenix.model_vs_data` (completeness, resolution range) | CCP4 ctruncate (Wilson B, L-test twinning, ΔB aniso, tNCS, ice rings); CCP4 aimless when unmerged intensities exist; wrapper `scripts/t13_data_quality.py` | (CC½ / ⟨I/σ⟩ / Rmerge require unmerged intensities — gap when artefact ships merged-only) |
@@ -185,6 +185,16 @@ cd reduce-src && mkdir build && cd build && cmake .. && make
 ```bash
 mamba create -n cryst-oracles -c conda-forge python=3.11 servalcat
 ```
+
+> **Two gemmi gotchas, both found by running it** (`ref/research/tolerance_benchmark_bond_rmsd.md`,
+> `ref/research/tolerance_benchmark_r_offset.md`):
+> - The Homebrew build links against `libz-ng`, which is **not** pulled in as a dependency. Without
+>   `brew install zlib-ng` every `gemmi` invocation dies in dyld — the binary is on PATH and still
+>   unusable, so "installed" is not the same as "runnable" here.
+> - `gemmi rmsz` prints **rmsZ** (unitless) and **rmsD** (Å) on separate lines. Only rmsD compares
+>   to a PHENIX RMSD; reading the rmsZ line instead is a units error, not a disagreement.
+> - The Python module is separate from the CLI (`pip install gemmi`); the CLI recipes above do not
+>   need it, but `scripts/bench_t06_r_offset.py` does.
 
 **gemmi** — Homebrew (the `brewsci/bio` tap):
 ```bash

@@ -159,4 +159,50 @@ check("ctruncate Wilson B parsed", float(t13._CT_WILSON.search(CTRUNCATE_LOG).gr
 check("a log missing the Wilson line yields no match — never a default value",
       t13._XT_WILSON.search("Sorry: Multiple equally suitable arrays"), None)
 
+
+
+# --- T06: free-flag convention (the bug that computed R-free and called it R-work) ---
+# Reading this backwards is worth ~+0.06 in R, four times the offset being measured,
+# so both conventions and the refusal case are pinned.
+
+t06 = load("bench_t06_r_offset")
+
+check("two-valued flags: the minority value is the test set",
+      t06.free_test_value([0] * 90 + [1] * 10), 1)
+check("two-valued flags, inverted convention (PHENIX-style) is handled too",
+      t06.free_test_value([1] * 90 + [0] * 10), 0)
+check("CCP4 multi-bin flags: bin 0 is the test set",
+      t06.free_test_value([i % 20 for i in range(2000)]), 0)
+check("an even two-way split is refused, not guessed",
+      t06.free_test_value([0] * 50 + [1] * 50), None)
+check("a single-valued flag column is refused",
+      t06.free_test_value([0] * 100), None)
+check("multi-bin flags with no bin 0 are refused",
+      t06.free_test_value([i % 5 + 1 for i in range(500)]), None)
+
+
+# --- T05 / T01: log parsing. A format change must fail loudly, not default. ---
+
+t05cs = load("bench_t05_clashscore_h")
+t05geom = load("bench_t05_bond_rmsd")
+t01 = load("bench_t01_superposition")
+
+check("phenix clashscore parsed", float(t05cs._CLASHSCORE.search("clashscore = 32.59").group(1)),
+      32.59)
+check("gemmi rmsD (Å) parsed, not rmsZ",
+      float(t05geom._GEMMI_RMSD.search(
+          "Model rmsZ: bond: 1.709, angle: 1.204\nModel rmsD: bond: 0.020, angle: 2.134"
+      ).group(1)), 0.020)
+check("phenix covalent-geometry bond line parsed with its count",
+      t05geom._PHENIX_COVALENT_BOND.search(
+          "  covalent geometry    : bond        0.01826 ( 1532)").groups(), ("0.01826", "1532"))
+check("TM-align aligned length and RMSD parsed",
+      t01._TM.search("Aligned length= 129, RMSD=   0.76, Seq_ID=n_identical/n_aligned= 0.605"
+                     ).groups(), ("129", "0.76"))
+check("phenix superpose final line parsed",
+      t01._PHENIX_FINAL.search("Final 1LZ1.pdb RMSD: 0.78 N: 129 of 129").groups(),
+      ("0.78", "129", "129"))
+check("a superpose log that crashed yields no match — never a default RMSD",
+      t01._PHENIX_FINAL.search("AttributeError: 'NoneType' object has no attribute"), None)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
