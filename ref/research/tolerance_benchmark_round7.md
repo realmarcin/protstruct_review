@@ -81,7 +81,12 @@ Half-maps fix the **half-map** FSC — they make the *map* resolution estimate w
 **model-map** FSC crossings degenerate. They are different quantities and only the second is what
 the tolerance gates on.
 
-**Diagnosis: it is a model-to-map coverage problem, not a missing reference.**
+> **WITHDRAWN by round 8.** The coverage explanation below was drawn from two entries and does not
+> survive a wider set: 21BQ at 71 atoms per 10⁶ Å³ — within 2.6× of 9VJD's 27 — produces a perfectly
+> sensible `d_FSC_model`. Failure rate is 1 of 6 EM entries and the cause is **not identified**. See
+> `ref/research/tolerance_benchmark_round8.md`. The negative result (half-maps do not fix it) stands.
+
+**Diagnosis (withdrawn): a model-to-map coverage problem, not a missing reference.**
 
 | Entry | atoms | map box | atoms per 10⁶ Å³ | `d_fsc_model` |
 |---|---:|---|---:|---|
@@ -92,9 +97,8 @@ the tolerance gates on.
 assembly map. The model-map FSC is then dominated by unmodelled density, and no amount of half-map
 information repairs that, because the half-maps describe the *map*, not the model's coverage of it.
 
-**Applied:** `d_FSC_model` stays ungateable, now with the reason established rather than assumed. A
-usable version of the clause would have to be conditioned on model-to-map coverage — measurable as
-atoms per unit box volume — and that condition is not currently part of the tolerance.
+**Applied:** `d_FSC_model` stays ungateable. The reason was *not* established — see the withdrawal
+above; round 8 refuted the coverage threshold this section proposed.
 
 ## 3. Rotamer favored/allowed boundary — bounded rather than verified
 

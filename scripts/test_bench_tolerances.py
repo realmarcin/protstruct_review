@@ -418,4 +418,19 @@ check("boundary exposure counts only residues near the cutoff",
 check("boundary exposure as a percentage", exposure["exposed_pct_x1.25"], 50.0)
 check("no scored residues yields an empty result", dep.boundary_exposure("no residues here"), {})
 
+
+
+# --- Round 8: restrained refinement mode ----------------------------------------
+
+# The restrained and unrestrained runs must not collide in the cache, or the second
+# would silently read the first's output and report a zero difference between them.
+check("restrained and unrestrained refinements use distinct prefixes",
+      refdel.refine_prefix("12lo", True) != refdel.refine_prefix("12lo", False), True)
+check("low-resolution restraints request NCS and secondary structure",
+      ("ncs_search.enabled=True" in refdel.LOW_RES_RESTRAINTS
+       and "secondary_structure.enabled=True" in refdel.LOW_RES_RESTRAINTS), True)
+# reference_model restraints would restrain the model to itself here, so they must
+# NOT be in the recipe.
+check("reference_model restraints excluded", "reference_model" in refdel.LOW_RES_RESTRAINTS, False)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
