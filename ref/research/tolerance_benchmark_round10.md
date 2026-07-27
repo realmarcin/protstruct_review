@@ -31,6 +31,22 @@ entries — that was the warning, and it was right.
 **`d_FSC_model` is comfortable**: max |Δ| **0.0094 Å** against ± 0.05 Å, ~5× headroom, now measured
 on all 6 rather than the 3 round 9 could complete.
 
+That 0.0094 is an **upper bound on the refinement effect**, not a clean measure of it. Two reasons:
+
+- **The estimator changed between rounds.** Round 9's ± 0.0007 used the interim last-crossing rule;
+  the sustained rule is noisier on the same entries (27WR +0.0007 → +0.0028, 10GX 0.0000 → −0.0038),
+  so the 13× increase in the reported maximum is partly the rule, not only the larger set.
+- **Part of each Δ is shell quantisation.** The sustained rule returns the start of a run of 20
+  sub-threshold shells, which can move several shells for a small curve change:
+
+  | Entry | crossing | local shell spacing | Δ | Δ in shells |
+  |---|---:|---:|---:|---:|
+  | 27WR | 2.5893 Å | 0.00132 Å | 0.0028 Å | **~2** |
+  | 10GX | 2.6904 Å | 0.00008 Å | 0.0038 Å | ~47 |
+
+  27WR's Δ is two shells — the estimator's own resolution. 10GX's is a real curve movement. The
+  sustained rule buys accuracy (it rejects both FSC artefacts) at the cost of precision.
+
 ## 2. §4 high-resolution end (3 → 9 entries below 2.0 Å)
 
 Round 8 recorded that the `< 2.5 Å` band rested on 3 entries below 2.0 Å and had "2× headroom".
@@ -85,7 +101,9 @@ values* between two implementations, applied to residues near the cutoff.
 > refinement breached on 1 of 6 EM entries (21BQ, −0.0139). Max observed 0.0139; the band is rounded
 > up from that on a 6-entry set.
 >
-> **`d_FSC_model` ± 0.05 Å retained**, now on all 6 EM entries: max |Δ| 0.0094 Å, ~5× headroom.
+> **`d_FSC_model` ± 0.05 Å retained**, now on all 6 EM entries: max |Δ| 0.0094 Å, ~5× headroom —
+> and that maximum is an **upper bound**, since part of it is the sustained estimator's shell
+> quantisation rather than model movement.
 >
 > **§4 `< 2.5 Å` bands retained** (+0.10 Å, − 0.5 pp) and validated on 14 entries including 9 below
 > 2.0 Å — but the headroom is **1.15×**, not the 2× round 8 reported. Treat as at the edge of its
@@ -102,4 +120,8 @@ values* between two implementations, applied to residues near the cutoff.
   be re-checked whenever entries are added, not treated as settled.
 - chi1 only. chi2–chi4 are not compared, and a rotamer name depends on all of them; agreement on
   chi1 is strong evidence but not proof that the full assignment geometry matches.
+- `d_FSC_model` Δs are not comparable across rounds 9 and 10: the crossing rule changed, and the
+  sustained rule reports larger differences for the same curves.
 - All refinements `phenix.refine` / `phenix.real_space_refine`, 3 macro-cycles, default weights.
+- One high-resolution entry (9LK0) failed in `phenix.refine` — the same missing-ligand-restraint
+  failure seen in round 5 — and is reported rather than dropped.
