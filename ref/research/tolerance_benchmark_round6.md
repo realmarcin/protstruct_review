@@ -88,9 +88,25 @@ flagged. This does the converse. Each deposited model is damaged by known Gaussi
 | ≥ 0.30 | ≥ 0.52 | 9 / 9 | up to 1073× |
 
 For reference, the **null** re-refinements from round 5 gave clashscore ratios of **0.00 – 4.26×**.
+Comparing those aggregate extremes would be misleading — the 4.26× null maximum and the 8.5× damage
+minimum come from opposite ends of the clashscore range — so the separation is given **per model**:
+
+| Model | pre | null ratio | σ = 0.1 damage ratio | margin |
+|---|---:|---:|---:|---:|
+| 30TW | 1.17 | 4.26× | 76.2× | 17.9× |
+| 12LO | 1.18 | 0.00× | 77.2× | — |
+| 30IZ | 1.83 | 2.09× | 59.9× | 28.7× |
+| 37AP | 2.49 | 0.89× | 39.2× | 44.0× |
+| 28SX | 4.24 | 3.45× | 23.3× | **6.7×** |
+| 11AF | 6.65 | 0.97× | 16.7× | 17.2× |
+| 28SW | 11.53 | 1.15× | 10.1× | 8.8× |
+| 24MR | 13.61 | 0.80× | 8.5× | 10.5× |
+
+Every model separates, with a worst-case margin of 6.7×.
 
 **Finding A — there is a detection floor at ~0.1 Å.** At σ = 0.05, which moves Cα by about 0.09 Å,
-**7 of 9 damaged models pass every band**. That is not a tuning problem: 0.09 Å is inside the
+**7 of 9 damaged models pass every band**. (The 2 that were caught were caught by the *Ramachandran
+favored* clause, not by ΔRMSD — favored % occasionally notices sub-floor damage, but not reliably.) That is not a tuning problem: 0.09 Å is inside the
 null-refinement spread (up to 0.107 Å), so no Δ band on these quantities can separate that damage
 from ordinary refinement jitter. Degradation below ~0.1 Å Cα RMSD is invisible to §4 by construction,
 and should be stated rather than left as an assumption of sensitivity.
@@ -109,6 +125,14 @@ the separation is clean:
 
 so a ratio threshold in the gap between them is a real check where a difference band was not.
 
+**Finding D — but the ratio gate has a validity limit, and it is not far away.** At σ = 0.1 Å the
+damaged clashscore lands at **89–117 regardless of where it started** (1.17 → 89.20; 13.61 → 115.04).
+The damage ratio is therefore approximately **100 / pre**, which means a 5× gate only fires while the
+starting clashscore is **≲ 20**. A model deposited above that — the benchmark's own set already
+reaches 13.6 — could be damaged at σ = 0.1 Å and not trip the gate. Above pre ≈ 20 the ratio is the
+wrong statistic and the **absolute** post-clashscore against §2's quality bar is what still works: a
+value near 100 is unambiguous however it is normalised.
+
 ## Applied
 
 > **Asn/Gln/His flip sets: expect ≤ 10 % of flippable residues to differ** between independent H
@@ -121,9 +145,12 @@ so a ratio threshold in the gap between them is a real check where a difference 
 > verdict. The underlying rotamer *assignment* is reproduced exactly — 8054/8054 residues over 17
 > entries — so assignment disagreement is not a risk to the band.
 >
-> **§4 clashscore: gate on the ratio, not the difference.** `clashscore_post / clashscore_pre ≥ 5×`
-> is evidence of degradation (null re-refinement ≤ 4.26×; σ = 0.1 Å damage ≥ 8.5×). The *difference*
-> stays ungated, as round 5 concluded.
+> **§4 clashscore: gate on the ratio, not the difference — while `clashscore_pre ≲ 20`.**
+> `clashscore_post / clashscore_pre ≥ 5×` is evidence of degradation; every model separates its null
+> ratio from its σ = 0.1 Å damage ratio by at least 6.7×. **Above pre ≈ 20 the gate stops working**:
+> damage drives clashscore to ~100 regardless of the starting value, so the ratio collapses towards
+> 5× and below. There, compare the **absolute** post-clashscore against §2's quality bar instead. The
+> *difference* stays ungated in all cases, as round 5 concluded.
 >
 > **§4 detection floor: degradation below ~0.1 Å Cα RMSD is not detectable** by any §4 clause —
 > 7 of 9 models damaged at σ = 0.05 Å passed everything. State this alongside the bands; it is a

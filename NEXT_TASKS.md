@@ -61,8 +61,11 @@ is documented as ungateable rather than enforced.
 Round 5 used 8 X-ray + 2 EM entries for the null case; round 6 used 9 for detection. Both are thin,
 and two specific numbers rest on single observations:
 
-- the **clashscore ratio gate (≥ 5×)** sits in the gap between a null maximum of 4.26× (n = 8) and a
-  σ = 0.1 Å damage minimum of 8.5× (n = 9). A wider set could close that gap.
+- the **clashscore ratio gate (≥ 5×)** separates per model by ≥ 6.7×, but has a **validity limit at
+  `clashscore_pre ≈ 20`** (issue #43): damage drives clashscore to ~100 regardless of starting value,
+  so the ratio is ≈ 100/pre and collapses on already-poor models. No benchmark model starts above
+  13.6, so the limit is extrapolated, not observed — a set including poor-geometry depositions would
+  test it directly.
 - the **EM CC_mask band** rests on 2 entries, one of which consumed 65 % of it on a null refinement.
 
 ### [ ] Rotamer favored/allowed boundary — the residual unknown
