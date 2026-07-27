@@ -8,7 +8,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Seven rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
+Eight rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
 in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 found that
 **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
@@ -22,7 +22,8 @@ resolution range and breached by null re-refinement once low-resolution entries 
 | 4 | [#36](https://github.com/realmarcin/protstruct_review/pull/36) (2026-07-26) | Ramachandran/rotamer outlier %, R-free, completeness, SS agreement, DockQ mapping, NMR ordered core |
 | 5 | [#39](https://github.com/realmarcin/protstruct_review/pull/39) (2026-07-26) | the §4 refinement Δ-tolerances (X-ray + cryo-EM), Ramachandran favored % |
 | 6 | [#42](https://github.com/realmarcin/protstruct_review/pull/42) (2026-07-26) | flip sets vs reduce2, rotamer assignment agreement, §4 detection floor |
-| 7 | [#44](https://github.com/realmarcin/protstruct_review/pull/44) (2026-07-26) | §4 bands made resolution-conditional; `d_FSC_model` diagnosed; rotamer boundary bounded |
+| 7 | [#44](https://github.com/realmarcin/protstruct_review/pull/44) (2026-07-26) | §4 bands made resolution-conditional; rotamer boundary bounded |
+| 8 | [#46](https://github.com/realmarcin/protstruct_review/pull/46) (2026-07-26) | 2.5 Å split validated; restraint effect measured; round-7 `d_FSC_model` diagnosis withdrawn |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -43,62 +44,41 @@ hypothesis, and in this repo the hypothesis lost 21 times out of 21. Round 6 add
 false-negative side was testable all along by damaging models rather than refining them.
 
 Round 7 adds the third: **a band this repo measured is a hypothesis too, outside the regime it was
-measured in.** The §4 bands held on 19/19 entries at 1.4–2.9 Å and failed on 10/19 once 3.0–3.6 Å
+measured in.** Round 8 adds the fourth, and it is about explanations rather than numbers: **a
+mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
+`d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
+(1 of 6 entries fails) survived; the story did not. The §4 bands held on 19/19 entries at 1.4–2.9 Å and failed on 10/19 once 3.0–3.6 Å
 entries were added. Before trusting any band here, check the range of the set it came from — every
 benchmark records that in its scope limits for exactly this reason.
 
 ## Open
 
-Round 7 closed all three. Two of them **invalidated bands set in rounds 5 and 6** — the §4 bands were
-fitted to a 1.37–2.92 Å set and fail at low resolution. What is left is narrower again.
+Round 8 closed all four. One result **withdrew a diagnosis published in round 7**. What is left is
+two genuine dead ends and one open mechanism question.
 
-### [ ] Fill the 2.5 Å resolution boundary
+### [ ] `d_FSC_model`: the mechanism is unknown
 
-The §4 bands are now split at `d_min = 2.5 Å` on the strength of 5 entries below and 14 above, with
-**nothing between 2.92 and 3.00 Å**. The split point is a convenience boundary, not a measured
-inflection — the null-refinement spread could turn over anywhere in that gap, or vary smoothly, in
-which case a two-band step is the wrong shape and a resolution-scaled band would be better.
+Round 7 proposed a model-to-map coverage threshold; round 8 refuted it (21BQ at 71 atoms per 10⁶ Å³
+works, 9VJD at 27 does not — within 2.6× of each other). Failure rate is **1 of 6** EM entries and
+nothing yet distinguishes the failing one.
 
-**Execute:** add entries at 2.3–3.1 Å and re-derive; check whether Cα shift and favored-drop vary
-smoothly with `d_min` (a fit) rather than stepping at 2.5 Å.
+**Execute:** the next step is diagnostic, not statistical. Inspect 9VJD's FSC curve directly
+(`fsc_model.masked.mtriage.log`, which mtriage writes) to see *how* it fails — never crossing 0.143,
+crossing at the wrong end, or non-monotonic — and compare against 21BQ's. One curve comparison will
+say more than another five entries.
 
-### [ ] `d_FSC_model`: condition the clause on model-to-map coverage
+### [ ] Rotamer favored/allowed boundary — verified dead end
 
-Round 7 established *why* it degenerates — the model covers a small fraction of the map box (9VJD:
-27 atoms per 10⁶ Å³ against 27WR's 813) — and that half-maps do not help. A usable clause would
-gate on coverage first.
+No independent rotamer library is installed: every `molprobity.*`/`phenix.*` rotamer tool is cctbx,
+biotite exposes only geometric rotation helpers, Bio.PDB has none, and the local Richardson tools are
+`probe`/`reduce`/`tmalign`. ± 1.0 pp stays contingent on the shared-library assumption (3.9 % of
+residues within ×1.25 of the cutoff). Reopen only if a non-cctbx rotamer implementation appears.
 
-**Execute:** measure `d_fsc_model` reliability against atoms-per-box-volume over ~10 EM entries
-spanning the coverage range, find where it breaks down, and make the tolerance conditional on being
-above it. Two entries at opposite extremes is not enough to place the threshold.
+### [ ] High-resolution end of the §4 split is thin
 
-### [ ] Rotamer favored %: the shared-library assumption
-
-± 1.0 pp is now known to be contingent — **3.9 %** of residues sit within ×1.25 of the Favored/
-Allowed cutoff, so a systematic ±25 % scoring difference would move favored % by more than the band.
-It is safe only if both pipelines use the same rotamer library, which the identical assignment of
-8054/8054 residues supports but does not prove.
-
-**Execute:** needs a rotamer implementation with an independent library. None is installed; this is
-the one item in this file with no local path forward.
-
-### [ ] Low-resolution §4 has little discriminating power (#45)
-
-The widened `d_min ≥ 2.5 Å` bands have a detection floor of ~**0.35 Å Cα** (σ ≈ 0.3) against ~0.1 Å at
-high resolution, and the −6 pp favored clause permits 92 % → 86 %. The bands are correct — the null
-spread really is that large — but they leave §4 able to catch only gross damage at low resolution.
-Recorded on the tolerance rather than fixed, because narrowing them would reintroduce the
-false-positive rate round 7 just removed. A genuinely better low-resolution check would need a
-different quantity, not a tighter band on these.
-
-### [ ] Low-resolution refinement protocol
-
-The low-resolution null spreads (up to 0.285 Å Cα, 5.26 pp favored) come from `phenix.refine` with
-**default weights and no NCS or reference-model restraints** — not how a 3.5 Å structure would
-actually be refined. The bands are therefore probably **pessimistic** at low resolution.
-
-**Execute:** re-run the ≥ 2.5 Å subset with restraints appropriate to the resolution and see how far
-the null spread contracts.
+The 26-entry set has only **3 entries below 2.0 Å**, and the `< 2.5 Å` band (0.10 Å) is 2× the
+largest shift observed there (0.045 Å). The band is safe but under-evidenced at the tight end —
+worth 5–6 more entries at 1.0–2.0 Å if §4 becomes load-bearing at high resolution.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

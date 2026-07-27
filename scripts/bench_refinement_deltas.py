@@ -105,16 +105,40 @@ def measure(model: Path, work: Path, tag: str) -> dict[str, Any]:
     }
 
 
-def refine(model: Path, mtz: Path, work: Path) -> tuple[Path | None, dict[str, Any]]:
-    """Re-refine a deposited model against its own data; returns (refined model, R stats)."""
-    prefix = f"r_{model.stem}"
+# Restraints a crystallographer would actually apply at low resolution. Reference-model
+# restraints are deliberately NOT included: they restrain to a higher-resolution
+# homolog, which this benchmark does not have, and pointing them at the input model
+# would restrain it to itself.
+LOW_RES_RESTRAINTS = "ncs_search.enabled=True secondary_structure.enabled=True"
+
+
+def refine_prefix(model_stem: str, restraints: bool) -> str:
+    """Output prefix for a refinement run.
+
+    Restrained and unrestrained runs must not share a prefix: the caching in
+    `refine()` keys on the output file, so a collision would make the second run
+    silently adopt the first's result and report no difference between protocols.
+    """
+    return f"{'rr' if restraints else 'r'}_{model_stem}"
+
+
+def refine(model: Path, mtz: Path, work: Path,
+           restraints: bool = False) -> tuple[Path | None, dict[str, Any]]:
+    """Re-refine a deposited model against its own data; returns (refined model, R stats).
+
+    With `restraints=True`, adds the NCS and secondary-structure restraints normally
+    used at low resolution — the round-7 null spreads came from default weights with
+    neither, which likely made them pessimistic.
+    """
+    prefix = refine_prefix(model.stem, restraints)
     out = work / f"{prefix}_001.pdb"
-    log = work / f"refine_{model.stem}.log"
+    log = work / f"refine_{refine_prefix(model.stem, restraints)}.log"
     if not out.exists():
         subprocess.run(
             ["bash", "-c",
              f"cd {work} && {PHENIX_BIN / 'phenix.refine'} {model} {mtz} "
-             f"main.number_of_macro_cycles={MACRO_CYCLES} output.prefix={prefix} "
+             f"main.number_of_macro_cycles={MACRO_CYCLES} "
+             f"{LOW_RES_RESTRAINTS if restraints else ''} output.prefix={prefix} "
              f"--overwrite > {log} 2>&1"],
             capture_output=True, text=True, timeout=7200, env=dict(os.environ))
     if not out.exists():
@@ -127,7 +151,8 @@ def refine(model: Path, mtz: Path, work: Path) -> tuple[Path | None, dict[str, A
     return out, stats
 
 
-def collect(pairs: list[tuple[Path, Path]], work: Path) -> tuple[list[dict], list[dict]]:
+def collect(pairs: list[tuple[Path, Path]], work: Path,
+            restraints: bool = False) -> tuple[list[dict], list[dict]]:
     """Refine each model and measure the geometry quantities before and after."""
     rows, skipped = [], []
     work.mkdir(parents=True, exist_ok=True)
@@ -138,12 +163,12 @@ def collect(pairs: list[tuple[Path, Path]], work: Path) -> tuple[list[dict], lis
         if pre["clashscore"] is None or pre["rama_favored_pct"] is None:
             skipped.append({"pdb_id": name, "reason": "pre-refinement validation failed"})
             continue
-        refined, r_stats = refine(model, mtz, work)
+        refined, r_stats = refine(model, mtz, work, restraints=restraints)
         if refined is None:
             print("  ! phenix.refine failed", file=sys.stderr)
             skipped.append({"pdb_id": name, "reason": "phenix.refine failed"})
             continue
-        post = measure(refined, work, "post")
+        post = measure(refined, work, "postr" if restraints else "post")
         if post["clashscore"] is None or post["rama_favored_pct"] is None:
             skipped.append({"pdb_id": name, "reason": "post-refinement validation failed"})
             continue
@@ -291,6 +316,8 @@ def main() -> int:
                     help="directory holding <id>.pdb and <id>_g_obs.mtz (bench_t06_r_offset.py)")
     ap.add_argument("--work", help="where to run refinements (default: <cache>/refine)")
     ap.add_argument("--json", dest="json_out")
+    ap.add_argument("--restraints", action="store_true",
+                    help="refine with NCS + secondary-structure restraints (low-resolution practice)")
     ap.add_argument("--detection-test", action="store_true",
                     help="perturb models by known amounts and report which bands fire")
     args = ap.parse_args()
@@ -324,7 +351,7 @@ def main() -> int:
         print(json.dumps(summary, indent=2))
         return 0
 
-    rows, skipped = collect(pairs, work)
+    rows, skipped = collect(pairs, work, restraints=args.restraints)
     summary = summarize(rows)
     if args.json_out:
         Path(args.json_out).write_text(
