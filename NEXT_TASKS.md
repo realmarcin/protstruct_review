@@ -8,7 +8,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Ten rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
+Eleven rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
 in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 found that
 **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
@@ -26,6 +26,7 @@ resolution range and breached by null re-refinement once low-resolution entries 
 | 8 | [#46](https://github.com/realmarcin/protstruct_review/pull/46) (2026-07-26) | 2.5 Å split validated; restraint effect measured; round-7 `d_FSC_model` diagnosis withdrawn |
 | 9 | [#48](https://github.com/realmarcin/protstruct_review/pull/48) (2026-07-27) | `d_FSC_model` mechanism found; the clause is gateable after all |
 | 10 | [#50](https://github.com/realmarcin/protstruct_review/pull/50) (2026-07-27) | EM set completed (CC_mask band breached and widened); §4 high-res end filled; rotamer chi geometry verified |
+| 11 | [#52](https://github.com/realmarcin/protstruct_review/pull/52) (2026-07-27) | both "edge" bands breached; CC_mask made resolution-conditional; rotamer library corroborated |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -51,6 +52,12 @@ mechanism inferred from two data points is a hypothesis.** Round 7 explained a d
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
 
+Round 11 sharpens round 10's lesson into a working rule: **when a band's headroom drops below ~1.2×,
+treat it as already broken.** Round 10 measured 1.15× headroom on the §4 Cα band and called CC_mask
+the thinnest evidence base in the file; round 11 broke both on the first attempt, CC_mask by more
+than 2×. Headroom is a leading indicator, and this repo now has three consecutive rounds of evidence
+that it should be acted on rather than noted.
+
 Round 10 adds a sixth, which is really the first one turned on this repo's own work: **a band is
 only as good as the last entry added to its set.** Completing the EM set from 2 to 6 entries broke
 the CC_mask band that had stood since round 5 — and round 5 had itself flagged that a null
@@ -67,33 +74,37 @@ benchmark records that in its scope limits for exactly this reason.
 
 ## Open
 
-Round 10 completed all three evidence bases. Completing the EM set **broke a band that had stood
-since round 5**, and filling the high-resolution end showed another band to be far closer to its
-limit than reported.
+Round 11 broke both bands round 10 had flagged, on the first try. The rotamer item — closed as a
+dead end in rounds 8 and 10 — turned out to have an independent library after all.
 
-### [ ] Two bands are now at the edge of their evidence
+### [ ] `d_FSC_model` is the next band to break
 
-Neither is violated, but neither has the margin previously claimed:
+Headroom fell from **5× to 1.55×** when the EM set went 6 → 12 entries (max |Δ| 0.0094 → 0.0322 Å
+against ± 0.05 Å). That is the same trajectory CC_mask and the §4 Cα band followed immediately
+before breaking. Expect it to breach on the next widening, and treat a pass as weak evidence.
 
-- **§4 `< 2.5 Å` Cα shift**: band 0.10 Å, largest null shift **0.0867 Å** — **1.15× headroom** over
-  14 entries. Round 8 reported "2×", which was an artefact of having only 3 entries below 2.0 Å.
-- **Map-model CC_mask**: widened to −0.02 after a null refinement breached −0.01 (21BQ, −0.0139).
-  The new band is a rounding-up from a single breach on 6 entries.
+**Execute:** add EM entries and re-derive. Note the estimator contributes some of this Δ
+(round 10, issue #51), so separate estimator jitter from refinement effect before widening.
 
-**Execute:** both need more entries before they can be called settled, and both should be re-checked
-whenever entries are added rather than assumed stable. The CC_mask one is the more urgent: 6 EM
-entries with 1 breach is the thinnest evidence base of any band currently in the file.
+### [ ] CC_mask `≥ 3.0 Å` branch rests on 6 entries
 
-### [ ] Rotamer library lookup — the last unverified step
+The new resolution-conditional band is `− 0.02` below 3.0 Å and `− 0.06` at or above. The upper
+branch has 6 entries, one of which (−0.0475) sets it. **This band has now broken twice in
+consecutive rounds** — −0.01 set on 2 entries broke at 6, −0.02 broke at 13 — so a third break is
+the base case, not a surprise.
 
-Round 10 verified the **geometry**: chi1 from gemmi matches `phenix.rotalyze` to ≤ 0.05° over 8054
-residues, its printed precision. Combined with round 7's boundary exposure (3.9 % of residues within
-×1.25 of the 2 % cutoff), the residual risk to ± 1.0 pp is now precisely one thing: a systematic
-difference in **library density values** between implementations, applied to residues near the
-cutoff. No non-cctbx rotamer library is installed, so it stays unverified.
+Also unmeasured: nothing lies between **2.97 and 3.07 Å**, so the 3.0 Å split point separates the
+observed groups but is not itself located.
 
-Two smaller extensions if this is revisited: **chi2–chi4** are not compared (a rotamer name depends
-on all of them), and chi1 agreement was measured on deposited models only.
+### [ ] Rotamer favored % — measurable comparison still absent
+
+Round 11 established that an independent library exists (CCP4 monomer library chi targets via
+`gemmi rmsz`) and that it ranks sidechains the same way MolProbity does — median torsion |Z| 1.50 /
+3.30 / 4.33 for Favored / Allowed / OUTLIER. That is corroboration, not a measurement: the two
+answer different questions and cannot be differenced into a favored-% tolerance.
+
+Still open if it matters: **chi2–chi4** were never compared (only chi1, verified to 0.05°), and no
+implementation produces a favored/allowed *percentage* from a non-MolProbity library.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

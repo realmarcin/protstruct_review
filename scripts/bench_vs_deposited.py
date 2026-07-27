@@ -46,6 +46,7 @@ RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 VALIDATION_XML = "https://www.ebi.ac.uk/pdbe/entry-files/download/{pdb_id}_validation.xml"
 KEY_STATS = "https://www.ebi.ac.uk/pdbe/api/validation/key_validation_stats/entry/{pdb_id}"
 PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
+CCP4_SETUP = "/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/bin/ccp4.setup-sh"
 
 _RAMA_OUT = re.compile(r"SUMMARY:\s*([\d.]+)%\s*outliers")
 _RAMA_FAV = re.compile(r"SUMMARY:\s*([\d.]+)%\s*favored")
@@ -226,6 +227,61 @@ def chi1_agreement(model: Path, rotalyze_log: str) -> dict[str, Any]:
     }
 
 
+# gemmi rmsz per-torsion line: "A 7(LEU) torsion CA-CB-CG-CD1: |Z|=3.8"
+_GEMMI_TORSION = re.compile(
+    r"^(?P<chain>\S+)\s+(?P<resseq>-?\d+)\((?P<resname>[A-Z]{3})\)\s+torsion\s+"
+    r"(?P<atoms>\S+):\s*\|Z\|=(?P<z>[\d.]+)")
+# Backbone torsions involve atoms of two residues; sidechain chi torsions do not.
+_BACKBONE_TORSIONS = {"C-N-CA-C", "CA-C-N-CA", "N-CA-C-N", "CA-C-N-H", "O-C-N-CA"}
+
+
+def sidechain_torsion_z(model: Path) -> dict[tuple[str, int, str], float]:
+    """Max sidechain chi torsion |Z| per residue, from the CCP4 monomer library.
+
+    This is the one genuinely independent opinion available on sidechain
+    conformation. `phenix.rotalyze` classifies against MolProbity's Top8000 density
+    library; `gemmi rmsz` scores chi torsions against the CCP4 monomer library's own
+    targets (e.g. `LEU chi1 N CA CB CG -60.000 10.0 3` — target, sigma, periodicity).
+    Different data, not merely different code, which is what the rotamer question has
+    lacked.
+    """
+    log = model.with_suffix(".rmsz.log")
+    if not log.exists() or "torsion" not in log.read_text(errors="ignore"):
+        subprocess.run(
+            ["bash", "-c",
+             f"source {CCP4_SETUP} >/dev/null 2>&1; gemmi rmsz --cutoff=0 {model} > {log} 2>&1"],
+            capture_output=True, text=True, timeout=3600)
+    if not log.exists():
+        return {}
+    worst: dict[tuple[str, int, str], float] = {}
+    for line in log.read_text(errors="ignore").splitlines():
+        m = _GEMMI_TORSION.match(line.strip())
+        if not m or m.group("atoms") in _BACKBONE_TORSIONS:
+            continue
+        key = (m.group("chain"), int(m.group("resseq")), m.group("resname").upper())
+        worst[key] = max(worst.get(key, 0.0), float(m.group("z")))
+    return worst
+
+
+def cross_library_sidechain(model: Path, rotalyze_log: str) -> dict[str, Any]:
+    """Do MolProbity and the CCP4 monomer library agree on unusual sidechains?"""
+    import statistics as st
+
+    z_by_res = sidechain_torsion_z(model)
+    verdicts = local_rotamers(rotalyze_log)
+    shared = sorted(set(z_by_res) & set(verdicts))
+    if not shared:
+        return {}
+    groups: dict[str, list[float]] = {}
+    for key in shared:
+        groups.setdefault(verdicts[key][1], []).append(z_by_res[key])
+    out: dict[str, Any] = {"n_sidechains_compared": len(shared)}
+    for verdict, values in groups.items():
+        out[f"median_torsion_z_{verdict.lower()}"] = round(st.median(values), 3)
+        out[f"n_{verdict.lower()}"] = len(values)
+    return out
+
+
 def rotamer_agreement(xml: str, rotalyze_log: str) -> dict[str, Any]:
     """Do the two pipelines assign the same rotamer to the same residue?
 
@@ -342,6 +398,7 @@ def collect(pdb_ids: list[str], cache: Path, mvd_cache: Path | None) -> tuple[li
         row.update({f"rotamer_{k}": v for k, v in rotamer_agreement(xml, rota_log).items()})
         row.update({f"boundary_{k}": v for k, v in boundary_exposure(rota_log).items()})
         row.update(chi1_agreement(model, rota_log))
+        row.update(cross_library_sidechain(model, rota_log))
 
         # R-free and completeness come from a model_vs_data run; reuse the R-offset
         # benchmark's cache when one is supplied rather than repeating a slow job.
@@ -399,6 +456,15 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
         "rama_outlier_pp": stats("rama_outlier_delta_pp"),
         "rama_favored_pp": stats("rama_favored_delta_pp"),
         "rota_favored_pp": stats("rota_favored_delta_pp"),
+        "cross_library_sidechain": {
+            "n_entries": sum(1 for r in rows if r.get("n_sidechains_compared")),
+            "n_residues": sum(r.get("n_sidechains_compared", 0) for r in rows),
+            **{f"median_z_{v}": (lambda vals: round(statistics.median(vals), 3) if vals else None)(
+                [r[f"median_torsion_z_{v}"] for r in rows if r.get(f"median_torsion_z_{v}") is not None])
+               for v in ("favored", "allowed", "outlier")},
+            **{f"n_{v}": sum(r.get(f"n_{v}", 0) for r in rows)
+               for v in ("favored", "allowed", "outlier")},
+        },
         "chi1_geometry_agreement": {
             "n_entries": sum(1 for r in rows if r.get("n_chi1_compared")),
             "n_residues": sum(r.get("n_chi1_compared", 0) for r in rows),
