@@ -393,4 +393,29 @@ try:
 finally:
     _p.unlink(missing_ok=True)
 
+
+
+# --- Round 7: rotalyze score parsing and boundary exposure ------------------------
+
+# The score column is what makes the favored/allowed boundary measurable at all, and
+# it sits between two other numeric fields — an off-by-one here would silently
+# produce a boundary-exposure figure from the wrong column.
+ROTA_LINE = " A   1  MET:1.00:79.0:306.4:300.1:284.6::Favored:mmm"
+_m = dep._ROTALYZE_RESIDUE.search(ROTA_LINE)
+check("rotalyze occupancy and score columns not transposed",
+      (_m.group("occ"), _m.group("score")), ("1.00", "79.0"))
+
+# Exposure counts residues whose score is within a factor m of the 2 % cutoff.
+EXPOSED = "\n".join([
+    " A   1  ALA:1.00:1.80:0:::" + ":Allowed:t",     # 1.80 -> within x1.25 (1.6-2.5)
+    " A   2  ALA:1.00:2.40:0:::" + ":Favored:t",     # 2.40 -> within x1.25
+    " A   3  ALA:1.00:79.0:0:::" + ":Favored:t",     # far above
+    " A   4  ALA:1.00:0.10:0:::" + ":OUTLIER:t",     # far below
+])
+exposure = dep.boundary_exposure(EXPOSED, margins=(1.25,))
+check("boundary exposure counts only residues near the cutoff",
+      (exposure["n_scored"], exposure["exposed_x1.25"]), (4, 2))
+check("boundary exposure as a percentage", exposure["exposed_pct_x1.25"], 50.0)
+check("no scored residues yields an empty result", dep.boundary_exposure("no residues here"), {})
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

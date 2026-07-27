@@ -8,10 +8,11 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Six rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
-in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 revisited
-the three items previously carried as blocked and found **two of the three blockers were wrong** —
-both were mis-invocations of a tool, not limits of it.
+Seven rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
+in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 found that
+**two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
+then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
+resolution range and breached by null re-refinement once low-resolution entries were included.
 
 | Round | PR | Settled |
 |---|---|---|
@@ -21,6 +22,7 @@ both were mis-invocations of a tool, not limits of it.
 | 4 | [#36](https://github.com/realmarcin/protstruct_review/pull/36) (2026-07-26) | Ramachandran/rotamer outlier %, R-free, completeness, SS agreement, DockQ mapping, NMR ordered core |
 | 5 | [#39](https://github.com/realmarcin/protstruct_review/pull/39) (2026-07-26) | the §4 refinement Δ-tolerances (X-ray + cryo-EM), Ramachandran favored % |
 | 6 | [#42](https://github.com/realmarcin/protstruct_review/pull/42) (2026-07-26) | flip sets vs reduce2, rotamer assignment agreement, §4 detection floor |
+| 7 | [#44](https://github.com/realmarcin/protstruct_review/pull/44) (2026-07-26) | §4 bands made resolution-conditional; `d_FSC_model` diagnosed; rotamer boundary bounded |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -40,41 +42,54 @@ hypothesis, and in this repo the hypothesis lost 21 times out of 21. Round 6 add
 `reduce2` reports flips once `add_flip_movers=True` is passed (it defaults off), and the §4
 false-negative side was testable all along by damaging models rather than refining them.
 
+Round 7 adds the third: **a band this repo measured is a hypothesis too, outside the regime it was
+measured in.** The §4 bands held on 19/19 entries at 1.4–2.9 Å and failed on 10/19 once 3.0–3.6 Å
+entries were added. Before trusting any band here, check the range of the set it came from — every
+benchmark records that in its scope limits for exactly this reason.
+
 ## Open
 
-Round 6 closed all three previously-open items — **two of the three "blockers" were wrong**. What
-remains is narrower.
+Round 7 closed all three. Two of them **invalidated bands set in rounds 5 and 6** — the §4 bands were
+fitted to a 1.37–2.92 Å set and fail at low resolution. What is left is narrower again.
 
-### [ ] §4 map-model half: half-maps for `d_FSC_model`
+### [ ] Fill the 2.5 Å resolution boundary
 
-Still the one clause with no measurement. `phenix.mtriage`'s model-map FSC crossings are degenerate
-without half-maps (27WR reports FSC = 0.5 at 29.79 Å for a 2.7 Å map; `resolution=` does not fix it,
-and the log shows `d99 (half map 1): None`). EMDB serves half-maps as separate downloads
-(`emd_<id>_half_map_1.map.gz`).
+The §4 bands are now split at `d_min = 2.5 Å` on the strength of 5 entries below and 14 above, with
+**nothing between 2.92 and 3.00 Å**. The split point is a convenience boundary, not a measured
+inflection — the null-refinement spread could turn over anywhere in that gap, or vary smoothly, in
+which case a two-band step is the wrong shape and a resolution-scaled band would be better.
 
-**Execute:** extend `scripts/bench_refinement_deltas_em.py` to fetch both half-maps and pass them to
-mtriage, then re-derive the `d_FSC_model_post ≤ d_FSC_model_pre + 0.05 Å` band. Until then the clause
-is documented as ungateable rather than enforced.
+**Execute:** add entries at 2.3–3.1 Å and re-derive; check whether Cα shift and favored-drop vary
+smoothly with `d_min` (a fit) rather than stepping at 2.5 Å.
 
-### [ ] Widen the §4 evidence base
+### [ ] `d_FSC_model`: condition the clause on model-to-map coverage
 
-Round 5 used 8 X-ray + 2 EM entries for the null case; round 6 used 9 for detection. Both are thin,
-and two specific numbers rest on single observations:
+Round 7 established *why* it degenerates — the model covers a small fraction of the map box (9VJD:
+27 atoms per 10⁶ Å³ against 27WR's 813) — and that half-maps do not help. A usable clause would
+gate on coverage first.
 
-- the **clashscore ratio gate (≥ 5×)** separates per model by ≥ 6.7×, but has a **validity limit at
-  `clashscore_pre ≈ 20`** (issue #43): damage drives clashscore to ~100 regardless of starting value,
-  so the ratio is ≈ 100/pre and collapses on already-poor models. No benchmark model starts above
-  13.6, so the limit is extrapolated, not observed — a set including poor-geometry depositions would
-  test it directly.
-- the **EM CC_mask band** rests on 2 entries, one of which consumed 65 % of it on a null refinement.
+**Execute:** measure `d_fsc_model` reliability against atoms-per-box-volume over ~10 EM entries
+spanning the coverage range, find where it breaks down, and make the tolerance conditional on being
+above it. Two entries at opposite extremes is not enough to place the threshold.
 
-### [ ] Rotamer favored/allowed boundary — the residual unknown
+### [ ] Rotamer favored %: the shared-library assumption
 
-Round 6 showed the rotamer *assignment* is reproduced exactly (8054/8054 residues), so ± 1.0 pp is
-not at risk from assignment disagreement. What remains unverified is how each pipeline draws the
-**favored/allowed boundary** for a given assignment — neither the wwPDB report nor `phenix.rotalyze`
-exposes the underlying rotamer-library density, so the two cannot be compared at that level without
-a third tool that does.
+± 1.0 pp is now known to be contingent — **3.9 %** of residues sit within ×1.25 of the Favored/
+Allowed cutoff, so a systematic ±25 % scoring difference would move favored % by more than the band.
+It is safe only if both pipelines use the same rotamer library, which the identical assignment of
+8054/8054 residues supports but does not prove.
+
+**Execute:** needs a rotamer implementation with an independent library. None is installed; this is
+the one item in this file with no local path forward.
+
+### [ ] Low-resolution refinement protocol
+
+The low-resolution null spreads (up to 0.285 Å Cα, 5.26 pp favored) come from `phenix.refine` with
+**default weights and no NCS or reference-model restraints** — not how a 3.5 Å structure would
+actually be refined. The bands are therefore probably **pessimistic** at low resolution.
+
+**Execute:** re-run the ≥ 2.5 Å subset with restraints appropriate to the resolution and see how far
+the null spread contracts.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

@@ -65,9 +65,20 @@ _RES_ROTA = re.compile(r'\brota="([^"]+)"')
 # against a local run: <ModelledSubgroup ... rota="mmm" ... chain="A" resnum="1" ...
 # resname="MET" ...>. Attribute order is not guaranteed, so each is matched separately.
 _XML_SUBGROUP = re.compile(r"<ModelledSubgroup ([^>]*)>")
+# MolProbity's rotamer classification cutoffs on the library score (%):
+#   score < 0.3   OUTLIER
+#   0.3 - 2.0     Allowed
+#   > 2.0         Favored
+# The wwPDB report exposes no rotamer score, so the favored/allowed *classification*
+# cannot be compared across pipelines. What can be measured is the exposure: how many
+# residues sit close enough to the 2.0 % cutoff that a small scoring difference would
+# move them across it, which bounds how far favored % could disagree.
+ROTAMER_FAVORED_CUTOFF = 2.0
+
 # phenix.rotalyze per-residue line:  A   1  MET:1.00:79.0:...:Favored:mmm
 _ROTALYZE_RESIDUE = re.compile(
     r"^\s*(?P<chain>\S+)\s+(?P<resseq>-?\d+)\s+(?P<resname>[A-Z]{3}):"
+    r"(?P<occ>[\d.]+):(?P<score>[\d.]+):"
     r"(?P<rest>.*?):(?P<verdict>Favored|Allowed|OUTLIER):(?P<rotamer>\S+)\s*$", re.M)
 
 
@@ -132,6 +143,28 @@ def local_rotamers(rotalyze_log: str) -> dict[tuple[str, int, str], tuple[str, s
     for m in _ROTALYZE_RESIDUE.finditer(rotalyze_log):
         out[(m.group("chain"), int(m.group("resseq")), m.group("resname").upper())] = (
             m.group("rotamer"), m.group("verdict"))
+    return out
+
+
+def boundary_exposure(rotalyze_log: str, margins=(1.25, 1.5, 2.0)) -> dict[str, Any]:
+    """How many residues sit near the Favored/Allowed cutoff, by score ratio.
+
+    A residue is "exposed" at margin m if its library score lies between
+    cutoff/m and cutoff*m — i.e. a scoring discrepancy of up to a factor m between
+    two implementations could move it across the boundary. Since favored % is just a
+    count, the exposed fraction is the worst-case pp by which two pipelines could
+    disagree on it, and it is the only handle available: the wwPDB report publishes
+    no rotamer score to compare against directly.
+    """
+    scores = [float(m.group("score")) for m in _ROTALYZE_RESIDUE.finditer(rotalyze_log)]
+    if not scores:
+        return {}
+    out: dict[str, Any] = {"n_scored": len(scores)}
+    for margin in margins:
+        low, high = ROTAMER_FAVORED_CUTOFF / margin, ROTAMER_FAVORED_CUTOFF * margin
+        exposed = sum(1 for s in scores if low <= s <= high)
+        out[f"exposed_x{margin}"] = exposed
+        out[f"exposed_pct_x{margin}"] = round(100.0 * exposed / len(scores), 2)
     return out
 
 
@@ -249,6 +282,7 @@ def collect(pdb_ids: list[str], cache: Path, mvd_cache: Path | None) -> tuple[li
         rota_fav = _ROTA_FAV.search(rota_log)
         row["phenix_rota_favored_pct"] = float(rota_fav.group(1)) if rota_fav else None
         row.update({f"rotamer_{k}": v for k, v in rotamer_agreement(xml, rota_log).items()})
+        row.update({f"boundary_{k}": v for k, v in boundary_exposure(rota_log).items()})
 
         # R-free and completeness come from a model_vs_data run; reuse the R-offset
         # benchmark's cache when one is supplied rather than repeating a slow job.
@@ -306,6 +340,13 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
         "rama_outlier_pp": stats("rama_outlier_delta_pp"),
         "rama_favored_pp": stats("rama_favored_delta_pp"),
         "rota_favored_pp": stats("rota_favored_delta_pp"),
+        "favored_allowed_boundary_exposure": {
+            "n_residues": sum(r.get("boundary_n_scored", 0) for r in rows),
+            **{f"pct_within_x{m}": (
+                round(100.0 * sum(r.get(f"boundary_exposed_x{m}", 0) for r in rows)
+                      / max(1, sum(r.get("boundary_n_scored", 0) for r in rows)), 2))
+               for m in (1.25, 1.5, 2.0)},
+        },
         "rotamer_name_agreement": {
             "n_entries": sum(1 for r in rows if r.get("rotamer_n_shared")),
             "n_residues": sum(r.get("rotamer_n_shared", 0) for r in rows),
