@@ -8,7 +8,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Nine rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
+Ten rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
 in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 found that
 **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
@@ -25,6 +25,7 @@ resolution range and breached by null re-refinement once low-resolution entries 
 | 7 | [#44](https://github.com/realmarcin/protstruct_review/pull/44) (2026-07-26) | §4 bands made resolution-conditional; rotamer boundary bounded |
 | 8 | [#46](https://github.com/realmarcin/protstruct_review/pull/46) (2026-07-26) | 2.5 Å split validated; restraint effect measured; round-7 `d_FSC_model` diagnosis withdrawn |
 | 9 | [#48](https://github.com/realmarcin/protstruct_review/pull/48) (2026-07-27) | `d_FSC_model` mechanism found; the clause is gateable after all |
+| 10 | [#50](https://github.com/realmarcin/protstruct_review/pull/50) (2026-07-27) | EM set completed (CC_mask band breached and widened); §4 high-res end filled; rotamer chi geometry verified |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -50,7 +51,13 @@ mechanism inferred from two data points is a hypothesis.** Round 7 explained a d
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
 
-Round 9 closes that thread with the fifth and sharpest: **"unmeasurable" usually means "not yet
+Round 10 adds a sixth, which is really the first one turned on this repo's own work: **a band is
+only as good as the last entry added to its set.** Completing the EM set from 2 to 6 entries broke
+the CC_mask band that had stood since round 5 — and round 5 had itself flagged that a null
+refinement consumed 65 % of it. The warning was in the file for five rounds before the data caught
+up with it.
+
+Round 9 closes the earlier thread with the fifth and sharpest: **"unmeasurable" usually means "not yet
 read properly".** Four rounds carried `d_FSC_model` as ungateable — blamed on missing half-maps,
 then on model-to-map coverage, then on nothing at all. Reading the FSC curve mtriage already writes
 took one comparison and showed the tool reports the *first* threshold crossing, which one anomalous
@@ -60,41 +67,33 @@ benchmark records that in its scope limits for exactly this reason.
 
 ## Open
 
-Round 9 identified the `d_FSC_model` mechanism and **unblocked the clause** — it was never
-ungateable, only mis-read. The crossing rule needs care in both directions: mtriage's *first*
-crossing is defeated by one low-resolution shell, and a *last* crossing by high-resolution
-oscillation, so the harness requires a **sustained** crossing (20 consecutive shells). Two items remain, one of them a verified dead end.
+Round 10 completed all three evidence bases. Completing the EM set **broke a band that had stood
+since round 5**, and filling the high-resolution end showed another band to be far closer to its
+limit than reported.
 
-### [ ] Finish the `d_FSC_model` Δ band (3 of 6 entries measured)
+### [ ] Two bands are now at the edge of their evidence
 
-The corrected crossing works on all 6 EM entries, but the before/after band rests on **3**:
-`real_space_refine` on 10QT (78 939 atoms) did not finish, and 21BQ and 24UM were queued behind it.
-Observed null Δ is at most **0.0007 Å** against a ± 0.05 Å band — ~70× headroom — but 3 refinements
-is not a basis for tightening.
+Neither is violated, but neither has the margin previously claimed:
 
-**Execute:** re-run `scripts/bench_refinement_deltas_em.py` with the cache warm (the mtriage
-measurements are already cached; only the three refinements are outstanding), then decide whether
-± 0.05 Å can be tightened. Budget hours, not minutes, for 10QT. Note the three measured pre/post
-pairs were computed under the interim last-crossing rule — the Δ is unaffected (both rules track the
-same curve) but the absolute values should be recomputed under the sustained rule when the run
-completes.
+- **§4 `< 2.5 Å` Cα shift**: band 0.10 Å, largest null shift **0.0867 Å** — **1.15× headroom** over
+  14 entries. Round 8 reported "2×", which was an artefact of having only 3 entries below 2.0 Å.
+- **Map-model CC_mask**: widened to −0.02 after a null refinement breached −0.01 (21BQ, −0.0139).
+  The new band is a rounding-up from a single breach on 6 entries.
 
-Also worth settling then: **`k = 20` rests on 5 curves.** `k = 10` agrees on all five and `k = 50`
-disagrees on 27WR, so the rule is sensitive somewhere between 20 and 50 and a larger set could move
-the right choice.
+**Execute:** both need more entries before they can be called settled, and both should be re-checked
+whenever entries are added rather than assumed stable. The CC_mask one is the more urgent: 6 EM
+entries with 1 breach is the thinnest evidence base of any band currently in the file.
 
-### [ ] Rotamer favored/allowed boundary — verified dead end
+### [ ] Rotamer library lookup — the last unverified step
 
-No independent rotamer library is installed: every `molprobity.*`/`phenix.*` rotamer tool is cctbx,
-biotite exposes only geometric rotation helpers, Bio.PDB has none, and the local Richardson tools are
-`probe`/`reduce`/`tmalign`. ± 1.0 pp stays contingent on the shared-library assumption (3.9 % of
-residues within ×1.25 of the cutoff). Reopen only if a non-cctbx rotamer implementation appears.
+Round 10 verified the **geometry**: chi1 from gemmi matches `phenix.rotalyze` to ≤ 0.05° over 8054
+residues, its printed precision. Combined with round 7's boundary exposure (3.9 % of residues within
+×1.25 of the 2 % cutoff), the residual risk to ± 1.0 pp is now precisely one thing: a systematic
+difference in **library density values** between implementations, applied to residues near the
+cutoff. No non-cctbx rotamer library is installed, so it stays unverified.
 
-### [ ] High-resolution end of the §4 split is thin
-
-Only **3 entries below 2.0 Å** in the 26-entry set, and the `< 2.5 Å` band (0.10 Å) is 2× the largest
-shift observed there (0.045 Å). Safe but under-evidenced at the tight end — worth 5–6 more entries at
-1.0–2.0 Å if §4 becomes load-bearing at high resolution.
+Two smaller extensions if this is revisited: **chi2–chi4** are not compared (a rotamer name depends
+on all of them), and chi1 agreement was measured on deposited models only.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

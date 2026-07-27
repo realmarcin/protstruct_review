@@ -465,4 +465,21 @@ try:
 finally:
     _cp.unlink(missing_ok=True)
 
+
+
+# --- Round 10: chi1 geometry check ------------------------------------------------
+
+# chi1 comes from the 4th colon-separated field of a rotalyze line. Taking the wrong
+# field would compare an occupancy or a score against a dihedral and still produce
+# numbers, so pin the extraction.
+_m10 = dep._ROTALYZE_RESIDUE.search(" A   1  MET:1.00:79.0:306.4:300.1:284.6::Favored:mmm")
+check("chi1 is the first field after the score",
+      _m10.group("rest").split(":")[0], "306.4")
+
+# Angles are compared modulo 360 with wraparound, so 359° and 1° are 2° apart, not 358.
+def _wrapped(a, b):
+    return min(abs(a - b), 360.0 - abs(a - b))
+check("chi1 comparison wraps around 360°", _wrapped(359.0, 1.0), 2.0)
+check("chi1 comparison unaffected mid-range", _wrapped(180.0, 176.0), 4.0)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
