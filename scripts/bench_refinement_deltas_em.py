@@ -65,25 +65,39 @@ def read_fsc_curve(path: Path) -> list[tuple[float, float]]:
     return rows
 
 
-def d_fsc_from_curve(rows: list[tuple[float, float]], threshold: float = FSC_THRESHOLD) -> float | None:
-    """Resolution at which FSC drops below `threshold` **and stays there**.
+# Consecutive shells that must stay below the threshold before a crossing counts.
+# 20 is ~0.1 % of a typical 18 000-shell curve — long enough to reject a one-shell
+# artefact, short enough not to run past a genuine crossing. See `d_fsc_from_curve`.
+FSC_SUSTAIN_SHELLS = 20
 
-    mtriage's reported `d_fsc_model` is the FIRST shell whose FSC falls below the
-    threshold, scanning from low resolution. A single anomalous low-resolution shell
-    therefore defeats it: 9VJD's masked model-map FSC dips to 0.073 at 23.11 Å and
-    recovers above 0.5, so mtriage reports 23.11 Å for a 2.86 Å map. Taking the LAST
-    crossing instead — the point beyond which FSC never recovers — gives 2.77 Å.
 
-    The same bug affects the 0.5 threshold on entries whose 0.143 value looks fine:
-    21BQ reports 36.11 Å at FSC = 0.5 and yields 2.69 Å here.
+def d_fsc_from_curve(rows: list[tuple[float, float]], threshold: float = FSC_THRESHOLD,
+                     sustain: int = FSC_SUSTAIN_SHELLS) -> float | None:
+    """Resolution beyond which FSC stays below `threshold` for `sustain` shells.
+
+    Two naive rules both fail, in opposite directions:
+
+    - **First crossing** (what mtriage reports) is defeated by a single anomalous
+      LOW-resolution shell. 9VJD's masked model-map FSC dips to 0.073 at 23.11 Å and
+      recovers above 0.5, so mtriage returns 23.11 Å for a 2.86 Å map.
+    - **Last crossing** is defeated by oscillation in the HIGH-resolution tail. 27WR
+      crosses 0.143 repeatedly between 2.15 and 2.70 Å (362 of 569 shells there are
+      above the threshold), so the last crossing gives 2.24 Å — finer than the map's
+      own 2.70 Å resolution, which is not credible.
+
+    Requiring the crossing to be *sustained* rejects both. Measured against the five
+    EM entries with curves, `sustain=20` gives 9VJD 2.77, 27WR 2.59, 21BQ 2.62,
+    10GX 2.69, 10QT 2.99 — every one at or just inside its map resolution.
     """
-    last = None
-    for d, fsc in rows:
-        if fsc >= threshold:
-            last = None
-        elif last is None:
-            last = d
-    return last
+    run = 0
+    for i, (_, fsc) in enumerate(rows):
+        if fsc < threshold:
+            run += 1
+            if run == sustain:
+                return rows[i - sustain + 1][0]
+        else:
+            run = 0
+    return None
 
 
 def run(cmd: str, log: Path, pattern: re.Pattern, work: Path) -> str | None:

@@ -61,7 +61,9 @@ benchmark records that in its scope limits for exactly this reason.
 ## Open
 
 Round 9 identified the `d_FSC_model` mechanism and **unblocked the clause** — it was never
-ungateable, only mis-read. Two items remain, one of them a verified dead end.
+ungateable, only mis-read. The crossing rule needs care in both directions: mtriage's *first*
+crossing is defeated by one low-resolution shell, and a *last* crossing by high-resolution
+oscillation, so the harness requires a **sustained** crossing (20 consecutive shells). Two items remain, one of them a verified dead end.
 
 ### [ ] Finish the `d_FSC_model` Δ band (3 of 6 entries measured)
 
@@ -72,7 +74,14 @@ is not a basis for tightening.
 
 **Execute:** re-run `scripts/bench_refinement_deltas_em.py` with the cache warm (the mtriage
 measurements are already cached; only the three refinements are outstanding), then decide whether
-± 0.05 Å can be tightened. Budget hours, not minutes, for 10QT.
+± 0.05 Å can be tightened. Budget hours, not minutes, for 10QT. Note the three measured pre/post
+pairs were computed under the interim last-crossing rule — the Δ is unaffected (both rules track the
+same curve) but the absolute values should be recomputed under the sustained rule when the run
+completes.
+
+Also worth settling then: **`k = 20` rests on 5 curves.** `k = 10` agrees on all five and `k = 50`
+disagrees on 27WR, so the rule is sensitive somewhere between 20 and 50 and a larger set could move
+the right choice.
 
 ### [ ] Rotamer favored/allowed boundary — verified dead end
 
