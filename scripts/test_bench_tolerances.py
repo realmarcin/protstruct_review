@@ -433,4 +433,36 @@ check("low-resolution restraints request NCS and secondary structure",
 # NOT be in the recipe.
 check("reference_model restraints excluded", "reference_model" in refdel.LOW_RES_RESTRAINTS, False)
 
+
+
+# --- Round 9: the FSC last-crossing rule -----------------------------------------
+
+# mtriage reports the FIRST shell below the threshold, which a single anomalous
+# low-resolution shell defeats (9VJD: dips to 0.073 at 23.11 Å, recovers, so mtriage
+# returns 23.11 Å for a 2.86 Å map). These pin the last-crossing behaviour.
+CURVE = [(30.0, 0.99), (23.0, 0.07), (20.0, 0.95), (10.0, 0.90),
+         (3.0, 0.60), (2.8, 0.10), (2.6, 0.08), (2.4, 0.05)]
+# With sustain=1 the rule degenerates to "first crossing" and the low-resolution dip
+# wins — which is precisely mtriage's bug, pinned here so the guard cannot regress.
+check("sustain=1 reproduces mtriage's bug (first crossing wins)",
+      refem.d_fsc_from_curve(CURVE, 0.143, sustain=1), 23.0)
+# Requiring 2 consecutive shells rejects the single-shell dip.
+check("a sustained crossing rejects a one-shell dip",
+      refem.d_fsc_from_curve(CURVE, 0.143, sustain=2), 2.8)
+check("a curve that never crosses yields None",
+      refem.d_fsc_from_curve([(30.0, 0.99), (3.0, 0.80)], 0.143, sustain=2), None)
+check("a run shorter than `sustain` does not count",
+      refem.d_fsc_from_curve([(30.0, 0.10), (20.0, 0.99), (3.0, 0.99)], 0.143, sustain=2), None)
+check("default sustain is stated, not incidental", refem.FSC_SUSTAIN_SHELLS, 20)
+
+# The curve file stores 1/d in column 1; reading it as d would inverte the whole
+# analysis and still produce plausible-looking numbers.
+import tempfile as _tf2
+_cp = Path(_tf2.mkstemp(suffix=".log")[1])
+try:
+    _cp.write_text("    0.010000000     0.990000000\n    0.500000000     0.100000000\n")
+    check("curve reader converts 1/d to d", refem.read_fsc_curve(_cp), [(100.0, 0.99), (2.0, 0.10)])
+finally:
+    _cp.unlink(missing_ok=True)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

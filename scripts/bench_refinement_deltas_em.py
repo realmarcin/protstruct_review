@@ -41,8 +41,63 @@ PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
 
 _CC_MASK = re.compile(r"CC_mask\s*:\s*([\d.]+)")
 # mtriage prints masked and unmasked columns; FSC=0.143 is the conventional model-map
-# figure, so take that row's masked value.
+# figure, so take that row's masked value. NOTE this summary value is unreliable —
+# see `d_fsc_from_curve`, which is what this benchmark actually uses.
 _D_FSC_MODEL = re.compile(r"FSC\(map,\s*model map\)=0\.143\s*:\s*([\d.]+)\s+([\d.]+)")
+
+FSC_CURVE = "fsc_model.masked.mtriage.log"
+FSC_THRESHOLD = 0.143
+
+
+def read_fsc_curve(path: Path) -> list[tuple[float, float]]:
+    """(d, FSC) pairs from mtriage's model-map FSC curve, ordered low → high resolution."""
+    rows = []
+    for line in path.read_text(errors="ignore").splitlines():
+        parts = line.split()
+        if len(parts) < 2:
+            continue
+        try:
+            inv_d, fsc = float(parts[0]), float(parts[1])
+        except ValueError:
+            continue
+        if inv_d > 0:
+            rows.append((1.0 / inv_d, fsc))
+    return rows
+
+
+# Consecutive shells that must stay below the threshold before a crossing counts.
+# 20 is ~0.1 % of a typical 18 000-shell curve — long enough to reject a one-shell
+# artefact, short enough not to run past a genuine crossing. See `d_fsc_from_curve`.
+FSC_SUSTAIN_SHELLS = 20
+
+
+def d_fsc_from_curve(rows: list[tuple[float, float]], threshold: float = FSC_THRESHOLD,
+                     sustain: int = FSC_SUSTAIN_SHELLS) -> float | None:
+    """Resolution beyond which FSC stays below `threshold` for `sustain` shells.
+
+    Two naive rules both fail, in opposite directions:
+
+    - **First crossing** (what mtriage reports) is defeated by a single anomalous
+      LOW-resolution shell. 9VJD's masked model-map FSC dips to 0.073 at 23.11 Å and
+      recovers above 0.5, so mtriage returns 23.11 Å for a 2.86 Å map.
+    - **Last crossing** is defeated by oscillation in the HIGH-resolution tail. 27WR
+      crosses 0.143 repeatedly between 2.15 and 2.70 Å (362 of 569 shells there are
+      above the threshold), so the last crossing gives 2.24 Å — finer than the map's
+      own 2.70 Å resolution, which is not credible.
+
+    Requiring the crossing to be *sustained* rejects both. Measured against the five
+    EM entries with curves, `sustain=20` gives 9VJD 2.77, 27WR 2.59, 21BQ 2.62,
+    10GX 2.69, 10QT 2.99 — every one at or just inside its map resolution.
+    """
+    run = 0
+    for i, (_, fsc) in enumerate(rows):
+        if fsc < threshold:
+            run += 1
+            if run == sustain:
+                return rows[i - sustain + 1][0]
+        else:
+            run = 0
+    return None
 
 
 def run(cmd: str, log: Path, pattern: re.Pattern, work: Path) -> str | None:
@@ -59,12 +114,16 @@ def measure(model: Path, map_file: Path, resolution: float, work: Path,
     cc_log = work / f"mc_{tag}.log"
     cc_text = run(f"{PHENIX_BIN / 'phenix.map_correlations'} {model} {map_file} "
                   f"resolution={resolution}", cc_log, _CC_MASK, work)
-    mt_log = work / f"mt_{tag}.log"
-    mt_text = run(f"{PHENIX_BIN / 'phenix.mtriage'} {model} {map_file}",
-                  mt_log, _D_FSC_MODEL, work)
+    # mtriage writes its FSC curve into the working directory under a fixed name, so
+    # each measurement gets its own directory or they overwrite one another.
+    mt_dir = work / f"mt_{tag}"
+    mt_dir.mkdir(parents=True, exist_ok=True)
+    mt_log = mt_dir / "mtriage.log"
+    run(f"{PHENIX_BIN / 'phenix.mtriage'} {model} {map_file} resolution={resolution}",
+        mt_log, _D_FSC_MODEL, mt_dir)
+    curve_path = mt_dir / FSC_CURVE
+    d_value = (d_fsc_from_curve(read_fsc_curve(curve_path)) if curve_path.exists() else None)
     cc = _CC_MASK.search(cc_text) if cc_text else None
-    dfsc = _D_FSC_MODEL.search(mt_text) if mt_text else None
-    d_value = float(dfsc.group(1)) if dfsc else None
     # mtriage's model-map FSC crossings are degenerate without half-maps: 27WR reports
     # FSC=0.5 at 29.79 Å for a 2.7 Å map, and 9VJD reports FSC=0.143 at 29.65 Å for a
     # 2.86 Å map (passing resolution= explicitly does not fix it, and the log shows
