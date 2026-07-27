@@ -53,8 +53,23 @@ the X-ray §4 bands turned out to be:
 | < 3.0 Å | 7 | **−0.0139** | −0.0019 |
 | ≥ 3.0 Å | 6 | **−0.0475** | −0.0165 |
 
-A null real-space refinement costs a ≥ 3.0 Å map more than 3× as much CC_mask as a < 3.0 Å one.
-The band becomes resolution-conditional, mirroring §4's Cα-shift and favored-% bands.
+**Resolution bounds the excursion; it does not predict it.** Every large negative Δ is at ≥ 3.08 Å,
+and all seven entries below 3.0 Å stay within −0.0139 — so the band must be resolution-conditional to
+cover the worst case in each regime. But within the ≥ 3.0 Å group the behaviour is bimodal: three
+entries degrade badly and three *improve*, with the worst (9UPM, 3.21 Å) and the best (10QT, 3.40 Å)
+bracketing each other, and 9V4D at 3.07 Å fine while 10SF at 3.08 Å is among the worst.
+
+No alternative predictor separates them either:
+
+| | the three that degrade | the three that improve |
+|---|---|---|
+| atoms | 1373 – 2338 | 2038 – 78 939 |
+| atoms per 10⁶ Å³ | 65, 74, 1077 | 109, 545, 2792 |
+| CC_mask before | 0.804 – 0.829 | 0.799 – 0.827 |
+
+So the mechanism is **unidentified**, and the split is an envelope rather than an explanation. Stated
+that way deliberately: round 7 described a median difference as a per-entry rule (model-to-map
+coverage) and round 8 had to withdraw it.
 
 `d_FSC_model` also tightened: with 12 measured entries the max |Δ| is **0.0322 Å** against ± 0.05 Å —
 **1.55× headroom**, not the 5× that 6 entries suggested.
@@ -95,7 +110,9 @@ wrong, and the tolerance is no longer resting on an untested shared-library assu
 >
 > **Map-model CC_mask is resolution-conditional**: `< 3.0 Å` → `CC_mask_post ≥ CC_mask_pre − 0.02`
 > (null min −0.0139); `≥ 3.0 Å` → **− 0.06** (null min −0.0475). The single −0.02 band from round 10
-> was breached by 3 of 13 entries, all at ≥ 3.0 Å.
+> was breached by 3 of 13 entries, all at ≥ 3.0 Å. **This is an envelope, not an explanation** —
+> resolution bounds the excursion but does not predict which ≥ 3.0 Å entries degrade (3 of 6 do), and
+> no alternative predictor was found among atom count, model-to-map coverage or starting CC_mask.
 >
 > **`d_FSC_model` ± 0.05 Å retained**, but headroom is now **1.55×** (max |Δ| 0.0322 Å over 12
 > entries), not the 5× that 6 entries suggested. Expect this to be the next band to break.
