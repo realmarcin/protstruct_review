@@ -42,8 +42,19 @@ from pathlib import Path
 from typing import Any
 
 RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
-PHENIX_REDUCE = str(Path.home() / "phenix-2.0-5936" / "phenix_bin" / "phenix.reduce")
+PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
+PHENIX_REDUCE = str(PHENIX_BIN / "phenix.reduce")
 REDUCE = str(Path.home() / "tools" / "reduce-src" / "build" / "reduce_src" / "reduce")
+REDUCE2 = str(PHENIX_BIN / "mmtbx.reduce2")
+
+# reduce2 reports each flippable group's final pose in its .txt report, e.g.
+#   AmideFlip at chain A GLN 2 NE2 Initial score: 13.30 ... pose Unflipped
+#   HisFlip   at chain A HIS 55 ... pose Flipped
+# NOTE add_flip_movers defaults to False: without it reduce2 never builds flip movers
+# and reports nothing, which is what made this comparison look impossible.
+_REDUCE2_FLIP = re.compile(
+    r"(?:Amide|His)Flip at chain (?P<chain>\S+)\s+(?P<resname>\S+)\s+(?P<resseq>\d+)\s+"
+    r"\S+.*?pose (?P<pose>Flipped|Unflipped)")
 
 # USER  MOD Single : A  32 GLN     :FLIP  amide:sc=   0.435  F(o=-0.2,f=0.44)
 _FLIP = re.compile(
@@ -93,6 +104,33 @@ def build(model: Path, cache: Path, phenix: bool) -> Path | None:
     return out
 
 
+def reduce2_flip_calls(model: Path, cache: Path) -> dict[tuple[str, int, str], tuple[bool, str]] | None:
+    """Flip decisions from `mmtbx.reduce2` — the genuinely independent H builder.
+
+    `phenix.reduce` and standalone `reduce` are the same binary, so comparing them
+    measures redistribution, not method. reduce2 is the cctbx reimplementation and is
+    a real second opinion — but only with `add_flip_movers=True`; the default is
+    False, in which case it builds no flip movers and reports nothing at all.
+    """
+    report = cache / f"{model.stem}FH.txt"
+    if not report.exists() or not _REDUCE2_FLIP.search(report.read_text(errors="ignore")):
+        subprocess.run(
+            ["bash", "-c",
+             f"cd {cache} && {REDUCE2} {model.name} approach=add add_flip_movers=True "
+             f"> {cache / f'r2_{model.stem}.log'} 2>&1"],
+            capture_output=True, text=True, timeout=7200)
+    if not report.exists():
+        return None
+    calls = {}
+    for m in _REDUCE2_FLIP.finditer(report.read_text(errors="ignore")):
+        resname = m.group("resname").upper()
+        if resname not in FLIPPABLE:
+            continue
+        calls[(m.group("chain"), int(m.group("resseq")), resname)] = (
+            m.group("pose") == "Flipped", "F" if m.group("pose") == "Flipped" else "K")
+    return calls or None
+
+
 def flip_calls(model_h: Path) -> dict[tuple[str, int, str], tuple[bool, str]]:
     """Map each flippable residue to (was_flipped, category) from its USER MOD line."""
     calls = {}
@@ -127,6 +165,7 @@ def collect(pdb_ids: list[str], cache: Path) -> tuple[list[dict], list[dict]]:
         n_h_phx, n_h_std = hydrogen_count(phx), hydrogen_count(std)
         het = het_components(model)
         a, b = flip_calls(phx), flip_calls(std)
+        r2 = reduce2_flip_calls(model, cache)
         if not a and not b:
             print("  ! no flippable residues with USER MOD records — skipped", file=sys.stderr)
             skipped.append({"pdb_id": pdb_id, "reason": "no flip records"})
@@ -135,6 +174,9 @@ def collect(pdb_ids: list[str], cache: Path) -> tuple[list[dict], list[dict]]:
         shared = sorted(set(a) & set(b))
         decision_diffs = [k for k in shared if a[k][0] != b[k][0]]
         category_diffs = [k for k in shared if a[k][1] != b[k][1] and a[k][0] == b[k][0]]
+        # The cross-implementation comparison: reduce (either build) vs reduce2.
+        r2_shared = sorted(set(a) & set(r2)) if r2 else []
+        r2_diffs = [k for k in r2_shared if a[k][0] != r2[k][0]]
         rows.append({
             "pdb_id": pdb_id,
             "n_flippable_phenix": len(a),
@@ -149,6 +191,10 @@ def collect(pdb_ids: list[str], cache: Path) -> tuple[list[dict], list[dict]]:
             "h_count_delta_pct": round(100.0 * (n_h_phx - n_h_std) / n_h_std, 3) if n_h_std else None,
             "het_components": sorted(het),
             "has_het": bool(het),
+            "n_reduce2_shared": len(r2_shared),
+            "n_reduce2_decision_disagreements": len(r2_diffs),
+            "reduce2_disagreements": [f"{c}{r} {n}" for c, r, n in r2_diffs],
+            "n_flipped_reduce2": sum(1 for v in r2.values() if v[0]) if r2 else None,
             "n_decision_disagreements": len(decision_diffs),
             "n_category_only_disagreements": len(category_diffs),
             "decision_disagreements": [f"{c}{r} {n}" for c, r, n in decision_diffs],
@@ -158,6 +204,8 @@ def collect(pdb_ids: list[str], cache: Path) -> tuple[list[dict], list[dict]]:
         print(f"  {len(shared)} shared residues, {rows[-1]['n_flipped_phenix']}/"
               f"{rows[-1]['n_flipped_standalone']} flipped, "
               f"{len(decision_diffs)} decision diffs, {len(category_diffs)} category-only diffs"
+              f" | reduce2 {rows[-1]['n_reduce2_decision_disagreements']}/"
+              f"{rows[-1]['n_reduce2_shared']} disagree"
               f" | H {n_h_phx}/{n_h_std} ({rows[-1]['h_count_delta_pct']:+.3f} %)"
               f"{' het:' + ','.join(sorted(het)) if het else ''}", file=sys.stderr)
     return rows, skipped
@@ -187,6 +235,11 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
         "n_flippable_residues_compared": shared,
         "n_models_identical": sum(1 for r in rows if r["identical"]),
         "total_decision_disagreements": sum(r["n_decision_disagreements"] for r in rows),
+        "reduce_vs_reduce2": {
+            "n_residues_compared": sum(r["n_reduce2_shared"] for r in rows),
+            "n_decision_disagreements": sum(r["n_reduce2_decision_disagreements"] for r in rows),
+            "n_models": sum(1 for r in rows if r["n_reduce2_shared"]),
+        },
         "total_category_only_disagreements": sum(r["n_category_only_disagreements"] for r in rows),
         "total_residues_only_one_builder": sum(
             r["n_only_phenix"] + r["n_only_standalone"] for r in rows),

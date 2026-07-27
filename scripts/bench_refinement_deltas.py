@@ -211,6 +211,65 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     }
 
 
+# Perturbation levels (Å, Gaussian per-coordinate) for the detection test. Chosen to
+# straddle the null-refinement spread (Cα shift up to 0.107 Å) so the smallest level
+# is inside the noise and the largest is unambiguous damage.
+PERTURB_SIGMAS = [0.05, 0.1, 0.2, 0.3, 0.5, 1.0]
+
+
+def perturb(model: Path, sigma: float, work: Path, seed: int = 7) -> Path:
+    """Copy `model` with Gaussian noise added to every atom coordinate."""
+    import random
+
+    out = work / f"{model.stem}_perturb{sigma}.pdb"
+    if out.exists() and out.stat().st_size:
+        return out
+    rng = random.Random(seed)
+    lines = []
+    for line in model.read_text(errors="ignore").splitlines():
+        if line.startswith(("ATOM", "HETATM")) and len(line) >= 54:
+            x, y, z = float(line[30:38]), float(line[38:46]), float(line[46:54])
+            x, y, z = (v + rng.gauss(0, sigma) for v in (x, y, z))
+            line = f"{line[:30]}{x:8.3f}{y:8.3f}{z:8.3f}{line[54:]}"
+        lines.append(line)
+    out.write_text("\n".join(lines) + "\n")
+    return out
+
+
+def detection_test(model: Path, work: Path) -> list[dict]:
+    """Do the §4 bands catch a *known* degradation? The false-negative side.
+
+    The null-case benchmark calibrates only how often a good refinement is wrongly
+    flagged. This does the converse: damage a deposited model by a known amount and
+    record which clause, if any, notices. A band that never fires is not a check.
+    """
+    pre = measure(model, work, "pre")
+    rows = []
+    for sigma in PERTURB_SIGMAS:
+        damaged = perturb(model, sigma, work)
+        post = measure(damaged, work, f"perturb{sigma}")
+        shift, _ = ca_shift_rmsd(model, damaged)
+        if post["clashscore"] is None or post["rama_favored_pct"] is None:
+            rows.append({"sigma": sigma, "ca_shift_rmsd": shift, "measurement_failed": True})
+            continue
+        favored_drop = (pre["rama_favored_pct"] or 0) - (post["rama_favored_pct"] or 0)
+        rotamer_rise = (post["rotamer_outlier_pct"] or 0) - (pre["rotamer_outlier_pct"] or 0)
+        rows.append({
+            "sigma": sigma,
+            "ca_shift_rmsd": shift,
+            "clashscore_pre": pre["clashscore"], "clashscore_post": post["clashscore"],
+            "rama_favored_pct_post": post["rama_favored_pct"],
+            "rotamer_outlier_pct_post": post["rotamer_outlier_pct"],
+            # The bands as applied after the round-5 revision.
+            "caught_by_rmsd": (shift or 0) > 0.15,
+            "caught_by_favored": favored_drop > 1.5,
+            "caught_by_rotamer": rotamer_rise > 4.0,
+        })
+        rows[-1]["caught"] = any(rows[-1][k] for k in
+                                 ("caught_by_rmsd", "caught_by_favored", "caught_by_rotamer"))
+    return rows
+
+
 def find_pairs(cache: Path, ids: list[str] | None) -> list[tuple[Path, Path]]:
     """Match cached `<id>.pdb` with `<id>_g_obs.mtz` from the R-offset benchmark."""
     pairs = []
@@ -232,6 +291,8 @@ def main() -> int:
                     help="directory holding <id>.pdb and <id>_g_obs.mtz (bench_t06_r_offset.py)")
     ap.add_argument("--work", help="where to run refinements (default: <cache>/refine)")
     ap.add_argument("--json", dest="json_out")
+    ap.add_argument("--detection-test", action="store_true",
+                    help="perturb models by known amounts and report which bands fire")
     args = ap.parse_args()
 
     cache = Path(args.cache)
@@ -239,6 +300,29 @@ def main() -> int:
     if not pairs:
         raise SystemExit(f"no <id>.pdb + <id>_g_obs.mtz pairs found in {cache}")
     work = Path(args.work) if args.work else cache / "refine"
+
+    if args.detection_test:
+        work.mkdir(parents=True, exist_ok=True)
+        results = []
+        for model, _ in pairs:
+            print(f"[{model.stem.upper()}]", file=sys.stderr)
+            for row in detection_test(model, work):
+                row["pdb_id"] = model.stem.upper()
+                results.append(row)
+                print(f"  σ={row['sigma']:<5} shift {row.get('ca_shift_rmsd')} Å"
+                      f"  caught={row.get('caught')}"
+                      f" (rmsd={row.get('caught_by_rmsd')}, fav={row.get('caught_by_favored')},"
+                      f" rota={row.get('caught_by_rotamer')})", file=sys.stderr)
+        by_sigma = {}
+        for row in results:
+            by_sigma.setdefault(row["sigma"], []).append(bool(row.get("caught")))
+        summary = {"detection_by_sigma": {str(s): {"caught": sum(v), "of": len(v)}
+                                          for s, v in sorted(by_sigma.items())}}
+        if args.json_out:
+            Path(args.json_out).write_text(
+                json.dumps({"rows": results, "summary": summary}, indent=2) + "\n")
+        print(json.dumps(summary, indent=2))
+        return 0
 
     rows, skipped = collect(pairs, work)
     summary = summarize(rows)

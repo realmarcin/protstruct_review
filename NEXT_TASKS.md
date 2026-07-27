@@ -8,9 +8,10 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Five rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
-in `ref/thresholds_and_standards.md` now carries `[benchmark]` provenance** (21 rows), with two
-named exceptions recorded below where no reference exists to measure against.
+Six rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
+in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 revisited
+the three items previously carried as blocked and found **two of the three blockers were wrong** —
+both were mis-invocations of a tool, not limits of it.
 
 | Round | PR | Settled |
 |---|---|---|
@@ -19,6 +20,7 @@ named exceptions recorded below where no reference exists to measure against.
 | 3 | [#32](https://github.com/realmarcin/protstruct_review/pull/32) (2026-07-26) | restraint-library decomposition, Asn/Gln/His flip sets, L-test |
 | 4 | [#36](https://github.com/realmarcin/protstruct_review/pull/36) (2026-07-26) | Ramachandran/rotamer outlier %, R-free, completeness, SS agreement, DockQ mapping, NMR ordered core |
 | 5 | [#39](https://github.com/realmarcin/protstruct_review/pull/39) (2026-07-26) | the §4 refinement Δ-tolerances (X-ray + cryo-EM), Ramachandran favored % |
+| 6 | [#42](https://github.com/realmarcin/protstruct_review/pull/42) (2026-07-26) | flip sets vs reduce2, rotamer assignment agreement, §4 detection floor |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -33,49 +35,46 @@ round 5 were breached by re-refining a deposited model against its own data, wit
 change at all.
 
 Carry the same suspicion into anything added next: a tolerance that has never been run is a
-hypothesis, and in this repo the hypothesis lost 21 times out of 21.
+hypothesis, and in this repo the hypothesis lost 21 times out of 21. Round 6 adds a corollary —
+**a "blocked" item is also a hypothesis**. Two of the three blockers dissolved on re-examination:
+`reduce2` reports flips once `add_flip_movers=True` is passed (it defaults off), and the §4
+false-negative side was testable all along by damaging models rather than refining them.
 
 ## Open
 
-### [ ] Rotamer **favored** % — no reference exists
+Round 6 closed all three previously-open items — **two of the three "blockers" were wrong**. What
+remains is narrower.
 
-Round 5 measured the Ramachandran favored % (± 1.0 pp → ± 0.2 pp) but could not measure the rotamer
-half. The wwPDB validation report's `rota=` attribute holds the rotamer **name** (`m-10`, `mp`,
-`mt-10`, …) with no favored/allowed classification and no `OUTLIER` value, so there is no reference
-figure to compare a local `phenix.rotalyze` run against. `phenix.rotalyze` also prints only an
-outlier SUMMARY line, not a favored one.
+### [ ] §4 map-model half: half-maps for `d_FSC_model`
 
-**Execute:** needs a different oracle — MolProbity's own rotamer classification, or counting
-per-residue rotamer verdicts from a full MolProbity run rather than the wwPDB report. Until then the
-clause stays unmeasured; `bench_vs_deposited.py` returns `None` for it rather than a confident 0 %.
+Still the one clause with no measurement. `phenix.mtriage`'s model-map FSC crossings are degenerate
+without half-maps (27WR reports FSC = 0.5 at 29.79 Å for a 2.7 Å map; `resolution=` does not fix it,
+and the log shows `d99 (half map 1): None`). EMDB serves half-maps as separate downloads
+(`emd_<id>_half_map_1.map.gz`).
 
-### [ ] Flip sets vs an independent H builder — BLOCKED on reduce2's output
+**Execute:** extend `scripts/bench_refinement_deltas_em.py` to fetch both half-maps and pass them to
+mtriage, then re-derive the `d_FSC_model_post ≤ d_FSC_model_pre + 0.05 Å` band. Until then the clause
+is documented as ungateable rather than enforced.
 
-Round 3 established that `phenix.reduce` and standalone `reduce` are the **same binary**
-(`reduce.4.16.250520`), so the "same Asn/Gln/His flip set" clause currently checks nothing.
-`mmtbx.reduce2` (v2.14.0) is the independent implementation — but it reports **no flip information**:
-zero occurrences of "flip" in its `.txt` log and no `USER  MOD` records in its output PDB, so flip
-calls cannot be extracted.
+### [ ] Widen the §4 evidence base
 
-Re-check on the next PHENIX upgrade.
+Round 5 used 8 X-ray + 2 EM entries for the null case; round 6 used 9 for detection. Both are thin,
+and two specific numbers rest on single observations:
 
-### [ ] Widen the §4 refinement benchmark
+- the **clashscore ratio gate (≥ 5×)** separates per model by ≥ 6.7×, but has a **validity limit at
+  `clashscore_pre ≈ 20`** (issue #43): damage drives clashscore to ~100 regardless of starting value,
+  so the ratio is ≈ 100/pre and collapses on already-poor models. No benchmark model starts above
+  13.6, so the limit is extrapolated, not observed — a set including poor-geometry depositions would
+  test it directly.
+- the **EM CC_mask band** rests on 2 entries, one of which consumed 65 % of it on a null refinement.
 
-Round 5 settled §4 on **8 X-ray entries and 2 cryo-EM entries** — enough to show the old bands failed
-on a null re-refinement (5/8 breached ΔRMSD, 3/8 clashscore), but thin for the EM half in particular.
-Three specific gaps:
+### [ ] Rotamer favored/allowed boundary — the residual unknown
 
-- **`d_FSC_model` is ungateable without half-maps.** `phenix.mtriage`'s model-map FSC crossings are
-  degenerate (27WR: FSC = 0.5 at 29.79 Å for a 2.7 Å map) and `resolution=` does not fix it. EMDB
-  serves half-maps separately; fetching them would make the second map-model clause measurable.
-- **Null case only.** The benchmark calibrates the false-positive side of each band — what a
-  refinement that should change nothing actually does. It never tests a genuinely *degrading*
-  refinement, so the false-negative side is unknown.
-- **One refinement protocol** (`phenix.refine`, 3 macro-cycles, default weights). REFMAC5/servalcat
-  as a second refiner would show how much of the null spread is protocol-specific.
-- **Clashscore Δ is currently ungated** (issue #40): its null-case range is −2.70 to +10.39, so no
-  useful band exists. A larger set would show whether the +10.39 outlier is representative or a
-  one-off, and whether the even 4-up/4-down split holds.
+Round 6 showed the rotamer *assignment* is reproduced exactly (8054/8054 residues), so ± 1.0 pp is
+not at risk from assignment disagreement. What remains unverified is how each pipeline draws the
+**favored/allowed boundary** for a given assignment — neither the wwPDB report nor `phenix.rotalyze`
+exposes the underlying rotamer-library density, so the two cannot be compared at that level without
+a third tool that does.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

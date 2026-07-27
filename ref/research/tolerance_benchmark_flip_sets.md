@@ -62,6 +62,14 @@ implementation run twice. But the two distributions do **not** ship the same het
 
 That difference is invisible on protein residues and decisive on ligands — see finding 4.
 
+> **Superseded in part (round 6).** This section concluded that a genuine flip comparison was
+> unavailable because `mmtbx.reduce2` "reports no flip information". That was true of the *run* and
+> wrong about the tool: `add_flip_movers` defaults to **False**, so reduce2 built no flip movers and
+> had nothing to report. With `approach=add add_flip_movers=True` it reports every group's final
+> pose, and the comparison shows **48 disagreements over 639 residues (7.5 %)** — see
+> `ref/research/tolerance_benchmark_round6.md`. The clause is not vacuous; it needed a rate rather
+> than an identity, and the identity result below is an artefact of comparing a binary with itself.
+
 **2. So the "same flip set" clause checks nothing for this tool pair.** A tolerance clause that is
 satisfied by construction gives false assurance: it reads as cross-tool corroboration and provides
 none. It should be stated as a same-implementation identity check, and a genuine flip-set comparison
@@ -98,11 +106,11 @@ residues this tolerance is about.
 
 ## Applied
 
-> **Asn/Gln/His flip-set agreement**: exact-match expected — 0 disagreements over 634 residues —
-> but **only because `phenix.reduce` and standalone `reduce` are the same binary
-> (reduce.4.16.250520)**. Treat this clause as a same-implementation identity check, not as cross-tool
-> corroboration. A meaningful flip-set comparison requires a genuinely independent H builder
-> (e.g. `reduce2`), which is not yet benchmarked here.
+> **Asn/Gln/His flip-set agreement — SUPERSEDED by round 6.** Exact match holds only between
+> `phenix.reduce` and standalone `reduce`, which are the same binary (reduce.4.16.250520; 0 of 634).
+> Against the independent `mmtbx.reduce2` the disagreement rate is **7.5 %**, and the applied
+> tolerance is now **≤ 10 % of flippable residues may differ**. See
+> `ref/research/tolerance_benchmark_round6.md`.
 >
 > **H-atom count: identical (Δ = 0) for protein-only models.** When non-water hetero components are
 > present the two distributions' het dictionaries differ and the count diverges by up to **3.96 %**,
