@@ -113,6 +113,11 @@ apparent "Δ +0.12 Å, band exceeded" into "not measured".
 
 ## Applied
 
+> **SUPERSEDED by round 7 — the band below is resolution-conditional now.** It was fitted to a
+> 1.37–2.92 Å set and is breached by null re-refinement on 4/19 entries once low-resolution entries
+> are included. Use + 0.10 Å below 2.5 Å and + 0.35 Å above; likewise the favored clause becomes
+> − 0.5 pp / − 6 pp. See `ref/research/tolerance_benchmark_round7.md`.
+>
 > **ΔRMSD sanity: `RMSD_post ≤ RMSD_pre + 0.15 Å`** (was + 0.05 Å). A null re-refinement of a
 > deposited model moves Cα by a median 0.072 Å and up to 0.107 Å, so the old band flagged 5/8
 > correct refinements as degradation.

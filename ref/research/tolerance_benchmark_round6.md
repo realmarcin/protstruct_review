@@ -133,6 +133,11 @@ reaches 13.6 — could be damaged at σ = 0.1 Å and not trip the gate. Above pr
 wrong statistic and the **absolute** post-clashscore against §2's quality bar is what still works: a
 value near 100 is unambiguous however it is normalised.
 
+> **Round 7 update.** The `d_FSC_model` fix proposed below (fetch half-maps) was **tested and does
+> not work**: half-maps repair the *half-map* FSC, not the *model-map* crossings. The cause is
+> model-to-map coverage. And the widened §4 set showed the round-5 bands to be resolution-conditional.
+> See `ref/research/tolerance_benchmark_round7.md`.
+
 ## Applied
 
 > **Asn/Gln/His flip sets: expect ≤ 10 % of flippable residues to differ** between independent H
