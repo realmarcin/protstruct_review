@@ -118,10 +118,13 @@ correctly-behaving refinement should change almost nothing. The old bands failed
 entries breached the ΔRMSD band and 3/8 the clashscore clause **with no modelling change at all**.
 See `ref/research/tolerance_benchmark_refinement_deltas.md`.
 
-> **Detection floor.** The converse was tested by damaging models with known coordinate noise
-> (`ref/research/tolerance_benchmark_round6.md`): **degradation below ~0.1 Å Cα RMSD is not
-> detectable by any §4 clause** at high resolution — and the floor is *worse* at low resolution,
-> where null re-refinement alone moves Cα up to 0.285 Å (`tolerance_benchmark_round7.md`) — 7 of 9 models damaged at σ = 0.05 Å (≈ 0.09 Å shift) passed
+> **Detection floor, and what §4 can actually see.** Tested by damaging models with known coordinate
+> noise: **degradation below ~0.1 Å Cα RMSD is undetectable by any §4 clause at high resolution**,
+> and **below ~0.35 Å at `d_min ≥ 2.5 Å`** — about 3× worse, because null re-refinement alone moves a
+> low-resolution model up to 0.285 Å. **§4 is therefore primarily a high-resolution check**: above
+> 2.5 Å it catches gross damage only (σ ≳ 0.3 Å), the −6 pp favored clause permits a drop from 92 %
+> to 86 %, and the absolute §2 quality bars carry most of the weight
+> (`tolerance_benchmark_round6.md`, `tolerance_benchmark_round7.md`) — 7 of 9 models damaged at σ = 0.05 Å (≈ 0.09 Å shift) passed
 > everything. That is a property of the quantities, not a tuning gap: 0.09 Å sits inside the
 > null-refinement spread. At σ = 0.1 Å (≈ 0.17 Å shift) all 9 were caught, by the ΔRMSD band.
 

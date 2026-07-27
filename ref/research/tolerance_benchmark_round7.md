@@ -39,6 +39,31 @@ The **clashscore ratio gate survives** the widening — no null re-refinement in
 consistent with round 6's prediction that the ratio compresses as the starting clashscore rises, and
 it extends the observed range from 13.6 to **17.2** without a false positive.
 
+### What the widened bands cost
+
+Widening is correct — the old bands flagged 10/19 correct refinements — but it removes most of the
+check at low resolution, and that has to be said rather than left for the reader to derive.
+
+Against the round-6 perturbation data, the median Cα shift each noise level produces:
+
+| σ (Å) | median Cα shift | exceeds `< 2.5 Å` band (0.10) | exceeds `≥ 2.5 Å` band (0.35) |
+|---:|---:|---|---|
+| 0.05 | 0.086 | no | no |
+| 0.10 | 0.173 | yes | **no** |
+| 0.20 | 0.346 | yes | **no** |
+| 0.30 | 0.518 | yes | yes |
+
+**The detection floor at `d_min ≥ 2.5 Å` is ~0.35 Å Cα — about 3× worse than the ~0.1 Å floor round 6
+measured at high resolution.** Only damage at σ ≳ 0.3 Å is visible.
+
+The favored clause weakens the same way: −6 pp applied to these models (deposited favored
+80.5–96.9 %) lets a model at 92 % fall to 86 % and pass, well under §2's 97 % quality bar.
+
+**So §4 is primarily a high-resolution check.** At `d_min ≥ 2.5 Å` it catches gross damage only, and
+the absolute §2 quality bars — not the Δ clauses — carry most of the weight. A wide band reported
+without its detection floor reads as "the refinement was fine" when it means "this check cannot see
+much here".
+
 ## 2. `d_FSC_model` with half-maps — the hypothesis was wrong
 
 Round 6 recorded that mtriage's model-map FSC crossings are degenerate without half-maps and
@@ -109,6 +134,11 @@ independent rotamer library.
 > The round-5 single bands (+0.15 Å, −1.5 pp) are retired: they were fitted to a 1.37–2.92 Å set and
 > are breached by null re-refinement on 4/19 and 6/19 entries respectively once low-resolution
 > entries are included.
+>
+> **§4 is primarily a high-resolution check.** The widened `≥ 2.5 Å` bands have a detection floor of
+> **~0.35 Å Cα** (σ ≈ 0.3), about 3× worse than the ~0.1 Å floor at high resolution, and the −6 pp
+> favored clause permits a drop from 92 % to 86 %. At low resolution rely on the absolute §2 quality
+> bars rather than these Δ clauses.
 >
 > **Unchanged and now better supported:** `rotamer outliers_post ≤ outliers_pre + 4 pp` (0/19
 > breaches) and the clashscore ratio gate ≥ 5× (0/19 false positives, starting clashscores up to

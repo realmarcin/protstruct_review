@@ -82,6 +82,15 @@ It is safe only if both pipelines use the same rotamer library, which the identi
 **Execute:** needs a rotamer implementation with an independent library. None is installed; this is
 the one item in this file with no local path forward.
 
+### [ ] Low-resolution §4 has little discriminating power (#45)
+
+The widened `d_min ≥ 2.5 Å` bands have a detection floor of ~**0.35 Å Cα** (σ ≈ 0.3) against ~0.1 Å at
+high resolution, and the −6 pp favored clause permits 92 % → 86 %. The bands are correct — the null
+spread really is that large — but they leave §4 able to catch only gross damage at low resolution.
+Recorded on the tolerance rather than fixed, because narrowing them would reintroduce the
+false-positive rate round 7 just removed. A genuinely better low-resolution check would need a
+different quantity, not a tighter band on these.
+
 ### [ ] Low-resolution refinement protocol
 
 The low-resolution null spreads (up to 0.285 Å Cα, 5.26 pp favored) come from `phenix.refine` with
