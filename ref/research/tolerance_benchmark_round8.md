@@ -45,10 +45,18 @@ Round 7's low-resolution null spreads came from `phenix.refine` with default wei
 secondary-structure restraints** — not how a 3.5 Å structure would be refined. Re-running the 11
 low-resolution entries with `ncs_search.enabled=True secondary_structure.enabled=True`:
 
-| | unrestrained | restrained | change |
-|---|---:|---:|---:|
-| Cα shift, max | 0.285 Å | **0.227 Å** | −20 % |
-| Favored drop, max | 5.26 pp | **3.35 pp** | −36 % |
+| | unrestrained max | restrained max | median change | improved / worsened |
+|---|---:|---:|---:|---:|
+| Cα shift | 0.285 Å | **0.227 Å** (−20 %) | **−0.0067 Å** | 8 / 3 |
+| Favored drop | 5.26 pp | **3.35 pp** (−36 %) | **−1.23 pp** | **10 / 1** |
+
+The maxima alone would be one entry out of eleven each, so the distribution matters: the effect is
+broad, not an outlier. For Ramachandran favored it is in fact *larger* than the headline suggests — a
+median 1.23 pp recovery against drops running 0–5.26 pp — while for Cα shift 3 of 11 entries got
+slightly *worse* with restraints, which a "−20 %" figure hides.
+
+The restraints demonstrably engaged: the refinement logs report `Found NCS groups: … Number of NCS
+groups: 1` and secondary structure read from the input model.
 
 (Reference-model restraints are deliberately excluded: they restrain to a higher-resolution homolog,
 which this benchmark does not have, and pointing them at the input model would restrain it to itself.)
