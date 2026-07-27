@@ -482,4 +482,30 @@ def _wrapped(a, b):
 check("chi1 comparison wraps around 360°", _wrapped(359.0, 1.0), 2.0)
 check("chi1 comparison unaffected mid-range", _wrapped(180.0, 176.0), 4.0)
 
+
+
+# --- Round 11: cross-library sidechain comparison ---------------------------------
+
+# gemmi rmsz emits both backbone and sidechain torsions. Counting backbone ones as
+# chi would mix in phi/psi deviations and destroy the comparison, so the filter is
+# pinned.
+TORSIONS = """A 7(LEU) torsion CA-CB-CG-CD1: |Z|=3.8
+A 7(LEU)-8(ASN) torsion C-N-CA-C: |Z|=3.0
+A 7(LEU) torsion N-CA-CB-CG: |Z|=1.2
+"""
+worst = {}
+for line in TORSIONS.splitlines():
+    m = dep._GEMMI_TORSION.match(line.strip())
+    if not m or m.group("atoms") in dep._BACKBONE_TORSIONS:
+        continue
+    key = (m.group("chain"), int(m.group("resseq")), m.group("resname"))
+    worst[key] = max(worst.get(key, 0.0), float(m.group("z")))
+check("sidechain torsions kept, backbone excluded", worst, {("A", 7, "LEU"): 3.8})
+# Inter-residue backbone torsions are written "7(LEU)-8(ASN)" and do not match the
+# single-residue pattern at all, so they are excluded before the name filter even
+# applies. That is the stronger guarantee, so assert it directly.
+check("an inter-residue backbone torsion line does not match at all",
+      dep._GEMMI_TORSION.match("A 7(LEU)-8(ASN) torsion C-N-CA-C: |Z|=3.0"), None)
+check("the worst chi per residue is kept, not the first", worst[("A", 7, "LEU")], 3.8)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
