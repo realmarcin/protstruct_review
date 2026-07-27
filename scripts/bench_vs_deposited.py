@@ -61,6 +61,14 @@ _MVD_COMPLETENESS = re.compile(r"Completeness in resolution range:\s*([\d.]+)")
 # cannot be obtained this way and is left unmeasured.
 _RES_RAMA = re.compile(r'\brama="([^"]+)"')
 _RES_ROTA = re.compile(r'\brota="([^"]+)"')
+# Per-residue rotamer assignment from the report, with enough identity to match it
+# against a local run: <ModelledSubgroup ... rota="mmm" ... chain="A" resnum="1" ...
+# resname="MET" ...>. Attribute order is not guaranteed, so each is matched separately.
+_XML_SUBGROUP = re.compile(r"<ModelledSubgroup ([^>]*)>")
+# phenix.rotalyze per-residue line:  A   1  MET:1.00:79.0:...:Favored:mmm
+_ROTALYZE_RESIDUE = re.compile(
+    r"^\s*(?P<chain>\S+)\s+(?P<resseq>-?\d+)\s+(?P<resname>[A-Z]{3}):"
+    r"(?P<rest>.*?):(?P<verdict>Favored|Allowed|OUTLIER):(?P<rotamer>\S+)\s*$", re.M)
 
 
 def entry_attribute(xml: str, name: str) -> float | None:
@@ -101,6 +109,53 @@ def favored_pct(xml: str, pattern: re.Pattern) -> float | None:
         return None
     favored = sum(1 for v in verdicts if v.lower() == "favored")
     return round(100.0 * favored / len(verdicts), 2)
+
+
+def report_rotamers(xml: str) -> dict[tuple[str, int, str], str]:
+    """Per-residue rotamer NAME from the validation report, keyed by residue."""
+    out = {}
+    for block in _XML_SUBGROUP.findall(xml):
+        attrs = dict(re.findall(r'([\w-]+)="([^"]*)"', block))
+        rota, chain, resnum = attrs.get("rota"), attrs.get("chain"), attrs.get("resnum")
+        if not rota or not chain or resnum is None:
+            continue
+        try:
+            out[(chain, int(resnum), attrs.get("resname", "").upper())] = rota
+        except ValueError:
+            continue
+    return out
+
+
+def local_rotamers(rotalyze_log: str) -> dict[tuple[str, int, str], tuple[str, str]]:
+    """Per-residue (rotamer name, verdict) from a phenix.rotalyze log."""
+    out = {}
+    for m in _ROTALYZE_RESIDUE.finditer(rotalyze_log):
+        out[(m.group("chain"), int(m.group("resseq")), m.group("resname").upper())] = (
+            m.group("rotamer"), m.group("verdict"))
+    return out
+
+
+def rotamer_agreement(xml: str, rotalyze_log: str) -> dict[str, Any]:
+    """Do the two pipelines assign the same rotamer to the same residue?
+
+    The favored-% tolerance itself cannot be measured against the wwPDB report — the
+    report carries no favored/allowed verdict. But it does carry the rotamer NAME,
+    in the same MolProbity vocabulary phenix.rotalyze uses, and the favored/allowed
+    classification is derived from that assignment. Agreement on the assignment is
+    therefore the strongest available evidence for the tolerance.
+    """
+    ref, local = report_rotamers(xml), local_rotamers(rotalyze_log)
+    shared = sorted(set(ref) & set(local))
+    if not shared:
+        return {"n_shared": 0}
+    same = [k for k in shared if ref[k] == local[k][0]]
+    return {
+        "n_shared": len(shared),
+        "n_same_rotamer": len(same),
+        "rotamer_agreement": round(len(same) / len(shared), 4),
+        "local_favored_pct": round(
+            100.0 * sum(1 for k in shared if local[k][1] == "Favored") / len(shared), 2),
+    }
 
 
 def fetch_text(url: str, dest: Path) -> str | None:
@@ -193,6 +248,7 @@ def collect(pdb_ids: list[str], cache: Path, mvd_cache: Path | None) -> tuple[li
         row["wwpdb_rota_favored_pct"] = favored_pct(xml, _RES_ROTA)
         rota_fav = _ROTA_FAV.search(rota_log)
         row["phenix_rota_favored_pct"] = float(rota_fav.group(1)) if rota_fav else None
+        row.update({f"rotamer_{k}": v for k, v in rotamer_agreement(xml, rota_log).items()})
 
         # R-free and completeness come from a model_vs_data run; reuse the R-offset
         # benchmark's cache when one is supplied rather than repeating a slow job.
@@ -250,6 +306,14 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
         "rama_outlier_pp": stats("rama_outlier_delta_pp"),
         "rama_favored_pp": stats("rama_favored_delta_pp"),
         "rota_favored_pp": stats("rota_favored_delta_pp"),
+        "rotamer_name_agreement": {
+            "n_entries": sum(1 for r in rows if r.get("rotamer_n_shared")),
+            "n_residues": sum(r.get("rotamer_n_shared", 0) for r in rows),
+            "n_same": sum(r.get("rotamer_n_same_rotamer", 0) for r in rows),
+            "worst_entry_agreement": min(
+                (r["rotamer_rotamer_agreement"] for r in rows
+                 if r.get("rotamer_rotamer_agreement") is not None), default=None),
+        },
         "rota_outlier_pp": stats("rota_outlier_delta_pp"),
         "r_free_vs_deposited": stats("r_free_delta"),
         "r_free_vs_wwpdb_recomputed": stats("r_free_delta_vs_dcc"),

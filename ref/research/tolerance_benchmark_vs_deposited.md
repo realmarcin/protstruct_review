@@ -88,7 +88,11 @@ comparisons are informative. The ± 1.0 pp band is ~6× too loose.
 
 The **rotamer** favored % could not be measured the same way: the report's `rota=` attribute holds
 the rotamer *name* (`m-10`, `mp`, `mt-10`, …) with no favored/allowed classification, and no
-`rota="OUTLIER"` values appear at all. That half of the tolerance still has no wwPDB reference.
+`rota="OUTLIER"` values appear at all. That half of the tolerance still has no wwPDB reference —
+but round 6 established what the report *can* corroborate: the rotamer **assignment** itself is
+identical for **8054 of 8054** residues across these 17 entries, in the same MolProbity vocabulary
+`phenix.rotalyze` prints. Since the favored/allowed verdict is derived from the assignment, that
+bounds one source of disagreement to zero and leaves only the classification boundary unverified.
 
 **2. Rotamer outlier % is nearly exact**, with two exceptions: 30IZ (0.70 vs 0.50) and 9HW2 (0.87 vs
 1.21), max 0.34 pp. The ± 0.5 pp band is about right here, and it is the looser of the two geometry

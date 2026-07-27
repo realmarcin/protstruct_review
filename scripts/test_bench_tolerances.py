@@ -353,4 +353,44 @@ check("rotamer names are not verdicts — None, not a confident 0.0 %",
       dep.favored_pct(' rota="m-10" rota="mp" rota="mt-10" ', dep._RES_ROTA), None)
 check("no verdicts at all yields None", dep.favored_pct("<Entry/>", dep._RES_RAMA), None)
 
+
+
+# --- Round 6: reduce2 flip poses, report rotamers, perturbation ------------------
+
+REDUCE2_REPORT = """
+ Added MoverAmideFlip 2 to chain A GLN 2
+   AmideFlip at chain A GLN 2 NE2 Initial score: 13.30 final score: 13.30 pose Unflipped . . . .
+   HisFlip at chain A HIS 55 ND1 Initial score: 1.00 final score: 9.00 pose Flipped . . . .
+   NH3Rotator at chain A LYS 4 NZ Initial score: 6.81 final score: 6.82 pose Angle 178.0 deg . .
+"""
+calls = {}
+for m in t14._REDUCE2_FLIP.finditer(REDUCE2_REPORT):
+    calls[(m.group("chain"), int(m.group("resseq")), m.group("resname").upper())] = (
+        m.group("pose") == "Flipped")
+check("reduce2 Unflipped pose parsed", calls.get(("A", 2, "GLN")), False)
+check("reduce2 Flipped pose parsed", calls.get(("A", 55, "HIS")), True)
+check("a rotator is not a flip", ("A", 4, "LYS") in calls, False)
+
+SUBGROUP = ('<ModelledSubgroup rota="mmm" model="1" chain="A" resnum="1" resname="MET"/>'
+            '<ModelledSubgroup rscc="0.9" model="1" chain="A" resnum="2" resname="GLY"/>')
+check("report rotamer assignment keyed by residue",
+      dep.report_rotamers(SUBGROUP), {("A", 1, "MET"): "mmm"})
+check("rotalyze per-residue line parsed",
+      dep.local_rotamers(" A   1  MET:1.00:79.0:306.4:300.1:284.6::Favored:mmm"),
+      {("A", 1, "MET"): ("mmm", "Favored")})
+check("agreement computed over shared residues only",
+      dep.rotamer_agreement(SUBGROUP, " A   1  MET:1.00:79.0::::Favored:mmm")["rotamer_agreement"],
+      1.0)
+
+# The perturbation used for the detection test must actually move atoms, and must
+# move them by about the requested sigma — a no-op would make the bands look blind.
+_p = _pdb([("A", i, 0.0, 0.0, 0.0) for i in range(1, 201)])
+try:
+    moved = refdel.perturb(_p, 0.5, Path(_tf.mkdtemp()))
+    shift, n = refdel.ca_shift_rmsd(_p, moved)
+    check("perturbation moves atoms by ~sigma*sqrt(3)", 0.6 < shift < 1.1, True)
+    check("perturbation keeps every residue", n, 200)
+finally:
+    _p.unlink(missing_ok=True)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
