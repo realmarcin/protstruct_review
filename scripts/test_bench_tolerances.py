@@ -433,4 +433,34 @@ check("low-resolution restraints request NCS and secondary structure",
 # NOT be in the recipe.
 check("reference_model restraints excluded", "reference_model" in refdel.LOW_RES_RESTRAINTS, False)
 
+
+
+# --- Round 9: the FSC last-crossing rule -----------------------------------------
+
+# mtriage reports the FIRST shell below the threshold, which a single anomalous
+# low-resolution shell defeats (9VJD: dips to 0.073 at 23.11 Å, recovers, so mtriage
+# returns 23.11 Å for a 2.86 Å map). These pin the last-crossing behaviour.
+CURVE = [(30.0, 0.99), (23.0, 0.07), (20.0, 0.95), (10.0, 0.90),
+         (3.0, 0.60), (2.8, 0.20), (2.6, 0.10), (2.4, 0.05)]
+# 2.6, not 2.8: FSC = 0.20 at 2.8 Å is still ABOVE the 0.143 threshold. Getting this
+# expectation wrong first time is exactly the confusion the rule has to survive.
+check("last crossing ignores a low-resolution dip that recovers",
+      refem.d_fsc_from_curve(CURVE, 0.143), 2.6)
+check("a monotonic curve gives the same answer either way",
+      refem.d_fsc_from_curve([(30.0, 0.99), (10.0, 0.90), (3.0, 0.60), (2.5, 0.10)], 0.143), 2.5)
+check("a curve that never crosses yields None",
+      refem.d_fsc_from_curve([(30.0, 0.99), (3.0, 0.80)], 0.143), None)
+check("threshold is honoured (0.5 crosses earlier than 0.143)",
+      refem.d_fsc_from_curve(CURVE, 0.5), 2.8)
+
+# The curve file stores 1/d in column 1; reading it as d would inverte the whole
+# analysis and still produce plausible-looking numbers.
+import tempfile as _tf2
+_cp = Path(_tf2.mkstemp(suffix=".log")[1])
+try:
+    _cp.write_text("    0.010000000     0.990000000\n    0.500000000     0.100000000\n")
+    check("curve reader converts 1/d to d", refem.read_fsc_curve(_cp), [(100.0, 0.99), (2.0, 0.10)])
+finally:
+    _cp.unlink(missing_ok=True)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

@@ -41,8 +41,49 @@ PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
 
 _CC_MASK = re.compile(r"CC_mask\s*:\s*([\d.]+)")
 # mtriage prints masked and unmasked columns; FSC=0.143 is the conventional model-map
-# figure, so take that row's masked value.
+# figure, so take that row's masked value. NOTE this summary value is unreliable —
+# see `d_fsc_from_curve`, which is what this benchmark actually uses.
 _D_FSC_MODEL = re.compile(r"FSC\(map,\s*model map\)=0\.143\s*:\s*([\d.]+)\s+([\d.]+)")
+
+FSC_CURVE = "fsc_model.masked.mtriage.log"
+FSC_THRESHOLD = 0.143
+
+
+def read_fsc_curve(path: Path) -> list[tuple[float, float]]:
+    """(d, FSC) pairs from mtriage's model-map FSC curve, ordered low → high resolution."""
+    rows = []
+    for line in path.read_text(errors="ignore").splitlines():
+        parts = line.split()
+        if len(parts) < 2:
+            continue
+        try:
+            inv_d, fsc = float(parts[0]), float(parts[1])
+        except ValueError:
+            continue
+        if inv_d > 0:
+            rows.append((1.0 / inv_d, fsc))
+    return rows
+
+
+def d_fsc_from_curve(rows: list[tuple[float, float]], threshold: float = FSC_THRESHOLD) -> float | None:
+    """Resolution at which FSC drops below `threshold` **and stays there**.
+
+    mtriage's reported `d_fsc_model` is the FIRST shell whose FSC falls below the
+    threshold, scanning from low resolution. A single anomalous low-resolution shell
+    therefore defeats it: 9VJD's masked model-map FSC dips to 0.073 at 23.11 Å and
+    recovers above 0.5, so mtriage reports 23.11 Å for a 2.86 Å map. Taking the LAST
+    crossing instead — the point beyond which FSC never recovers — gives 2.77 Å.
+
+    The same bug affects the 0.5 threshold on entries whose 0.143 value looks fine:
+    21BQ reports 36.11 Å at FSC = 0.5 and yields 2.69 Å here.
+    """
+    last = None
+    for d, fsc in rows:
+        if fsc >= threshold:
+            last = None
+        elif last is None:
+            last = d
+    return last
 
 
 def run(cmd: str, log: Path, pattern: re.Pattern, work: Path) -> str | None:
@@ -59,12 +100,16 @@ def measure(model: Path, map_file: Path, resolution: float, work: Path,
     cc_log = work / f"mc_{tag}.log"
     cc_text = run(f"{PHENIX_BIN / 'phenix.map_correlations'} {model} {map_file} "
                   f"resolution={resolution}", cc_log, _CC_MASK, work)
-    mt_log = work / f"mt_{tag}.log"
-    mt_text = run(f"{PHENIX_BIN / 'phenix.mtriage'} {model} {map_file}",
-                  mt_log, _D_FSC_MODEL, work)
+    # mtriage writes its FSC curve into the working directory under a fixed name, so
+    # each measurement gets its own directory or they overwrite one another.
+    mt_dir = work / f"mt_{tag}"
+    mt_dir.mkdir(parents=True, exist_ok=True)
+    mt_log = mt_dir / "mtriage.log"
+    run(f"{PHENIX_BIN / 'phenix.mtriage'} {model} {map_file} resolution={resolution}",
+        mt_log, _D_FSC_MODEL, mt_dir)
+    curve_path = mt_dir / FSC_CURVE
+    d_value = (d_fsc_from_curve(read_fsc_curve(curve_path)) if curve_path.exists() else None)
     cc = _CC_MASK.search(cc_text) if cc_text else None
-    dfsc = _D_FSC_MODEL.search(mt_text) if mt_text else None
-    d_value = float(dfsc.group(1)) if dfsc else None
     # mtriage's model-map FSC crossings are degenerate without half-maps: 27WR reports
     # FSC=0.5 at 29.79 Å for a 2.7 Å map, and 9VJD reports FSC=0.143 at 29.65 Å for a
     # 2.86 Å map (passing resolution= explicitly does not fix it, and the log shows
