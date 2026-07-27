@@ -168,6 +168,64 @@ def boundary_exposure(rotalyze_log: str, margins=(1.25, 1.5, 2.0)) -> dict[str, 
     return out
 
 
+# chi1 atom quadruple is N-CA-CB-X, where X depends on the residue type.
+_CHI1_LAST_ATOM = {
+    "ARG": "CG", "ASN": "CG", "ASP": "CG", "CYS": "SG", "GLN": "CG", "GLU": "CG",
+    "HIS": "CG", "ILE": "CG1", "LEU": "CG", "LYS": "CG", "MET": "CG", "PHE": "CG",
+    "PRO": "CG", "SER": "OG", "THR": "OG1", "TRP": "CG", "TYR": "CG", "VAL": "CG1",
+}
+
+
+def chi1_agreement(model: Path, rotalyze_log: str) -> dict[str, Any]:
+    """Compare chi1 computed independently (gemmi) against phenix.rotalyze's value.
+
+    The favored/allowed classification is a library lookup applied to chi angles.
+    The library cannot be checked — no non-cctbx rotamer library is installed — but
+    the *geometry* half can, with gemmi. If chi agrees exactly, any favored-%
+    disagreement between pipelines must come from the library, which narrows the
+    unverified surface from "the classification" to "the density lookup".
+    """
+    import math
+
+    import gemmi
+
+    structure = gemmi.read_structure(str(model))
+    structure.remove_alternative_conformations()
+    structure.remove_hydrogens()
+    mine: dict[tuple[str, int, str], float] = {}
+    for chain in structure[0]:
+        for residue in chain:
+            last = _CHI1_LAST_ATOM.get(residue.name)
+            if not last:
+                continue
+            try:
+                positions = [residue[name][0].pos for name in ("N", "CA", "CB", last)]
+            except Exception:                      # noqa: BLE001 - missing atom
+                continue
+            angle = gemmi.calculate_dihedral(*positions) * 180.0 / math.pi
+            mine[(chain.name, residue.seqid.num, residue.name)] = angle % 360.0
+
+    theirs: dict[tuple[str, int, str], float] = {}
+    for m in _ROTALYZE_RESIDUE.finditer(rotalyze_log):
+        chi1 = m.group("rest").split(":")[0]
+        try:
+            theirs[(m.group("chain"), int(m.group("resseq")),
+                    m.group("resname").upper())] = float(chi1) % 360.0
+        except ValueError:
+            continue
+
+    shared = sorted(set(mine) & set(theirs))
+    if not shared:
+        return {}
+    diffs = [min(abs(mine[k] - theirs[k]), 360.0 - abs(mine[k] - theirs[k])) for k in shared]
+    return {
+        "n_chi1_compared": len(shared),
+        "chi1_max_abs_deg": round(max(diffs), 4),
+        "chi1_median_abs_deg": round(statistics.median(diffs), 4),
+        "n_chi1_above_0_1_deg": sum(1 for d in diffs if d > 0.1),
+    }
+
+
 def rotamer_agreement(xml: str, rotalyze_log: str) -> dict[str, Any]:
     """Do the two pipelines assign the same rotamer to the same residue?
 
@@ -283,6 +341,7 @@ def collect(pdb_ids: list[str], cache: Path, mvd_cache: Path | None) -> tuple[li
         row["phenix_rota_favored_pct"] = float(rota_fav.group(1)) if rota_fav else None
         row.update({f"rotamer_{k}": v for k, v in rotamer_agreement(xml, rota_log).items()})
         row.update({f"boundary_{k}": v for k, v in boundary_exposure(rota_log).items()})
+        row.update(chi1_agreement(model, rota_log))
 
         # R-free and completeness come from a model_vs_data run; reuse the R-offset
         # benchmark's cache when one is supplied rather than repeating a slow job.
@@ -340,6 +399,13 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
         "rama_outlier_pp": stats("rama_outlier_delta_pp"),
         "rama_favored_pp": stats("rama_favored_delta_pp"),
         "rota_favored_pp": stats("rota_favored_delta_pp"),
+        "chi1_geometry_agreement": {
+            "n_entries": sum(1 for r in rows if r.get("n_chi1_compared")),
+            "n_residues": sum(r.get("n_chi1_compared", 0) for r in rows),
+            "max_abs_deg": max((r["chi1_max_abs_deg"] for r in rows
+                                if r.get("chi1_max_abs_deg") is not None), default=None),
+            "n_above_0_1_deg": sum(r.get("n_chi1_above_0_1_deg", 0) for r in rows),
+        },
         "favored_allowed_boundary_exposure": {
             "n_residues": sum(r.get("boundary_n_scored", 0) for r in rows),
             **{f"pct_within_x{m}": (
