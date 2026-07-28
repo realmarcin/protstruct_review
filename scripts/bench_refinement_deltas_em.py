@@ -138,21 +138,58 @@ def measure(model: Path, map_file: Path, resolution: float, work: Path,
     }
 
 
+# `Sorry:` is how cctbx reports a fatal, user-actionable problem; a bare traceback is
+# a crash. Both end the run, but they mean different things to whoever reads the skip
+# list, so the reason is carried through rather than flattened to "failed".
+_SORRY = re.compile(r"^Sorry: (.+)$", re.MULTILINE)
+_UNKNOWN_ENERGY = re.compile(
+    r"Number of atoms with unknown nonbonded energy type symbols: (\d+)")
+
+
+def refine_failure_reason(log: Path) -> str:
+    """Why real_space_refine stopped, in one line, from its log.
+
+    A skip recorded as "real_space_refine failed" is indistinguishable from a bug in
+    this script. The common cause is neither: an entry carrying a ligand with no
+    restraints in the monomer library cannot be refined by this pipeline at all, which
+    is a property of the entry and belongs in the scope limits.
+    """
+    if not log.exists():
+        return "real_space_refine produced no log"
+    text = log.read_text(errors="ignore")
+    unknown = _UNKNOWN_ENERGY.search(text)
+    if unknown:
+        return (f"unparameterised ligand: {unknown.group(1)} atoms with unknown "
+                f"nonbonded energy types (no monomer-library restraints)")
+    sorry = _SORRY.search(text)
+    if sorry:
+        return f"real_space_refine: {sorry.group(1).strip()}"
+    if "Traceback" in text:
+        return "real_space_refine crashed (traceback in log)"
+    return "real_space_refine produced no refined model"
+
+
 def refine(model: Path, map_file: Path, resolution: float, work: Path,
-           tag: str) -> Path | None:
-    """Real-space refine the model against its map; returns the refined coordinates."""
+           tag: str) -> tuple[Path | None, str | None]:
+    """Real-space refine the model against its map.
+
+    Returns (refined coordinates, failure reason). Exactly one is None.
+    """
     prefix = f"rs_{tag}"
     cached = sorted(work.glob(f"{prefix}_real_space_refined_*.cif"))
     if cached:                       # real_space_refine takes minutes; do not repeat it
-        return cached[-1]
+        return cached[-1], None
+    log = work / f"rsr_{tag}.log"
     subprocess.run(
         ["bash", "-c",
          f"cd {work} && {PHENIX_BIN / 'phenix.real_space_refine'} {model} {map_file} "
          f"resolution={resolution} output.prefix={prefix} --overwrite "
-         f"> {work / f'rsr_{tag}.log'} 2>&1"],
+         f"> {log} 2>&1"],
         capture_output=True, text=True, timeout=14400, env=dict(os.environ))
     hits = sorted(work.glob(f"{prefix}_real_space_refined_*.cif"))
-    return hits[-1] if hits else None
+    if hits:
+        return hits[-1], None
+    return None, refine_failure_reason(log)
 
 
 def collect(entries: list[dict], cache: Path) -> tuple[list[dict], list[dict]]:
@@ -169,10 +206,10 @@ def collect(entries: list[dict], cache: Path) -> tuple[list[dict], list[dict]]:
         if pre["cc_mask"] is None:
             skipped.append({"pdb_id": pdb_id.upper(), "reason": "map_correlations failed"})
             continue
-        refined = refine(model, map_file, resolution, cache, pdb_id)
+        refined, reason = refine(model, map_file, resolution, cache, pdb_id)
         if refined is None:
-            print("  ! real_space_refine failed", file=sys.stderr)
-            skipped.append({"pdb_id": pdb_id.upper(), "reason": "real_space_refine failed"})
+            print(f"  ! {reason}", file=sys.stderr)
+            skipped.append({"pdb_id": pdb_id.upper(), "reason": reason})
             continue
         post = measure(refined, map_file, resolution, cache, f"{pdb_id}_post")
         if post["cc_mask"] is None:

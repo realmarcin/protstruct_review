@@ -34,6 +34,18 @@ sub-band queries, interleaved so an early stop still spans the window, are the f
 and would have refined for hours to contribute a single resolution point. Model size drives
 `real_space_refine` cost much harder than map size, so the model cap sits far below the map cap.
 
+**And a skip has to explain itself.** 11MR failed with `Sorry: Fatal problems interpreting model
+file` — 128 atoms of a novel ligand (`A1C9W`) with no monomer-library restraints. The benchmark
+recorded that as `real_space_refine failed`, which is indistinguishable from a bug in the benchmark.
+It is neither a bug nor a tool limit: an entry carrying an unparameterised ligand **cannot** be
+re-refined by this pipeline, which is a property of the entry. `refine_failure_reason()` now names
+the cause, because the alternative is a skip list nobody can act on.
+
+That failure is also a **selection effect**, and it runs the same way every time: entries with novel
+ligands drop out, so the set drifts toward ligand-free and common-ligand structures. Whether ligand
+content correlates with refinement behaviour is untested here — it is recorded so the bias is
+visible, not because its direction is known.
+
 ## 1. Entry count is not evidence for a one-sided band
 
 Round 13 established this for `d_FSC_model`: the clause is one-sided, so only entries that move in
@@ -103,6 +115,10 @@ more slowly than the count implies.
 - "Degradation" here means Δ < 0 at the precision published (4 dp). Entries at exactly 0.0000 and
   entries at −0.0001 are separated by less than the measurement's meaningful precision, so the share
   is approximate near zero; 10SH (+0.0001) and 10SG (−0.0019) illustrate the boundary.
+- Entries whose ligands lack monomer-library restraints are skipped, so the set under-represents
+  structures with novel ligands (11MR in this round). Supplying generated restraints would refine
+  those entries under a different protocol than the rest, which is why they are dropped rather than
+  patched.
 - Whether headroom is *predictable* — e.g. from starting CC_mask — is not established here. Round 12
   tested starting CC_mask against degradations and found nothing, and any relationship in round 14's
   entries alone rests on too few points to claim. Recorded as a question, not a finding.

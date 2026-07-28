@@ -612,4 +612,40 @@ check("an oversized model is not left on disk to look like a cache hit",
       (_tmp / "test.cif").exists(), False)
 check("a model under the cap is kept", under is not None, True)
 
+
+# --- Round 14: refinement skips must explain themselves ---------------------------
+
+# 11MR failed with 128 atoms of an unparameterised ligand (A1C9W). Recorded as
+# "real_space_refine failed", that is indistinguishable from a bug in this script; it
+# is actually a property of the entry, and belongs in the scope limits.
+import tempfile as _tf
+
+_logdir = Path(_tf.mkdtemp())
+
+
+def _reason(text: str) -> str:
+    p = _logdir / "one.log"
+    p.write_text(text)
+    return refem.refine_failure_reason(p)
+
+
+check("an unparameterised ligand is named, with its atom count",
+      _reason("Number of atoms with unknown nonbonded energy type symbols: 128\n"
+              "Sorry: Fatal problems interpreting model file:"),
+      "unparameterised ligand: 128 atoms with unknown nonbonded energy types "
+      "(no monomer-library restraints)")
+# The ligand cause is checked first because cctbx reports it alongside a generic
+# `Sorry:` line; matching the Sorry first would report the vague half of the message.
+check("a plain Sorry: is carried through verbatim",
+      _reason("Sorry: Map and model do not overlap."),
+      "real_space_refine: Map and model do not overlap.")
+check("a crash is distinguished from a user-actionable stop",
+      _reason("Traceback (most recent call last):\n  File x\nValueError: boom"),
+      "real_space_refine crashed (traceback in log)")
+check("an empty log is not reported as success",
+      _reason(""), "real_space_refine produced no refined model")
+check("a missing log is reported as such",
+      refem.refine_failure_reason(_logdir / "absent.log"),
+      "real_space_refine produced no log")
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
