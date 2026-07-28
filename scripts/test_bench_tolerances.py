@@ -508,4 +508,24 @@ check("an inter-residue backbone torsion line does not match at all",
       dep._GEMMI_TORSION.match("A 7(LEU)-8(ASN) torsion C-N-CA-C: |Z|=3.0"), None)
 check("the worst chi per residue is kept, not the first", worst[("A", 7, "LEU")], 3.8)
 
+
+
+# --- Round 12: d_FSC_model relative band ------------------------------------------
+
+# The band became relative because the quantity spans 2.2-6.1 Å. A 0.26 Å change on
+# a 6.1 Å value and a 0.12 Å change on a 2.7 Å value are the same 4.3 % — an absolute
+# band cannot treat them alike, which is what broke ±0.05 Å.
+def _rel(pre, post):
+    return round(100.0 * (post - pre) / pre, 2)
+
+
+check("a large absolute change on a large value is a small relative one",
+      _rel(6.1020, 6.3629), 4.28)
+check("a smaller absolute change on a small value is the same relative size",
+      _rel(2.7163, 2.5967), -4.40)
+check("both breach an absolute 0.05 Å band",
+      (abs(6.3629 - 6.1020) > 0.05, abs(2.5967 - 2.7163) > 0.05), (True, True))
+check("neither breaches a 5 % relative band",
+      (abs(_rel(6.1020, 6.3629)) <= 5.0, abs(_rel(2.7163, 2.5967)) <= 5.0), (True, True))
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

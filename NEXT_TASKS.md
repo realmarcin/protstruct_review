@@ -8,7 +8,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Eleven rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
+Twelve rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
 in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 found that
 **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
@@ -27,6 +27,7 @@ resolution range and breached by null re-refinement once low-resolution entries 
 | 9 | [#48](https://github.com/realmarcin/protstruct_review/pull/48) (2026-07-27) | `d_FSC_model` mechanism found; the clause is gateable after all |
 | 10 | [#50](https://github.com/realmarcin/protstruct_review/pull/50) (2026-07-27) | EM set completed (CC_mask band breached and widened); §4 high-res end filled; rotamer chi geometry verified |
 | 11 | [#52](https://github.com/realmarcin/protstruct_review/pull/52) (2026-07-27) | both "edge" bands breached; CC_mask made resolution-conditional; rotamer library corroborated |
+| 12 | [#54](https://github.com/realmarcin/protstruct_review/pull/54) (2026-07-27) | CC_mask holds at 22 entries and its split is located; `d_FSC_model` band made relative |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -52,6 +53,13 @@ mechanism inferred from two data points is a hypothesis.** Round 7 explained a d
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
 
+Round 12 adds the counterpart to the headroom rule: **when a band keeps breaking as the set grows,
+check its shape before widening it again.** `d_FSC_model` was widened and re-widened as an absolute
+± 0.05 Å band and broke anyway at 3 of 21 entries — because the quantity ranges 2.2–6.1 Å and no
+absolute band serves both ends. As a **relative** 5 % band the same data has zero violations and a
+median of 0.31 %. Rounds 1 and 2 reached the identical conclusion for interface BSA and Wilson B;
+it took ten rounds to apply it here.
+
 Round 11 sharpens round 10's lesson into a working rule: **when a band's headroom drops below ~1.2×,
 treat it as already broken.** Round 10 measured 1.15× headroom on the §4 Cα band and called CC_mask
 the thinnest evidence base in the file; round 11 broke both on the first attempt, CC_mask by more
@@ -74,37 +82,34 @@ benchmark records that in its scope limits for exactly this reason.
 
 ## Open
 
-Round 11 broke both bands round 10 had flagged, on the first try. The rotamer item — closed as a
-dead end in rounds 8 and 10 — turned out to have an independent library after all.
+Round 12 settled both remaining items. CC_mask **held** — the first band in four rounds to survive a
+widening — and `d_FSC_model` broke exactly as round 11 predicted, because it was the wrong *shape*
+rather than the wrong size.
 
-### [ ] `d_FSC_model` is the next band to break
+### [ ] CC_mask `< 3.0 Å` branch is now the thin one
 
-Headroom fell from **5× to 1.55×** when the EM set went 6 → 12 entries (max |Δ| 0.0094 → 0.0322 Å
-against ± 0.05 Å). That is the same trajectory CC_mask and the §4 Cα band followed immediately
-before breaking. Expect it to breach on the next widening, and treat a pass as weak evidence.
+The roles have swapped. The `≥ 3.0 Å` branch that round 11 called provisional now rests on **14**
+entries and holds. The `< 3.0 Å` branch has **8**, and its worst case (−0.0139) is a single
+observation from 21BQ. On this series' record — four consecutive rounds in which the thinnest branch
+broke next — that is the configuration to test.
 
-**Execute:** add EM entries and re-derive. Note the estimator contributes some of this Δ
-(round 10, issue #51), so separate estimator jitter from refinement effect before widening.
+**Execute:** add EM entries below 3.0 Å, concentrating at 2.4–2.9 Å where the current set has only
+five points.
 
-### [ ] CC_mask `≥ 3.0 Å` branch rests on 6 entries
+### [ ] The 5 % `d_FSC_model` band has a thin tail
 
-The new resolution-conditional band is `− 0.02` below 3.0 Å and `− 0.06` at or above. The upper
-branch has 6 entries, one of which (−0.0475) sets it. **This band has now broken twice in
-consecutive rounds** — −0.01 set on 2 entries broke at 6, −0.02 broke at 13 — so a third break is
-the base case, not a surprise.
+21 entries, of which only **3** exceed 2 % (4.40 %, 4.28 %, 2.43 %) and the median is 0.31 %. The
+band is set just above the largest of three observations, which is the same construction that has
+broken repeatedly here.
 
-Also unmeasured: nothing lies between **2.97 and 3.07 Å**, so the 3.0 Å split point separates the
-observed groups but is not itself located.
+**Execute:** the same EM widening tests both this and the CC_mask branch above, since one run
+produces both quantities.
 
-### [ ] Rotamer favored % — measurable comparison still absent
+### [ ] The transition location is set by two entries
 
-Round 11 established that an independent library exists (CCP4 monomer library chi targets via
-`gemmi rmsz`) and that it ranks sidechains the same way MolProbity does — median torsion |Z| 1.50 /
-3.30 / 4.33 for Favored / Allowed / OUTLIER. That is corroboration, not a measurement: the two
-answer different questions and cannot be differenced into a favored-% tolerance.
-
-Still open if it matters: **chi2–chi4** were never compared (only chi1, verified to 0.05°), and no
-implementation produces a favored/allowed *percentage* from a non-MolProbity library.
+Every entry from 2.97 to 3.07 Å is positive; the first excursion past −0.02 is 10SF at 3.08 Å. That
+brackets the transition to 0.01 Å on **two adjacent observations**, which is far more precision than
+the data supports. The 3.0 Å split is deliberately left conservative rather than moved to 3.05.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 
