@@ -648,4 +648,33 @@ check("a missing log is reported as such",
       refem.refine_failure_reason(_logdir / "absent.log"),
       "real_space_refine produced no log")
 
+
+# --- Round 14: entry count is not evidence for a one-sided band --------------------
+
+# Round 14 ran 8 EM entries and every one improved, so it added 8 to the entry count
+# and 0 to the evidence. summarize() must make that visible rather than reporting a
+# healthy-looking n.
+_r14 = [{"pdb_id": i, "resolution": r, "cc_mask_pre": 0.8, "cc_mask_post": 0.8 + d,
+         "cc_mask_delta": d, "d_fsc_model_delta_pct": pct,
+         "d_fsc_model_degradation_pct": max(0.0, pct), "d_fsc_model_reliable": True}
+        for i, r, d, pct in [("11NJ", 2.40, 0.0195, -0.135), ("11QC", 2.40, 0.0004, 0.0),
+                             ("10XZ", 2.60, 0.0001, 0.0), ("10YA", 2.70, 0.0016, 0.0),
+                             ("11JF", 2.85, 0.0099, -0.112), ("21AO", 2.85, 0.0006, 0.0),
+                             ("10ES", 3.00, 0.0418, -1.229), ("10IJ", 3.10, 0.0244, -0.665)]]
+_s14 = refem.summarize(_r14)
+
+check("round 14's entry count is 8", _s14["n_entries"], 8)
+check("but no entry degraded: the CC_mask minimum is positive",
+      _s14["cc_mask_delta"]["min"] > 0, True)
+check("and the worst d_FSC_model degradation is zero",
+      _s14["d_fsc_model_degradation_pct"]["max"], 0.0)
+# The trap this guards: a two-sided |delta| summary would report a 1.229 % "change"
+# on 10ES and make the round look like it stressed the band. It did not -- 10ES
+# improved.
+check("the largest d_FSC_model movement is an improvement, not a stressor",
+      min(r["d_fsc_model_delta_pct"] for r in _r14), -1.229)
+check("so a one-sided read of this round yields no evidence at all",
+      sum(1 for r in _r14 if r["cc_mask_delta"] < 0
+          or r["d_fsc_model_degradation_pct"] > 0), 0)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

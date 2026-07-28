@@ -101,8 +101,74 @@ a band that no observed degradation breached. It does mean the entry counts in
 breaking as the set grows — most growth is not evidence, so the genuine evidence base grows far
 more slowly than the count implies.
 
+## 3. Results: eight entries, eight improvements, no evidence
+
+| Entry | d_min | CC_mask | Δ | d_FSC_model |
+|---|---:|---|---:|---:|
+| 11NJ | 2.40 Å | 0.8471 → 0.8666 | +0.0195 | −0.14 % |
+| 11QC | 2.40 Å | 0.8311 → 0.8315 | +0.0004 | 0.00 % |
+| 10XZ | 2.60 Å | 0.8797 → 0.8798 | +0.0001 | 0.00 % |
+| 11MR | 2.60 Å | *skipped* | — | unparameterised ligand |
+| 10YA | 2.70 Å | 0.9061 → 0.9077 | +0.0016 | 0.00 % |
+| 11JF | 2.85 Å | 0.8053 → 0.8152 | +0.0099 | −0.11 % |
+| 21AO | 2.85 Å | 0.8338 → 0.8344 | +0.0006 | 0.00 % |
+| 10ES | 3.00 Å | 0.7491 → 0.7909 | +0.0418 | −1.23 % |
+| 10IJ | 3.10 Å | 0.7893 → 0.8137 | +0.0244 | −0.67 % |
+
+**Every entry improved on both quantities.** Minimum CC_mask Δ is **+0.0001**; maximum `d_FSC_model`
+degradation is **0.000 %**. So this round adds 8 entries and, by §1, **zero evidence** to either
+band — the outcome §1 predicts, observed prospectively rather than reconstructed.
+
+It is not small-sample luck. Against the historical 41 % degradation share, eight consecutive
+improvements has probability **0.015**, so this set differs from the earlier ones in some way this
+round cannot identify. The one available reading is that the two `≥ 3.0 Å` entries moved *large*
+amounts (+0.0418, +0.0244) where historical `≥ 3.0 Å` entries moved large amounts the other way
+(−0.0371 to −0.0475): consistent with rounds 11–12's "resolution **bounds** but does not **predict**
+the excursion", with this round drawing two large positives. That reading rests on 2 entries.
+
+### The three open items, resolved
+
+| Item | Round 14 outcome |
+|---|---|
+| Re-test both CC_mask bands | **No breach — and no evidence.** 0 degradations in 8 entries. Both bands stand exactly where round 13 left them, on the same observations. |
+| Widen the `d_FSC_model` tail | **Not widened.** The tail is still 8 degradations with one above 1.1 %. This round contributed 0 degradations, so the item is *not* closed. |
+| Collapse the CC_mask split | **Decided: keep the split.** Reversing the recommendation made in PR #58 — see below. |
+
+## 4. Keeping the split: "buys no additional margin" was the wrong criterion
+
+PR #58 recommended collapsing the resolution split, on the ground that a single −0.06 band has the
+same 1.26× headroom as the looser branch, so the split "buys essentially zero additional margin".
+Round 14 gives no new data on the question, but the argument does not survive re-examination.
+
+**Headroom against breaching is not what the tolerance is for.** A Δ tolerance exists to flag a
+refinement that degraded the map-model fit. Judging it by how hard it is to breach optimises for the
+band never firing — which a band of ±∞ achieves perfectly. The right criterion is detection power:
+how small a genuine degradation it still catches.
+
+By that criterion the split earns its keep. Collapsing to a single −0.06 **loosens the
+high-resolution branch by 50 %**, from −0.04 to −0.06, in exactly the regime where the null spread is
+genuinely tighter — the worst `< 3.0 Å` degradation is −0.0311 against −0.0475 above 3.0 Å. A single
+band would sit at **1.93×** headroom over the high-resolution worst case: comfortable, and comfortably
+blind to a real 0.05 drop at 2.4 Å.
+
+The cost side is also smaller than PR #58 implied. The "resolution lookup" a consumer must do is one
+it already has — `real_space_refine` and `map_correlations` both require the resolution as an
+argument, so no caller can reach this tolerance without it.
+
+What remains true from PR #58 is that the split's *evidence* is thin: by §1's counting each branch
+rests on roughly 5 degradations, not 14 entries. That argues for re-testing it against
+low-resolution entries, not for deleting it.
+
 ## Applied
 
+> **Both CC_mask bands and the `d_FSC_model` band are unchanged.** 8 new entries at 2.40–3.10 Å
+> produced 0 degradations, so there is nothing to re-fit; the bands rest on exactly the observations
+> they rested on after round 13.
+>
+> **The resolution split is kept**, reversing PR #58's recommendation to collapse it. Collapsing
+> loosens the `< 3.0 Å` branch by 50 % where the null spread is measurably tighter, trading detection
+> power for a simplification whose cost was overstated.
+>
 > The CC_mask and `d_FSC_model` tolerance rows now quote a **degradation count** alongside the entry
 > count. The entry count alone is not a measure of the evidence for a one-sided band.
 

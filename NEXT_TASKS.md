@@ -3,7 +3,7 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-07-27.** No open GitHub issues, no open PRs. There is no CI in this
+**Last reconciled: 2026-07-27** (round 14). No open GitHub issues. There is no CI in this
 repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
 
 ## Where the tolerance work stands
@@ -29,6 +29,7 @@ resolution range and breached by null re-refinement once low-resolution entries 
 | 11 | [#52](https://github.com/realmarcin/protstruct_review/pull/52) (2026-07-27) | both "edge" bands breached; CC_mask made resolution-conditional; rotamer library corroborated |
 | 12 | [#54](https://github.com/realmarcin/protstruct_review/pull/54) (2026-07-27) | CC_mask holds at 22 entries and its split is located; `d_FSC_model` band made relative |
 | 13 | [#56](https://github.com/realmarcin/protstruct_review/pull/56) (2026-07-27) | CC_mask `< 3.0 Å` breached and widened; `d_FSC_model` band corrected to one-sided |
+| 14 | [#60](https://github.com/realmarcin/protstruct_review/pull/60) (2026-07-27) | EM benchmark made reproducible; entry count shown not to be evidence; split kept |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -93,67 +94,55 @@ benchmark records that in its scope limits for exactly this reason.
 
 ## Open
 
-Round 13 broke the CC_mask `< 3.0 Å` branch exactly as predicted — **3 breaks in that tolerance's 4
-widenings** (it held once, in round 12) — and found that `d_FSC_model`'s band had been measured in
-the wrong direction. The "thinnest band breaks next" heuristic is 3 for 4: it missed round 12, where
-the flagged branch held and a different band failed on a shape error instead.
+Round 14 ran 8 EM entries at 2.40–3.10 Å and **every one improved**, on both CC_mask and
+`d_FSC_model`. That is the round's main result, and it is not a null result:
 
-**Reconciling the three items below turned them into one — but not the one first written up here.**
-Each was filed separately (a complexity question, a one-worst-case question, a thin-tail question),
-and the first draft of this section ranked them by headroom against the round-11 "below ~1.2×" rule.
-**Back-testing that rule shows it does not separate the bands that broke from the one that held:**
+**Entry count is not evidence for a one-sided band.** Only a degradation can breach
+`post ≥ pre − x`; an improvement cannot fail it at any size. Round 13 established this for
+`d_FSC_model` (28 entries → 8 degradations) and nobody applied it to CC_mask, which has the identical
+structure. Of the 22 entries with published per-entry values, **9 degraded** — so "36 EM entries"
+stands for roughly **9 pieces of evidence**, and round 14 added 8 entries and **0**.
 
-| Band | headroom when set | outcome |
-|---|---:|---|
-| §4 Cα shift (round 10) | 1.15× | broke in round 11 |
-| `d_FSC_model` (round 11) | 1.55× | broke in round 12 |
-| CC_mask `< 3.0 Å` (round 12) | 1.44× | broke in round 13 |
-| CC_mask `≥ 3.0 Å` (round 11) | **1.26×** | **held** in rounds 12 and 13 |
+**The null-case premise is false for a substantial minority of entries.** 9OID improved by +0.0595
+and 10ES by +0.0418 — more than the entire band. Those models were not at any optimum, so Δ mixes
+*refinement noise* (what the band means) with *deposition headroom* (a property of the deposition).
+The corollary is the sharp part: entries that **can** degrade are those already at optimum, so a band
+is set by low-headroom entries and validated on a set where high-headroom entries dominate. Every
+improvable entry added makes "0 breaches over N entries" look stronger without being stronger.
 
-Breaks at 1.15×, 1.44× and 1.55×; the sole survivor had the second-*lowest* headroom, across a set
-that grew 6 → 14 entries. The ordering is inverted from what the rule predicts. See #59.
+Round 14 also **reversed PR #58's recommendation to collapse the CC_mask resolution split**.
+Headroom against breaching is not the criterion — a band of ±∞ maximises it. Detection power is, and
+collapsing loosens the `< 3.0 Å` branch by 50 % exactly where the null spread is tighter.
 
-What the four bands do share is that **each was set just above a single worst case**, and three of
-four broke once the set grew. That points at set growth as the trigger and leaves no metric that
-ranks which band goes first — so the three items below are **co-equal**, not ordered. Current
-headroom (`d_FSC_model` 1.17×, CC_mask −0.06 1.26×, CC_mask −0.04 1.29×) is recorded as an
-observation, not a priority.
+### [ ] Target the regime where degradations actually occur
 
-### [ ] The one-sided `d_FSC_model` band rests on a thin tail
+Round 14's window (2.4–3.2 Å) was chosen to test both CC_mask branches at once. It produced no
+degradations, and in hindsight the historical degradations concentrate at **≥ 3.08 Å** — 10SF
+(−0.0371), 9OIF (−0.0217), 10SD (−0.0421), 9UPM (−0.0475), 9UPO (−0.0402). The 2.4–3.2 Å window
+contains almost none of that regime.
 
-28 entries produce only **8 degradations**, of which exactly one exceeds 1.1 % (9VAM, 4.28 %). The
-5 % band is therefore set from a single observation, even though the entry count looks healthy.
-
-**Execute:** add EM entries and re-measure before trusting the clause. Note the compounding problem:
-splitting measurements by direction — as round 13 had to — halves the usable evidence for any
-one-sided band, so 28 entries buy the tail only 8. Reaching a comparable evidence base to the
-two-sided bands needs roughly twice the entries.
-
-### [ ] Collapse the CC_mask resolution split — the two branches have converged
-
-After three widenings the branches are **−0.04** (< 3.0 Å) and **−0.06** (≥ 3.0 Å) — a 1.5× gap,
-down from the 3× that justified splitting them in round 11. A single −0.06 band would hold on all 28
-entries today.
-
-**The split costs a resolution lookup and a branch in every consumer**, and the evidence for it is
-now one 0.02 gap between two 14-entry groups whose medians (+0.0012 and +0.0073) differ by less than
-either band. Collapsing does not change the risk of a future breach in any way the record can
-measure — a single −0.06 band has the same 1.26× headroom as the looser branch has today.
-
-**Execute:** collapse to a single `CC_mask_post ≥ CC_mask_pre − 0.06`, or record explicitly why the
-resolution dependence is worth keeping on evidence this weak. Collapsing also retires the 3.0 Å
-boundary question that has consumed two rounds.
+**Execute:** widen at **3.0–4.0 Å**, where a null re-refinement has ~36 % chance of degrading rather
+than the ~0 % this round observed. Expect roughly 3 degradations per 8 entries there, against 0 here.
+This is the first widening in the series aimed at the *informative* subset rather than at the entry
+count.
 
 ### [ ] Both CC_mask bands are still set from single worst cases
 
-−0.04 sits just above 9O9K's −0.0311 and −0.06 just above 9UPM's −0.0475, each on 14 entries. That
-is the construction that has broken three times running for this tolerance. Not worth pre-emptively
-widening — the point of the benchmark is to measure, not to guess — but it should be the first thing
-re-tested when EM entries are added, and it is flagged here so a passing result is not mistaken for a
-settled one.
+−0.04 sits just above 9O9K's −0.0311 and −0.06 just above 9UPM's −0.0475. Round 14 did not change
+this: it added no degradation to either branch. By the counting above each branch rests on roughly
+**5 degradations**, not 14 entries. Re-test with low-resolution entries per the item above.
 
-**One EM widening at 2.4–3.2 Å tests all three items at once**, since a single `mtriage` +
-`real_space_refine` run produces both CC_mask and `d_FSC_model`.
+### [ ] The one-sided `d_FSC_model` band rests on a thin tail
+
+Still **8 degradations**, of which one exceeds 1.1 % (9VAM, 4.28 %). Round 14 contributed 0. The
+item is unchanged and explicitly **not** closed by this round.
+
+### [ ] Recover per-entry values for rounds 5 and 9–13
+
+`scripts/fetch_em_entries.py` makes the EM benchmark reproducible **going forward**. The earlier
+rounds' per-entry CC_mask and `d_FSC_model` values were lost with the hand-built cache, except the 22
+published in round 12's table. Re-running those entries would put the degradation counts above on
+measured rather than partially-reconstructed footing.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 
