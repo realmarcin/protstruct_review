@@ -119,6 +119,10 @@ more slowly than the count implies.
   structures with novel ligands (11MR in this round). Supplying generated restraints would refine
   those entries under a different protocol than the rest, which is why they are dropped rather than
   patched.
-- Whether headroom is *predictable* — e.g. from starting CC_mask — is not established here. Round 12
-  tested starting CC_mask against degradations and found nothing, and any relationship in round 14's
-  entries alone rests on too few points to claim. Recorded as a question, not a finding.
+- Whether headroom is *predictable* — e.g. from starting CC_mask — is **not** established here. The
+  direction is right: over round 14's entries, Spearman ρ(pre-CC_mask, Δ) = **−0.714**, i.e. models
+  that started worse gained more, which is what the headroom reading predicts. But at n = 6 the 5 %
+  critical value is |ρ| ≈ 0.886, so this does not reach significance, and pre-CC_mask is
+  **confounded with resolution** in this sample (ρ = −0.514) — the two lowest-CC entries are also the
+  two lowest-resolution ones. Round 12 tested starting CC_mask against degradations and found
+  nothing. Recorded as consistent-with, not evidence-for.
