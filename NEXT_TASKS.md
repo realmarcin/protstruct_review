@@ -68,11 +68,14 @@ absolute band serves both ends. As a **relative** 5 % band the same data has zer
 median of 0.31 %. Rounds 1 and 2 reached the identical conclusion for interface BSA and Wilson B;
 it took ten rounds to apply it here.
 
-Round 11 sharpens round 10's lesson into a working rule: **when a band's headroom drops below ~1.2×,
-treat it as already broken.** Round 10 measured 1.15× headroom on the §4 Cα band and called CC_mask
-the thinnest evidence base in the file; round 11 broke both on the first attempt, CC_mask by more
-than 2×. Headroom is a leading indicator, and this repo now has three consecutive rounds of evidence
-that it should be acted on rather than noted.
+Round 11 proposed a working rule — **when a band's headroom drops below ~1.2×, treat it as already
+broken** — after round 10 measured 1.15× on the §4 Cα band and round 11 broke it on the first
+attempt. **Back-tested in the round-13 reconciliation, the rule does not hold** (#59): breaks have
+occurred at 1.15×, 1.44× and 1.55×, while the one band that survived two rounds of set growth had
+the second-lowest headroom of the four at 1.26×. It was generalised from a single observation and
+never re-tested — the same construction this file warns about everywhere else, applied to a rule
+*about* tolerances rather than to a tolerance. Treat low headroom as worth noting, not as a
+predictor, and treat **set growth** as the thing that actually precedes a break.
 
 Round 10 adds a sixth, which is really the first one turned on this repo's own work: **a band is
 only as good as the last entry added to its set.** Completing the EM set from 2 to 6 entries broke
@@ -95,43 +98,47 @@ widenings** (it held once, in round 12) — and found that `d_FSC_model`'s band 
 the wrong direction. The "thinnest band breaks next" heuristic is 3 for 4: it missed round 12, where
 the flagged branch held and a different band failed on a shape error instead.
 
-**Reconciling the three items below turned them into one.** Each was written up separately — a
-complexity question, a one-worst-case question, a thin-tail question — but running this repo's own
-headroom rule (*below ~1.2×, treat as already broken*) across all three shows they are the same
-finding:
+**Reconciling the three items below turned them into one — but not the one first written up here.**
+Each was filed separately (a complexity question, a one-worst-case question, a thin-tail question),
+and the first draft of this section ranked them by headroom against the round-11 "below ~1.2×" rule.
+**Back-testing that rule shows it does not separate the bands that broke from the one that held:**
 
-| Band | worst observed | band | headroom |
-|---|---:|---:|---:|
-| `d_FSC_model` (relative, one-sided) | 4.28 % (9VAM) | 5 % | **1.17× — under the threshold** |
-| CC_mask `≥ 3.0 Å` | −0.0475 | −0.06 | 1.26× |
-| CC_mask `< 3.0 Å` | −0.0311 | −0.04 | 1.29× |
+| Band | headroom when set | outcome |
+|---|---:|---|
+| §4 Cα shift (round 10) | 1.15× | broke in round 11 |
+| `d_FSC_model` (round 11) | 1.55× | broke in round 12 |
+| CC_mask `< 3.0 Å` (round 12) | 1.44× | broke in round 13 |
+| CC_mask `≥ 3.0 Å` (round 11) | **1.26×** | **held** in rounds 12 and 13 |
 
-**Every EM band in the file now sits at or below ~1.3× headroom**, and the rule that produced that
-threshold has predicted a break 3 times in 4. So the ranking is not "which of these three is most
-interesting" but "`d_FSC_model` is already past the line the repo acts on."
+Breaks at 1.15×, 1.44× and 1.55×; the sole survivor had the second-*lowest* headroom, across a set
+that grew 6 → 14 entries. The ordering is inverted from what the rule predicts. See #59.
 
-### [ ] `d_FSC_model` is below the 1.2× headroom threshold — re-test first
+What the four bands do share is that **each was set just above a single worst case**, and three of
+four broke once the set grew. That points at set growth as the trigger and leaves no metric that
+ranks which band goes first — so the three items below are **co-equal**, not ordered. Current
+headroom (`d_FSC_model` 1.17×, CC_mask −0.06 1.26×, CC_mask −0.04 1.29×) is recorded as an
+observation, not a priority.
 
-This was previously filed as a *thin-tail* concern: 28 entries produce only **8 degradations**, of
-which exactly one exceeds 1.1 % (9VAM, 4.28 %). That framing understated it. 4.28 % against a 5 %
-band is **1.17× headroom** — below the threshold this repo established in round 11 and has acted on
-since. By its own rule the band should be treated as already broken.
+### [ ] The one-sided `d_FSC_model` band rests on a thin tail
+
+28 entries produce only **8 degradations**, of which exactly one exceeds 1.1 % (9VAM, 4.28 %). The
+5 % band is therefore set from a single observation, even though the entry count looks healthy.
 
 **Execute:** add EM entries and re-measure before trusting the clause. Note the compounding problem:
 splitting measurements by direction — as round 13 had to — halves the usable evidence for any
 one-sided band, so 28 entries buy the tail only 8. Reaching a comparable evidence base to the
 two-sided bands needs roughly twice the entries.
 
-### [ ] Collapse the CC_mask resolution split — it now buys no safety margin
+### [ ] Collapse the CC_mask resolution split — the two branches have converged
 
 After three widenings the branches are **−0.04** (< 3.0 Å) and **−0.06** (≥ 3.0 Å) — a 1.5× gap,
 down from the 3× that justified splitting them in round 11. A single −0.06 band would hold on all 28
 entries today.
 
-The decisive argument is headroom, not tidiness. Collapsing gives **1.26×**; the split currently
-gives 1.29× and 1.26×. **The split costs a resolution lookup and a branch in every consumer and buys
-essentially zero additional margin** — the two 14-entry groups have medians (+0.0012 and +0.0073)
-that differ by less than either band.
+**The split costs a resolution lookup and a branch in every consumer**, and the evidence for it is
+now one 0.02 gap between two 14-entry groups whose medians (+0.0012 and +0.0073) differ by less than
+either band. Collapsing does not change the risk of a future breach in any way the record can
+measure — a single −0.06 band has the same 1.26× headroom as the looser branch has today.
 
 **Execute:** collapse to a single `CC_mask_post ≥ CC_mask_pre − 0.06`, or record explicitly why the
 resolution dependence is worth keeping on evidence this weak. Collapsing also retires the 3.0 Å
@@ -139,7 +146,7 @@ boundary question that has consumed two rounds.
 
 ### [ ] Both CC_mask bands are still set from single worst cases
 
-−0.04 sits just above 9O9K's −0.0311 and −0.06 just above 9VAM's −0.0475, each on 14 entries. That
+−0.04 sits just above 9O9K's −0.0311 and −0.06 just above 9UPM's −0.0475, each on 14 entries. That
 is the construction that has broken three times running for this tolerance. Not worth pre-emptively
 widening — the point of the benchmark is to measure, not to guess — but it should be the first thing
 re-tested when EM entries are added, and it is flagged here so a passing result is not mistaken for a
