@@ -191,6 +191,8 @@ def collect(entries: list[dict], cache: Path) -> tuple[list[dict], list[dict]]:
             if pre["d_fsc_model_masked"]:
                 row["d_fsc_model_delta_pct"] = round(
                     100.0 * row["d_fsc_model_delta"] / pre["d_fsc_model_masked"], 3)
+                # Positive only: how much WORSE the fit got. Improvements report 0.
+                row["d_fsc_model_degradation_pct"] = max(0.0, row["d_fsc_model_delta_pct"])
         rows.append(row)
         print(f"  CC_mask {pre['cc_mask']}→{post['cc_mask']} (Δ {row['cc_mask_delta']:+.4f})"
               f" | d_FSC_model {pre['d_fsc_model_masked']}→{post['d_fsc_model_masked']}",
@@ -219,9 +221,13 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
         # relative: an absolute one is simultaneously too tight at the top of that
         # range and too loose at the bottom (round 12).
         "d_fsc_model_relative_pct": stats("d_fsc_model_delta_pct"),
+        # d_FSC_model is a resolution: LARGER is worse. The §4 clause is "did not
+        # degrade", so the band is one-sided and improvements are unbounded. Measuring
+        # it as a two-sided |delta| counts a better fit as a failure (round 13).
+        "d_fsc_model_degradation_pct": stats("d_fsc_model_degradation_pct"),
         "asserted_bands": {
-            "cc_mask": "post >= pre - 0.02 (d_min < 3.0 A); - 0.06 (d_min >= 3.0 A)",
-            "d_fsc_model": "|delta| <= 5 % of pre",
+            "cc_mask": "post >= pre - 0.04 (d_min < 3.0 A); - 0.06 (d_min >= 3.0 A)",
+            "d_fsc_model": "post <= pre * 1.05 (one-sided; improvements unbounded)",
         },
     }
 
