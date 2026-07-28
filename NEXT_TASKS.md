@@ -3,7 +3,7 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-07-26.** No open GitHub issues, no open PRs. There is no CI in this
+**Last reconciled: 2026-07-27.** No open GitHub issues, no open PRs. There is no CI in this
 repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
 
 ## Where the tolerance work stands
@@ -95,30 +95,58 @@ widenings** (it held once, in round 12) — and found that `d_FSC_model`'s band 
 the wrong direction. The "thinnest band breaks next" heuristic is 3 for 4: it missed round 12, where
 the flagged branch held and a different band failed on a shape error instead.
 
-### [ ] Does the CC_mask resolution split still earn its complexity?
+**Reconciling the three items below turned them into one.** Each was written up separately — a
+complexity question, a one-worst-case question, a thin-tail question — but running this repo's own
+headroom rule (*below ~1.2×, treat as already broken*) across all three shows they are the same
+finding:
 
-After three widenings the two branches are **−0.04** (< 3.0 Å) and **−0.06** (≥ 3.0 Å) — a 1.5×
-difference, down from the 3× that justified splitting them in round 11. **A single −0.06 band would
-hold on all 28 entries today.**
+| Band | worst observed | band | headroom |
+|---|---:|---:|---:|
+| `d_FSC_model` (relative, one-sided) | 4.28 % (9VAM) | 5 % | **1.17× — under the threshold** |
+| CC_mask `≥ 3.0 Å` | −0.0475 | −0.06 | 1.26× |
+| CC_mask `< 3.0 Å` | −0.0311 | −0.04 | 1.29× |
 
-**Execute:** decide whether to collapse the split. Keeping it costs a resolution lookup and a branch
-in every consumer; the evidence for it is now one 0.02 gap between two 14-entry groups whose medians
-(+0.0012 and +0.0073) differ by less than either band. Collapsing would also remove the 3.0 Å
+**Every EM band in the file now sits at or below ~1.3× headroom**, and the rule that produced that
+threshold has predicted a break 3 times in 4. So the ranking is not "which of these three is most
+interesting" but "`d_FSC_model` is already past the line the repo acts on."
+
+### [ ] `d_FSC_model` is below the 1.2× headroom threshold — re-test first
+
+This was previously filed as a *thin-tail* concern: 28 entries produce only **8 degradations**, of
+which exactly one exceeds 1.1 % (9VAM, 4.28 %). That framing understated it. 4.28 % against a 5 %
+band is **1.17× headroom** — below the threshold this repo established in round 11 and has acted on
+since. By its own rule the band should be treated as already broken.
+
+**Execute:** add EM entries and re-measure before trusting the clause. Note the compounding problem:
+splitting measurements by direction — as round 13 had to — halves the usable evidence for any
+one-sided band, so 28 entries buy the tail only 8. Reaching a comparable evidence base to the
+two-sided bands needs roughly twice the entries.
+
+### [ ] Collapse the CC_mask resolution split — it now buys no safety margin
+
+After three widenings the branches are **−0.04** (< 3.0 Å) and **−0.06** (≥ 3.0 Å) — a 1.5× gap,
+down from the 3× that justified splitting them in round 11. A single −0.06 band would hold on all 28
+entries today.
+
+The decisive argument is headroom, not tidiness. Collapsing gives **1.26×**; the split currently
+gives 1.29× and 1.26×. **The split costs a resolution lookup and a branch in every consumer and buys
+essentially zero additional margin** — the two 14-entry groups have medians (+0.0012 and +0.0073)
+that differ by less than either band.
+
+**Execute:** collapse to a single `CC_mask_post ≥ CC_mask_pre − 0.06`, or record explicitly why the
+resolution dependence is worth keeping on evidence this weak. Collapsing also retires the 3.0 Å
 boundary question that has consumed two rounds.
 
-### [ ] The `< 3.0 Å` band is again set from one worst case
+### [ ] Both CC_mask bands are still set from single worst cases
 
-−0.04 sits just above 9O9K's −0.0311, on 14 entries. That is the same construction that has broken
-three times running for this tolerance. Not worth pre-emptively widening — the point of the
-benchmark is to measure, not to guess — but it should be the first thing re-tested when EM entries
-are added, and it is flagged here so a passing result is not mistaken for a settled one.
+−0.04 sits just above 9O9K's −0.0311 and −0.06 just above 9VAM's −0.0475, each on 14 entries. That
+is the construction that has broken three times running for this tolerance. Not worth pre-emptively
+widening — the point of the benchmark is to measure, not to guess — but it should be the first thing
+re-tested when EM entries are added, and it is flagged here so a passing result is not mistaken for a
+settled one.
 
-### [ ] The one-sided `d_FSC_model` band rests on a thin tail
-
-28 entries produce only **8 degradations**, of which exactly one exceeds 1.1 % (9VAM, 4.28 %). The
-5 % band is therefore set from a single observation again, even though the entry count looks
-healthy. Splitting measurements by direction — as round 13 had to — halves the usable evidence for
-any one-sided band, which is worth remembering when reading the other §4 clauses.
+**One EM widening at 2.4–3.2 Å tests all three items at once**, since a single `mtriage` +
+`real_space_refine` run produces both CC_mask and `d_FSC_model`.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 
@@ -155,3 +183,8 @@ any one-sided band, which is worth remembering when reading the other §4 clause
   H-count tolerance.
 - **GitHub #37, #38** *(closed 2026-07-26, PR #36)*: the Ramachandran 0.00-vs-0.00 evidence base, and
   the SS-agreement metric being degenerate at the bad end.
+- **GitHub #57** *(closed 2026-07-27, PR #56)*: a self-review finding — the round-13 write-up claimed
+  a "fifth consecutive round" of thinnest-band failures when the record is 3 breaks in 4 widenings,
+  round 12 having held. Logged because the correction changed a stated rule of thumb, not just a
+  number: the heuristic is 3 for 4, and its one miss was a band of the wrong *shape* rather than the
+  wrong size — a failure mode headroom does not track.
