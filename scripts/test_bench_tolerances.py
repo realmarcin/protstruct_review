@@ -548,4 +548,68 @@ check("the 36 % improvement would fail a two-sided 5 % band",
 check("but passes the one-sided band the clause specifies",
       _degradation_pct(4.0604, 2.5924) <= 5.0, True)
 
+
+# --- Round 14: EM entry selection -------------------------------------------------
+
+fetchem = load("fetch_em_entries")
+
+# A single sorted RCSB query does NOT sample a resolution window: asking for the 40
+# best-resolution entries in 2.4-3.2 A returned 40 entries at exactly 2.40 A, because
+# the PDB holds far more structures at the fine end of any window. That matters here
+# because the tolerance under test is resolution-conditional, so a set collapsed onto
+# one resolution cannot test it. `stratified_search` queries equal sub-bands instead.
+_BANDS: list[tuple[float, float]] = []
+
+
+def _fake_search(lo: float, hi: float, rows: int) -> list[str]:
+    """Stand-in for the RCSB call, labelling each hit with the band it came from."""
+    _BANDS.append((round(lo, 4), round(hi, 4)))
+    return [f"B{len(_BANDS)}_{i}" for i in range(rows)]
+
+
+_real_search = fetchem.search
+fetchem.search = _fake_search
+try:
+    _BANDS.clear()
+    ordered = fetchem.stratified_search(2.4, 3.2, strata=4, per_stratum=3)
+finally:
+    fetchem.search = _real_search
+
+check("the window is split into equal sub-bands that tile it exactly",
+      _BANDS, [(2.4, 2.6), (2.6, 2.8), (2.8, 3.0), (3.0, 3.2)])
+# The round-robin is the point: a caller that stops at --limit must still get a
+# spread. Taking the first 4 of a concatenated (not interleaved) list would return
+# four entries from the finest band alone -- the exact failure being corrected.
+check("results are interleaved across bands, so an early stop still spans the window",
+      ordered[:4], ["B1_0", "B2_0", "B3_0", "B4_0"])
+check("every candidate is returned, not just the first of each band",
+      len(ordered), 12)
+
+# Size caps. 8RJC (255 550 atoms) reached the round-14 cache before the model cap
+# existed; real_space_refine on it would have run for hours and contributed a single
+# resolution point, so the cap is a cost gate, not a quality judgement.
+_CALLS: list[str] = []
+
+
+def _fake_get(url: str, timeout: int = 300) -> bytes:
+    _CALLS.append(url)
+    return b"x" * 20_000_000          # 20 MB model
+
+
+_real_get = fetchem._get
+fetchem._get = _fake_get
+try:
+    _tmp = Path(__import__("tempfile").mkdtemp())
+    over, reason = fetchem.fetch_model("TEST", _tmp, max_model_mb=8.0)
+    under, _ = fetchem.fetch_model("TES2", _tmp, max_model_mb=25.0)
+finally:
+    fetchem._get = _real_get
+
+check("an oversized model is refused", over, None)
+check("and the refusal names the measured size and the cap",
+      reason, "model 20 MB exceeds --max-model-mb 8")
+check("an oversized model is not left on disk to look like a cache hit",
+      (_tmp / "test.cif").exists(), False)
+check("a model under the cap is kept", under is not None, True)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
