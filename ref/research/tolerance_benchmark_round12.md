@@ -59,6 +59,12 @@ widening". It did, by 5×:
 | **9ELS** | 3.02 Å | 2.7163 → 2.5967 | **−0.1196** | 4.40 % |
 | **9OID** | 3.00 Å | 2.8993 → 2.8290 | **−0.0704** | 2.43 % |
 
+> **Corrected by round 13.** `d_FSC_model` is a resolution — larger is worse — and the §4 clause is
+> one-sided ("did not degrade"). Measuring it as a two-sided `|Δ|`, as below, counts improvements as
+> failures: of these three, only **9VAM** is a degradation; 9ELS and 9OID both got *better*. The
+> conclusion that the band must be relative stands on 9VAM alone, and the band is now stated
+> one-sided. See `ref/research/tolerance_benchmark_round13.md`.
+
 Three of 21 entries breach ± 0.05 Å. These are **not** the estimator artefact found in round 10 —
 measuring local shell spacing at each crossing, the moves are 124, 399 and 117 shells respectively,
 i.e. genuine curve movement.

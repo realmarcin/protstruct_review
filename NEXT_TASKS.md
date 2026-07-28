@@ -8,7 +8,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Twelve rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
+Thirteen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
 in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 found that
 **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
@@ -28,6 +28,7 @@ resolution range and breached by null re-refinement once low-resolution entries 
 | 10 | [#50](https://github.com/realmarcin/protstruct_review/pull/50) (2026-07-27) | EM set completed (CC_mask band breached and widened); §4 high-res end filled; rotamer chi geometry verified |
 | 11 | [#52](https://github.com/realmarcin/protstruct_review/pull/52) (2026-07-27) | both "edge" bands breached; CC_mask made resolution-conditional; rotamer library corroborated |
 | 12 | [#54](https://github.com/realmarcin/protstruct_review/pull/54) (2026-07-27) | CC_mask holds at 22 entries and its split is located; `d_FSC_model` band made relative |
+| 13 | [#56](https://github.com/realmarcin/protstruct_review/pull/56) (2026-07-27) | CC_mask `< 3.0 Å` breached and widened; `d_FSC_model` band corrected to one-sided |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -52,6 +53,13 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 13 adds a rule about *reading* a band rather than sizing it: **check the clause's direction
+before measuring it.** `d_FSC_model` is a resolution, so larger is worse, and the §4 clause says
+"did not degrade". Round 12 measured a two-sided `|Δ|` and reported 3 breaches; two of them were
+models that got *better*. Under the one-sided band the clause actually specifies, the tolerance
+holds on all 28 entries — and the largest change in the whole set, a 36 % improvement, is exactly
+the kind of result a symmetric band would have flagged as a failure.
 
 Round 12 adds the counterpart to the headroom rule: **when a band keeps breaking as the set grows,
 check its shape before widening it again.** `d_FSC_model` was widened and re-widened as an absolute
@@ -82,34 +90,35 @@ benchmark records that in its scope limits for exactly this reason.
 
 ## Open
 
-Round 12 settled both remaining items. CC_mask **held** — the first band in four rounds to survive a
-widening — and `d_FSC_model` broke exactly as round 11 predicted, because it was the wrong *shape*
-rather than the wrong size.
+Round 13 broke the CC_mask `< 3.0 Å` branch exactly as predicted — **3 breaks in that tolerance's 4
+widenings** (it held once, in round 12) — and found that `d_FSC_model`'s band had been measured in
+the wrong direction. The "thinnest band breaks next" heuristic is 3 for 4: it missed round 12, where
+the flagged branch held and a different band failed on a shape error instead.
 
-### [ ] CC_mask `< 3.0 Å` branch is now the thin one
+### [ ] Does the CC_mask resolution split still earn its complexity?
 
-The roles have swapped. The `≥ 3.0 Å` branch that round 11 called provisional now rests on **14**
-entries and holds. The `< 3.0 Å` branch has **8**, and its worst case (−0.0139) is a single
-observation from 21BQ. On this series' record — four consecutive rounds in which the thinnest branch
-broke next — that is the configuration to test.
+After three widenings the two branches are **−0.04** (< 3.0 Å) and **−0.06** (≥ 3.0 Å) — a 1.5×
+difference, down from the 3× that justified splitting them in round 11. **A single −0.06 band would
+hold on all 28 entries today.**
 
-**Execute:** add EM entries below 3.0 Å, concentrating at 2.4–2.9 Å where the current set has only
-five points.
+**Execute:** decide whether to collapse the split. Keeping it costs a resolution lookup and a branch
+in every consumer; the evidence for it is now one 0.02 gap between two 14-entry groups whose medians
+(+0.0012 and +0.0073) differ by less than either band. Collapsing would also remove the 3.0 Å
+boundary question that has consumed two rounds.
 
-### [ ] The 5 % `d_FSC_model` band has a thin tail
+### [ ] The `< 3.0 Å` band is again set from one worst case
 
-21 entries, of which only **3** exceed 2 % (4.40 %, 4.28 %, 2.43 %) and the median is 0.31 %. The
-band is set just above the largest of three observations, which is the same construction that has
-broken repeatedly here.
+−0.04 sits just above 9O9K's −0.0311, on 14 entries. That is the same construction that has broken
+three times running for this tolerance. Not worth pre-emptively widening — the point of the
+benchmark is to measure, not to guess — but it should be the first thing re-tested when EM entries
+are added, and it is flagged here so a passing result is not mistaken for a settled one.
 
-**Execute:** the same EM widening tests both this and the CC_mask branch above, since one run
-produces both quantities.
+### [ ] The one-sided `d_FSC_model` band rests on a thin tail
 
-### [ ] The transition location is set by two entries
-
-Every entry from 2.97 to 3.07 Å is positive; the first excursion past −0.02 is 10SF at 3.08 Å. That
-brackets the transition to 0.01 Å on **two adjacent observations**, which is far more precision than
-the data supports. The 3.0 Å split is deliberately left conservative rather than moved to 3.05.
+28 entries produce only **8 degradations**, of which exactly one exceeds 1.1 % (9VAM, 4.28 %). The
+5 % band is therefore set from a single observation again, even though the entry count looks
+healthy. Splitting measurements by direction — as round 13 had to — halves the usable evidence for
+any one-sided band, which is worth remembering when reading the other §4 clauses.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

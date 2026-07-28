@@ -528,4 +528,24 @@ check("both breach an absolute 0.05 Å band",
 check("neither breaches a 5 % relative band",
       (abs(_rel(6.1020, 6.3629)) <= 5.0, abs(_rel(2.7163, 2.5967)) <= 5.0), (True, True))
 
+
+
+# --- Round 13: d_FSC_model is one-sided -------------------------------------------
+
+# d_FSC_model is a resolution, so LARGER is worse and the §4 clause is "did not
+# degrade". Measuring it two-sided counts a better fit as a failure — which is
+# exactly what happened to 9H7U (4.0604 -> 2.5924, a 36 % improvement).
+def _degradation_pct(pre, post):
+    return max(0.0, round(100.0 * (post - pre) / pre, 2))
+
+
+check("a large improvement registers as zero degradation",
+      _degradation_pct(4.0604, 2.5924), 0.0)
+check("a genuine degradation is reported at its size",
+      _degradation_pct(6.1020, 6.3629), 4.28)
+check("the 36 % improvement would fail a two-sided 5 % band",
+      abs(100.0 * (2.5924 - 4.0604) / 4.0604) > 5.0, True)
+check("but passes the one-sided band the clause specifies",
+      _degradation_pct(4.0604, 2.5924) <= 5.0, True)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
