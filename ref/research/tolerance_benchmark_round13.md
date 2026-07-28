@@ -1,7 +1,7 @@
 # Round 13 — the thin branch broke, and a band shape was wrong in a new way
 
-Round 12 named two thin things and predicted the CC_mask `< 3.0 Å` branch would break next. It did —
-the fifth consecutive round in which the thinnest branch failed on the next widening. The
+Round 12 named two thin things and predicted the CC_mask `< 3.0 Å` branch would break next. It did.
+That makes **3 breaks in CC_mask's 4 widenings** (rounds 10, 11 and 13; it held in round 12). The
 `d_FSC_model` result is more interesting: the band did *not* fail, but the way round 12 stated it
 was wrong.
 
@@ -22,6 +22,14 @@ five of them below 2.9 Å. The set reaches **28 entries**.
 **9O9K (2.90 Å): CC_mask 0.8441 → 0.8130, Δ −0.0311** on a null real-space refinement — 1.5× the
 band. Round 12 set −0.02 from a single worst-case observation (21BQ, −0.0139) on 8 entries and
 recorded that as the configuration most likely to break. It broke on the first widening.
+
+The refinement itself is normal: `real_space_refine` logs only routine `REVERT` lines (sidechain
+changes rejected for lowering local CC), with no errors, so the drop is a genuine result.
+
+**On the record of the "thinnest band breaks next" heuristic:** it predicted correctly in rounds 10,
+11 and 13, and **failed in round 12**, where the flagged branch (CC_mask ≥ 3.0 Å, 6 entries) held and
+a different band broke — on a shape error rather than a sizing one. 3 of 4 is useful; it is not the
+unbroken run an earlier draft of this file claimed.
 
 Band widened to **−0.04**. The two branches are now −0.04 (< 3.0 Å, 14 entries) and −0.06
 (≥ 3.0 Å, 14 entries), which is a much weaker resolution distinction than round 11 proposed — the
@@ -76,5 +84,10 @@ count was inflated 3×.
   presented as settled.
 - The one-sided `d_FSC_model` band rests on 8 degradations, of which only one exceeds 1.1 %. The
   tail is thinner than the 27-entry count suggests.
+- The direction error was checked against the other §4 clauses and is isolated to `d_FSC_model`:
+  favored is published as its max *drop* (5.26 pp, against a max rise of 5.94 pp), rotamer as its max
+  *rise* (3.60 pp, against a max fall of −12.24 pp), and Cα shift is a magnitude. Each of those
+  clauses also has improvements larger than its worst degradation, so a two-sided reading would have
+  mis-stated them the same way.
 - The two CC_mask branches now differ by only 1.5× (−0.04 vs −0.06). Whether the split earns its
   complexity is worth re-testing: a single −0.06 band would hold on all 28 entries today.

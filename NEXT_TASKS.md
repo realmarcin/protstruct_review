@@ -90,9 +90,10 @@ benchmark records that in its scope limits for exactly this reason.
 
 ## Open
 
-Round 13 broke the CC_mask `< 3.0 Å` branch exactly as predicted — the fifth consecutive round in
-which the thinnest band failed on the next widening — and found that `d_FSC_model`'s band had been
-measured in the wrong direction.
+Round 13 broke the CC_mask `< 3.0 Å` branch exactly as predicted — **3 breaks in that tolerance's 4
+widenings** (it held once, in round 12) — and found that `d_FSC_model`'s band had been measured in
+the wrong direction. The "thinnest band breaks next" heuristic is 3 for 4: it missed round 12, where
+the flagged branch held and a different band failed on a shape error instead.
 
 ### [ ] Does the CC_mask resolution split still earn its complexity?
 
