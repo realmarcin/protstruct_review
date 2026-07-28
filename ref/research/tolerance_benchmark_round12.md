@@ -83,6 +83,30 @@ relative terms the same data is well behaved:
 An absolute band wide enough to cover the data (0.30 Å) would permit an 11 % change on a 2.7 Å
 measurement. **5 % relative covers all 21 with the largest observation at 4.40 %.**
 
+**The range argument rests on one entry.** 9VAM is the only entry above 4 Å — its `d_FSC_model` is
+6.10 Å and the next largest is 3.62 Å. Remove it and the range collapses to 2.25–3.62 Å (a factor of
+1.6), the largest |Δ| falls to 0.1196 Å, and a widened *absolute* band of 0.15 Å has zero violations
+on the remaining 20. So on 20 of 21 entries an absolute band works as well as a relative one, and
+"no absolute band serves both ends" is carried entirely by 9VAM. That is the n = 1 generalisation
+this series has spent eleven rounds catching elsewhere, so it is stated rather than glossed.
+
+The relative band is still the better choice — it extends to maps outside the sampled range, and
+9VAM is a genuine entry rather than an artefact (its Δ is 124 shells of real curve movement) — but
+the evidence for the *shape* is thinner than the evidence for the *number*.
+
+**A physically-motivated alternative was tested and rejected.** mtriage samples the FSC curve
+uniformly in **1/d**, so a fixed shell shift implies Δd ∝ d², suggesting a `|Δd| / d²` band. Measured
+across the set by how far the worst case sits above the median:
+
+| Band shape | median | max | max / median |
+|---|---:|---:|---:|
+| \|Δd\| absolute | 0.00930 | 0.26090 | 28.1 |
+| **\|Δd\| / d (relative)** | 0.00315 | 0.04403 | **14.0** |
+| \|Δd\| / d² (≈ Δ(1/d)) | 0.00105 | 0.01621 | 15.4 |
+
+The plain relative form is the tightest of the three, so the d² scaling that the sampling suggests
+does **not** fit better and the relative band stands on its own.
+
 This is the same conclusion rounds 1 and 2 reached for interface BSA and Wilson B: when the
 underlying quantity spans a wide range, the band has to be relative.
 
@@ -102,6 +126,7 @@ underlying quantity spans a wide range, the band has to be relative.
   than dropped.
 - The `< 3.0 Å` CC_mask branch has 8 entries and its worst case (−0.0139) is a single observation
   from 21BQ; on this series' record that is exactly the configuration that breaks next.
-- The 5 % relative band for `d_FSC_model` rests on 21 entries with 3 above 2 %. The tail is thin.
+- The 5 % relative band for `d_FSC_model` rests on 21 entries with 3 above 2 %. The tail is thin, and
+  the argument for a relative *shape* rests on a single entry (9VAM) — the only one above 4 Å.
 - The transition location (3.07–3.08 Å) is set by two adjacent entries and should not be treated as
   a measured inflection.
