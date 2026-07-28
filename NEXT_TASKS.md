@@ -101,7 +101,9 @@ Round 14 ran 8 EM entries at 2.40–3.10 Å and **every one improved**, on both 
 `post ≥ pre − x`; an improvement cannot fail it at any size. Round 13 established this for
 `d_FSC_model` (28 entries → 8 degradations) and nobody applied it to CC_mask, which has the identical
 structure. Of the 22 entries with published per-entry values, **9 degraded** — so "36 EM entries"
-stands for roughly **9 pieces of evidence**, and round 14 added 8 entries and **0**.
+stands for roughly **9 pieces of evidence**, and round 14 added 8 entries and **0**. The most
+anomalous part is the high-resolution half: **0 of 6 below 3.0 Å**, against a 50 % historical rate
+there (p = 0.016 for that subset alone).
 
 **The null-case premise is false for a substantial minority of entries.** 9OID improved by +0.0595
 and 10ES by +0.0418 — more than the entire band. Those models were not at any optimum, so Δ mixes
@@ -114,17 +116,27 @@ Round 14 also **reversed PR #58's recommendation to collapse the CC_mask resolut
 Headroom against breaching is not the criterion — a band of ±∞ maximises it. Detection power is, and
 collapsing loosens the `< 3.0 Å` branch by 50 % exactly where the null spread is tighter.
 
-### [ ] Target the regime where degradations actually occur
+### [ ] Target the regime where degradations are large enough to set a band
 
-Round 14's window (2.4–3.2 Å) was chosen to test both CC_mask branches at once. It produced no
-degradations, and in hindsight the historical degradations concentrate at **≥ 3.08 Å** — 10SF
-(−0.0371), 9OIF (−0.0217), 10SD (−0.0421), 9UPM (−0.0475), 9UPO (−0.0402). The 2.4–3.2 Å window
-contains almost none of that regime.
+Round 14's window (2.4–3.2 Å) was chosen to test both CC_mask branches at once and produced no
+degradations. The obvious next move is a low-resolution widening, but the reason has to be stated
+correctly — an earlier draft of this section had it backwards (#61). Degradation is **more** frequent
+below 3.0 Å, not less:
 
-**Execute:** widen at **3.0–4.0 Å**, where a null re-refinement has ~36 % chance of degrading rather
-than the ~0 % this round observed. Expect roughly 3 degradations per 8 entries there, against 0 here.
-This is the first widening in the series aimed at the *informative* subset rather than at the entry
-count.
+| Branch | degradation rate | worst | median degradation |
+|---|---:|---:|---:|
+| `< 3.0 Å` | **4/8 = 50 %** | −0.0139 | −0.0060 |
+| `≥ 3.0 Å` | 5/14 = 36 % | −0.0475 | −0.0402 |
+
+What concentrates above 3.08 Å is **magnitude**: every degradation there is ≥ 0.0217, while every one
+below 3.0 Å is ≤ 0.0139 — 9O9K's −0.0311 being the lone exception, and the reason that band moved.
+
+**Execute:** widen at **3.0–4.0 Å**, not because a degradation is more likely there (it is less
+likely) but because a degradation there is **3–7× larger** and is therefore what actually re-fits a
+band. A frequent 0.006 degradation cannot move a −0.04 band; a 0.0475 one did.
+
+Also note this is the first widening in the series aimed at the *informative* subset rather than at
+the entry count.
 
 ### [ ] Both CC_mask bands are still set from single worst cases
 

@@ -119,12 +119,37 @@ more slowly than the count implies.
 degradation is **0.000 %**. So this round adds 8 entries and, by §1, **zero evidence** to either
 band — the outcome §1 predicts, observed prospectively rather than reconstructed.
 
-It is not small-sample luck. Against the historical 41 % degradation share, eight consecutive
-improvements has probability **0.015**, so this set differs from the earlier ones in some way this
-round cannot identify. The one available reading is that the two `≥ 3.0 Å` entries moved *large*
-amounts (+0.0418, +0.0244) where historical `≥ 3.0 Å` entries moved large amounts the other way
-(−0.0371 to −0.0475): consistent with rounds 11–12's "resolution **bounds** but does not **predict**
-the excursion", with this round drawing two large positives. That reading rests on 2 entries.
+Against the historical 41 % degradation share, eight consecutive improvements has probability
+**0.015**. The high-resolution half is the anomalous part: **0 of 6 below 3.0 Å**, where the
+historical rate is **50 %** (p = 0.016 for that subset alone). Treat both figures as descriptive —
+they were computed after the pattern was noticed, not from a prediction made before it.
+
+Two readings, one available and one not:
+
+- **Available.** The two `≥ 3.0 Å` entries moved *large* amounts (+0.0418, +0.0244) where historical
+  `≥ 3.0 Å` entries moved large amounts the other way (−0.0371 to −0.0475). That is consistent with
+  rounds 11–12's "resolution **bounds** but does not **predict** the excursion", with this round
+  drawing two large positives. It rests on 2 entries.
+- **Not available.** Any claim that this round's entries are systematically better-deposited. Nothing
+  measured here distinguishes them; all four checked used PHENIX for model refinement, as the
+  historical entries largely did.
+
+### Frequency and magnitude are different things
+
+An earlier draft of this round's recommendation said degradations "concentrate at ≥ 3.08 Å" and
+proposed widening there to raise the *chance* of one. That misreads the table (#61): degradation is
+**more** frequent below 3.0 Å.
+
+| Branch | degradation rate | worst | median degradation |
+|---|---:|---:|---:|
+| `< 3.0 Å` | **4/8 = 50 %** | −0.0139 | −0.0060 |
+| `≥ 3.0 Å` | 5/14 = 36 % | −0.0475 | −0.0402 |
+
+What concentrates above 3.08 Å is **magnitude** — every degradation there is ≥ 0.0217, every one
+below 3.0 Å ≤ 0.0139 (9O9K's −0.0311 excepted, which is why that band moved). A frequent 0.006
+degradation cannot re-fit a −0.04 band; a 0.0475 one did. So the low-resolution widening is worth
+doing for magnitude, not frequency — and the distinction matters, because the two point at opposite
+resolutions.
 
 ### The three open items, resolved
 
@@ -145,9 +170,12 @@ refinement that degraded the map-model fit. Judging it by how hard it is to brea
 band never firing — which a band of ±∞ achieves perfectly. The right criterion is detection power:
 how small a genuine degradation it still catches.
 
-By that criterion the split earns its keep. Collapsing to a single −0.06 **loosens the
-high-resolution branch by 50 %**, from −0.04 to −0.06, in exactly the regime where the null spread is
-genuinely tighter — the worst `< 3.0 Å` degradation is −0.0311 against −0.0475 above 3.0 Å. A single
+By that criterion the split earns its keep, and the frequency/magnitude table above supports it
+directly rather than in the abstract: **the two regimes differ in the size of a null degradation**
+(≤ 0.0139 below 3.0 Å versus ≥ 0.0217 above it), which is exactly what a band's width should track.
+Collapsing to a single −0.06 **loosens the high-resolution branch by 50 %**, from −0.04 to −0.06, in
+exactly the regime where the null spread is genuinely tighter — the worst `< 3.0 Å` degradation is
+−0.0311 against −0.0475 above 3.0 Å. A single
 band would sit at **1.93×** headroom over the high-resolution worst case: comfortable, and comfortably
 blind to a real 0.05 drop at 2.4 Å.
 
