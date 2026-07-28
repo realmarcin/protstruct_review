@@ -548,4 +548,133 @@ check("the 36 % improvement would fail a two-sided 5 % band",
 check("but passes the one-sided band the clause specifies",
       _degradation_pct(4.0604, 2.5924) <= 5.0, True)
 
+
+# --- Round 14: EM entry selection -------------------------------------------------
+
+fetchem = load("fetch_em_entries")
+
+# A single sorted RCSB query does NOT sample a resolution window: asking for the 40
+# best-resolution entries in 2.4-3.2 A returned 40 entries at exactly 2.40 A, because
+# the PDB holds far more structures at the fine end of any window. That matters here
+# because the tolerance under test is resolution-conditional, so a set collapsed onto
+# one resolution cannot test it. `stratified_search` queries equal sub-bands instead.
+_BANDS: list[tuple[float, float]] = []
+
+
+def _fake_search(lo: float, hi: float, rows: int) -> list[str]:
+    """Stand-in for the RCSB call, labelling each hit with the band it came from."""
+    _BANDS.append((round(lo, 4), round(hi, 4)))
+    return [f"B{len(_BANDS)}_{i}" for i in range(rows)]
+
+
+_real_search = fetchem.search
+fetchem.search = _fake_search
+try:
+    _BANDS.clear()
+    ordered = fetchem.stratified_search(2.4, 3.2, strata=4, per_stratum=3)
+finally:
+    fetchem.search = _real_search
+
+check("the window is split into equal sub-bands that tile it exactly",
+      _BANDS, [(2.4, 2.6), (2.6, 2.8), (2.8, 3.0), (3.0, 3.2)])
+# The round-robin is the point: a caller that stops at --limit must still get a
+# spread. Taking the first 4 of a concatenated (not interleaved) list would return
+# four entries from the finest band alone -- the exact failure being corrected.
+check("results are interleaved across bands, so an early stop still spans the window",
+      ordered[:4], ["B1_0", "B2_0", "B3_0", "B4_0"])
+check("every candidate is returned, not just the first of each band",
+      len(ordered), 12)
+
+# Size caps. 8RJC (255 550 atoms) reached the round-14 cache before the model cap
+# existed; real_space_refine on it would have run for hours and contributed a single
+# resolution point, so the cap is a cost gate, not a quality judgement.
+_CALLS: list[str] = []
+
+
+def _fake_get(url: str, timeout: int = 300) -> bytes:
+    _CALLS.append(url)
+    return b"x" * 20_000_000          # 20 MB model
+
+
+_real_get = fetchem._get
+fetchem._get = _fake_get
+try:
+    _tmp = Path(__import__("tempfile").mkdtemp())
+    over, reason = fetchem.fetch_model("TEST", _tmp, max_model_mb=8.0)
+    under, _ = fetchem.fetch_model("TES2", _tmp, max_model_mb=25.0)
+finally:
+    fetchem._get = _real_get
+
+check("an oversized model is refused", over, None)
+check("and the refusal names the measured size and the cap",
+      reason, "model 20 MB exceeds --max-model-mb 8")
+check("an oversized model is not left on disk to look like a cache hit",
+      (_tmp / "test.cif").exists(), False)
+check("a model under the cap is kept", under is not None, True)
+
+
+# --- Round 14: refinement skips must explain themselves ---------------------------
+
+# 11MR failed with 128 atoms of an unparameterised ligand (A1C9W). Recorded as
+# "real_space_refine failed", that is indistinguishable from a bug in this script; it
+# is actually a property of the entry, and belongs in the scope limits.
+import tempfile as _tf
+
+_logdir = Path(_tf.mkdtemp())
+
+
+def _reason(text: str) -> str:
+    p = _logdir / "one.log"
+    p.write_text(text)
+    return refem.refine_failure_reason(p)
+
+
+check("an unparameterised ligand is named, with its atom count",
+      _reason("Number of atoms with unknown nonbonded energy type symbols: 128\n"
+              "Sorry: Fatal problems interpreting model file:"),
+      "unparameterised ligand: 128 atoms with unknown nonbonded energy types "
+      "(no monomer-library restraints)")
+# The ligand cause is checked first because cctbx reports it alongside a generic
+# `Sorry:` line; matching the Sorry first would report the vague half of the message.
+check("a plain Sorry: is carried through verbatim",
+      _reason("Sorry: Map and model do not overlap."),
+      "real_space_refine: Map and model do not overlap.")
+check("a crash is distinguished from a user-actionable stop",
+      _reason("Traceback (most recent call last):\n  File x\nValueError: boom"),
+      "real_space_refine crashed (traceback in log)")
+check("an empty log is not reported as success",
+      _reason(""), "real_space_refine produced no refined model")
+check("a missing log is reported as such",
+      refem.refine_failure_reason(_logdir / "absent.log"),
+      "real_space_refine produced no log")
+
+
+# --- Round 14: entry count is not evidence for a one-sided band --------------------
+
+# Round 14 ran 8 EM entries and every one improved, so it added 8 to the entry count
+# and 0 to the evidence. summarize() must make that visible rather than reporting a
+# healthy-looking n.
+_r14 = [{"pdb_id": i, "resolution": r, "cc_mask_pre": 0.8, "cc_mask_post": 0.8 + d,
+         "cc_mask_delta": d, "d_fsc_model_delta_pct": pct,
+         "d_fsc_model_degradation_pct": max(0.0, pct), "d_fsc_model_reliable": True}
+        for i, r, d, pct in [("11NJ", 2.40, 0.0195, -0.135), ("11QC", 2.40, 0.0004, 0.0),
+                             ("10XZ", 2.60, 0.0001, 0.0), ("10YA", 2.70, 0.0016, 0.0),
+                             ("11JF", 2.85, 0.0099, -0.112), ("21AO", 2.85, 0.0006, 0.0),
+                             ("10ES", 3.00, 0.0418, -1.229), ("10IJ", 3.10, 0.0244, -0.665)]]
+_s14 = refem.summarize(_r14)
+
+check("round 14's entry count is 8", _s14["n_entries"], 8)
+check("but no entry degraded: the CC_mask minimum is positive",
+      _s14["cc_mask_delta"]["min"] > 0, True)
+check("and the worst d_FSC_model degradation is zero",
+      _s14["d_fsc_model_degradation_pct"]["max"], 0.0)
+# The trap this guards: a two-sided |delta| summary would report a 1.229 % "change"
+# on 10ES and make the round look like it stressed the band. It did not -- 10ES
+# improved.
+check("the largest d_FSC_model movement is an improvement, not a stressor",
+      min(r["d_fsc_model_delta_pct"] for r in _r14), -1.229)
+check("so a one-sided read of this round yields no evidence at all",
+      sum(1 for r in _r14 if r["cc_mask_delta"] < 0
+          or r["d_fsc_model_degradation_pct"] > 0), 0)
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
