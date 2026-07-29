@@ -30,6 +30,7 @@ resolution range and breached by null re-refinement once low-resolution entries 
 | 12 | [#54](https://github.com/realmarcin/protstruct_review/pull/54) (2026-07-27) | CC_mask holds at 22 entries and its split is located; `d_FSC_model` band made relative |
 | 13 | [#56](https://github.com/realmarcin/protstruct_review/pull/56) (2026-07-27) | CC_mask `< 3.0 Å` breached and widened; `d_FSC_model` band corrected to one-sided |
 | 14 | [#60](https://github.com/realmarcin/protstruct_review/pull/60) (2026-07-27) | EM benchmark made reproducible; entry count shown not to be evidence; split kept |
+| 15 | [#62](https://github.com/realmarcin/protstruct_review/pull/62) (2026-07-28) | pre-registered low-resolution widening: P1–P4 confirmed, P5/P6 falsified, clustering withdrawn |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -94,67 +95,70 @@ benchmark records that in its scope limits for exactly this reason.
 
 ## Open
 
-Round 14 ran 8 EM entries at 2.40–3.10 Å and **every one improved**, on both CC_mask and
-`d_FSC_model`. That is the round's main result, and it is not a null result:
+Round 15 widened at 3.0–4.0 Å with **predictions registered before the data**, after round 14 had to
+label its own p-values as computed post hoc. Four of six held.
 
-**Entry count is not evidence for a one-sided band.** Only a degradation can breach
-`post ≥ pre − x`; an improvement cannot fail it at any size. Round 13 established this for
-`d_FSC_model` (28 entries → 8 degradations) and nobody applied it to CC_mask, which has the identical
-structure. Of the 22 entries with published per-entry values, **9 degraded** — so "36 EM entries"
-stands for roughly **9 pieces of evidence**, and round 14 added 8 entries and **0**. The most
-anomalous part is the high-resolution half: **0 of 6 below 3.0 Å**, against a 50 % historical rate
-there (p = 0.016 for that subset alone).
+| # | Prediction | Outcome |
+|---|---|---|
+| P1 | ≥ 1 entry degrades | ✅ 4 did |
+| P2 | largest degradation > 0.0139 | ✅ 0.0351, 2.5× |
+| P3 | −0.06 band holds | ✅ 1.71× headroom |
+| P4 | rate nearer 36 % than 0 % | ✅ 50 % |
+| P5/P6 | cluster-mates behave alike | ❌ **both falsified** |
 
-**The null-case premise is false for a substantial minority of entries.** 9OID improved by +0.0595
-and 10ES by +0.0418 — more than the entire band. Those models were not at any optimum, so Δ mixes
-*refinement noise* (what the band means) with *deposition headroom* (a property of the deposition).
-The corollary is the sharp part: entries that **can** degrade are those already at optimum, so a band
-is set by low-headroom entries and validated on a set where high-headroom entries dominate. Every
-improvable entry added makes "0 breaches over N entries" look stronger without being stronger.
+**P2 was the round's real test.** The rationale for widening low rather than high — that degradations
+there are large enough to re-fit a band — is confirmed, so round 14's frequency/magnitude correction
+was right and the resolution split is better evidenced than before.
 
-Round 14 also **reversed PR #58's recommendation to collapse the CC_mask resolution split**.
-Headroom against breaching is not the criterion — a band of ±∞ maximises it. Detection power is, and
-collapsing loosens the `< 3.0 Å` branch by 50 % exactly where the null spread is tighter.
+**P5/P6 cost a finding.** Mid-round I claimed the evidence base was smaller than round 14 said,
+because 22 entries came from 12 publications and the four largest degradations arrived as same-paper
+pairs. Both registered tests failed — the peptidase cluster produced **opposite signs on the same
+protein** — and a permutation test put within-cluster agreement at **p = 0.38**. Withdrawn, per the
+rule registered before the test ran. Round 14's count argument is untouched; only the further
+deflation from ~9 to ~6 is gone.
 
-### [ ] Target the regime where degradations are large enough to set a band
+### [ ] `d_FSC_model` has 1.045× headroom — the thinnest margin in the file
 
-Round 14's window (2.4–3.2 Å) was chosen to test both CC_mask branches at once and produced no
-degradations. The obvious next move is a low-resolution widening, but the reason has to be stated
-correctly — an earlier draft of this section had it backwards (#61). Degradation is **more** frequent
-below 3.0 Å, not less:
+10BU degraded it by **+4.79 %** against a **5 %** band, displacing 9VAM's +4.28 %. **Any future
+degradation above 4.79 % breaks it.**
 
-| Branch | degradation rate | worst | median degradation |
-|---|---:|---:|---:|
-| `< 3.0 Å` | **4/8 = 50 %** | −0.0139 | −0.0060 |
-| `≥ 3.0 Å` | 5/14 = 36 % | −0.0475 | −0.0402 |
+Deliberately **not** widened: it holds with 0 breaches, and this series does not move bands on
+anticipation. But it is now the first thing to re-test, ahead of CC_mask — which is the reversal of
+where attention has been for six rounds. P3 was registered about CC_mask because that tolerance has
+all the breakage history; it came through at 1.71× while the quantity nobody was watching nearly
+broke.
 
-What concentrates above 3.08 Å is **magnitude**: every degradation there is ≥ 0.0217, while every one
-below 3.0 Å is ≤ 0.0139 — 9O9K's −0.0311 being the lone exception, and the reason that band moved.
+**Execute:** the next EM widening should be sized to produce `d_FSC_model` degradations specifically.
+Note that CC_mask and `d_FSC_model` can move in **opposite directions** on one refinement (10RI), so a
+set chosen to stress one does not automatically stress the other.
 
-**Execute:** widen at **3.0–4.0 Å**, not because a degradation is more likely there (it is less
-likely) but because a degradation there is **3–7× larger** and is therefore what actually re-fits a
-band. A frequent 0.006 degradation cannot move a −0.04 band; a 0.0475 one did.
+### [ ] Entry attrition is systematic, at ~17 %
 
-Also note this is the first widening in the series aimed at the *informative* subset rather than at
-the entry count.
+Three of 18 attempted entries across rounds 14–15 were unprocessable: 11MR and 10EG (unparameterised
+ligands, 128 and 195 atoms), 10EN (`O1-` outside the electron scattering table). These are entry
+properties, not tool failures, and they bias the set toward chemically simple structures every run.
+
+**Execute:** quantify whether ligand-bearing entries differ in Δ, or record the bias as permanent in
+the tolerance row. Currently the direction is unknown, only the existence is.
 
 ### [ ] Both CC_mask bands are still set from single worst cases
 
-−0.04 sits just above 9O9K's −0.0311 and −0.06 just above 9UPM's −0.0475. Round 14 did not change
-this: it added no degradation to either branch. By the counting above each branch rests on roughly
-**5 degradations**, not 14 entries. Re-test with low-resolution entries per the item above.
+−0.04 above 9O9K's −0.0311 and −0.06 above 9UPM's −0.0475. Round 15 added 4 degradations to the
+`≥ 3.0 Å` branch but none exceeded −0.0351, so the worst case is unchanged and the band is untested at
+its edge.
 
-### [ ] The one-sided `d_FSC_model` band rests on a thin tail
+### [ ] Recover per-entry values for rounds 5 and 9–13 — now a prerequisite, not housekeeping
 
-Still **8 degradations**, of which one exceeds 1.1 % (9VAM, 4.28 %). Round 14 contributed 0. The
-item is unchanged and explicitly **not** closed by this round.
+Round 15 hit this gap twice. The permutation test could only use 30 of 44 entries, and **the headline
+CC_mask degradation count cannot be stated as a number at all** — round 13 published only its branch
+minimum, so 5 of its entries have no recorded Δ and the total is a range, 14–19 (#63).
 
-### [ ] Recover per-entry values for rounds 5 and 9–13
+Since round 14 established that the degradation count *is* the evidence measure for a one-sided band,
+not being able to state it is a direct limit on every claim built on it.
 
-`scripts/fetch_em_entries.py` makes the EM benchmark reproducible **going forward**. The earlier
-rounds' per-entry CC_mask and `d_FSC_model` values were lost with the hand-built cache, except the 22
-published in round 12's table. Re-running those entries would put the degradation counts above on
-measured rather than partially-reconstructed footing.
+**Execute:** re-run rounds 5 and 9–13's entries through `bench_refinement_deltas_em.py`, now that
+`fetch_em_entries.py` can rebuild the cache. The entry lists survive in the audit trails even though
+the per-entry values do not.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

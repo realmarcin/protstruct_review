@@ -122,15 +122,34 @@ def stratified_search(min_res: float, max_res: float, strata: int,
     return ordered
 
 
-def entry_metadata(pdb_id: str) -> tuple[float | None, str | None]:
-    """(resolution, EMDB accession digits) for one entry."""
+def entry_metadata(pdb_id: str) -> tuple[float | None, str | None, str]:
+    """(resolution, EMDB accession digits, publication key) for one entry.
+
+    The publication key exists because a resolution window does not sample
+    independent depositions. Round 15 pulled 10 entries in 3.0-4.0 A and got two
+    3-entry series (one protein at three conformations; one kinetochore paper's three
+    complexes) -- 10 entries, 6 independent units. The historical set is worse: 22
+    entries came from 12 publications, and the four largest CC_mask degradations ever
+    recorded came from just TWO papers, in near-duplicate pairs (9UPM -0.0475 with
+    9UPO -0.0402; 10SD -0.0421 with 10SF -0.0371).
+
+    That matters because a null-refinement Delta is a property of the model, the map
+    and the depositor's protocol together. Two entries from one paper share all three,
+    so they are close to one observation counted twice -- and the two tightest pairs
+    in the set (myoglobin fibrils, spread 0.0005; spectral tuning, spread 0.0073) are
+    exactly the pairs that anchor the bands.
+
+    DOI is preferred over title: the same study can vary its title string across
+    entries, but the DOI is a stable identifier. Unpublished entries fall back to
+    their own id, which keeps them independent rather than silently merging them.
+    """
     raw = _get(RCSB_ENTRY.format(pdb_id=pdb_id.upper()), timeout=120)
     if raw is None:
-        return None, None
+        return None, None, ""
     try:
         data = json.loads(raw)
     except json.JSONDecodeError:
-        return None, None
+        return None, None, ""
     resolutions = data.get("rcsb_entry_info", {}).get("resolution_combined") or []
     resolution = float(resolutions[0]) if resolutions else None
     accession = None
@@ -138,7 +157,11 @@ def entry_metadata(pdb_id: str) -> tuple[float | None, str | None]:
             "emdb_ids", []) or []:
         accession = related.split("-")[-1]      # "EMD-12345" -> "12345"
         break
-    return resolution, accession
+    citation = data.get("rcsb_primary_citation") or {}
+    pub_key = (citation.get("pdbx_database_id_DOI")
+               or citation.get("title")
+               or f"unpublished:{pdb_id.upper()}")
+    return resolution, accession, pub_key
 
 
 def fetch_model(pdb_id: str, cache: Path,
@@ -190,15 +213,46 @@ def fetch_map(pdb_id: str, accession: str, cache: Path,
     return dest, None
 
 
-def collect(pdb_ids: list[str], cache: Path, max_map_mb: float,
-            max_model_mb: float) -> tuple[list[dict], list[dict]]:
+def collect(pdb_ids: list[str], cache: Path, max_map_mb: float, max_model_mb: float,
+            seen_pubs: set[str] | None = None,
+            max_per_pub: int = 0) -> tuple[list[dict], list[dict]]:
+    """Fetch entries, keeping at most `max_per_pub` from any one publication.
+
+    `max_per_pub=0` means no limit, and that is the default **because the limit was
+    tested and did not earn its place**. Round 15 keyed this on citation DOI after
+    noticing that 22 historical entries came from 12 publications, with the four
+    largest CC_mask degradations arriving as two same-paper pairs. Two registered
+    predictions then tested whether cluster-mates actually behave alike:
+
+        P5  peptidase, ONE protein: 10EQ +0.0603, 10ET -0.0351, 10EO -0.0221
+        P6  kinetochore, one paper: 10EH +0.1268, 10DQ +0.0151
+
+    Both failed, P5 with opposite signs on the same protein. A permutation test over
+    every labelled entry then put it beyond doubt: within-cluster pairs differ by a
+    mean 0.0318 against 0.0354 between clusters, ratio 0.897, **p = 0.38**. Shared
+    publication -- and even shared protein -- does not predict a similar null Delta.
+    The tight historical pairs (myoglobin 0.0005) were coincidence among 21
+    within-cluster pairs.
+
+    The key is still computed and recorded on every entry, because knowing the
+    provenance is useful, and a future round may find it predicts something else. It
+    just no longer filters anything unless asked.
+    """
     cache.mkdir(parents=True, exist_ok=True)
+    pub_counts: dict[str, int] = {}
+    if seen_pubs and max_per_pub:
+        pub_counts = {k: max_per_pub for k in seen_pubs}
     entries, skipped = [], []
     for pdb_id in pdb_ids:
         print(f"[{pdb_id}]", file=sys.stderr)
-        resolution, accession = entry_metadata(pdb_id)
+        resolution, accession, pub_key = entry_metadata(pdb_id)
         if resolution is None or accession is None:
             skipped.append({"pdb_id": pdb_id, "reason": "no resolution or EMDB accession"})
+            continue
+        if max_per_pub and pub_counts.get(pub_key, 0) >= max_per_pub:
+            reason = f"publication already represented ({pub_key})"
+            skipped.append({"pdb_id": pdb_id, "reason": reason})
+            print(f"  ! {reason}", file=sys.stderr)
             continue
         model, reason = fetch_model(pdb_id, cache, max_model_mb)
         if model is None:
@@ -210,8 +264,9 @@ def collect(pdb_ids: list[str], cache: Path, max_map_mb: float,
             skipped.append({"pdb_id": pdb_id, "reason": reason})
             print(f"  ! {reason}", file=sys.stderr)
             continue
+        pub_counts[pub_key] = pub_counts.get(pub_key, 0) + 1
         entries.append({"pdb_id": pdb_id, "resolution": resolution,
-                        "emdb": f"EMD-{accession}"})
+                        "emdb": f"EMD-{accession}", "publication": pub_key})
         print(f"  {resolution} Å, EMD-{accession}, "
               f"{map_file.stat().st_size / 1e6:.0f} MB", file=sys.stderr)
     return entries, skipped
@@ -237,6 +292,10 @@ def main() -> int:
     ap.add_argument("--exclude", default="",
                     help="comma-separated PDB ids already in the benchmark set")
     ap.add_argument("--ids", default="", help="explicit ids, bypassing the search")
+    ap.add_argument("--max-per-pub", type=int, default=0,
+                    help="entries to keep from any one publication (0 = no limit, the "
+                         "default: clustering was tested and does not predict a "
+                         "similar null delta, permutation p = 0.38)")
     ap.add_argument("--json", dest="json_out")
     args = ap.parse_args()
 
@@ -254,19 +313,29 @@ def main() -> int:
     cache = Path(args.cache)
     entries: list[dict[str, Any]] = []
     skipped: list[dict[str, Any]] = []
+    seen_pubs: set[str] = set()
+    pub_counts: dict[str, int] = {}
     for pdb_id in candidates:
         if len(entries) >= args.limit:
             break
-        got, miss = collect([pdb_id], cache, args.max_map_mb, args.max_model_mb)
+        got, miss = collect([pdb_id], cache, args.max_map_mb, args.max_model_mb,
+                            seen_pubs=seen_pubs, max_per_pub=args.max_per_pub)
+        for row in got:
+            key = row["publication"]
+            pub_counts[key] = pub_counts.get(key, 0) + 1
+            if args.max_per_pub and pub_counts[key] >= args.max_per_pub:
+                seen_pubs.add(key)
         entries.extend(got)
         skipped.extend(miss)
 
     (cache / "entries.json").write_text(json.dumps(entries, indent=2) + "\n")
     report = {"entries": entries, "skipped": skipped,
-              "window": [args.min_res, args.max_res], "excluded": sorted(exclude)}
+              "window": [args.min_res, args.max_res], "excluded": sorted(exclude),
+              "n_publications": len({e["publication"] for e in entries})}
     if args.json_out:
         Path(args.json_out).write_text(json.dumps(report, indent=2) + "\n")
-    print(json.dumps({"n_entries": len(entries), "n_skipped": len(skipped)}, indent=2))
+    print(json.dumps({"n_entries": len(entries), "n_skipped": len(skipped),
+                      "n_publications": report["n_publications"]}, indent=2))
     return 0 if entries else 1
 
 

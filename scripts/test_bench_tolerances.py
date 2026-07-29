@@ -643,7 +643,19 @@ check("a crash is distinguished from a user-actionable stop",
       _reason("Traceback (most recent call last):\n  File x\nValueError: boom"),
       "real_space_refine crashed (traceback in log)")
 check("an empty log is not reported as success",
-      _reason(""), "real_space_refine produced no refined model")
+      _reason(""), "real_space_refine produced no usable result")
+# 10EN failed inside map_correlations, whose skip printed nothing at all -- the entry
+# vanished between two bracketed ids in the log. The reason extractor is shared across
+# steps so no step can fail invisibly.
+(_logdir / "sc.log").write_text(
+    'Sorry: The model contains atoms which are not in the scattering table '
+    '"electron".\n    Unknown atom types:\n    O1- \n')
+check("an unknown scattering type is named, with the offending atom",
+      refem.failure_reason(_logdir / "sc.log", "map_correlations"),
+      "atom type absent from the electron scattering table: O1-")
+check("the step name is carried into a generic failure",
+      refem.failure_reason(_logdir / "one.log", "map_correlations"),
+      "map_correlations produced no usable result")
 check("a missing log is reported as such",
       refem.refine_failure_reason(_logdir / "absent.log"),
       "real_space_refine produced no log")
@@ -676,5 +688,65 @@ check("the largest d_FSC_model movement is an improvement, not a stressor",
 check("so a one-sided read of this round yields no evidence at all",
       sum(1 for r in _r14 if r["cc_mask_delta"] < 0
           or r["d_fsc_model_degradation_pct"] > 0), 0)
+
+
+# --- Round 15: a resolution window does not sample independent depositions --------
+
+# 22 historical entries came from 12 publications, and the four largest CC_mask
+# degradations ever recorded came from TWO papers as near-duplicate pairs
+# (9UPM -0.0475 / 9UPO -0.0402; 10SD -0.0421 / 10SF -0.0371). One entry per
+# publication is the default so a band cannot be anchored by one lab twice.
+_ENTRY_META = {
+    "AAAA": (3.1, "111", "10.1/dup"), "BBBB": (3.2, "222", "10.1/dup"),
+    "CCCC": (3.3, "333", "10.2/other"), "DDDD": (3.4, "444", None),
+    "EEEE": (3.5, "555", None),
+}
+
+
+def _fake_meta(pdb_id):
+    res, acc, doi = _ENTRY_META[pdb_id.upper()]
+    return res, acc, doi or f"unpublished:{pdb_id.upper()}"
+
+
+_real_meta, _real_model, _real_map = (
+    fetchem.entry_metadata, fetchem.fetch_model, fetchem.fetch_map)
+fetchem.entry_metadata = _fake_meta
+def _stub(path: Path) -> Path:
+    """collect() stats the map to report its size, so the stub must leave a file."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"stub")
+    return path
+
+
+fetchem.fetch_model = lambda pid, cache, mm: (_stub(cache / f"{pid.lower()}.cif"), None)
+fetchem.fetch_map = lambda pid, acc, cache, mm: (_stub(cache / f"{pid.lower()}.map"), None)
+try:
+    _c = Path(__import__("tempfile").mkdtemp())
+    default_all, _ = fetchem.collect(["AAAA", "BBBB", "CCCC"], _c, 300.0, 8.0)
+    kept, dropped = fetchem.collect(["AAAA", "BBBB", "CCCC"], _c, 300.0, 8.0,
+                                    max_per_pub=1)
+    both, _ = fetchem.collect(["AAAA", "BBBB"], _c, 300.0, 8.0, max_per_pub=2)
+    unpub, _ = fetchem.collect(["DDDD", "EEEE"], _c, 300.0, 8.0, max_per_pub=1)
+finally:
+    fetchem.entry_metadata, fetchem.fetch_model, fetchem.fetch_map = (
+        _real_meta, _real_model, _real_map)
+
+# The default keeps everything: P5 and P6 both failed and a permutation test put
+# within-cluster agreement at p = 0.38, so filtering by publication would discard
+# real evidence from a benchmark that has too little of it.
+check("by default no entry is dropped for sharing a publication",
+      [e["pdb_id"] for e in default_all], ["AAAA", "BBBB", "CCCC"])
+check("the limit still works when asked for explicitly",
+      [e["pdb_id"] for e in kept], ["AAAA", "CCCC"])
+check("and the skip says why, naming the publication",
+      dropped[0]["reason"], "publication already represented (10.1/dup)")
+check("the publication key is recorded on every kept entry",
+      kept[0]["publication"], "10.1/dup")
+check("--max-per-pub sets the cap when a cluster limit is wanted deliberately",
+      len(both), 2)
+# Unpublished entries must stay independent: keying them all to one empty string
+# would collapse them into a single unit and drop every one but the first.
+check("unpublished entries are independent, not merged",
+      [e["pdb_id"] for e in unpub], ["DDDD", "EEEE"])
 
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

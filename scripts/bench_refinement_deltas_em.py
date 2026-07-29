@@ -146,27 +146,47 @@ _UNKNOWN_ENERGY = re.compile(
     r"Number of atoms with unknown nonbonded energy type symbols: (\d+)")
 
 
-def refine_failure_reason(log: Path) -> str:
-    """Why real_space_refine stopped, in one line, from its log.
+_SCATTERING = re.compile(
+    r"model contains atoms which are not in the scattering table", re.IGNORECASE)
+_UNKNOWN_TYPES = re.compile(r"Unknown atom types:\s*\n\s*(.+)")
 
-    A skip recorded as "real_space_refine failed" is indistinguishable from a bug in
-    this script. The common cause is neither: an entry carrying a ligand with no
-    restraints in the monomer library cannot be refined by this pipeline at all, which
-    is a property of the entry and belongs in the scope limits.
+
+def failure_reason(log: Path, step: str) -> str:
+    """Why a PHENIX step stopped, in one line, from its log.
+
+    A skip recorded as "<step> failed" is indistinguishable from a bug in this script.
+    The common causes are neither: an entry carrying a ligand with no monomer-library
+    restraints, or an atom type absent from the electron scattering table, cannot be
+    processed by this pipeline at all. Those are properties of the entry and belong in
+    the scope limits.
+
+    Applied to every step, not just refinement. 10EN failed in `map_correlations` and
+    vanished from the log entirely -- the caller appended a bare "map_correlations
+    failed" to the skip list and printed nothing, so the entry simply disappeared
+    between two bracketed ids.
     """
     if not log.exists():
-        return "real_space_refine produced no log"
+        return f"{step} produced no log"
     text = log.read_text(errors="ignore")
     unknown = _UNKNOWN_ENERGY.search(text)
     if unknown:
         return (f"unparameterised ligand: {unknown.group(1)} atoms with unknown "
                 f"nonbonded energy types (no monomer-library restraints)")
+    if _SCATTERING.search(text):
+        types = _UNKNOWN_TYPES.search(text)
+        named = f": {types.group(1).strip()}" if types else ""
+        return f"atom type absent from the electron scattering table{named}"
     sorry = _SORRY.search(text)
     if sorry:
-        return f"real_space_refine: {sorry.group(1).strip()}"
+        return f"{step}: {sorry.group(1).strip()}"
     if "Traceback" in text:
-        return "real_space_refine crashed (traceback in log)"
-    return "real_space_refine produced no refined model"
+        return f"{step} crashed (traceback in log)"
+    return f"{step} produced no usable result"
+
+
+def refine_failure_reason(log: Path) -> str:
+    """Back-compatible wrapper: the refinement step's failure reason."""
+    return failure_reason(log, "real_space_refine")
 
 
 def refine(model: Path, map_file: Path, resolution: float, work: Path,
@@ -204,7 +224,9 @@ def collect(entries: list[dict], cache: Path) -> tuple[list[dict], list[dict]]:
             continue
         pre = measure(model, map_file, resolution, cache, f"{pdb_id}_pre")
         if pre["cc_mask"] is None:
-            skipped.append({"pdb_id": pdb_id.upper(), "reason": "map_correlations failed"})
+            reason = failure_reason(cache / f"mc_{pdb_id}_pre.log", "map_correlations")
+            print(f"  ! {reason}", file=sys.stderr)
+            skipped.append({"pdb_id": pdb_id.upper(), "reason": reason})
             continue
         refined, reason = refine(model, map_file, resolution, cache, pdb_id)
         if refined is None:
@@ -213,7 +235,10 @@ def collect(entries: list[dict], cache: Path) -> tuple[list[dict], list[dict]]:
             continue
         post = measure(refined, map_file, resolution, cache, f"{pdb_id}_post")
         if post["cc_mask"] is None:
-            skipped.append({"pdb_id": pdb_id.upper(), "reason": "post map_correlations failed"})
+            reason = failure_reason(cache / f"mc_{pdb_id}_post.log",
+                                    "map_correlations (post)")
+            print(f"  ! {reason}", file=sys.stderr)
+            skipped.append({"pdb_id": pdb_id.upper(), "reason": reason})
             continue
         row = {"pdb_id": pdb_id.upper(), "resolution": resolution,
                "cc_mask_pre": pre["cc_mask"], "cc_mask_post": post["cc_mask"],
