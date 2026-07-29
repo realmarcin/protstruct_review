@@ -643,7 +643,19 @@ check("a crash is distinguished from a user-actionable stop",
       _reason("Traceback (most recent call last):\n  File x\nValueError: boom"),
       "real_space_refine crashed (traceback in log)")
 check("an empty log is not reported as success",
-      _reason(""), "real_space_refine produced no refined model")
+      _reason(""), "real_space_refine produced no usable result")
+# 10EN failed inside map_correlations, whose skip printed nothing at all -- the entry
+# vanished between two bracketed ids in the log. The reason extractor is shared across
+# steps so no step can fail invisibly.
+(_logdir / "sc.log").write_text(
+    'Sorry: The model contains atoms which are not in the scattering table '
+    '"electron".\n    Unknown atom types:\n    O1- \n')
+check("an unknown scattering type is named, with the offending atom",
+      refem.failure_reason(_logdir / "sc.log", "map_correlations"),
+      "atom type absent from the electron scattering table: O1-")
+check("the step name is carried into a generic failure",
+      refem.failure_reason(_logdir / "one.log", "map_correlations"),
+      "map_correlations produced no usable result")
 check("a missing log is reported as such",
       refem.refine_failure_reason(_logdir / "absent.log"),
       "real_space_refine produced no log")
