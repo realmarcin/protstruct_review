@@ -96,6 +96,43 @@ complexes from one lab. P6b predicts the second, and it is the claim that would 
 Same fairness note as P5: 10EH is now the extreme value of the whole benchmark, so regression to the
 mean again works against the prediction.
 
+## P6 is falsified — and that is the round's most useful result
+
+**10DQ: CC_mask 0.7536 → 0.7687, Δ +0.0151**, against its cluster-mate 10EH's **+0.1268**. The gap is
+**0.1117 — 5.6× the ±0.02 window**. P6 fails on its first data point, before 10FI has even run.
+
+| Pair | Shares | Spread |
+|---|---|---:|
+| Myoglobin fibrils (24UM, 27WR) | same protein, one fibril study | **0.0005** |
+| Spectral tuning (9UPM, 9UPO) | same protein family | 0.0073 |
+| **Yeast kinetochore (10EH, 10DQ)** | **same paper, three different complexes** | **0.1117** |
+
+The kinetochore pair is not merely loose — its spread is **larger than the benchmark's entire
+observed Δ range was before this round**. Same paper, same lab, same reconstruction pipeline, same
+software, and the two entries behave as differently as any two entries ever measured here.
+
+**So shared publication is not sufficient for non-independence.** The claim committed earlier in this
+round — that citation clustering explains the tight historical pairs — is too coarse as stated. What
+the tight pairs share is the **protein**, not merely the paper: myoglobin fibrils with the same
+myoglobin, 9UPM/9UPO with the same rhodopsin family. The kinetochore entries share a paper and
+nothing structural, and they came apart.
+
+This has a direct consequence for the fetcher change made earlier this round, which keys
+`--max-per-pub` on the primary-citation **DOI**. If the operative grouping is the molecule rather than
+the publication, DOI is the wrong key: it would drop 10DQ as a duplicate of 10EH when the two are, by
+measurement, independent observations — discarding real evidence in a benchmark whose central
+problem is that it has too little.
+
+**P5 now decides it.** The glutamyl peptidase cluster is *one protein* in three
+mutants/conformations, exactly the configuration the tight historical pairs have. 10ET and 10EO are
+still unrun.
+
+- **P5 holds and P6 failed** → the rule is "same molecule", not "same paper"; re-key the fetcher.
+- **P5 also fails** → clustering is a bookkeeping artefact throughout, the evidence recount in this
+  round should be withdrawn, and `--max-per-pub` should default to off.
+
+Either way the answer is measured rather than assumed, which it was not when the fetcher was changed.
+
 ## Results
 
 *(pending — refinements running)*
