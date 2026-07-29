@@ -3,12 +3,12 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-07-27** (round 14). No open GitHub issues. There is no CI in this
+**Last reconciled: 2026-07-29** (round 15). No open GitHub issues, no open PRs. There is no CI in this
 repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
 
 ## Where the tolerance work stands
 
-Thirteen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
+Fifteen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
 in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 found that
 **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
@@ -36,62 +36,17 @@ Per-tolerance detail lives in the audit trails under `ref/research/tolerance_ben
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-The pattern held to the end. Tolerances generalised from a single observation — clashscore ±1.0 from
-one 1SAR pair; H-count ±0.1 % from one builder in two conventions; the SS floor ≥0.80 from 1SAR
-alone; the bond-length attribution by analogy with bond angles; the DockQ and NMR preconditions
-asserted with no magnitude at all — **every one moved when measured**. Three moved by more than an
-order of magnitude; one (SS agreement) was the wrong *shape* of check entirely; and the §4 bands in
-round 5 were breached by re-refining a deposited model against its own data, with no modelling
-change at all.
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — fifteen rounds of
+rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
+Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
-Carry the same suspicion into anything added next: a tolerance that has never been run is a
-hypothesis, and in this repo the hypothesis lost 21 times out of 21. Round 6 adds a corollary —
-**a "blocked" item is also a hypothesis**. Two of the three blockers dissolved on re-examination:
-`reduce2` reports flips once `add_flip_movers=True` is passed (it defaults off), and the §4
-false-negative side was testable all along by damaging models rather than refining them.
-
-Round 7 adds the third: **a band this repo measured is a hypothesis too, outside the regime it was
-measured in.** Round 8 adds the fourth, and it is about explanations rather than numbers: **a
-mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
-`d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
-(1 of 6 entries fails) survived; the story did not.
-
-Round 13 adds a rule about *reading* a band rather than sizing it: **check the clause's direction
-before measuring it.** `d_FSC_model` is a resolution, so larger is worse, and the §4 clause says
-"did not degrade". Round 12 measured a two-sided `|Δ|` and reported 3 breaches; two of them were
-models that got *better*. Under the one-sided band the clause actually specifies, the tolerance
-holds on all 28 entries — and the largest change in the whole set, a 36 % improvement, is exactly
-the kind of result a symmetric band would have flagged as a failure.
-
-Round 12 adds the counterpart to the headroom rule: **when a band keeps breaking as the set grows,
-check its shape before widening it again.** `d_FSC_model` was widened and re-widened as an absolute
-± 0.05 Å band and broke anyway at 3 of 21 entries — because the quantity ranges 2.2–6.1 Å and no
-absolute band serves both ends. As a **relative** 5 % band the same data has zero violations and a
-median of 0.31 %. Rounds 1 and 2 reached the identical conclusion for interface BSA and Wilson B;
-it took ten rounds to apply it here.
-
-Round 11 proposed a working rule — **when a band's headroom drops below ~1.2×, treat it as already
-broken** — after round 10 measured 1.15× on the §4 Cα band and round 11 broke it on the first
-attempt. **Back-tested in the round-13 reconciliation, the rule does not hold** (#59): breaks have
-occurred at 1.15×, 1.44× and 1.55×, while the one band that survived two rounds of set growth had
-the second-lowest headroom of the four at 1.26×. It was generalised from a single observation and
-never re-tested — the same construction this file warns about everywhere else, applied to a rule
-*about* tolerances rather than to a tolerance. Treat low headroom as worth noting, not as a
-predictor, and treat **set growth** as the thing that actually precedes a break.
-
-Round 10 adds a sixth, which is really the first one turned on this repo's own work: **a band is
-only as good as the last entry added to its set.** Completing the EM set from 2 to 6 entries broke
-the CC_mask band that had stood since round 5 — and round 5 had itself flagged that a null
-refinement consumed 65 % of it. The warning was in the file for five rounds before the data caught
-up with it.
-
-Round 9 closes the earlier thread with the fifth and sharpest: **"unmeasurable" usually means "not yet
-read properly".** Four rounds carried `d_FSC_model` as ungateable — blamed on missing half-maps,
-then on model-to-map coverage, then on nothing at all. Reading the FSC curve mtriage already writes
-took one comparison and showed the tool reports the *first* threshold crossing, which one anomalous
-low-resolution shell defeats. The clause was gateable the whole time. The §4 bands held on 19/19 entries at 1.4–2.9 Å and failed on 10/19 once 3.0–3.6 Å
-entries were added. Before trusting any band here, check the range of the set it came from — every
-benchmark records that in its scope limits for exactly this reason.
+- **A tolerance that has never been run is a hypothesis** — it lost 21 times out of 21 here. So is a
+  "blocked" item, a measured band outside its measured regime, and a mechanism from two data points.
+- **Register the prediction before the data.** It changed the outcome twice in round 15 alone.
+- **Count what the clause can actually be broken by.** A one-sided band gains nothing from an
+  improvement, so a round can raise every count in the tolerance row while strengthening nothing.
+- **Check the clause's direction and shape before sizing it.** Two rounds were spent widening a band
+  that was the wrong shape, and one reported improvements as breaches.
 
 ## Open
 
@@ -200,3 +155,14 @@ the per-entry values do not.
   round 12 having held. Logged because the correction changed a stated rule of thumb, not just a
   number: the heuristic is 3 for 4, and its one miss was a band of the wrong *shape* rather than the
   wrong size — a failure mode headroom does not track.
+- **GitHub #59** *(closed 2026-07-28, PR #58)*: the round-11 "below 1.2× headroom, treat as already
+  broken" rule, back-tested and found not to hold — breaks at 1.15×, 1.44× and 1.55× while the one
+  band that survived two rounds of set growth sat at 1.26×. Logged because it retired a *lesson*, not
+  a tolerance: the rule was generalised from one observation and never re-tested.
+- **GitHub #61** *(closed 2026-07-28, PR #60)*: degradation frequency and magnitude conflated, which
+  had inverted a widening recommendation. Degradation is more frequent below 3.0 Å (4/8 vs 5/14) but
+  3–7× larger above it; only magnitude re-fits a band. Round 15 then confirmed the corrected version.
+- **GitHub #63** *(closed 2026-07-29, PR #62)*: "14 CC_mask degradations" stated as a count when it is
+  a lower bound (14–19) — round 13 published only its branch minimum. Logged because the degradation
+  count is now the headline evidence measure, so an unverifiable figure there is not an improvement on
+  an inflated one.
