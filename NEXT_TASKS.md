@@ -147,10 +147,18 @@ the tolerance row. Currently the direction is unknown, only the existence is.
 `≥ 3.0 Å` branch but none exceeded −0.0351, so the worst case is unchanged and the band is untested at
 its edge.
 
-### [ ] Recover per-entry values for rounds 5 and 9–13
+### [ ] Recover per-entry values for rounds 5 and 9–13 — now a prerequisite, not housekeeping
 
-Unchanged from round 14. The permutation test above could only use the 30 entries with known cluster
-labels because earlier rounds' per-entry values were published without provenance.
+Round 15 hit this gap twice. The permutation test could only use 30 of 44 entries, and **the headline
+CC_mask degradation count cannot be stated as a number at all** — round 13 published only its branch
+minimum, so 5 of its entries have no recorded Δ and the total is a range, 14–19 (#63).
+
+Since round 14 established that the degradation count *is* the evidence measure for a one-sided band,
+not being able to state it is a direct limit on every claim built on it.
+
+**Execute:** re-run rounds 5 and 9–13's entries through `bench_refinement_deltas_em.py`, now that
+`fetch_em_entries.py` can rebuild the cache. The entry lists survive in the audit trails even though
+the per-entry values do not.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

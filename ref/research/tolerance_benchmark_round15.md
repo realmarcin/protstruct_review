@@ -248,8 +248,10 @@ extreme examples yet, both at low resolution and low starting CC_mask.
 > overall); `< 3.0 Å` untested here; `d_FSC_model` holds at 5 % with **1.045× headroom**, its worst
 > case now 10BU's +4.79 %.
 >
-> **The EM set is 44 entries with 14 CC_mask degradations and 10 `d_FSC_model` degradations.** Quote
-> the degradation counts; the entry count overstates the evidence for a one-sided band.
+> **The EM set is 44 entries with 14–19 CC_mask degradations and 10 `d_FSC_model` degradations.**
+> Quote the degradation counts; the entry count overstates the evidence for a one-sided band. The
+> CC_mask figure is a **range, not a count** — round 13 published only its branch minimum for 5 of
+> the entries it added, so 14 is what is verifiable and 19 is the ceiling (#63).
 >
 > **`--max-per-pub` defaults to off** — publication clustering was tested and does not predict a
 > similar null Δ (p = 0.38).
@@ -261,6 +263,10 @@ extreme examples yet, both at low resolution and low starting CC_mask.
   biased toward chemically simple structures. The direction of any resulting bias in Δ is untested.
 - The permutation test uses the 30 entries with a known cluster label, which excludes rounds 13–14's
   entries whose per-entry values were published without provenance keys.
+- **The CC_mask degradation total is a lower bound.** Round 13 added 6 net entries and published only
+  its branch minimum (9O9K, −0.0311), so 5 of them have no recorded Δ. Verifiable total 14; ceiling 19.
+  This is the second analysis in this round limited by the same gap, which promotes "recover per-entry
+  values for rounds 5 and 9–13" from housekeeping to a prerequisite for stating the headline number.
 - P6b is scored confirmed but should not be relied on: both clusters failed their tightness test, and
   0.1117 versus 0.0954 is well inside the noise of two 2–3 entry groups.
 - The `d_FSC_model` 5 % band now rests on a worst case 4.5 % of the way to it. One further degradation
