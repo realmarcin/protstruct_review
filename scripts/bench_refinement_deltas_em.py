@@ -294,11 +294,54 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     }
 
 
+RESULTS_TSV = "ref/research/data/em_refinement_deltas.tsv"
+
+
+def append_results(rows: list[dict], skipped: list[dict], path: Path) -> None:
+    """Append this run's per-entry values to a committed, cumulative TSV.
+
+    Round 16 found that round 13's entry IDs do not exist anywhere in the repo. Its
+    write-up names 9O9K and 9H7U and reports the branch minimum; the other four
+    entries it measured are unrecoverable, because results were only ever written to a
+    JSON in a temporary cache. That makes the CC_mask degradation count permanently a
+    range (14-19) rather than a number -- and the count is the evidence measure for a
+    one-sided band, so an unrecoverable identity is an unrecoverable piece of
+    evidence.
+
+    Prose in an audit trail is not a record: it names the entries an author found
+    interesting, which is exactly the subset that cannot be used to recount anything.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    header = ("pdb_id\tresolution\tcc_mask_pre\tcc_mask_post\tcc_mask_delta\t"
+              "d_fsc_model_pre\td_fsc_model_post\td_fsc_model_delta_pct\tstatus\n")
+    existing = path.read_text() if path.exists() else ""
+    seen = {line.split("\t")[0] for line in existing.splitlines()[1:] if line.strip()}
+    lines = [] if existing else [header]
+    for r in rows:
+        if r["pdb_id"] in seen:
+            continue
+        lines.append("\t".join(str(x) for x in [
+            r["pdb_id"], r["resolution"], r["cc_mask_pre"], r["cc_mask_post"],
+            r["cc_mask_delta"], r.get("d_fsc_model_pre"), r.get("d_fsc_model_post"),
+            r.get("d_fsc_model_delta_pct"), "measured"]) + "\n")
+    for s in skipped:
+        if s["pdb_id"] in seen:
+            continue
+        lines.append("\t".join([s["pdb_id"], "", "", "", "", "", "", "",
+                                 f"skipped: {s['reason']}"]) + "\n")
+    if lines:
+        with path.open("a") as fh:
+            fh.writelines(lines)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--cache", required=True)
     ap.add_argument("--entries", help="JSON: [{pdb_id, resolution}, ...]; default <cache>/entries.json")
     ap.add_argument("--json", dest="json_out")
+    ap.add_argument("--results-tsv", default=RESULTS_TSV,
+                    help="cumulative per-entry record, appended to and committed; "
+                         "empty string disables")
     args = ap.parse_args()
 
     cache = Path(args.cache)
@@ -306,6 +349,8 @@ def main() -> int:
     entries = json.loads(entries_path.read_text())
 
     rows, skipped = collect(entries, cache)
+    if args.results_tsv:
+        append_results(rows, skipped, Path(args.results_tsv))
     summary = summarize(rows)
     if args.json_out:
         Path(args.json_out).write_text(
