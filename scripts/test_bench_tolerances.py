@@ -791,4 +791,56 @@ check("an already-recorded entry is not duplicated",
       sum(1 for l in _third.splitlines() if l.startswith("AAAA")), 1)
 check("while a genuinely new entry is still added", "DDDD" in _third, True)
 
+
+# --- Round 16: screen out charged models before downloading a 300 MB map ----------
+
+# cctbx's electron scattering table holds 98 NEUTRAL elements and no ions, so any
+# formal charge aborts map_correlations. 10EN and 10FL both died there; every entry
+# that processed cleanly carries no charges. PHENIX names only the anion, so anions
+# are the confirmed fatal case and cations are reported but not refused.
+# The model is built with gemmi's own API rather than hand-written: a minimal cif
+# string parses without error but yields zero atoms, which would make the screen look
+# like it passed when it never saw anything.
+def _screen(charge: int):
+    import gemmi
+    st = gemmi.Structure()
+    st.cell = gemmi.UnitCell(50, 50, 50, 90, 90, 90)
+    st.spacegroup_hm = "P 1"
+    model = gemmi.Model("1")
+    chain = gemmi.Chain("A")
+    residue = gemmi.Residue()
+    residue.name, residue.seqid = "ALA", gemmi.SeqId("1")
+    for name, element, chg in (("N", "N", charge), ("CA", "C", 0)):
+        atom = gemmi.Atom()
+        atom.name, atom.element = name, gemmi.Element(element)
+        atom.charge, atom.occ, atom.b_iso = chg, 1.0, 20.0
+        atom.pos = gemmi.Position(1.0, 2.0, 3.0)
+        residue.add_atom(atom)
+    chain.add_residue(residue)
+    model.add_chain(chain)
+    st.add_model(model)
+    st.setup_entities()
+    path = _tsv_dir / f"m_{charge}.cif"
+    st.make_mmcif_document().write_file(str(path))
+    return fetchem.charge_screen(path)
+
+
+_neutral_reason, _neutral_counts = _screen(0)
+_anion_reason, _anion_counts = _screen(-1)
+_cation_reason, _cation_counts = _screen(1)
+
+check("a neutral model passes the screen", _neutral_reason, None)
+check("and reports no charges", _neutral_counts, {})
+
+check("an anion is refused", _anion_reason is not None, True)
+check("and the refusal names the type and count",
+      _anion_reason, "formal charges absent from the electron scattering table: N1-×1")
+check("the inventory records it", _anion_counts, {"N1-": 1})
+
+# A cation alone is NOT refused: PHENIX named only the anion in both real failures, so
+# whether cations abort on their own is untested. Refusing them would discard entries
+# on an unverified rule, in a benchmark whose problem is too little evidence.
+check("a cation alone is reported, not refused", _cation_reason, None)
+check("but it is still recorded for a future round to test", _cation_counts, {"N1+": 1})
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
