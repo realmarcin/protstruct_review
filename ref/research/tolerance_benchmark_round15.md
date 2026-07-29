@@ -133,6 +133,53 @@ still unrun.
 
 Either way the answer is measured rather than assumed, which it was not when the fetcher was changed.
 
+## P5 fails too — the clustering finding is withdrawn
+
+**10ET: Δ −0.0351. 10EO: Δ −0.0221.** Against 10EQ's **+0.0603**, from the same protein:
+
+| Cluster | Members | Spread |
+|---|---|---:|
+| Peptidase (P5) — *one protein*, three mutants | +0.0603, −0.0351, −0.0221 | **0.0954** |
+| Kinetochore (P6) — one paper, three complexes | +0.1268, +0.0151 | 0.1117 |
+
+P5 fails by 4.8×, and worse than P6 in one respect: the *same protein* produced an improvement of
++0.0603 and a degradation of −0.0351. Opposite signs.
+
+A permutation test over every entry with a known cluster label settles it:
+
+| | pairs | mean \|Δ difference\| |
+|---|---:|---:|
+| Within cluster | 21 | **0.0318** |
+| Between clusters | 414 | 0.0354 |
+| ratio | | 0.897 |
+
+**Permutation p = 0.38.** Cluster-mates are not measurably more similar than unrelated entries. The
+tight historical pairs — myoglobin at 0.0005, spectral tuning at 0.0073 — were coincidence among 21
+within-cluster pairs, which is exactly what picking the two smallest of 21 looks like.
+
+### What is withdrawn, and what stands
+
+Earlier in this round I committed the claim that the historical evidence base is smaller than round 14
+said, because 22 entries came from 12 publications and the four largest degradations arrived as two
+same-paper pairs. **That claim is withdrawn.** It was inference from provenance, never a measurement,
+and when measured it failed at p = 0.38.
+
+The decision rule for this was registered before P5 ran — *"P5 also fails → clustering is a
+bookkeeping artefact throughout, the evidence recount should be withdrawn, and `--max-per-pub` should
+default to off"* — and is followed here rather than renegotiated.
+
+**Round 14's finding stands unchanged**: entry count is not evidence for a one-sided band, because
+only degradations can breach it, so 36 entries carry roughly 9 pieces of evidence. That argument
+never depended on clustering. What is withdrawn is only the *further* deflation from ~9 to ~6.
+
+`--max-per-pub` now defaults to **0 (no limit)**. The citation key is still computed and recorded on
+every entry, because provenance is worth knowing and may predict something else — it simply no longer
+filters anything unless explicitly asked for.
+
+**The four largest degradations still come from two papers.** That observation was true and remains
+true; what the test refutes is the inference that it *matters*. With 21 within-cluster pairs among
+30 entries, some striking coincidence was likely, and this one was.
+
 ## Results
 
 *(pending — refinements running)*

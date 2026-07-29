@@ -215,11 +215,32 @@ def fetch_map(pdb_id: str, accession: str, cache: Path,
 
 def collect(pdb_ids: list[str], cache: Path, max_map_mb: float, max_model_mb: float,
             seen_pubs: set[str] | None = None,
-            max_per_pub: int = 1) -> tuple[list[dict], list[dict]]:
-    """Fetch entries, keeping at most `max_per_pub` from any one publication."""
+            max_per_pub: int = 0) -> tuple[list[dict], list[dict]]:
+    """Fetch entries, keeping at most `max_per_pub` from any one publication.
+
+    `max_per_pub=0` means no limit, and that is the default **because the limit was
+    tested and did not earn its place**. Round 15 keyed this on citation DOI after
+    noticing that 22 historical entries came from 12 publications, with the four
+    largest CC_mask degradations arriving as two same-paper pairs. Two registered
+    predictions then tested whether cluster-mates actually behave alike:
+
+        P5  peptidase, ONE protein: 10EQ +0.0603, 10ET -0.0351, 10EO -0.0221
+        P6  kinetochore, one paper: 10EH +0.1268, 10DQ +0.0151
+
+    Both failed, P5 with opposite signs on the same protein. A permutation test over
+    every labelled entry then put it beyond doubt: within-cluster pairs differ by a
+    mean 0.0318 against 0.0354 between clusters, ratio 0.897, **p = 0.38**. Shared
+    publication -- and even shared protein -- does not predict a similar null Delta.
+    The tight historical pairs (myoglobin 0.0005) were coincidence among 21
+    within-cluster pairs.
+
+    The key is still computed and recorded on every entry, because knowing the
+    provenance is useful, and a future round may find it predicts something else. It
+    just no longer filters anything unless asked.
+    """
     cache.mkdir(parents=True, exist_ok=True)
     pub_counts: dict[str, int] = {}
-    if seen_pubs:
+    if seen_pubs and max_per_pub:
         pub_counts = {k: max_per_pub for k in seen_pubs}
     entries, skipped = [], []
     for pdb_id in pdb_ids:
@@ -228,7 +249,7 @@ def collect(pdb_ids: list[str], cache: Path, max_map_mb: float, max_model_mb: fl
         if resolution is None or accession is None:
             skipped.append({"pdb_id": pdb_id, "reason": "no resolution or EMDB accession"})
             continue
-        if pub_counts.get(pub_key, 0) >= max_per_pub:
+        if max_per_pub and pub_counts.get(pub_key, 0) >= max_per_pub:
             reason = f"publication already represented ({pub_key})"
             skipped.append({"pdb_id": pdb_id, "reason": reason})
             print(f"  ! {reason}", file=sys.stderr)
@@ -271,9 +292,10 @@ def main() -> int:
     ap.add_argument("--exclude", default="",
                     help="comma-separated PDB ids already in the benchmark set")
     ap.add_argument("--ids", default="", help="explicit ids, bypassing the search")
-    ap.add_argument("--max-per-pub", type=int, default=1,
-                    help="entries to keep from any one publication; a resolution "
-                         "window does not sample independent depositions")
+    ap.add_argument("--max-per-pub", type=int, default=0,
+                    help="entries to keep from any one publication (0 = no limit, the "
+                         "default: clustering was tested and does not predict a "
+                         "similar null delta, permutation p = 0.38)")
     ap.add_argument("--json", dest="json_out")
     args = ap.parse_args()
 
@@ -301,7 +323,7 @@ def main() -> int:
         for row in got:
             key = row["publication"]
             pub_counts[key] = pub_counts.get(key, 0) + 1
-            if pub_counts[key] >= args.max_per_pub:
+            if args.max_per_pub and pub_counts[key] >= args.max_per_pub:
                 seen_pubs.add(key)
         entries.extend(got)
         skipped.extend(miss)

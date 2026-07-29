@@ -722,20 +722,27 @@ fetchem.fetch_model = lambda pid, cache, mm: (_stub(cache / f"{pid.lower()}.cif"
 fetchem.fetch_map = lambda pid, acc, cache, mm: (_stub(cache / f"{pid.lower()}.map"), None)
 try:
     _c = Path(__import__("tempfile").mkdtemp())
-    kept, dropped = fetchem.collect(["AAAA", "BBBB", "CCCC"], _c, 300.0, 8.0)
+    default_all, _ = fetchem.collect(["AAAA", "BBBB", "CCCC"], _c, 300.0, 8.0)
+    kept, dropped = fetchem.collect(["AAAA", "BBBB", "CCCC"], _c, 300.0, 8.0,
+                                    max_per_pub=1)
     both, _ = fetchem.collect(["AAAA", "BBBB"], _c, 300.0, 8.0, max_per_pub=2)
-    unpub, _ = fetchem.collect(["DDDD", "EEEE"], _c, 300.0, 8.0)
+    unpub, _ = fetchem.collect(["DDDD", "EEEE"], _c, 300.0, 8.0, max_per_pub=1)
 finally:
     fetchem.entry_metadata, fetchem.fetch_model, fetchem.fetch_map = (
         _real_meta, _real_model, _real_map)
 
-check("a second entry sharing a DOI is dropped",
+# The default keeps everything: P5 and P6 both failed and a permutation test put
+# within-cluster agreement at p = 0.38, so filtering by publication would discard
+# real evidence from a benchmark that has too little of it.
+check("by default no entry is dropped for sharing a publication",
+      [e["pdb_id"] for e in default_all], ["AAAA", "BBBB", "CCCC"])
+check("the limit still works when asked for explicitly",
       [e["pdb_id"] for e in kept], ["AAAA", "CCCC"])
 check("and the skip says why, naming the publication",
       dropped[0]["reason"], "publication already represented (10.1/dup)")
 check("the publication key is recorded on every kept entry",
       kept[0]["publication"], "10.1/dup")
-check("--max-per-pub raises the cap when a cluster is wanted deliberately",
+check("--max-per-pub sets the cap when a cluster limit is wanted deliberately",
       len(both), 2)
 # Unpublished entries must stay independent: keying them all to one empty string
 # would collapse them into a single unit and drop every one but the first.
