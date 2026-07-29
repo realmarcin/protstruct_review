@@ -3,12 +3,12 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-07-27** (round 14). No open GitHub issues. There is no CI in this
+**Last reconciled: 2026-07-29** (round 15). No open GitHub issues, no open PRs. There is no CI in this
 repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
 
 ## Where the tolerance work stands
 
-Thirteen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
+Fifteen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
 in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 found that
 **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
@@ -55,6 +55,40 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 15 adds the rule this file most needed, because it is about the *method* rather than any
+tolerance: **register the prediction before the data.** Round 14 had to label its own p-values as
+computed after noticing the pattern they described. Round 15 committed four predictions before the
+refinements finished and two more mid-run, and it changed the outcome twice. P5 and P6 — that entries
+sharing a publication behave alike — were **falsified**, and a permutation test then put
+within-cluster agreement at p = 0.38. The finding they tested had already been written up, committed,
+and built into the fetcher's default. Unregistered, it would have survived as a plausible story with
+two supporting examples and two counterexamples quietly reframed; registered, it was withdrawn inside
+the same round under a decision rule fixed before the test ran.
+
+The corollary is about which prediction to make: **the band you are watching is not necessarily the
+band at risk.** P3 was registered about CC_mask, which had broken in 3 of its 4 widenings. CC_mask
+came through at 1.71× headroom while `d_FSC_model` — flagged only for a thin tail — took a +4.79 %
+degradation against a 5 % band and now sits at **1.045×**, the thinnest margin in the file.
+
+Round 14 adds the counting rule: **count what the clause can actually be broken by.** A one-sided
+band (`post ≥ pre − x`) can only be breached by a degradation, so improvements are not evidence at
+any magnitude. 44 EM entries carry 14–19 CC_mask degradations and 10 `d_FSC_model` degradations —
+that is the evidence, and round 14 added 8 entries containing none of it. A round can therefore raise
+every count in the tolerance row while strengthening nothing.
+
+Two corollaries, both found the hard way. First, the *premise* can fail: the benchmark asserts a
+deposited model sits at its optimum, but 10EH gained **+0.1268** on a null re-refinement — twice the
+width of the band measuring it — so Δ mixes refinement noise with deposition headroom. Second,
+**frequency and magnitude can point at opposite resolutions** (#61): degradation is more common below
+3.0 Å but 3–7× larger above it, and only magnitude re-fits a band. Getting that backwards inverted a
+widening recommendation.
+
+Round 15 also adds a maintenance rule, learned from 10EN vanishing from a log with no result and no
+error: **fixing one instance of a failure class and leaving its siblings is how the class stays
+invisible.** Round 14 added failure-reason reporting to `real_space_refine` and left the two
+measurement steps bare, so an entry that died in `map_correlations` simply disappeared between two
+bracketed ids.
 
 Round 13 adds a rule about *reading* a band rather than sizing it: **check the clause's direction
 before measuring it.** `d_FSC_model` is a resolution, so larger is worse, and the §4 clause says
@@ -200,3 +234,14 @@ the per-entry values do not.
   round 12 having held. Logged because the correction changed a stated rule of thumb, not just a
   number: the heuristic is 3 for 4, and its one miss was a band of the wrong *shape* rather than the
   wrong size — a failure mode headroom does not track.
+- **GitHub #59** *(closed 2026-07-28, PR #58)*: the round-11 "below 1.2× headroom, treat as already
+  broken" rule, back-tested and found not to hold — breaks at 1.15×, 1.44× and 1.55× while the one
+  band that survived two rounds of set growth sat at 1.26×. Logged because it retired a *lesson*, not
+  a tolerance: the rule was generalised from one observation and never re-tested.
+- **GitHub #61** *(closed 2026-07-28, PR #60)*: degradation frequency and magnitude conflated, which
+  had inverted a widening recommendation. Degradation is more frequent below 3.0 Å (4/8 vs 5/14) but
+  3–7× larger above it; only magnitude re-fits a band. Round 15 then confirmed the corrected version.
+- **GitHub #63** *(closed 2026-07-29, PR #62)*: "14 CC_mask degradations" stated as a count when it is
+  a lower bound (14–19) — round 13 published only its branch minimum. Logged because the degradation
+  count is now the headline evidence measure, so an unverifiable figure there is not an improvement on
+  an inflated one.
