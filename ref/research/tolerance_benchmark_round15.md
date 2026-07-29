@@ -66,6 +66,36 @@ Note the asymmetry that makes this a fair test: 10EQ is the *largest* value in t
 regression to the mean works **against** P5. Cluster-mates drawn independently would be expected to
 fall well below it.
 
+## P6: a second, looser cluster — registered before it runs
+
+**10EH has run: CC_mask 0.6531 → 0.7799, Δ +0.1268** — double the record 10EQ set minutes earlier,
+and more than twice the width of the entire `≥ 3.0 Å` band. Its starting CC_mask, 0.6531, is the
+lowest in the benchmark.
+
+10EH belongs to the second cluster in this set, the yeast kinetochore series (10EH, 10DQ, 10FI).
+**10DQ and 10FI are 7th and 10th in the fetch order and have not run.** That gives a second test of
+the same claim, on a cluster that is deliberately *looser* than the first:
+
+| Cluster | Members | What is shared |
+|---|---|---|
+| Glutamyl peptidase (P5) | 10EQ, 10ET, 10EO | **one protein**, three mutants/conformations |
+| Yeast kinetochore (P6) | 10EH, 10DQ, 10FI | one paper, **three different complexes** (CBF3-CEN, apo CCAN, Cbf1-CCAN-CEN) |
+
+> **P6.** 10DQ and 10FI land within ±0.02 of 10EH's +0.1268 — the same absolute window as P5, which
+> is now a *tighter* relative test since the observed range has grown to 0.157.
+>
+> **P6b.** The kinetochore cluster is **looser** than the peptidase cluster: its within-cluster
+> spread exceeds the peptidase cluster's.
+
+P6b is the more interesting half. If clustering is about shared protocol alone, both should be
+equally tight. If it is about the *structure* as well — same molecule, same map-making, same
+difficulties — then one protein in three conformations should agree more closely than three distinct
+complexes from one lab. P6b predicts the second, and it is the claim that would tell a future round
+*how* to define a cluster rather than merely that clusters exist.
+
+Same fairness note as P5: 10EH is now the extreme value of the whole benchmark, so regression to the
+mean again works against the prediction.
+
 ## Results
 
 *(pending — refinements running)*
