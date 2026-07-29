@@ -182,4 +182,86 @@ true; what the test refutes is the inference that it *matters*. With 21 within-c
 
 ## Results
 
-*(pending — refinements running)*
+| Entry | d_min | CC_mask | Δ | d_FSC_model |
+|---|---:|---|---:|---:|
+| 10ET | 3.00 Å | 0.7822 → 0.7471 | **−0.0351** | −0.78 % |
+| 10BU | 3.20 Å | 0.7577 → 0.7278 | **−0.0299** | **+4.79 %** |
+| 10EO | 3.20 Å | 0.8707 → 0.8486 | **−0.0221** | −0.25 % |
+| 10EQ | 3.30 Å | 0.7162 → 0.7765 | +0.0603 | −2.35 % |
+| 10FI | 3.30 Å | 0.8181 → 0.8155 | **−0.0026** | −0.00 % |
+| 10EH | 3.50 Å | 0.6531 → 0.7799 | **+0.1268** | −0.75 % |
+| 10RI | 3.60 Å | 0.7481 → 0.7596 | +0.0115 | +0.45 % |
+| 10DQ | 3.90 Å | 0.7536 → 0.7687 | +0.0151 | +0.00 % |
+
+Skipped: **10EG** (unparameterised ligand, 195 atoms) and **10EN** (`O1-` absent from the electron
+scattering table). Both are entry properties, not tool failures.
+
+**CC_mask: 4 of 8 degraded (50 %), worst −0.0351. `d_FSC_model`: 2 of 8 degraded, worst +4.79 %.**
+
+## Scoring the predictions
+
+| # | Prediction | Outcome |
+|---|---|---|
+| **P1** | ≥ 1 entry degrades | ✅ **4 did** |
+| **P2** | largest degradation > 0.0139 | ✅ **0.0351 — 2.5×** |
+| **P3** | −0.06 band holds | ✅ **holds**, worst −0.0351, 1.71× headroom |
+| **P4** | rate nearer 36 % than 0 % | ✅ **50 %** |
+| **P5** | peptidase cluster within ±0.02 | ❌ **falsified**, spread 0.0954 |
+| **P6** | kinetochore cluster within ±0.02 | ❌ **falsified**, spread 0.1117 |
+| **P6b** | kinetochore looser than peptidase | ✅ 0.1117 > 0.0954 — but both are loose and the gap is small, so this is a comparison between two failures, not a useful confirmation |
+
+**P2 was the round's real test and it passed.** The rationale for widening at low resolution rather
+than high — that degradations here are large enough to re-fit a band — is confirmed: the worst
+degradation is 2.5× anything ever recorded below 3.0 Å. Round 14's frequency/magnitude correction was
+right, and the resolution split it supports is better evidenced than before.
+
+**P4 confirms the frequency half too.** 50 % against round 14's 0 % in the same number of entries.
+Round 14's 8-improvement run really was anomalous rather than a change in the benchmark.
+
+## The band under threat is `d_FSC_model`, not CC_mask
+
+P3 was registered about CC_mask because that tolerance has broken in 3 of its 4 widenings. It came
+through comfortably at 1.71× headroom. Meanwhile **10BU degraded `d_FSC_model` by +4.79 % against a
+5 % band — 1.045× headroom**, displacing 9VAM's +4.28 % as the worst ever recorded.
+
+That is now the thinnest margin anywhere in `ref/thresholds_and_standards.md`. It is **not** widened
+here: the band holds with 0 breaches, and this series has learned not to move a band on anticipation.
+It is recorded as the first thing to re-test.
+
+**10RI also showed the two quantities disagreeing in direction** — CC_mask +0.0115 while
+`d_FSC_model` degraded +0.45 %. §4 gates on both, so they are not interchangeable evidence, and a
+refinement can pass one while failing the other.
+
+## Deposition headroom, again
+
+10EH started at CC_mask **0.6531** and gained **+0.1268** on a null re-refinement — twice the width of
+the band it is measured against, and the largest movement ever recorded here. 10EQ gained +0.0603 from
+a start of 0.7162.
+
+Round 14 argued that a Δ this large means the deposited model was not at any optimum, so the
+measurement is *deposition headroom* rather than refinement noise. Round 15 supplies the two most
+extreme examples yet, both at low resolution and low starting CC_mask.
+
+## Applied
+
+> **All bands unchanged.** CC_mask `≥ 3.0 Å` holds at −0.06 (worst −0.0351 this round, −0.0475
+> overall); `< 3.0 Å` untested here; `d_FSC_model` holds at 5 % with **1.045× headroom**, its worst
+> case now 10BU's +4.79 %.
+>
+> **The EM set is 44 entries with 14 CC_mask degradations and 10 `d_FSC_model` degradations.** Quote
+> the degradation counts; the entry count overstates the evidence for a one-sided band.
+>
+> **`--max-per-pub` defaults to off** — publication clustering was tested and does not predict a
+> similar null Δ (p = 0.38).
+
+## Scope limits
+
+- Two of ten entries were skipped for entry properties (unparameterised ligand; atom type outside the
+  electron scattering table). Across rounds 14–15 that is **3 of 18 attempted**, a ~17 % attrition
+  biased toward chemically simple structures. The direction of any resulting bias in Δ is untested.
+- The permutation test uses the 30 entries with a known cluster label, which excludes rounds 13–14's
+  entries whose per-entry values were published without provenance keys.
+- P6b is scored confirmed but should not be relied on: both clusters failed their tightness test, and
+  0.1117 versus 0.0954 is well inside the noise of two 2–3 entry groups.
+- The `d_FSC_model` 5 % band now rests on a worst case 4.5 % of the way to it. One further degradation
+  of any size above +4.79 % breaks it.
