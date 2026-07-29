@@ -40,6 +40,32 @@ over the worst observation ever recorded, this series has broken a CC_mask band 
 widenings, and this is the first widening aimed squarely at the regime that produces large
 degradations. Predicting it holds is the conservative call, not the confident one.
 
+## P5: a natural experiment on independence, registered mid-run
+
+The independence finding above was made by inspecting citations, not by measuring anything. This
+round's set happens to contain a direct test of it, and the test is still in the future at the time
+of writing.
+
+**10EQ has run: CC_mask 0.7162 → 0.7765, Δ +0.0603** — the largest improvement ever recorded in this
+benchmark, displacing 9OID's +0.0595. 10EQ belongs to the chloroplast glutamyl peptidase series, and
+its two cluster-mates **10ET and 10EO have not yet been refined** — they are 8th and 9th in the fetch
+order, with six entries between.
+
+> **P5.** 10ET and 10EO will both land within **±0.02** of 10EQ's +0.0603, i.e. inside a window one
+> fifth the width of the benchmark's observed Δ range (−0.0475 to +0.0603, span 0.108).
+>
+> **Falsified if** either cluster-mate falls outside ±0.02, which under independence is where most of
+> the distribution sits.
+
+If P5 holds, "one entry per publication" is measuring something real rather than being a
+precaution. If it fails, the citation clustering is a bookkeeping artefact and the entry counts stand
+as they were — in which case the fetcher change is harmless but the evidence recount in this round
+should be withdrawn.
+
+Note the asymmetry that makes this a fair test: 10EQ is the *largest* value in the whole set, so
+regression to the mean works **against** P5. Cluster-mates drawn independently would be expected to
+fall well below it.
+
 ## Results
 
 *(pending — refinements running)*
