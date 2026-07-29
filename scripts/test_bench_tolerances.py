@@ -677,4 +677,57 @@ check("so a one-sided read of this round yields no evidence at all",
       sum(1 for r in _r14 if r["cc_mask_delta"] < 0
           or r["d_fsc_model_degradation_pct"] > 0), 0)
 
+
+# --- Round 15: a resolution window does not sample independent depositions --------
+
+# 22 historical entries came from 12 publications, and the four largest CC_mask
+# degradations ever recorded came from TWO papers as near-duplicate pairs
+# (9UPM -0.0475 / 9UPO -0.0402; 10SD -0.0421 / 10SF -0.0371). One entry per
+# publication is the default so a band cannot be anchored by one lab twice.
+_ENTRY_META = {
+    "AAAA": (3.1, "111", "10.1/dup"), "BBBB": (3.2, "222", "10.1/dup"),
+    "CCCC": (3.3, "333", "10.2/other"), "DDDD": (3.4, "444", None),
+    "EEEE": (3.5, "555", None),
+}
+
+
+def _fake_meta(pdb_id):
+    res, acc, doi = _ENTRY_META[pdb_id.upper()]
+    return res, acc, doi or f"unpublished:{pdb_id.upper()}"
+
+
+_real_meta, _real_model, _real_map = (
+    fetchem.entry_metadata, fetchem.fetch_model, fetchem.fetch_map)
+fetchem.entry_metadata = _fake_meta
+def _stub(path: Path) -> Path:
+    """collect() stats the map to report its size, so the stub must leave a file."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"stub")
+    return path
+
+
+fetchem.fetch_model = lambda pid, cache, mm: (_stub(cache / f"{pid.lower()}.cif"), None)
+fetchem.fetch_map = lambda pid, acc, cache, mm: (_stub(cache / f"{pid.lower()}.map"), None)
+try:
+    _c = Path(__import__("tempfile").mkdtemp())
+    kept, dropped = fetchem.collect(["AAAA", "BBBB", "CCCC"], _c, 300.0, 8.0)
+    both, _ = fetchem.collect(["AAAA", "BBBB"], _c, 300.0, 8.0, max_per_pub=2)
+    unpub, _ = fetchem.collect(["DDDD", "EEEE"], _c, 300.0, 8.0)
+finally:
+    fetchem.entry_metadata, fetchem.fetch_model, fetchem.fetch_map = (
+        _real_meta, _real_model, _real_map)
+
+check("a second entry sharing a DOI is dropped",
+      [e["pdb_id"] for e in kept], ["AAAA", "CCCC"])
+check("and the skip says why, naming the publication",
+      dropped[0]["reason"], "publication already represented (10.1/dup)")
+check("the publication key is recorded on every kept entry",
+      kept[0]["publication"], "10.1/dup")
+check("--max-per-pub raises the cap when a cluster is wanted deliberately",
+      len(both), 2)
+# Unpublished entries must stay independent: keying them all to one empty string
+# would collapse them into a single unit and drop every one but the first.
+check("unpublished entries are independent, not merged",
+      [e["pdb_id"] for e in unpub], ["DDDD", "EEEE"])
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
