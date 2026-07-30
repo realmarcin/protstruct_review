@@ -50,3 +50,15 @@ UNKNOWN-R13-1								LOST: round 13 measured 4 further entries whose ids were ne
 UNKNOWN-R13-2								LOST: id never recorded
 UNKNOWN-R13-3								LOST: id never recorded
 UNKNOWN-R13-4								LOST: id never recorded
+21EO	3.91	0.7076	0.7683	0.0607	3.814407486247678	3.8150663670089724	0.018	measured
+10ME	4.0	0.8149	0.8286	0.0137	3.7542096562935092	3.809575605239372	1.476	measured
+32FE	3.81	0.7947	0.7944	-0.0003	3.840438033602942	3.839906082655453	-0.013	measured
+10ZU	4.0	0.7577	0.7773	0.0196	3.661624477942059	3.6629335037388606	0.036	measured
+5YKE	4.11	0.7604	0.7831	0.0227	4.059737066013651	4.037942347599758	-0.537	measured
+10EU	3.0	0.7542	0.7698	0.0156	3.22874829958778	3.193762239974019	-1.084	measured
+10EP	3.2	0.8032	0.8129	0.0097	3.305334910035378	3.281022827106049	-0.735	measured
+10MJ	3.3	0.847	0.8847	0.0377	3.221585042456416	3.2223212097815725	0.022	measured
+10YG	3.4	0.8513	0.8965	0.0452	2.854109354783229	2.854109354783229	0.0	measured
+10FL								skipped: atom type absent from the electron scattering table: O1-
+10FJ								skipped: atom type absent from the electron scattering table: O1-
+28JV								skipped: unparameterised ligand: 38 atoms with unknown nonbonded energy types (no monomer-library restraints)

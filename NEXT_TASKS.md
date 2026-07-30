@@ -31,6 +31,7 @@ resolution range and breached by null re-refinement once low-resolution entries 
 | 13 | [#56](https://github.com/realmarcin/protstruct_review/pull/56) (2026-07-27) | CC_mask `< 3.0 Å` breached and widened; `d_FSC_model` band corrected to one-sided |
 | 14 | [#60](https://github.com/realmarcin/protstruct_review/pull/60) (2026-07-27) | EM benchmark made reproducible; entry count shown not to be evidence; split kept |
 | 15 | [#62](https://github.com/realmarcin/protstruct_review/pull/62) (2026-07-28) | pre-registered low-resolution widening: P1–P4 confirmed, P5/P6 falsified, clustering withdrawn |
+| 16 | [#66](https://github.com/realmarcin/protstruct_review/pull/66) (2026-07-29) | per-entry record made durable; all 5 predictions held; `d_FSC_model` tail shown to be sampled thinly, not thin |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -50,70 +51,54 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
 
 ## Open
 
-Round 15 widened at 3.0–4.0 Å with **predictions registered before the data**, after round 14 had to
-label its own p-values as computed post hoc. Four of six held.
+Round 16 targeted `d_FSC_model` at 1.045× headroom with 12 entries at 3.00–4.11 Å. **All five
+registered predictions held**, which is itself worth distrusting — three were near-certain, and the
+one I called risky (P2, the 5 % band holding) held for a reason that indicts how I set its
+probability.
 
-| # | Prediction | Outcome |
-|---|---|---|
-| P1 | ≥ 1 entry degrades | ✅ 4 did |
-| P2 | largest degradation > 0.0139 | ✅ 0.0351, 2.5× |
-| P3 | −0.06 band holds | ✅ 1.71× headroom |
-| P4 | rate nearer 36 % than 0 % | ✅ 50 % |
-| P5/P6 | cluster-mates behave alike | ❌ **both falsified** |
+**Two items from the previous backlog are now closed.** The per-entry recovery item was
+**infeasible**: round 13 named 2 of its 6 entries, and the other 4 cannot be re-run because nothing
+records what they were. The count is permanently 15–20. The cause is fixed instead — every run now
+appends to `ref/research/data/em_refinement_deltas.tsv`, and it earned its keep inside the same round
+by enabling the first cross-round resolution analysis (ρ = +0.397, n = 44).
 
-**P2 was the round's real test.** The rationale for widening low rather than high — that degradations
-there are large enough to re-fit a band — is confirmed, so round 14's frequency/magnitude correction
-was right and the resolution split is better evidenced than before.
+**Attrition is 6 of 31 (19 %) across rounds 14–16**, from exactly two causes. Charged models are now
+screened before the map download, at no cost; unparameterised ligands still cost a full download and
+a refinement attempt.
 
-**P5/P6 cost a finding.** Mid-round I claimed the evidence base was smaller than round 14 said,
-because 22 entries came from 12 publications and the four largest degradations arrived as same-paper
-pairs. Both registered tests failed — the peptidase cluster produced **opposite signs on the same
-protein** — and a permutation test put within-cluster agreement at **p = 0.38**. Withdrawn, per the
-rule registered before the test ran. Round 14's count argument is untouched; only the further
-deflation from ~9 to ~6 is gone.
+### [ ] A selectively recorded history biases priors, not just counts
 
-### [ ] `d_FSC_model` has 1.045× headroom — the thinnest margin in the file
+The sharpest finding of round 16, and it generalises past this repo. I set P2's probability from the
+three `d_FSC_model` magnitudes then on record — 2 of 3 above 4 % — and concluded the band was at
+real risk. With every value now recorded, **1 of 6 is above 4 %, median 0.240 %**. The old sample
+contained the alarming values *because* they were the ones worth writing down.
 
-10BU degraded it by **+4.79 %** against a **5 %** band, displacing 9VAM's +4.28 %. **Any future
-degradation above 4.79 % breaks it.**
+**Execute:** audit the other tolerance rows for magnitudes quoted from partial records. Any row citing
+"worst observed" without a denominator is suspect in the same way — the worst is always recorded, the
+typical often is not. `ref/research/data/` now gives a place to put the denominators.
 
-Deliberately **not** widened: it holds with 0 breaches, and this series does not move bands on
-anticipation. But it is now the first thing to re-test, ahead of CC_mask — which is the reversal of
-where attention has been for six rounds. P3 was registered about CC_mask because that tolerance has
-all the breakage history; it came through at 1.71× while the quantity nobody was watching nearly
-broke.
+### [ ] The `d_FSC_model` band is safer than 1.045× suggests, but the worst case is untouched
 
-**Execute:** the next EM widening should be sized to produce `d_FSC_model` degradations specifically.
-Note that CC_mask and `d_FSC_model` can move in **opposite directions** on one refinement (10RI), so a
-set chosen to stress one does not automatically stress the other.
+10BU's +4.787 % still stands as the only observation near the 5 % band, and round 16 did not approach
+it (worst +1.476 %). So the band is not in imminent danger, but neither has anything been learned
+about *why* 10BU was six times the median.
 
-### [ ] Entry attrition is systematic, at ~17 %
+**Execute:** re-run 10BU specifically and check whether +4.787 % reproduces, before treating it as
+the number that sets the band. One irreproducible outlier setting a tolerance is the failure mode this
+series has hit repeatedly — and unlike the historical worst cases, 10BU's inputs are still on disk.
 
-Three of 18 attempted entries across rounds 14–15 were unprocessable: 11MR and 10EG (unparameterised
-ligands, 128 and 195 atoms), 10EN (`O1-` outside the electron scattering table). These are entry
-properties, not tool failures, and they bias the set toward chemically simple structures every run.
+### [ ] Screen unparameterised ligands at fetch time
 
-**Execute:** quantify whether ligand-bearing entries differ in Δ, or record the bias as permanent in
-the tolerance row. Currently the direction is unknown, only the existence is.
+The charge screen removed one attrition cause from the expensive path. The ligand cause — 3 of the 6
+skips — still costs a model download, a map download and a `real_space_refine` attempt before failing.
+Residues absent from the CCP4 monomer library are checkable from the model alone.
 
-### [ ] Both CC_mask bands are still set from single worst cases
+### [ ] CC_mask degradation rate is not resolution-driven — find what does drive it
 
-−0.04 above 9O9K's −0.0311 and −0.06 above 9UPM's −0.0475. Round 15 added 4 degradations to the
-`≥ 3.0 Å` branch but none exceeded −0.0351, so the worst case is unchanged and the band is untested at
-its edge.
-
-### [ ] Recover per-entry values for rounds 5 and 9–13 — now a prerequisite, not housekeeping
-
-Round 15 hit this gap twice. The permutation test could only use 30 of 44 entries, and **the headline
-CC_mask degradation count cannot be stated as a number at all** — round 13 published only its branch
-minimum, so 5 of its entries have no recorded Δ and the total is a range, 14–19 (#63).
-
-Since round 14 established that the degradation count *is* the evidence measure for a one-sided band,
-not being able to state it is a direct limit on every claim built on it.
-
-**Execute:** re-run rounds 5 and 9–13's entries through `bench_refinement_deltas_em.py`, now that
-`fetch_em_entries.py` can rebuild the cache. The entry lists survive in the audit trails even though
-the per-entry values do not.
+Round 15 (3.00–3.90 Å) degraded 4 of 8; round 16 (3.00–4.11 Å, coarser) degraded 1 of 9. A four-fold
+difference between adjacent windows means resolution sets the *magnitude* envelope but not the rate.
+The TSV now holds pre/post CC_mask, resolution and charge inventory for every entry from round 14 on,
+so candidate predictors can be tested without new refinements.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 
