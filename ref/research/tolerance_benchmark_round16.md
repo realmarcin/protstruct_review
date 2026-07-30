@@ -81,7 +81,7 @@ rounds 14–15 were unprocessable; this round should see roughly two.
 | 10ZU | 4.00 Å | +0.0196 | +0.04 % |
 | 5YKE | 4.11 Å | +0.0227 | −0.54 % |
 
-**CC_mask: 1 of 9 degraded, worst −0.0003. `d_FSC_model`: 4 of 9 degraded, worst +1.476 %.**
+**CC_mask: 1 of 9 degraded, and that one by −0.0003** — reproducible (see below) but 0.5 % of the band, so round 16 produced no CC_mask degradation of consequence. **`d_FSC_model`: 4 of 9 degraded, worst +1.476 %.**
 
 | # | Prediction | Outcome |
 |---|---|---|
@@ -117,9 +117,9 @@ tail was sampled thinly rather than being thin. Two of the six recorded degradat
 
 ## CC_mask degradation rate is not set by resolution
 
-Round 15 (3.00–3.90 Å) degraded CC_mask in **4 of 8** entries. Round 16 (3.00–4.11 Å), a *coarser*
-window, degraded **1 of 9**, and that one by −0.0003 — at the reporting precision. Two adjacent
-low-resolution rounds differ by a factor of four in rate.
+Round 15 (3.00–3.90 Å) degraded CC_mask in **4 of 8** entries, worst −0.0351. Round 16 (3.00–4.11 Å),
+a *coarser* window, degraded **1 of 9**, worst −0.0003 — a hundredfold smaller. Two adjacent
+low-resolution rounds differ four-fold in rate and by two orders of magnitude in severity.
 
 Whatever drives a null re-refinement to lose map-model correlation, it is not resolution alone. Round
 12 said resolution "bounds but does not predict" the excursion; this is the sharpest evidence yet for
@@ -142,6 +142,38 @@ split is post-hoc and the coarsest bin has n = 11.
 **This analysis was impossible yesterday.** It needed per-entry values across rounds, which existed
 only in prose for whichever entries an author found interesting. The TSV built in §0 paid for itself
 inside the round that created it.
+
+## The pipeline is deterministic, so no Δ is noise
+
+Round 16's single CC_mask degradation is 32FE at **−0.0003** — three units in the last reported
+place. Reviewing this round I flagged that as possibly indistinguishable from zero, and noted the
+larger gap behind it: **sixteen rounds have compared Δ values against bands without ever measuring
+the pipeline's own run-to-run repeatability** (#67). Round 14 recorded the concern in its scope
+limits and nobody acted on it.
+
+Measured rather than assumed:
+
+| Step | Repeat run |
+|---|---|
+| `map_correlations` on 32FE | 0.7947, 0.7947 — identical |
+| `real_space_refine` on 32FE, then re-measured | 0.7944 vs 0.7944 — **identical** |
+
+**The hypothesis was wrong in the useful direction.** A full 33-minute refinement re-run reproduces
+its CC_mask exactly at 4 dp, so 32FE's −0.0003 is a real, reproducible degradation rather than
+numerical noise — and by extension **no recorded Δ in this benchmark is noise**. The smallest values
+in the set (10SH +0.0001, 10SG −0.0019, 10FI −0.0026) are exact, not marginal.
+
+This *removes* a caveat instead of adding one: round 14's scope limit that entries near zero "are
+separated by less than the measurement's meaningful precision" is wrong and is withdrawn. The limit
+is the 4 dp of the reported value, not any noise floor beneath it.
+
+What remains true from the review is narrower and still worth fixing: **"1 of 9 degraded" invites a
+false comparison** with round 15's "4 of 8" when round 16's single degradation is a hundred times
+smaller. The rates are comparable; the rounds are not. Both are now quoted with their magnitudes.
+
+Scope: determinism is tested on **one entry, one repeat**. It is strong evidence — an exact match
+across a 33-minute optimisation is unlikely by chance — but a protocol with stochastic components on
+some other input class is not excluded.
 
 ## Attrition is 3 of 12, not ~17 %
 
