@@ -749,4 +749,98 @@ check("--max-per-pub sets the cap when a cluster limit is wanted deliberately",
 check("unpublished entries are independent, not merged",
       [e["pdb_id"] for e in unpub], ["DDDD", "EEEE"])
 
+
+# --- Round 16: per-entry results must survive the cache ---------------------------
+
+# Round 13 measured 6 entries, named 2, and wrote results only to a JSON in a
+# temporary cache. Clearing it destroyed the other 4 entries' IDENTITIES, not just
+# their values -- they cannot be re-run because nothing records what they were, so the
+# CC_mask degradation count is permanently a range. append_results() is the fix.
+_tsv_dir = Path(__import__("tempfile").mkdtemp())
+_tsv = _tsv_dir / "deltas.tsv"
+
+
+def _row(pid, delta, pct=None):
+    return {"pdb_id": pid, "resolution": 3.2, "cc_mask_pre": 0.80,
+            "cc_mask_post": round(0.80 + delta, 4), "cc_mask_delta": delta,
+            "d_fsc_model_pre": 3.0, "d_fsc_model_post": 3.1,
+            "d_fsc_model_delta_pct": pct}
+
+
+refem.append_results([_row("AAAA", -0.03, 1.5)], [], _tsv)
+_first = _tsv.read_text()
+check("a header is written once", _first.splitlines()[0].split("\t")[0], "pdb_id")
+check("the entry's delta is recorded", "-0.03" in _first, True)
+
+# A second run appends rather than truncating -- the whole point is cumulative history.
+refem.append_results([_row("BBBB", 0.01)], [{"pdb_id": "CCCC", "reason": "no restraints"}],
+                     _tsv)
+_second = _tsv.read_text()
+check("a later run appends instead of replacing", "AAAA" in _second and "BBBB" in _second, True)
+check("only one header line exists after two runs",
+      sum(1 for l in _second.splitlines() if l.startswith("pdb_id")), 1)
+check("a skipped entry is recorded with its reason, not omitted",
+      "CCCC\t\t\t\t\t\t\t\tskipped: no restraints" in _second, True)
+
+# Re-running an entry must not duplicate it: the benchmark caches and re-runs freely,
+# so without dedup the file would accumulate copies and inflate every count taken
+# from it -- the same failure mode as counting entries instead of degradations.
+refem.append_results([_row("AAAA", -0.03, 1.5), _row("DDDD", 0.02)], [], _tsv)
+_third = _tsv.read_text()
+check("an already-recorded entry is not duplicated",
+      sum(1 for l in _third.splitlines() if l.startswith("AAAA")), 1)
+check("while a genuinely new entry is still added", "DDDD" in _third, True)
+
+
+# --- Round 16: screen out charged models before downloading a 300 MB map ----------
+
+# cctbx's electron scattering table holds 98 NEUTRAL elements and no ions, so any
+# formal charge aborts map_correlations. 10EN and 10FL both died there; every entry
+# that processed cleanly carries no charges. PHENIX names only the anion, so anions
+# are the confirmed fatal case and cations are reported but not refused.
+# The model is built with gemmi's own API rather than hand-written: a minimal cif
+# string parses without error but yields zero atoms, which would make the screen look
+# like it passed when it never saw anything.
+def _screen(charge: int):
+    import gemmi
+    st = gemmi.Structure()
+    st.cell = gemmi.UnitCell(50, 50, 50, 90, 90, 90)
+    st.spacegroup_hm = "P 1"
+    model = gemmi.Model("1")
+    chain = gemmi.Chain("A")
+    residue = gemmi.Residue()
+    residue.name, residue.seqid = "ALA", gemmi.SeqId("1")
+    for name, element, chg in (("N", "N", charge), ("CA", "C", 0)):
+        atom = gemmi.Atom()
+        atom.name, atom.element = name, gemmi.Element(element)
+        atom.charge, atom.occ, atom.b_iso = chg, 1.0, 20.0
+        atom.pos = gemmi.Position(1.0, 2.0, 3.0)
+        residue.add_atom(atom)
+    chain.add_residue(residue)
+    model.add_chain(chain)
+    st.add_model(model)
+    st.setup_entities()
+    path = _tsv_dir / f"m_{charge}.cif"
+    st.make_mmcif_document().write_file(str(path))
+    return fetchem.charge_screen(path)
+
+
+_neutral_reason, _neutral_counts = _screen(0)
+_anion_reason, _anion_counts = _screen(-1)
+_cation_reason, _cation_counts = _screen(1)
+
+check("a neutral model passes the screen", _neutral_reason, None)
+check("and reports no charges", _neutral_counts, {})
+
+check("an anion is refused", _anion_reason is not None, True)
+check("and the refusal names the type and count",
+      _anion_reason, "formal charges absent from the electron scattering table: N1-×1")
+check("the inventory records it", _anion_counts, {"N1-": 1})
+
+# A cation alone is NOT refused: PHENIX named only the anion in both real failures, so
+# whether cations abort on their own is untested. Refusing them would discard entries
+# on an unverified rule, in a benchmark whose problem is too little evidence.
+check("a cation alone is reported, not refused", _cation_reason, None)
+check("but it is still recorded for a future round to test", _cation_counts, {"N1+": 1})
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

@@ -186,6 +186,48 @@ def fetch_model(pdb_id: str, cache: Path,
     return dest, None
 
 
+# PHENIX aborts `map_correlations` with "The model contains atoms which are not in the
+# scattering table 'electron'" on entries carrying formal charges. The mechanism is
+# read from cctbx rather than guessed: the electron table
+# (`cctbx.eltbx.e_scattering.ito_vol_c_2011_table_4_3_2_2_elements`) holds **98 neutral
+# elements and no ions at all** -- there is no O1-, N1+, or Fe3+ entry to find.
+#
+# Empirically 10EN and 10FL both failed here and both carry charges (10FL: 264 O1-,
+# 252 N1+), while every entry that processed cleanly carries none. PHENIX names only
+# the ANION in its message, so anions are the confirmed fatal case; whether cations
+# alone would abort is untested, and this screen therefore refuses on a negative
+# charge and merely reports positive ones.
+#
+# Screening happens before the map download because a map is 200-300 MB and the model
+# is ~1 MB: the whole cost of this failure is avoidable.
+def charge_screen(model: Path) -> tuple[str | None, dict[str, int]]:
+    """(refusal reason, charge inventory) for a model, via gemmi.
+
+    Returns (None, inventory) when the model is usable. The inventory is returned
+    either way so a caller can record what was seen rather than only what was fatal.
+    """
+    try:
+        import gemmi
+        structure = gemmi.read_structure(str(model))
+    except Exception as exc:                     # unreadable model: not a charge problem
+        return None, {"unreadable": 1, "error": str(exc)[:40]}
+    counts: dict[str, int] = {}
+    for mdl in structure:
+        for chain in mdl:
+            for residue in chain:
+                for atom in residue:
+                    if atom.charge:
+                        sign = "+" if atom.charge > 0 else "-"
+                        key = f"{atom.element.name}{abs(atom.charge)}{sign}"
+                        counts[key] = counts.get(key, 0) + 1
+    anions = {k: v for k, v in counts.items() if k.endswith("-")}
+    if anions:
+        named = ", ".join(f"{k}×{v}" for k, v in sorted(anions.items()))
+        return (f"formal charges absent from the electron scattering table: {named}",
+                counts)
+    return None, counts
+
+
 def fetch_map(pdb_id: str, accession: str, cache: Path,
               max_map_mb: float) -> tuple[Path | None, str | None]:
     """Download and decompress the primary EMDB map. Returns (path, skip_reason)."""
@@ -259,6 +301,13 @@ def collect(pdb_ids: list[str], cache: Path, max_map_mb: float, max_model_mb: fl
             skipped.append({"pdb_id": pdb_id, "reason": reason})
             print(f"  ! {reason}", file=sys.stderr)
             continue
+        charge_reason, charges = charge_screen(model)
+        if charge_reason is not None:
+            skipped.append({"pdb_id": pdb_id, "reason": charge_reason,
+                            "charges": charges})
+            print(f"  ! {charge_reason}", file=sys.stderr)
+            model.unlink(missing_ok=True)
+            continue
         map_file, reason = fetch_map(pdb_id, accession, cache, max_map_mb)
         if map_file is None:
             skipped.append({"pdb_id": pdb_id, "reason": reason})
@@ -266,7 +315,8 @@ def collect(pdb_ids: list[str], cache: Path, max_map_mb: float, max_model_mb: fl
             continue
         pub_counts[pub_key] = pub_counts.get(pub_key, 0) + 1
         entries.append({"pdb_id": pdb_id, "resolution": resolution,
-                        "emdb": f"EMD-{accession}", "publication": pub_key})
+                        "emdb": f"EMD-{accession}", "publication": pub_key,
+                        "charges": charges or None})
         print(f"  {resolution} Å, EMD-{accession}, "
               f"{map_file.stat().st_size / 1e6:.0f} MB", file=sys.stderr)
     return entries, skipped

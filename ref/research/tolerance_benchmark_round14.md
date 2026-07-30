@@ -206,9 +206,12 @@ low-resolution entries, not for deleting it.
   published in this repo. Rounds 13 and 14 report their own entries but the earlier rounds' per-entry
   values were lost with the hand-built cache — which is the reproducibility gap §0 closes going
   forward, not retroactively.
-- "Degradation" here means Δ < 0 at the precision published (4 dp). Entries at exactly 0.0000 and
+- "Degradation" here means Δ < 0 at the precision published (4 dp). ~~Entries at exactly 0.0000 and
   entries at −0.0001 are separated by less than the measurement's meaningful precision, so the share
-  is approximate near zero; 10SH (+0.0001) and 10SG (−0.0019) illustrate the boundary.
+  is approximate near zero~~ — **withdrawn in round 16**: the pipeline was measured and is
+  deterministic (`real_space_refine` re-run on 32FE reproduced its CC_mask exactly at 4 dp), so a
+  −0.0001 is exact and distinguishable from 0.0000. The share is not approximate near zero. This
+  caveat had stood unexamined for two rounds; measuring it removed it rather than confirming it.
 - Entries whose ligands lack monomer-library restraints are skipped, so the set under-represents
   structures with novel ligands (11MR in this round). Supplying generated restraints would refine
   those entries under a different protocol than the rest, which is why they are dropped rather than
