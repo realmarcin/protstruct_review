@@ -12,6 +12,10 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| A selectively recorded history biases the priors built on it | 16 |
+| Prose in an audit trail is not a record | 16 |
+| Measuring a caveat can dissolve it | 16 |
+| Read the tool's data table, not its error message | 16 |
 | Register the prediction before the data | 15 |
 | The band you are watching is not necessarily the band at risk | 15 |
 | Fixing one instance of a failure class and leaving its siblings hides the class | 15 |
@@ -47,6 +51,38 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 16 adds the rule with the widest reach, because it is about the record rather than any
+measurement: **a selectively recorded history biases the priors built on it, not just the counts.**
+Round 16 registered P2 — that the `d_FSC_model` 5 % band would hold — at "nearer 60 % than 90 %",
+reasoning from the three degradation magnitudes then on record, 2 of 3 above 4 %. With every value
+recorded the distribution is 1 of 6 above 4 %, median 0.240 %. The old sample contained the alarming
+values *because* those were the ones worth writing down, so the risk looked four times larger than it
+was. Round 14's counting rule says an entry count overstates evidence; this says a *partial* record
+distorts probability, which is worse, because a count that is too big is visibly too big and a prior
+that is too pessimistic is invisible.
+
+Its cause is the second lesson: **prose in an audit trail is not a record.** Round 13 measured six
+entries and named two. The other four cannot be re-run because nothing anywhere records what they
+were — their *identities* were lost with a temporary cache, so the CC_mask degradation count is
+permanently a range. An audit trail names the entries its author found interesting, which is exactly
+the subset that cannot be used to recount anything. Per-entry values now go to
+`ref/research/data/em_refinement_deltas.tsv` on every run, with the unrecoverable entries listed as
+`LOST` rows: a gap that is visible can still bound a claim.
+
+Round 16's third is round 9's rule turned on this repo's own hedging: **measuring a caveat can
+dissolve it.** Round 14 recorded that Δ values near zero were "separated by less than the
+measurement's meaningful precision" and it stood unexamined for two rounds, quietly making every
+small degradation unclassifiable. Re-running a 33-minute `real_space_refine` showed the pipeline
+reproduces CC_mask *exactly* at 4 dp — so there is no noise floor, no recorded Δ is an artefact, and
+the caveat was withdrawn rather than confirmed. A caveat is a claim; this file's own standard applies
+to it.
+
+And a small one with an outsized payoff: **read the tool's data table, not its error message.**
+PHENIX names only `O1-` when it aborts on an unsupported atom type, from which round 16 first
+inferred that `N1+` was accepted. `cctbx.eltbx.e_scattering` holds **98 neutral elements and no ions
+at all** — the error was naming one example, not the rule. Reading the table turned a recurring
+mid-run failure into a fetch-time screen that costs nothing.
 
 Round 15 adds the rule this file most needed, because it is about the *method* rather than any
 tolerance: **register the prediction before the data.** Round 14 had to label its own p-values as
