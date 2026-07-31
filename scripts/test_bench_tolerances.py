@@ -780,7 +780,21 @@ check("a later run appends instead of replacing", "AAAA" in _second and "BBBB" i
 check("only one header line exists after two runs",
       sum(1 for l in _second.splitlines() if l.startswith("pdb_id")), 1)
 check("a skipped entry is recorded with its reason, not omitted",
-      "CCCC\t\t\t\t\t\t\t\tskipped: no restraints" in _second, True)
+      "CCCC\t\t\t\t\t\t\t\t\tskipped: no restraints" in _second, True)
+
+# Round 17: the round label. Without it, a cross-round analysis has to reconstruct
+# which round measured what by matching prose in the audit trails against row order in
+# the TSV -- which is the same "prose is not a record" failure one level up.
+_r17 = _tsv_dir / "labelled.tsv"
+refem.append_results([_row("EEEE", -0.01)], [{"pdb_id": "FFFF", "reason": "ligand"}],
+                     _r17, "17")
+_labelled = _r17.read_text()
+check("the header carries the round column",
+      _labelled.splitlines()[0].split("\t")[1], "round")
+check("a measured row records which round measured it",
+      _labelled.splitlines()[1].split("\t")[1], "17")
+check("and so does a skipped one -- attrition is per-round evidence too",
+      _labelled.splitlines()[2].split("\t")[1], "17")
 
 # Re-running an entry must not duplicate it: the benchmark caches and re-runs freely,
 # so without dedup the file would accumulate copies and inflate every count taken

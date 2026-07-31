@@ -1,4 +1,4 @@
-# Lessons from fifteen rounds of tolerance benchmarking
+# Lessons from seventeen rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,10 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| Check the power before hunting the mechanism | 17 |
+| Registering a prediction does not protect you from registering a bad test | 17 |
+| Recoverability is an accident unless the script commits its input set | 17 |
+| A reimplementation must be validated against the tool it stands in for | 17 |
 | A selectively recorded history biases the priors built on it | 16 |
 | Prose in an audit trail is not a record | 16 |
 | Measuring a caveat can dissolve it | 16 |
@@ -51,6 +55,50 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 17 adds the rule that should run *before* any of the others about mechanisms: **check the power
+before hunting the mechanism.** The backlog asked why round 15 degraded CC_mask in 4 of 8 entries and
+round 16 in 1 of 9 — a four-fold rate difference across two adjacent windows. Registered as the gate
+on that item, **P0 asked whether the difference was real at all, and it is not: Fisher's exact test
+gives p = 0.131.** Holding those rates, the comparison first clears 0.05 at **20 entries per round**;
+rounds carry 8–9. The question was unanswerable before any predictor was chosen, and the two earlier
+mechanism hunts (round 7's coverage story, round 15's clustering story) were also launched at a
+phenomenon nobody had first shown to exist. The score for mechanism hunts here is **0 for 3**. When a
+round proposes to explain something, size the effect and the sample first; if the phenomenon is not
+established, the mechanism cannot be.
+
+Its companion is uncomfortable, because it is a limit on this file's own favourite rule:
+**registering a prediction does not protect you from registering a bad test.** Round 17's P2 —
+that CC_mask Δ correlates negatively with the starting CC_mask — was registered in advance and
+**held**, at ρ = −0.445, p = 0.026. It is still wrong. Correlating a *change* against its own
+*baseline* is negatively biased by construction, because the baseline sits on both sides of the
+comparison with opposite signs. Under Oldham's correction (change against the *mean* of the two
+measurements) it collapses to p = 0.18; ρ(post, Δ) is −0.05; and it fails leave-one-out. Registration
+stops you fitting a story to the data. It does nothing about a test that was the wrong test when you
+wrote it down — so state the test's known artefacts in the registration, where they can be checked
+against the result rather than invented after it.
+
+Round 17's audit of every `[benchmark]` row generalises round 16's record lesson one level up:
+**recoverability is an accident unless the script commits its input set.** Of 20 rows — not the 21
+carried in `NEXT_TASKS.md` since round 5, since CC_mask and `d_FSC_model` share one — eleven are
+fully backed, two are recoverable, and **seven quote a figure from a set that cannot be
+reconstructed** —
+not because anyone chose to record less, but because only four bench scripts hardcode the entries
+they ran on. The rest take `--ids-file <ids.json>` or glob an uncommitted cache, and no `ids.json` is
+committed anywhere in this repo. Where a row *is* recoverable it is because an author happened to
+paste a table into the audit trail. The most expensive instance is the two §4 X-ray bands: **+0.35 Å**
+and **−6 pp** are each set just above a null maximum (0.285 Å, 5.26 pp) produced by ~11
+low-resolution entries that are named nowhere. Round 16 fixed this for the EM benchmark's *values*;
+the *inputs* of every other benchmark are still in the position round 13's entries were in.
+
+And one about building tools rather than measuring with them: **a reimplementation must be validated
+against the tool it stands in for.** Round 17 moved the unparameterised-ligand skip off the expensive
+path by checking components against PHENIX's monomer libraries at fetch time — a reimplementation of
+what cctbx does at refinement. A file-existence check alone looked right and was not: DT, DA, DC and
+DG are in neither library under those names, so it flagged every DNA chain, reporting 1431 atoms on
+28JV where 38 had actually failed. Checked against `phenix.pdb_interpretation` over all 37 cached
+models the corrected screen agrees exactly, including atom counts. A screen that silently drifts from
+the tool it replaces is worse than no screen, because it rejects entries that would have refined.
 
 Round 16 adds the rule with the widest reach, because it is about the record rather than any
 measurement: **a selectively recorded history biases the priors built on it, not just the counts.**

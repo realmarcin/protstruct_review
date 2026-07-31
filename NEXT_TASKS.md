@@ -3,13 +3,18 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-07-30** (round 16). No open GitHub issues, no open PRs. There is no CI in this
+**Last reconciled: 2026-07-30** (round 17). No open GitHub issues, no open PRs. There is no CI in this
 repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
 
 ## Where the tolerance work stands
 
-Sixteen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
-in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 found that
+Seventeen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every
+tolerance in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** — **20 rows, not
+the 21 quoted here since round 5** (CC_mask and `d_FSC_model` share one row). Round 17's audit found
+**7 of those 20 quote a figure from a set that can no longer be reconstructed**, and marked them
+`⚠ partial record`.
+
+Round 6 found that
 **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -32,12 +37,13 @@ resolution range and breached by null re-refinement once low-resolution entries 
 | 14 | [#60](https://github.com/realmarcin/protstruct_review/pull/60) (2026-07-27) | EM benchmark made reproducible; entry count shown not to be evidence; split kept |
 | 15 | [#62](https://github.com/realmarcin/protstruct_review/pull/62) (2026-07-28) | pre-registered low-resolution widening: P1–P4 confirmed, P5/P6 falsified, clustering withdrawn |
 | 16 | [#66](https://github.com/realmarcin/protstruct_review/pull/66) (2026-07-30) | per-entry record made durable; all 5 predictions held; `d_FSC_model` tail shown to be sampled thinly, not thin |
+| 17 | [#70](https://github.com/realmarcin/protstruct_review/pull/70) (2026-07-30) | rate question closed as underpowered; 10BU verified byte-identical; registry audited (7 rows marked partial); ligand screen moved to fetch time |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — sixteen rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — seventeen rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -51,61 +57,71 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
 - **Record every entry, not the interesting ones.** A partial history does not just lose evidence, it
   biases the priors built on what survives — and four entries counted in the published totals are now
   unidentifiable. `scripts/validate.sh` gates that each round leaves its lesson here.
+- **Check the power before hunting the mechanism.** Mechanism hunts are 0 for 3 here. Round 17's
+  gate showed the phenomenon it was asked to explain (4/8 vs 1/9) is p = 0.131 — the question needed
+  ~20 entries per arm and the rounds build 8.
+- **Registering a prediction does not protect you from registering a bad test.** Round 17's P2 held
+  as registered and was still wrong, because correlating a change against its own baseline is
+  negatively biased by construction. Name the test's artefacts *in* the registration.
 
 ## Open
 
-Round 16 targeted `d_FSC_model` at 1.045× headroom with 12 entries at 3.00–4.11 Å. **All five
-registered predictions held**, which is itself worth distrusting — three were near-certain, and the
-one I called risky (P2, the 5 % band holding) held for a reason that indicts how I set its
-probability.
+Round 17 executed all four items from the round-16 backlog. Two produced the answer asked for, and
+two produced a different answer than expected — the mechanism hunt found there was nothing to
+explain, and the 10BU re-run confirmed the entry while correcting the number.
 
-**Two items from the previous backlog are now closed.** The per-entry recovery item was
-**infeasible**: round 13 named 2 of its 6 entries, and the other 4 cannot be re-run because nothing
-records what they were. The count is permanently 15–20. The cause is fixed instead — every run now
-appends to `ref/research/data/em_refinement_deltas.tsv`, and it earned its keep inside the same round
-by enabling the first cross-round resolution analysis (ρ = +0.397, n = 44).
+**All four previous items are closed.** The `d_FSC_model` worst case is now **+4.786 %** (10BU,
+verified by a byte-identical re-run; the old +4.787 % was a backfill rounding artefact), the ligand
+skip is screened at fetch time, the registry has been audited, and the CC_mask rate question is
+closed as underpowered rather than answered.
 
-**Attrition is 6 of 31 (19 %) across rounds 14–16**, from exactly two causes. Charged models are now
-screened before the map download, at no cost; unparameterised ligands still cost a full download and
-a refinement attempt.
+**The CC_mask degradation *rate* item is retired, not deferred.** Fisher's exact on 4/8 vs 1/9 gives
+**p = 0.131**; the comparison needs **~20 entries per arm** and rounds build 8–9. Do not open it
+again without that sample size. Magnitude remains fittable and is where band work should go.
 
-### [ ] Audit the tolerance rows for magnitudes quoted from partial records
+### [ ] Commit the entry set each bench script runs on
 
-Round 16's sharpest finding generalises past the row that produced it. Any tolerance citing a "worst
-observed" without a denominator is suspect the same way P2's prior was: **the worst is always
-recorded, the typical often is not.** `ref/research/data/` now gives somewhere to put denominators.
+The round-17 audit found **7 of 20 `[benchmark]` rows quote a figure from a set that cannot be
+reconstructed**, and the cause is systemic: only `bench_t01_superposition.py`,
+`bench_t15_ss_agreement.py`, `bench_t16_bsa_vs_pisa.py` and `bench_t16_dockq_mapping.py` hardcode
+their entries. The rest take `--ids-file <ids.json>` or glob an uncommitted cache, and **no
+`ids.json` is committed anywhere in this repo.** Where a row survives, it survives because an author
+happened to paste a table into the audit trail.
 
-**Execute:** for each `[benchmark]` row, check whether the quoted extreme comes from a set whose other
-values were also written down. Where they were not, either recover them or mark the figure as
-drawn from a partial record.
+**Execute:** give every `bench_*.py` a hardcoded `DEFAULT_SET`, backfilled from the trail tables
+where those exist. That converts "recoverable by accident" into "recoverable by re-running", which is
+what `[benchmark]` provenance already claims. Where no table exists, the set is gone — record that
+rather than inventing one.
 
-### [ ] Re-run 10BU before treating +4.787 % as the number that sets the band
+### [ ] Recover the two rows marked recoverable
 
-10BU is still the only observation near the `d_FSC_model` 5 % band, at **six times the median** of
-the six recorded degradations, and round 16 did not come close to it (worst +1.476 %). One
-irreproducible outlier setting a tolerance is a failure mode this series has hit repeatedly.
+Cheap, and it removes two marks:
 
-Round 16 established the pipeline is deterministic, so a re-run should reproduce it exactly — which
-makes this cheap and makes a *non*-reproduction highly informative. **Unlike the historical worst
-cases, 10BU's inputs are still on disk.**
+- **Bond-angle RMSD** — no per-entry angle value was ever published, but the set is the same 17
+  models as bond-length RMSD and `bench_t05_restraint_library.py` already computes per-entry angle
+  figures into its `--json`. Re-run and publish the table.
+- **DockQ** — `DEFAULT_SET` is hardcoded and the mapping enumeration is deterministic, so the
+  un-printed mappings regenerate. The trail shows 6 of up to 8 per complex.
 
-### [ ] Screen unparameterised ligands at fetch time
+### [ ] Re-validate the §4 geometry row against the 37-entry set
 
-The charge screen took one attrition cause off the expensive path. The ligand cause — 3 of the 6
-skips across rounds 14–16 — still costs a model download, a map download and a `real_space_refine`
-attempt before failing. Residues absent from the CCP4 monomer library are checkable from the model
-alone, exactly as the charge case was.
+The geometry Δ row says **19 entries**; the ΔRMSD row directly above it says **37**. They describe
+the same benchmark, so one was not re-validated when the set grew. Its quoted maxima (favored null
+max 5.26 pp, clashscore ratio max 4.26×) set band widths, so a stale denominator there is
+load-bearing. Note this row is also `⚠ partial record` — the ~11 low-resolution entries producing
+those maxima are named nowhere, so re-validation may mean re-measuring rather than recounting.
 
-### [ ] Find what drives the CC_mask degradation *rate*
+### [ ] Make fetch-stage attrition and the charge inventory durable
 
-Round 15 (3.00–3.90 Å) degraded 4 of 8, worst −0.0351. Round 16 (3.00–4.11 Å, coarser) degraded 1 of
-9, worst −0.0003 — a hundredfold smaller. Resolution sets the magnitude envelope
-(ρ = +0.397, n = 44) but plainly not the rate.
+`em_refinement_deltas.tsv` records attrition from the refinement stage onward. An entry rejected at
+fetch time — by the charge screen, the new ligand screen, or a size cap — is recorded only in the
+fetch run's JSON, inside a temporary cache. **10GJ, 10GK, 10GL and 10GM were found on disk in round
+14's cache carrying an unparameterised ligand and appear in no durable record at all.**
 
-**Execute:** the TSV now holds pre/post CC_mask, resolution and charge inventory for every entry from
-round 14 on, so candidate predictors can be tested with no new refinements. Register the prediction
-first — this is the third mechanism hunt in the series, and the previous two (round 7's coverage
-story, round 15's clustering story) were both wrong.
+The same applies to the charge inventory. Round 16 recorded a publication-clustering hypothesis for
+the `O1-` failures and noted the inventory was "stored on every kept entry so a future round can test
+it" — it is stored in `entries.json`, which does not survive the round. This is the round-13 failure
+in a new place: the *screens* now work, and their output is not being kept.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 
