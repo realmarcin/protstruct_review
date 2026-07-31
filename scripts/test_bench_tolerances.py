@@ -843,4 +843,86 @@ check("the inventory records it", _anion_counts, {"N1-": 1})
 check("a cation alone is reported, not refused", _cation_reason, None)
 check("but it is still recorded for a future round to test", _cation_counts, {"N1+": 1})
 
+# --- Round 17: the ligand screen moves that skip off the expensive path -------------
+
+# The three ligand skips in rounds 14-16 each cost a model download, a 200-300 MB map
+# download and a `real_space_refine` attempt before failing. Whether a component has
+# restraints is a property of the model alone, so the screen runs at fetch time.
+#
+# These are logic tests. The screen's *agreement with PHENIX* is not testable here --
+# it needs the monomer libraries and real entries -- and was established separately
+# against `phenix.pdb_interpretation` on 37 cached models with zero disagreements
+# (`ref/research/tolerance_benchmark_round17.md`).
+
+def _ligand_model(residue_name: str, n_atoms: int, hetero: bool = True):
+    """A one-residue model carrying `residue_name`."""
+    import gemmi
+    st = gemmi.Structure()
+    model, chain = gemmi.Model("1"), gemmi.Chain("A")
+    residue = gemmi.Residue()
+    residue.name = residue_name
+    residue.seqid = gemmi.SeqId("1")
+    residue.het_flag = "H" if hetero else "A"
+    for i in range(n_atoms):
+        atom = gemmi.Atom()
+        atom.name = f"C{i}"
+        atom.element = gemmi.Element("C")
+        atom.pos = gemmi.Position(float(i), 0.0, 0.0)
+        residue.add_atom(atom)
+    chain.add_residue(residue)
+    model.add_chain(chain)
+    st.add_model(model)
+    path = _tsv_dir / f"lig_{residue_name}.cif"
+    st.make_mmcif_document().write_file(str(path))
+    return fetchem.ligand_screen(path)
+
+
+if fetchem._monomer_libraries() is None:
+    print("SKIP  ligand screen: PHENIX monomer libraries not installed here")
+else:
+    check("a standard amino acid passes", _ligand_model("ALA", 5, hetero=False)[0], None)
+    # The regression that motivates using gemmi's residue table rather than file
+    # existence alone: DT, DA, DC and DG are in NEITHER library under those names, so a
+    # bare file check flags every DNA chain -- 1431 atoms on 28JV instead of the 38
+    # that actually failed.
+    check("a DNA residue passes despite being absent from both libraries",
+          _ligand_model("DT", 20, hetero=False)[0], None)
+    check("a library ligand passes", _ligand_model("ATP", 31)[0], None)
+
+    # The refusal case points the screen at empty stub libraries rather than picking a
+    # code that happens to be missing: GeoStd ships ~44 000 components, so almost any
+    # three-letter code exists, and a test keyed on one that does not would start
+    # failing the day PHENIX adds it.
+    _stub = Path(_tf.mkdtemp())
+    (_stub / "geostd").mkdir()
+    (_stub / "mon_lib").mkdir()
+    _real_libs = fetchem._monomer_libraries
+    fetchem._monomer_libraries = lambda: (_stub / "geostd", _stub / "mon_lib")
+    try:
+        _unk_reason, _unk_counts = _ligand_model("LIG", 7)
+        check("a component in neither library is refused", _unk_reason is not None, True)
+        check("and the refusal names the component and its atom count",
+              _unk_reason, "unparameterised ligand: 7 atoms with no monomer-library "
+                           "restraints (LIG×7)")
+        check("the inventory records what was missing", _unk_counts, {"LIG": 7})
+        # Standard residues are exempted by gemmi's table, not by the libraries, so
+        # they still pass when the libraries hold nothing at all.
+        check("a standard residue still passes with empty libraries",
+              _ligand_model("ALA", 5, hetero=False)[0], None)
+    finally:
+        fetchem._monomer_libraries = _real_libs
+
+    # A screen that cannot find the libraries must not refuse anything: dropping good
+    # entries silently is worse than the download it would have saved.
+    fetchem._monomer_libraries = lambda: None
+    try:
+        check("with no libraries installed the screen refuses nothing",
+              _ligand_model("LIG", 7)[0], None)
+    finally:
+        fetchem._monomer_libraries = _real_libs
+
+    check("a passing model reports an empty inventory",
+          _ligand_model("ATP", 31)[1], {})
+
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

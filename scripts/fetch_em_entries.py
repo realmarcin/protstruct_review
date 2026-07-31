@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
+import os
 import shutil
 import sys
 import urllib.error
@@ -228,6 +229,88 @@ def charge_screen(model: Path) -> tuple[str | None, dict[str, int]]:
     return None, counts
 
 
+# `real_space_refine` aborts on a residue it has no restraints for, reporting "Number
+# of atoms with unknown nonbonded energy type symbols: N". That was 3 of the 6 skips
+# across rounds 14-16, and unlike the charge case it cost a model download, a 200-300 MB
+# map download and a refinement attempt before failing -- all of it avoidable, because
+# whether a component has restraints is a property of the model alone.
+#
+# PHENIX resolves restraints from two libraries shipped under `chem_data`: GeoStd
+# (`geostd/<c>/data_<CODE>.cif`, ~44 000 components) and the CCP4 monomer library
+# (`mon_lib/<c>/<CODE>.cif`, ~220). A component in neither has no restraints.
+#
+# Standard polymer residues are exempted via gemmi's own residue table rather than a
+# hand-written list, because they are NOT in either library under their PDB names --
+# DT, DA, DC and DG are all absent, and cctbx resolves them through a separate
+# nucleic-acid path. Checking file existence alone therefore flags every DNA chain,
+# which on 28JV means 1431 atoms instead of the 38 that actually failed.
+#
+# VALIDATED AGAINST THE AUTHORITATIVE CODE PATH. This screen is a reimplementation, so
+# it was checked against `phenix.pdb_interpretation` -- the same cctbx interpretation
+# `real_space_refine` runs -- over all 37 cached models from rounds 14-16. The two
+# agree on every model, including the exact atom counts on the three known failures
+# (11MR 128, 10EG 195, 28JV 38) and on four never-benchmarked entries (10GJ/GK/GL/GM,
+# 23 each). Zero disagreements. Re-run that comparison if the screen is ever changed:
+# an in-repo reimplementation that silently drifts from the tool it stands in for is
+# worse than no screen, because it rejects entries that would have refined.
+CHEM_DATA_GLOB = "phenix-2.0-5936/lib/python3*/site-packages/chem_data"
+
+
+def _monomer_libraries() -> tuple[Path, Path] | None:
+    """(geostd, mon_lib) roots, or None if PHENIX is not installed here."""
+    root = Path(os.environ["PHENIX"]) if os.environ.get("PHENIX") else None
+    candidates = [root / "lib"] if root else []
+    for chem_data in list(Path.home().glob(CHEM_DATA_GLOB)) + candidates:
+        geostd, mon_lib = chem_data / "geostd", chem_data / "mon_lib"
+        if geostd.is_dir() and mon_lib.is_dir():
+            return geostd, mon_lib
+    return None
+
+
+def ligand_screen(model: Path) -> tuple[str | None, dict[str, int]]:
+    """(refusal reason, {component: atom count}) for components with no restraints.
+
+    Returns (None, {}) when the model is usable. When PHENIX's libraries cannot be
+    found the screen is **skipped rather than guessed** — refusing an entry on a
+    library that is not there would drop good entries silently.
+    """
+    libs = _monomer_libraries()
+    if libs is None:
+        return None, {}
+    geostd, mon_lib = libs
+    try:
+        import gemmi
+        structure = gemmi.read_structure(str(model))
+    except Exception:                 # unreadable model: not a restraint problem
+        return None, {}
+
+    def parameterised(code: str) -> bool:
+        code = code.strip().upper()
+        if not code:
+            return True
+        try:
+            info = gemmi.find_tabulated_residue(code)
+            if info is not None and info.is_standard():
+                return True
+        except Exception:
+            pass
+        bucket = code[0].lower()
+        return ((geostd / bucket / f"data_{code}.cif").exists()
+                or (mon_lib / bucket / f"{code}.cif").exists())
+
+    missing: dict[str, int] = {}
+    for chain in structure[0] if len(structure) else []:
+        for residue in chain:
+            if not parameterised(residue.name):
+                missing[residue.name] = missing.get(residue.name, 0) + len(residue)
+    if missing:
+        total = sum(missing.values())
+        named = ", ".join(f"{k}×{v}" for k, v in sorted(missing.items()))
+        return (f"unparameterised ligand: {total} atoms with no monomer-library "
+                f"restraints ({named})", missing)
+    return None, missing
+
+
 def fetch_map(pdb_id: str, accession: str, cache: Path,
               max_map_mb: float) -> tuple[Path | None, str | None]:
     """Download and decompress the primary EMDB map. Returns (path, skip_reason)."""
@@ -306,6 +389,13 @@ def collect(pdb_ids: list[str], cache: Path, max_map_mb: float, max_model_mb: fl
             skipped.append({"pdb_id": pdb_id, "reason": charge_reason,
                             "charges": charges})
             print(f"  ! {charge_reason}", file=sys.stderr)
+            model.unlink(missing_ok=True)
+            continue
+        ligand_reason, unparameterised = ligand_screen(model)
+        if ligand_reason is not None:
+            skipped.append({"pdb_id": pdb_id, "reason": ligand_reason,
+                            "unparameterised": unparameterised})
+            print(f"  ! {ligand_reason}", file=sys.stderr)
             model.unlink(missing_ok=True)
             continue
         map_file, reason = fetch_map(pdb_id, accession, cache, max_map_mb)
