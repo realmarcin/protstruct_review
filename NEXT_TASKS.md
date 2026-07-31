@@ -3,12 +3,12 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-07-29** (round 15). No open GitHub issues, no open PRs. There is no CI in this
+**Last reconciled: 2026-07-30** (round 16). No open GitHub issues, no open PRs. There is no CI in this
 repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
 
 ## Where the tolerance work stands
 
-Fifteen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
+Sixteen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every tolerance
 in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** (21 rows). Round 6 found that
 **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
@@ -31,13 +31,13 @@ resolution range and breached by null re-refinement once low-resolution entries 
 | 13 | [#56](https://github.com/realmarcin/protstruct_review/pull/56) (2026-07-27) | CC_mask `< 3.0 Å` breached and widened; `d_FSC_model` band corrected to one-sided |
 | 14 | [#60](https://github.com/realmarcin/protstruct_review/pull/60) (2026-07-27) | EM benchmark made reproducible; entry count shown not to be evidence; split kept |
 | 15 | [#62](https://github.com/realmarcin/protstruct_review/pull/62) (2026-07-28) | pre-registered low-resolution widening: P1–P4 confirmed, P5/P6 falsified, clustering withdrawn |
-| 16 | [#66](https://github.com/realmarcin/protstruct_review/pull/66) (2026-07-29) | per-entry record made durable; all 5 predictions held; `d_FSC_model` tail shown to be sampled thinly, not thin |
+| 16 | [#66](https://github.com/realmarcin/protstruct_review/pull/66) (2026-07-30) | per-entry record made durable; all 5 predictions held; `d_FSC_model` tail shown to be sampled thinly, not thin |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — fifteen rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — sixteen rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -48,6 +48,9 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
   improvement, so a round can raise every count in the tolerance row while strengthening nothing.
 - **Check the clause's direction and shape before sizing it.** Two rounds were spent widening a band
   that was the wrong shape, and one reported improvements as breaches.
+- **Record every entry, not the interesting ones.** A partial history does not just lose evidence, it
+  biases the priors built on what survives — and four entries counted in the published totals are now
+  unidentifiable. `scripts/validate.sh` gates that each round leaves its lesson here.
 
 ## Open
 
@@ -66,39 +69,43 @@ by enabling the first cross-round resolution analysis (ρ = +0.397, n = 44).
 screened before the map download, at no cost; unparameterised ligands still cost a full download and
 a refinement attempt.
 
-### [ ] A selectively recorded history biases priors, not just counts
+### [ ] Audit the tolerance rows for magnitudes quoted from partial records
 
-The sharpest finding of round 16, and it generalises past this repo. I set P2's probability from the
-three `d_FSC_model` magnitudes then on record — 2 of 3 above 4 % — and concluded the band was at
-real risk. With every value now recorded, **1 of 6 is above 4 %, median 0.240 %**. The old sample
-contained the alarming values *because* they were the ones worth writing down.
+Round 16's sharpest finding generalises past the row that produced it. Any tolerance citing a "worst
+observed" without a denominator is suspect the same way P2's prior was: **the worst is always
+recorded, the typical often is not.** `ref/research/data/` now gives somewhere to put denominators.
 
-**Execute:** audit the other tolerance rows for magnitudes quoted from partial records. Any row citing
-"worst observed" without a denominator is suspect in the same way — the worst is always recorded, the
-typical often is not. `ref/research/data/` now gives a place to put the denominators.
+**Execute:** for each `[benchmark]` row, check whether the quoted extreme comes from a set whose other
+values were also written down. Where they were not, either recover them or mark the figure as
+drawn from a partial record.
 
-### [ ] The `d_FSC_model` band is safer than 1.045× suggests, but the worst case is untouched
+### [ ] Re-run 10BU before treating +4.787 % as the number that sets the band
 
-10BU's +4.787 % still stands as the only observation near the 5 % band, and round 16 did not approach
-it (worst +1.476 %). So the band is not in imminent danger, but neither has anything been learned
-about *why* 10BU was six times the median.
+10BU is still the only observation near the `d_FSC_model` 5 % band, at **six times the median** of
+the six recorded degradations, and round 16 did not come close to it (worst +1.476 %). One
+irreproducible outlier setting a tolerance is a failure mode this series has hit repeatedly.
 
-**Execute:** re-run 10BU specifically and check whether +4.787 % reproduces, before treating it as
-the number that sets the band. One irreproducible outlier setting a tolerance is the failure mode this
-series has hit repeatedly — and unlike the historical worst cases, 10BU's inputs are still on disk.
+Round 16 established the pipeline is deterministic, so a re-run should reproduce it exactly — which
+makes this cheap and makes a *non*-reproduction highly informative. **Unlike the historical worst
+cases, 10BU's inputs are still on disk.**
 
 ### [ ] Screen unparameterised ligands at fetch time
 
-The charge screen removed one attrition cause from the expensive path. The ligand cause — 3 of the 6
-skips — still costs a model download, a map download and a `real_space_refine` attempt before failing.
-Residues absent from the CCP4 monomer library are checkable from the model alone.
+The charge screen took one attrition cause off the expensive path. The ligand cause — 3 of the 6
+skips across rounds 14–16 — still costs a model download, a map download and a `real_space_refine`
+attempt before failing. Residues absent from the CCP4 monomer library are checkable from the model
+alone, exactly as the charge case was.
 
-### [ ] CC_mask degradation rate is not resolution-driven — find what does drive it
+### [ ] Find what drives the CC_mask degradation *rate*
 
-Round 15 (3.00–3.90 Å) degraded 4 of 8; round 16 (3.00–4.11 Å, coarser) degraded 1 of 9. A four-fold
-difference between adjacent windows means resolution sets the *magnitude* envelope but not the rate.
-The TSV now holds pre/post CC_mask, resolution and charge inventory for every entry from round 14 on,
-so candidate predictors can be tested without new refinements.
+Round 15 (3.00–3.90 Å) degraded 4 of 8, worst −0.0351. Round 16 (3.00–4.11 Å, coarser) degraded 1 of
+9, worst −0.0003 — a hundredfold smaller. Resolution sets the magnitude envelope
+(ρ = +0.397, n = 44) but plainly not the rate.
+
+**Execute:** the TSV now holds pre/post CC_mask, resolution and charge inventory for every entry from
+round 14 on, so candidate predictors can be tested with no new refinements. Register the prediction
+first — this is the third mechanism hunt in the series, and the previous two (round 7's coverage
+story, round 15's clustering story) were both wrong.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

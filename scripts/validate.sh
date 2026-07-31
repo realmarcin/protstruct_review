@@ -155,3 +155,38 @@ fi
 if [[ "${QUIET}" == "0" ]]; then
   echo "published views in sync with ref/catalog.yaml"
 fi
+
+# Every benchmark round must leave its lesson in ref/research/lessons.md. Two
+# consecutive reconciliations found rounds 14-15 and then round 16 missing from it:
+# the lesson gets written into the round's own audit trail, where nothing later reads
+# it, and the round closes. That is a process gap, not an oversight, so it is checked
+# rather than remembered.
+if ! missing_lessons="$(python3 -c '
+import pathlib, re, sys
+
+repo = pathlib.Path(sys.argv[1])
+lessons = (repo / "ref/research/lessons.md").read_text()
+
+# The index rows end with the round(s) a lesson came from. That column is prose as
+# often as not -- "11, back-tested 13" -- so the round is matched as a token in the
+# final cell rather than as a whole cell, which would miss every multi-round entry.
+covered = set()
+for row in re.findall(r"^\|.*\|\s*$", lessons, re.M):
+    cells = [c.strip() for c in row.strip("|").split("|")]
+    if len(cells) >= 2:
+        covered.update(re.findall(r"\d+", cells[-1]))
+
+rounds = sorted(
+    (re.search(r"round(\d+)", p.name).group(1)
+     for p in (repo / "ref/research").glob("tolerance_benchmark_round*.md")),
+    key=int)
+print(" ".join(r for r in rounds if r not in covered))
+' "${REPO_ROOT}")"; then
+  fail "could not check lessons coverage"
+fi
+if [[ -n "${missing_lessons// /}" ]]; then
+  fail "ref/research/lessons.md has no index entry for round(s): ${missing_lessons}"
+fi
+if [[ "${QUIET}" == "0" ]]; then
+  echo "every benchmark round is represented in ref/research/lessons.md"
+fi
