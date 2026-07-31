@@ -161,6 +161,11 @@ fi
 # the lesson gets written into the round's own audit trail, where nothing later reads
 # it, and the round closes. That is a process gap, not an oversight, so it is checked
 # rather than remembered.
+#
+# This checks REPRESENTATION, not completeness -- a round that yielded four lessons
+# and recorded one still passes. There is no ground truth for how many lessons a round
+# should have produced, so representation is the strongest mechanisable check; do not
+# read a pass as "no lesson was lost".
 if ! missing_lessons="$(python3 -c '
 import pathlib, re, sys
 
