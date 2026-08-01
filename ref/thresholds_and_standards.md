@@ -23,10 +23,12 @@ external standards — change them only when the standard does, and update the c
 magnitude was observed rather than inferred.
 
 > **⚠ partial record.** Round 17 audited all `[benchmark]` rows for one defect: an extreme quoted
-> from a set whose *other* values were never written down. **This table holds 20 such rows, not the
-> 21 long quoted elsewhere** — CC_mask and `d_FSC_model` share the single "Map-model fit did not
-> degrade" row. **13 are fully backed and 7 are marked `⚠ partial record` below** (that last row
-> carrying two separate partial figures, one per quantity).
+> from a set whose *other* values were never written down. §3 and §4 hold **21 tolerance rows, 20 of
+> them `[benchmark]`** — §4's *absolute geometry floors* row is `[literature]` and was never measured
+> here, so "every tolerance carries `[benchmark]`" was never quite true. Those 20 rows carry **21
+> benchmarked tolerances**, since the map-model row holds both CC_mask and `d_FSC_model`. Of the 20
+> rows: **13 are fully backed and 7 are marked `⚠ partial record` below**, the map-model row carrying
+> two separate partial figures, one per quantity.
 >
 > A marked figure is not wrong — it is unverifiable, and it cannot be recounted, re-medianed, or used
 > to set a prior. Round 16 learned why that matters: reasoning from the three `d_FSC_model`

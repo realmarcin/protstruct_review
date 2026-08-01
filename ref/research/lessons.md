@@ -1,4 +1,4 @@
-# Lessons from seventeen rounds of tolerance benchmarking
+# Lessons from eighteen rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -48,7 +48,9 @@ round 5 were breached by re-refining a deposited model against its own data, wit
 change at all.
 
 Carry the same suspicion into anything added next: a tolerance that has never been run is a
-hypothesis, and in this repo the hypothesis lost 21 times out of 21. Round 6 adds a corollary —
+hypothesis, and in this repo the hypothesis lost 21 times out of 21 — that 21 is the count of
+benchmarked *tolerances*, which is one more than the 20 `[benchmark]` *rows* because the map-model
+row carries both CC_mask and `d_FSC_model`. Round 6 adds a corollary —
 **a "blocked" item is also a hypothesis**. Two of the three blockers dissolved on re-examination:
 `reduce2` reports flips once `add_flip_movers=True` is passed (it defaults off), and the §4
 false-negative side was testable all along by damaging models rather than refining them.
@@ -116,9 +118,9 @@ wrote it down — so state the test's known artefacts in the registration, where
 against the result rather than invented after it.
 
 Round 17's audit of every `[benchmark]` row generalises round 16's record lesson one level up:
-**recoverability is an accident unless the script commits its input set.** Of 20 rows — not the 21
-carried in `NEXT_TASKS.md` since round 5, since CC_mask and `d_FSC_model` share one — eleven are
-fully backed, two are recoverable, and **seven quote a figure from a set that cannot be
+**recoverability is an accident unless the script commits its input set.** Of the 20 `[benchmark]`
+rows — §3 and §4 hold 21 tolerance rows, but §4's absolute geometry floors are `[literature]` — eleven
+were fully backed, two recoverable, and **seven quoted a figure from a set that cannot be
 reconstructed** —
 not because anyone chose to record less, but because only four bench scripts hardcode the entries
 they ran on. The rest take `--ids-file <ids.json>` or glob an uncommitted cache, and no `ids.json` is

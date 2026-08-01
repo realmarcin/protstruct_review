@@ -3,23 +3,30 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-07-31** (round 18). No open GitHub issues; PR
-[#69](https://github.com/realmarcin/protstruct_review/pull/69) open for this round. There is no CI in
-this repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
+**Last reconciled: 2026-07-31** (round 18). No open GitHub issues. PR
+[#69](https://github.com/realmarcin/protstruct_review/pull/69) is open and carries **both** rounds 17
+and 18 — round 18 is the fix for what round 17 found, and #69 had not merged in between. There is no
+CI in this repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
 
 ## Where the tolerance work stands
 
-Eighteen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every
-tolerance in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** — **20 rows, not
-the 21 quoted here since round 5** (CC_mask and `d_FSC_model` share one row). Round 17's audit found
-**7 of those 20 quote a figure from a set that can no longer be reconstructed**, and marked them
-`⚠ partial record`. Round 18 fixed the cause: **every `bench_*.py` now commits the set it ran on**,
-and `scripts/validate.sh` fails if one does not.
-
-Round 6 found that
-**two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
-then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
+Eighteen rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
+Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
+
+**Where the registry stands.** Round 17 audited every `[benchmark]` row and found **7 quote a figure
+from a set that can no longer be reconstructed**; they are marked `⚠ partial record`. Round 18 fixed
+the cause — **every `bench_*.py` now commits the set it ran on**, and `scripts/validate.sh` fails if
+one does not. **13 rows are fully backed.**
+
+**The counts, reconciled (round 18) — there are two different 21s and both are right.** §3 and §4
+hold **21 rows**, of which **20 carry `[benchmark]`**; the exception is §4's *absolute geometry
+floors*, which is `[literature]` and was never measured here. Those 20 rows carry **21 benchmarked
+tolerances**, because the map-model row holds two, CC_mask and `d_FSC_model`. So "21 rows" and "lost
+21 times out of 21" are both correct and count different things — and round 17's "20 rows, not 21"
+was itself a miscount, blaming the shared map-model row when the real exception is the `[literature]`
+floors row.
 
 | Round | PR | Settled |
 |---|---|---|
@@ -83,6 +90,25 @@ models, every published figure reproduced), **DockQ** was never partial at all a
 withdrawn. Fetch-stage attrition and the charge inventory are durable in
 `ref/research/data/em_fetch_attrition.tsv`. **The registry is 13 rows fully backed, 7 marked partial.**
 
+### [ ] Grow the EM set against the thinnest band — the work rounds 17–18 did not do
+
+**Rounds 17 and 18 added no entries to any benchmark.** They audited records, fixed the recording
+mechanism and verified one entry; all of that was worth doing and none of it tested a band. This item exists
+so the series does not drift into maintaining its records instead of testing its tolerances.
+
+`d_FSC_model` is still the thinnest margin in the file at **1.0448×**, and round 17 confirmed the
+single entry holding it up (10BU, +4.786 %, byte-identical on re-run). A verified worst case is not a
+safe one — it means the band has been *proved* to sit 4.5 % above a real observation.
+
+**Execute:** fetch and refine a fresh batch, excluding every prior entry. Target **3.0–3.5 Å**, which
+round 16 measured as carrying the largest *median* excursion (0.0232 over 18 entries) even though
+3.5–4.2 Å holds the largest single one. Both attrition causes are now screened at fetch time, so a
+batch should cost close to zero wasted refinements — and `em_fetch_attrition.tsv` will measure
+whether that is true rather than assuming it.
+
+Two standing rules apply. **Register the predictions first**, and **do not ask a rate question** —
+round 17 established that needs ~20 entries per arm. Magnitude is what re-fits a band.
+
 ### [ ] Re-measure the two §4 clauses that have been untested since round 7
 
 Round 18 diagnosed the "19 vs 37" discrepancy and it is not a stale count. The ΔRMSD row is correct;
@@ -97,9 +123,11 @@ the original 8. The "19 is really the `< 2.5 Å` branch" reading is ruled out �
 resolution-split.
 
 **Scope this honestly before running it.** Only **16 of the 37** entries are identifiable, so a run
-is a *new measurement on a smaller set*, not a re-validation. It would still be worth doing: 16 named
-entries beats 8, and either clause could have been breached at any point in eleven rounds. Report it
-as a new measurement with its own denominator, and do not restate the old figures as confirmed.
+is a *new measurement on a smaller set*, not a re-validation — 16 identified entries against a
+round-7 basis of 19 unidentified ones. The gain is identifiability, not size: whatever it reports can
+be re-derived, which is not true of either figure it would replace. Either clause could also have
+been breached at any point in eleven rounds and nobody would know. Report it with its own
+denominator, and do not restate the old figures as confirmed.
 
 ### [ ] Decide whether the four irrecoverable sets get re-measured or retired
 
@@ -113,6 +141,14 @@ them was the honest move; it is not a resolution. Each needs a decision:
 The L-test is the clearest candidate for the second: its **twin/no-twin call agreed 27/27** and that
 is the load-bearing half of the tolerance, so the unrecoverable part (median |Δ| 0.006, max 0.047)
 could be demoted to a caveat without weakening the gate.
+
+**The seventh marked row is not on that list and should not be reopened.** The EM map-model row
+(CC_mask 15–20, `d_FSC_model` 6 recorded magnitudes of 14) is marked partial for a *different*
+reason: its set **is** committed, in `em_refinement_deltas.tsv`. What is missing is rounds ≤13's
+per-entry values, and round 16 established recovery is **infeasible** — four entries' identities were
+destroyed with a temporary cache, so they cannot be re-run because nothing records what they were.
+That row's uncertainty is published as a range rather than a point, which is the best available
+state. Adding new entries strengthens it; nothing recovers the old ones.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 
@@ -165,3 +201,19 @@ could be demoted to a caveat without weakening the gate.
   a lower bound (14–19) — round 13 published only its branch minimum. Logged because the degradation
   count is now the headline evidence measure, so an unverifiable figure there is not an improvement on
   an inflated one.
+- **Rounds 17–18 self-corrections** *(no issue raised; recorded in the round trails and PR #69)*.
+  Three, all of the same family as #57/#59/#61/#63 — a published figure that did not survive being
+  checked:
+  - **`d_FSC_model`'s worst degradation is +4.786 %, not +4.787 %.** The old value came from
+    recomputing the ratio out of intermediates already rounded to 4 dp during round 16's backfill.
+    Logged because it is *the* number setting the thinnest band in the file, and it was not the
+    number the pipeline produces. Headroom 1.0445× → 1.0448×; no verdict changed.
+  - **Round 17's DockQ "partial record" mark was wrong**, and round 18 withdrew it. The audit
+    inferred unpublished mappings from a `limit=8` in the code; re-running showed the cap was never
+    reached. Logged because it retired an *audit finding* rather than a tolerance — the first time
+    this series over-reported a gap rather than under-reporting one.
+  - **Round 17's row-count correction was itself a miscount.** It reported "20 rows, not 21" and
+    blamed the shared map-model row; §3+§4 really do hold 21 rows, and the exception is the
+    `[literature]` absolute-floors row. Reconciled in round 18: **21 rows, 20 `[benchmark]`, 21
+    benchmarked tolerances.** Logged because the wrong explanation had already propagated into four
+    files before it was caught.

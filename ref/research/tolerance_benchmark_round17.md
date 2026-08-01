@@ -227,10 +227,22 @@ Round 16's finding — the worst case is always recorded, the typical often is n
 every `[benchmark]` row. For each: does the quoted extreme come from a set whose *other* values were
 also written down, and is the input set enumerated anywhere committed?
 
-**First, a count correction.** The registry holds **20** `[benchmark]` rows, not the **21** quoted in
-`NEXT_TASKS.md` since round 5. CC_mask and `d_FSC_model` are not separate rows — they share the
-single "Map-model fit did not degrade" row. The figure had been carried forward unchecked, which is
-a small instance of the thing being audited.
+**First, a count correction — itself corrected in round 18.** The registry's `[benchmark]` rows
+number **20**, against the **21** long quoted in `NEXT_TASKS.md`.
+
+*Round 17 attributed the gap to CC_mask and `d_FSC_model` sharing the "Map-model fit did not degrade"
+row. That is a true fact and the wrong explanation.* §3 and §4 hold **21 rows**, so that count was
+right all along; the false part was "every tolerance carries `[benchmark]`", because §4's *absolute
+geometry floors* row is `[literature]` (Chen 2010 / Williams 2018) and was never measured here.
+
+Round 18 reconciled all of it: **21 rows, 20 of them `[benchmark]`, carrying 21 benchmarked
+tolerances** — the shared map-model row is why the tolerance count exceeds the row count, and it is
+also why the long-standing "lost 21 times out of 21" is correct. Three numbers, all right, counting
+three different things.
+
+Left visible rather than quietly amended: an audit that miscounts while correcting a miscount is
+worth keeping in the record, and it is the same failure this round diagnosed elsewhere — a figure
+carried forward because it sounded settled.
 
 | Verdict | rows | Which |
 |---|---:|---|
