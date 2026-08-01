@@ -412,6 +412,62 @@ def collect(pdb_ids: list[str], cache: Path, max_map_mb: float, max_model_mb: fl
     return entries, skipped
 
 
+# Fetch-stage outcomes go to a committed TSV, for the reason round 16 gave for the
+# refinement-stage one: a result that exists only in a temporary cache is a result that
+# will be lost, and an unrecoverable identity is an unrecoverable piece of evidence.
+#
+# `em_refinement_deltas.tsv` records attrition from the refinement attempt onward. It
+# cannot record attrition that happens BEFORE that, which is now most of it -- both
+# screens deliberately reject entries before any refinement. Round 17 found four models
+# (10GJ, 10GK, 10GL, 10GM) sitting in round 14's cache carrying an unparameterised
+# ligand and appearing in no durable record at all.
+#
+# The charge inventory lands here too. Round 16 recorded a publication-clustering
+# hypothesis for the `O1-` failures and noted the inventory was "stored on every kept
+# entry so a future round can test it" -- it was stored in `entries.json`, inside the
+# cache, which does not survive the round. Storing what a screen saw is not the same as
+# keeping it.
+FETCH_RECORD = "ref/research/data/em_fetch_attrition.tsv"
+
+FETCH_HEADER = ("pdb_id\tround\tresolution\temdb\toutcome\tcharges\t"
+                "unparameterised\tpublication\n")
+
+
+def _cell(value: Any) -> str:
+    """One TSV cell: dicts as `k×n` pairs, empty for nothing, never a stray tab."""
+    if not value:
+        return ""
+    if isinstance(value, dict):
+        value = ", ".join(f"{k}×{v}" for k, v in sorted(value.items()))
+    return str(value).replace("\t", " ").replace("\n", " ")
+
+
+def append_fetch_record(entries: list[dict], skipped: list[dict], path: Path,
+                        round_label: str = "") -> None:
+    """Append this fetch run's outcomes — kept and rejected alike — deduplicated by id."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    existing = path.read_text() if path.exists() else ""
+    seen = {line.split("\t")[0] for line in existing.splitlines()[1:] if line.strip()}
+    lines = [] if existing else [FETCH_HEADER]
+    for e in entries:
+        if e["pdb_id"].upper() in seen:
+            continue
+        lines.append("\t".join([
+            e["pdb_id"].upper(), round_label, _cell(e.get("resolution")),
+            _cell(e.get("emdb")), "kept", _cell(e.get("charges")), "",
+            _cell(e.get("publication"))]) + "\n")
+    for s in skipped:
+        if s["pdb_id"].upper() in seen:
+            continue
+        lines.append("\t".join([
+            s["pdb_id"].upper(), round_label, "", "",
+            f"rejected: {_cell(s.get('reason'))}", _cell(s.get("charges")),
+            _cell(s.get("unparameterised")), ""]) + "\n")
+    if lines:
+        with path.open("a") as fh:
+            fh.writelines(lines)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--cache", required=True)
@@ -437,6 +493,11 @@ def main() -> int:
                          "default: clustering was tested and does not predict a "
                          "similar null delta, permutation p = 0.38)")
     ap.add_argument("--json", dest="json_out")
+    ap.add_argument("--round", default="",
+                    help="round label written to the fetch-attrition TSV")
+    ap.add_argument("--fetch-tsv", default=FETCH_RECORD,
+                    help="cumulative fetch-stage record, appended to and committed; "
+                         "empty string disables")
     args = ap.parse_args()
 
     exclude = {i.strip().upper() for i in args.exclude.split(",") if i.strip()}
@@ -469,6 +530,8 @@ def main() -> int:
         skipped.extend(miss)
 
     (cache / "entries.json").write_text(json.dumps(entries, indent=2) + "\n")
+    if args.fetch_tsv:
+        append_fetch_record(entries, skipped, Path(args.fetch_tsv), args.round)
     report = {"entries": entries, "skipped": skipped,
               "window": [args.min_res, args.max_res], "excluded": sorted(exclude),
               "n_publications": len({e["publication"] for e in entries})}

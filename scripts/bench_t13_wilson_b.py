@@ -256,6 +256,21 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+# The 24 datasets the Wilson B tolerance was measured on, committed in round 18.
+# Recovered from the per-entry table in `ref/research/tolerance_benchmark_wilson_b.md`,
+# which names all 24 with d_min, dB_cart, both estimators and both deltas.
+#
+# This is NOT the L-test set, despite both rows being measured with the same two tools:
+# that benchmark reports n = 27. The extra datasets are unnamed -- see
+# `bench_t13_l_test.py`.
+DEFAULT_SET = [
+    "9PLB", "9ZHM", "9PM1", "9HW2", "9PNX", "12LO", "9LLR", "9PLC", "37AP", "37AS",
+    "37BG", "32CR", "30IZ", "28JJ", "28SV", "28JK", "28SZ", "28SX", "31EG", "28SW",
+    "9PN7", "9HX9", "9RWI", "9PI0",
+]
+SET_IS_COMPLETE = True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
@@ -271,7 +286,9 @@ def main() -> int:
         payload = json.loads(Path(args.ids_file).read_text())
         ids += payload if isinstance(payload, list) else [i for v in payload.values() for i in v]
     if not ids:
-        ap.error("give PDB IDs or --ids-file")
+        ids = list(DEFAULT_SET)
+        print(f"using the committed benchmark set ({len(ids)} entries)",
+              file=sys.stderr)
 
     if args.screen:
         eligible = screen(ids)

@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| Confirm a suspected gap by running, not by reading | 18 |
+| An attrition rate needs its denominator, so record what passed | 18 |
 | Check the power before hunting the mechanism | 17 |
 | Registering a prediction does not protect you from registering a bad test | 17 |
 | Recoverability is an accident unless the script commits its input set | 17 |
@@ -55,6 +57,28 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 18 adds a correction to round 17's own audit, and it points the opposite way from everything
+else here: **confirm a suspected gap by running, not by reading.** The audit marked the DockQ row a
+partial record because the script's `plausible_mappings(..., limit=8)` could score eight mappings per
+complex while the trail showed six — so two looked computed and unpublished. Re-running on the
+now-committed set shows `limit` is a cap that was never reached: 4HHB has 4 plausible mappings and
+1BRS has 2, `n_mappings_scored` equals what was published in both, and every value reproduces
+exactly. The row is a full record and the mark is withdrawn. Inferring a gap from a bound in the
+*code* is the same error as inferring a distribution from a published *extreme* — reading an upper
+limit as a quantity. This series is well practised at doubting numbers; it should doubt its own
+suspicions on the same terms, and it was cheap to check.
+
+Round 18's second is about which half of a record to keep: **an attrition rate needs its denominator,
+so record what passed, not only what failed.** Fetch-stage rejections were landing in a JSON inside a
+temporary cache, so the two screens — which now reject most entries *before* any refinement — were
+producing evidence that did not survive the round. Recording only the rejections would have fixed
+half of it and left the rate unrecoverable, which is the numerator-without-denominator shape that
+round 16's biased prior already demonstrated. `em_fetch_attrition.tsv` records kept and rejected
+alike, with the charge and ligand inventories the screens actually saw. Six models found on disk in
+old caches are backfilled as `unrecorded` rather than as rejections: the screen verdicts on them were
+computed in round 18 and are not the reason they were dropped at the time, and writing a plausible
+reason into a record is how a record stops being one.
 
 Round 17 adds the rule that should run *before* any of the others about mechanisms: **check the power
 before hunting the mechanism.** The backlog asked why round 15 degraded CC_mask in 4 of 8 entries and

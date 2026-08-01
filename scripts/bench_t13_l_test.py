@@ -134,6 +134,25 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     }
 
 
+# INCOMPLETE: 5 of the 27 datasets, committed in round 18 as the most recoverable.
+#
+# This script has no id argument at all -- it reads whatever `xt_*.log` / `ct_*.log`
+# pairs a prior `bench_t13_wilson_b.py` run left in `--cache`. So its set was never
+# expressible, let alone recorded, and the trail tables only the 5 worst cases. The
+# other 22 are named nowhere.
+#
+# The set is NOT Wilson B's 24, even though the same two tools produce both rows: this
+# benchmark reports n = 27. At least three datasets are therefore unique to it and
+# cannot be identified even by cross-referencing the sibling benchmark.
+#
+# What IS reproducible: the twin/no-twin call agreed 27/27, and that is the load-bearing
+# half of the tolerance. What is not: the median |Δ| 0.006 and the max 0.047.
+PUBLISHED_N = 27
+KNOWN_IDS = ["9PLC", "30IZ", "9RWI", "12LO", "9LLR"]
+SET_IS_COMPLETE = False
+SET_SHORTFALL = "5 of 27 named -- only the worst cases were tabulated"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--cache", required=True,
@@ -142,6 +161,10 @@ def main() -> int:
     args = ap.parse_args()
 
     rows, skipped = collect(Path(args.cache))
+    if len(rows) != PUBLISHED_N:
+        print(f"WARNING: {len(rows)} datasets in this cache; the published tolerance "
+              f"used {PUBLISHED_N}. The set is unrecoverable ({SET_SHORTFALL}), so this "
+              f"run is a new measurement, not a reproduction.", file=sys.stderr)
     summary = summarize(rows)
     if args.json_out:
         Path(args.json_out).write_text(

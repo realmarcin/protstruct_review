@@ -324,6 +324,16 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     }
 
 
+# The 15 entries (1.20-2.92 A) the R offset was measured on, committed in round 18.
+# Recovered from the per-entry table in `ref/research/tolerance_benchmark_r_offset.md`,
+# which names all 15 with their gemmi and PHENIX R values.
+DEFAULT_SET = [
+    "29QD", "12LO", "29OL", "29OH", "30TW", "9LK0", "37AP", "36TD", "30IZ", "28JJ",
+    "11MQ", "24MR", "28SX", "11AF", "28SW",
+]
+SET_IS_COMPLETE = True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
@@ -339,7 +349,9 @@ def main() -> int:
         payload = json.loads(Path(args.ids_file).read_text())
         ids += payload if isinstance(payload, list) else [i for v in payload.values() for i in v]
     if not ids:
-        ap.error("give PDB IDs or --ids-file")
+        ids = list(DEFAULT_SET)
+        print(f"using the committed benchmark set ({len(ids)} entries)",
+              file=sys.stderr)
 
     if args.screen:
         eligible = screen(ids)

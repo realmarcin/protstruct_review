@@ -43,16 +43,33 @@ published only 9VAM's magnitude (+4.28 %), so the per-entry values behind that 8
 Prose in an audit trail is not a record. It names the entries the author found interesting, which is
 precisely the subset that cannot be used to recount anything.
 
-## What this file still does not record
+## `em_fetch_attrition.tsv`
 
-Round 17 found two gaps while using it, both the same shape as the one above:
+The other half of the same record, added in round 18 to close the two gaps round 17 found.
 
-- **Fetch-stage attrition is missing.** This file records entries that reached a refinement attempt.
-  An entry rejected at fetch time — by the charge screen, the ligand screen, or a size cap — is
-  recorded only in the fetch run's JSON, which lives in a temporary cache. Four models
-  (10GJ, 10GK, 10GL, 10GM) were found on disk in round 14's cache carrying an unparameterised ligand
-  and appear in no durable record at all.
-- **The charge inventory is not here.** `fetch_em_entries.py` stores it on each entry in
-  `entries.json`, in the same temporary cache. Round 16 recorded a publication-clustering hypothesis
-  for the `O1-` failures and noted the inventory was "stored on every kept entry so a future round
-  can test it" — it is not stored anywhere that survives the round.
+`em_refinement_deltas.tsv` records entries from the refinement attempt onward. That is now the
+smaller half of attrition: both screens deliberately reject entries **before** any refinement, so
+their rejections were landing only in the fetch run's `entries.json`, inside a temporary cache.
+`fetch_em_entries.py` now appends every fetch outcome here — kept and rejected alike — with the
+charge and ligand inventories the screens actually saw.
+
+| column | meaning |
+|---|---|
+| `outcome` | `kept`, `rejected: <reason>`, or `unrecorded: …` for the backfilled rows |
+| `charges` | what the charge screen saw, on kept entries too — not only on the fatal ones |
+| `unparameterised` | components with no monomer-library restraints, as `CODE×atoms` |
+
+**Why kept entries are recorded, not just rejections.** An attrition *rate* needs a denominator.
+Recording only failures gives the numerator and leaves the rate unrecoverable — the same shape as
+recording only the worst case and leaving the distribution unrecoverable.
+
+### The backfilled `unrecorded` rows
+
+Six models were found on disk in rounds 14's and 16's caches that appear in no record at all: they
+were downloaded and never benchmarked, and **nothing says why**. Four (10GJ, 10GK, 10GL, 10GM) carry
+an unparameterised ligand and would fail the round-18 screen; 10TP carries charges the screen
+refuses; 10UA passes both and has no visible reason to have been dropped.
+
+They are recorded as `unrecorded` rather than as rejections, because the screen verdicts above were
+computed in round 18 and are **not** the reason those entries were dropped at the time — the ligand
+screen did not exist yet. Writing a plausible reason into a record is how a record stops being one.

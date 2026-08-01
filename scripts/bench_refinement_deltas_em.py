@@ -296,6 +296,15 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
 
 RESULTS_TSV = "ref/research/data/em_refinement_deltas.tsv"
 
+# This benchmark's entry set is the TSV itself, not a hardcoded list. That is the
+# stronger form: the file is cumulative, it records the skips alongside the
+# measurements, and it carries the round each entry belongs to -- so "which entries did
+# this benchmark run on" is answerable per round rather than in aggregate. Declared here
+# because `scripts/validate.sh` requires every bench script to commit its set, and a
+# list duplicated from the TSV would be one more thing to drift.
+SET_RECORD = "ref/research/data/em_refinement_deltas.tsv"
+SET_IS_COMPLETE = False   # rounds <=13 are partly unrecoverable; see the LOST rows
+
 
 def append_results(rows: list[dict], skipped: list[dict], path: Path,
                    round_label: str = "") -> None:

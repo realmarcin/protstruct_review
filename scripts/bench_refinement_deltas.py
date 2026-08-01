@@ -309,6 +309,42 @@ def find_pairs(cache: Path, ids: list[str] | None) -> list[tuple[Path, Path]]:
     return pairs
 
 
+# INCOMPLETE: 16 of the 37 entries, committed in round 18 as the most recoverable.
+#
+# **This is the most expensive partial record in the repo.** Both §4 X-ray band widths
+# are set just above a null maximum that this set cannot reproduce:
+#
+#   ΔRMSD, d_min >= 2.5 A   band +0.35 A   set just above a null max of 0.285 A
+#   favored, d_min >= 2.5 A band -6 pp     set just above a null max of 5.26 pp
+#
+# Both maxima come from the ~11 low-resolution entries round 7 added, and rounds 7 and 8
+# publish only that bin's median and max -- no entry is named. They are not in the list
+# below and cannot be. Re-running this set reproduces the HIGH-resolution end of the
+# benchmark and neither of the two numbers that actually size the bands.
+#
+# Recovered from three places, none of them a record of the set:
+#   - the original 8, from the per-entry table in
+#     `ref/research/tolerance_benchmark_refinement_deltas.md`
+#   - 6 more at 1.45-1.98 A, from round 10's table
+#   - 2 singly-named outliers: 31LC (round 8, 0.172 A) and 43SK (round 11, 0.1011 A,
+#     the breach that widened the `< 2.5 A` band)
+#
+# `find_pairs()` globs whatever `<id>.pdb` + `<id>_g_obs.mtz` sit in `--cache`, which is
+# why the set was never pinned in the first place: the script's input was a directory
+# someone had populated by hand.
+DEFAULT_SET = [
+    # the original 8
+    "12LO", "37AP", "30TW", "30IZ", "24MR", "28SX", "28SW", "11AF",
+    # round 10, the high-resolution end (1.45-1.98 A)
+    "9LLR", "9LLN", "9LLO", "9LLP", "37AS", "32CR",
+    # named outliers
+    "31LC", "43SK",
+]
+SET_IS_COMPLETE = False
+SET_SHORTFALL = ("16 of 37 -- the ~11 low-resolution entries that produce BOTH quoted "
+                 "null maxima (0.285 A, 5.26 pp) are named nowhere")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
@@ -326,6 +362,12 @@ def main() -> int:
     pairs = find_pairs(cache, args.pdb_ids or None)
     if not pairs:
         raise SystemExit(f"no <id>.pdb + <id>_g_obs.mtz pairs found in {cache}")
+    if not args.pdb_ids:
+        # Globbing a cache is how the set was lost. Say what the published benchmark
+        # used, so a run over some other directory is not silently read as a reproduction.
+        print(f"WARNING: running whatever is in {cache} ({len(pairs)} pairs). The "
+              f"published benchmark used 37 entries, of which only {len(DEFAULT_SET)} "
+              f"are recoverable -- {SET_SHORTFALL}.", file=sys.stderr)
     work = Path(args.work) if args.work else cache / "refine"
 
     if args.detection_test:

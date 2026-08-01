@@ -939,4 +939,111 @@ else:
           _ligand_model("ATP", 31)[1], {})
 
 
+# --- Round 18: every benchmark commits the entry set it ran on ---------------------
+
+# The round-17 audit found 7 of the registry's 20 `[benchmark]` rows quoting a figure
+# from a set that could not be reconstructed, and the cause was systemic: the scripts
+# took their entries from an uncommitted `--ids-file` or globbed a cache. These pin the
+# recovered sets so a later edit cannot silently change what a tolerance was measured
+# on. `scripts/validate.sh` separately gates that a set is DECLARED at all.
+#
+# The counts are the published denominators. Where a set is short of its denominator the
+# script says so via SET_IS_COMPLETE = False, and that shortfall is asserted too --
+# an incomplete set quietly promoted to complete is exactly the failure being guarded.
+
+_SETS = {
+    #  script                        published n   recovered   complete
+    "bench_t05_bond_rmsd":          (17, 17, True),
+    "bench_t05_restraint_library":  (17, 17, True),
+    "bench_t05_clashscore_h":       (10, 10, True),
+    "bench_t06_r_offset":           (15, 15, True),
+    "bench_t13_wilson_b":           (24, 24, True),
+    "bench_t17_ordered_core":       (5, 5, True),
+    "bench_t14_flip_sets":          (17, 12, False),
+    "bench_vs_deposited":           (17, 11, False),
+    "bench_refinement_deltas":      (37, 16, False),
+}
+
+for _name, (_published, _recovered, _complete) in _SETS.items():
+    _mod = load(_name)
+    _set = _mod.DEFAULT_SET
+    check(f"{_name}: set has the recovered size", len(_set), _recovered)
+    check(f"{_name}: no duplicate ids", len(set(_set)), len(_set))
+    check(f"{_name}: completeness is declared honestly", _mod.SET_IS_COMPLETE, _complete)
+    if not _complete:
+        # A partial set must say how far short it falls, in the script, where whoever
+        # re-runs it will see it -- not only in an audit trail they may never open.
+        check(f"{_name}: shortfall is stated", bool(getattr(_mod, "SET_SHORTFALL", "")), True)
+        check(f"{_name}: shortfall names the denominator",
+              str(_published) in _mod.SET_SHORTFALL, True)
+
+# The L-test is the one benchmark whose set was never expressible: the script has no id
+# argument at all, it reads whatever logs a prior Wilson B run left behind. It records
+# what is known rather than pretending to a default.
+_lt = load("bench_t13_l_test")
+check("bench_t13_l_test: published denominator recorded", _lt.PUBLISHED_N, 27)
+check("bench_t13_l_test: only the 5 named datasets are claimed", len(_lt.KNOWN_IDS), 5)
+check("bench_t13_l_test: not claimed complete", _lt.SET_IS_COMPLETE, False)
+
+# Two benchmarks are documented as sharing one set. If that stops being true the
+# bond-angle row loses its only route to recovery, so it is asserted rather than trusted.
+check("bond-length and restraint-library share one set",
+      sorted(load("bench_t05_bond_rmsd").DEFAULT_SET),
+      sorted(load("bench_t05_restraint_library").DEFAULT_SET))
+
+# 9LK0 is in the flip-set benchmark and in neither sibling 17-model set. The audit found
+# this by hand; pinning it stops a future round "tidying" the sets into one list.
+check("the flip-set benchmark is not interchangeable with its siblings",
+      "9LK0" in load("bench_t14_flip_sets").DEFAULT_SET
+      and "9LK0" not in load("bench_t05_bond_rmsd").DEFAULT_SET, True)
+
+
+# --- Round 18: fetch-stage attrition must outlive the cache too --------------------
+
+# `em_refinement_deltas.tsv` records attrition from the refinement attempt onward, which
+# is now the smaller half: both screens reject entries BEFORE any refinement, so their
+# rejections were landing only in a JSON inside a temporary cache. Round 17 found four
+# models in round 14's cache carrying an unparameterised ligand and appearing in no
+# durable record at all.
+_fetch_tsv = _tsv_dir / "fetch.tsv"
+fetchem.append_fetch_record(
+    [{"pdb_id": "1AAA", "resolution": 3.2, "emdb": "EMD-1", "publication": "10.1/x",
+      "charges": {"N1+": 4}}],
+    [{"pdb_id": "2BBB", "reason": "unparameterised ligand: 38 atoms",
+      "unparameterised": {"VM6": 38}}],
+    _fetch_tsv, "18")
+_ft = _fetch_tsv.read_text()
+
+check("a kept entry is recorded, not only the rejected ones",
+      _ft.splitlines()[1].split("\t")[0], "1AAA")
+check("and its outcome says so", _ft.splitlines()[1].split("\t")[4], "kept")
+# The charge inventory is the specific thing round 16 said it was storing "so a future
+# round can test it" and then stored in a file that does not survive the round.
+check("the charge inventory survives the cache",
+      _ft.splitlines()[1].split("\t")[5], "N1+×4")
+check("a rejected entry keeps its reason",
+      _ft.splitlines()[2].split("\t")[4],
+      "rejected: unparameterised ligand: 38 atoms")
+check("and what the screen actually saw", _ft.splitlines()[2].split("\t")[6], "VM6×38")
+check("both rows carry the round", [l.split("\t")[1] for l in _ft.splitlines()[1:]],
+      ["18", "18"])
+
+# Same dedup contract as the refinement record: the fetcher is re-run freely, and
+# duplicate rows would inflate any attrition count taken from the file.
+fetchem.append_fetch_record([{"pdb_id": "1AAA", "resolution": 3.2}],
+                            [{"pdb_id": "3CCC", "reason": "map too large"}],
+                            _fetch_tsv, "18")
+_ft2 = _fetch_tsv.read_text()
+check("re-fetching an entry does not duplicate it",
+      sum(1 for l in _ft2.splitlines() if l.startswith("1AAA")), 1)
+check("while a new rejection is still added", "3CCC" in _ft2, True)
+check("only one header after two runs",
+      sum(1 for l in _ft2.splitlines() if l.startswith("pdb_id")), 1)
+
+# A reason containing a tab or newline would silently shift every later column.
+_cells = fetchem._cell("a\treason\nwith control chars")
+check("a reason cannot break the column layout",
+      "\t" not in _cells and "\n" not in _cells, True)
+
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
