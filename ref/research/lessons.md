@@ -13,6 +13,7 @@ maxims.
 | Rule | Round |
 |---|---|
 | Confirm a suspected gap by running, not by reading | 18 |
+| When the set grows, re-test every clause it backs | 18 |
 | An attrition rate needs its denominator, so record what passed | 18 |
 | Check the power before hunting the mechanism | 17 |
 | Registering a prediction does not protect you from registering a bad test | 17 |
@@ -69,7 +70,19 @@ exactly. The row is a full record and the mark is withdrawn. Inferring a gap fro
 limit as a quantity. This series is well practised at doubting numbers; it should doubt its own
 suspicions on the same terms, and it was cheap to check.
 
-Round 18's second is about which half of a record to keep: **an attrition rate needs its denominator,
+Round 18's second is about coverage when a benchmark grows: **when the set grows, re-test every
+clause it backs, not just the one you are working on.** Round 17 spotted that the §4 geometry row
+says 19 entries where the ΔRMSD row above it says 37 and could not tell which was stale. Tracing the
+*rounds* rather than the *rows* answered it: the ΔRMSD figure is right, and rounds 8, 10 and 11 grew
+the set 19 → 26 → 32 → 37 while re-testing **only the Cα-shift and favored clauses**. So the
+rotamer-outlier band and the 5× clashscore gate have not been checked since round 7, against a set
+that has since nearly doubled — and the tempting reading that "19" is really the `< 2.5 Å` branch is
+ruled out, because neither clause was ever resolution-split. What looked like a stale *count* is
+actually two *untested clauses*, which is a materially different claim. Each round naturally
+re-validates the band it is widening; the siblings sharing that set go quietly unchecked, and nothing
+in the file says how long it has been.
+
+Round 18's third is about which half of a record to keep: **an attrition rate needs its denominator,
 so record what passed, not only what failed.** Fetch-stage rejections were landing in a JSON inside a
 temporary cache, so the two screens — which now reject most entries *before* any refinement — were
 producing evidence that did not survive the round. Recording only the rejections would have fixed

@@ -3,17 +3,18 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-07-30** (round 17). No open GitHub issues; PR
+**Last reconciled: 2026-07-31** (round 18). No open GitHub issues; PR
 [#69](https://github.com/realmarcin/protstruct_review/pull/69) open for this round. There is no CI in
 this repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
 
 ## Where the tolerance work stands
 
-Seventeen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every
+Eighteen rounds of benchmarking have replaced inferred magnitudes with measured ones. **Every
 tolerance in `ref/thresholds_and_standards.md` carries `[benchmark]` provenance** — **20 rows, not
 the 21 quoted here since round 5** (CC_mask and `d_FSC_model` share one row). Round 17's audit found
 **7 of those 20 quote a figure from a set that can no longer be reconstructed**, and marked them
-`⚠ partial record`.
+`⚠ partial record`. Round 18 fixed the cause: **every `bench_*.py` now commits the set it ran on**,
+and `scripts/validate.sh` fails if one does not.
 
 Round 6 found that
 **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool. Round 7
@@ -39,12 +40,13 @@ resolution range and breached by null re-refinement once low-resolution entries 
 | 15 | [#62](https://github.com/realmarcin/protstruct_review/pull/62) (2026-07-28) | pre-registered low-resolution widening: P1–P4 confirmed, P5/P6 falsified, clustering withdrawn |
 | 16 | [#66](https://github.com/realmarcin/protstruct_review/pull/66) (2026-07-30) | per-entry record made durable; all 5 predictions held; `d_FSC_model` tail shown to be sampled thinly, not thin |
 | 17 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-30) | rate question closed as underpowered; 10BU verified byte-identical; registry audited (7 rows marked partial); ligand screen moved to fetch time |
+| 18 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-31) | every benchmark commits its set + gate; bond-angle recovered and DockQ mark withdrawn; fetch attrition made durable; §4 staleness diagnosed as two untested clauses |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — seventeen rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — eighteen rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -64,65 +66,53 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
 - **Registering a prediction does not protect you from registering a bad test.** Round 17's P2 held
   as registered and was still wrong, because correlating a change against its own baseline is
   negatively biased by construction. Name the test's artefacts *in* the registration.
+- **Confirm a suspected gap by running, not by reading.** Round 17 marked the DockQ row partial from
+  a `limit=8` in the code; re-running showed the cap was never reached and the record was complete.
+- **When the set grows, re-test every clause it backs.** Rounds 8/10/11 grew the §4 X-ray set
+  19 → 37 while re-testing only two of its four clauses; the other two have been untested since
+  round 7.
 
 ## Open
 
-Round 17 executed all four items from the round-16 backlog. Two produced the answer asked for, and
-two produced a different answer than expected — the mechanism hunt found there was nothing to
-explain, and the 10BU re-run confirmed the entry while correcting the number.
+Round 18 executed the whole round-17 backlog. Three items closed outright; the fourth turned out to
+be a bigger finding than a stale number and is re-opened in sharper form.
 
-**All four previous items are closed.** The `d_FSC_model` worst case is now **+4.786 %** (10BU,
-verified by a byte-identical re-run; the old +4.787 % was a backfill rounding artefact), the ligand
-skip is screened at fetch time, the registry has been audited, and the CC_mask rate question is
-closed as underpowered rather than answered.
+**Closed.** Every `bench_*.py` now commits its entry set, gated by `scripts/validate.sh`. Both rows
+marked "recoverable" were re-run: **bond-angle** was a real gap and is now a full record (all 17
+models, every published figure reproduced), **DockQ** was never partial at all and its mark is
+withdrawn. Fetch-stage attrition and the charge inventory are durable in
+`ref/research/data/em_fetch_attrition.tsv`. **The registry is 13 rows fully backed, 7 marked partial.**
 
-**The CC_mask degradation *rate* item is retired, not deferred.** Fisher's exact on 4/8 vs 1/9 gives
-**p = 0.131**; the comparison needs **~20 entries per arm** and rounds build 8–9. Do not open it
-again without that sample size. Magnitude remains fittable and is where band work should go.
+### [ ] Re-measure the two §4 clauses that have been untested since round 7
 
-### [ ] Commit the entry set each bench script runs on
+Round 18 diagnosed the "19 vs 37" discrepancy and it is not a stale count. The ΔRMSD row is correct;
+rounds 8, 10 and 11 grew the X-ray set 19 → 26 → 32 → 37 while re-testing **only** the Cα-shift and
+favored clauses. So:
 
-The round-17 audit found **7 of 20 `[benchmark]` rows quote a figure from a set that cannot be
-reconstructed**, and the cause is systemic: only `bench_t01_superposition.py`,
-`bench_t15_ss_agreement.py`, `bench_t16_bsa_vs_pisa.py` and `bench_t16_dockq_mapping.py` hardcode
-their entries. The rest take `--ids-file <ids.json>` or glob an uncommitted cache, and **no
-`ids.json` is committed anywhere in this repo.** Where a row survives, it survives because an author
-happened to paste a table into the audit trail.
+- `rotamer outliers_post ≤ outliers_pre + 4 pp` (quoted `0/19`, worst rise 3.60 pp)
+- the `clashscore_post / clashscore_pre ≥ 5×` gate (quoted max 4.26×, starting clashscore up to 17.2)
 
-**Execute:** give every `bench_*.py` a hardcoded `DEFAULT_SET`, backfilled from the trail tables
-where those exist. That converts "recoverable by accident" into "recoverable by re-running", which is
-what `[benchmark]` provenance already claims. Where no table exists, the set is gone — record that
-rather than inventing one.
+**have not been checked against the 18 entries added since round 7**, and both worst cases come from
+the original 8. The "19 is really the `< 2.5 Å` branch" reading is ruled out — neither clause was ever
+resolution-split.
 
-### [ ] Recover the two rows marked recoverable
+**Scope this honestly before running it.** Only **16 of the 37** entries are identifiable, so a run
+is a *new measurement on a smaller set*, not a re-validation. It would still be worth doing: 16 named
+entries beats 8, and either clause could have been breached at any point in eleven rounds. Report it
+as a new measurement with its own denominator, and do not restate the old figures as confirmed.
 
-Cheap, and it removes two marks:
+### [ ] Decide whether the four irrecoverable sets get re-measured or retired
 
-- **Bond-angle RMSD** — no per-entry angle value was ever published, but the set is the same 17
-  models as bond-length RMSD and `bench_t05_restraint_library.py` already computes per-entry angle
-  figures into its `--json`. Re-run and publish the table.
-- **DockQ** — `DEFAULT_SET` is hardcoded and the mapping enumeration is deterministic, so the
-  un-printed mappings regenerate. The trail shows 6 of up to 8 per complex.
+Four benchmarks are short of their published denominators and now say so in the script
+(`SET_IS_COMPLETE = False`): flip-sets 12/17, vs-deposited 11/17, X-ray §4 16/37, L-test 5/27. Marking
+them was the honest move; it is not a resolution. Each needs a decision:
 
-### [ ] Re-validate the §4 geometry row against the 37-entry set
+- **Re-measure** on a fresh, committed set and replace the figure — costly, but ends the ambiguity.
+- **Retire** the un-backed figure and quote only what the recoverable subset supports.
 
-The geometry Δ row says **19 entries**; the ΔRMSD row directly above it says **37**. They describe
-the same benchmark, so one was not re-validated when the set grew. Its quoted maxima (favored null
-max 5.26 pp, clashscore ratio max 4.26×) set band widths, so a stale denominator there is
-load-bearing. Note this row is also `⚠ partial record` — the ~11 low-resolution entries producing
-those maxima are named nowhere, so re-validation may mean re-measuring rather than recounting.
-
-### [ ] Make fetch-stage attrition and the charge inventory durable
-
-`em_refinement_deltas.tsv` records attrition from the refinement stage onward. An entry rejected at
-fetch time — by the charge screen, the new ligand screen, or a size cap — is recorded only in the
-fetch run's JSON, inside a temporary cache. **10GJ, 10GK, 10GL and 10GM were found on disk in round
-14's cache carrying an unparameterised ligand and appear in no durable record at all.**
-
-The same applies to the charge inventory. Round 16 recorded a publication-clustering hypothesis for
-the `O1-` failures and noted the inventory was "stored on every kept entry so a future round can test
-it" — it is stored in `entries.json`, which does not survive the round. This is the round-13 failure
-in a new place: the *screens* now work, and their output is not being kept.
+The L-test is the clearest candidate for the second: its **twin/no-twin call agreed 27/27** and that
+is the load-bearing half of the tolerance, so the unrecoverable part (median |Δ| 0.006, max 0.047)
+could be demoted to a caveat without weakening the gate.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

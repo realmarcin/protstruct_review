@@ -137,3 +137,45 @@ Round 16 argued per-entry *values* must be committed, because prose in a trail i
 The rule that covers both: **a benchmark's evidence must be re-derivable without asking anyone what
 they ran.** A committed set achieves that when re-running is cheap; a committed table of values is
 needed when it is not.
+
+## 3. The §4 "19 vs 37" discrepancy is real, and worse than a stale number
+
+Round 17 noticed the §4 geometry row says **19 entries** where the ΔRMSD row directly above says
+**37**, and flagged it as possible staleness. Traced round by round, it is staleness — of a specific
+and more awkward kind than a number left un-updated.
+
+| round | X-ray set | < 2.5 Å | ≥ 2.5 Å | what was re-tested |
+|---|---:|---:|---:|---|
+| 5/6 | 8 | — | — | the original single bands (rotamer max 3.60 pp, clashscore ratio 4.26× both originate here) |
+| 7 | **19** | 5 | 14 | all four clauses: RMSD 4/19, favored 6/19, rotamer 0/19, clashscore 0/19 |
+| 8 | 26 | — | — | **Cα shift and favored only** |
+| 10 | 32 | 14 | 18 | **Cα shift and favored only** |
+| 11 | **37** | **19** | 18 | **RMSD only** (43SK breached 0.10 Å → widened to 0.12 Å) |
+
+The ΔRMSD row is **correct**: 37 = 19 below 2.5 Å + 18 above, traceable through rounds 10 and 11.
+
+The tempting reading — that the geometry row's `19` is really the `< 2.5 Å` branch, which is also 19 —
+is **ruled out structurally**. The rotamer-outlier clause and the clashscore-ratio gate were never
+resolution-split; they are single global bands, so there is no `< 2.5 Å` branch for a 19 to denote.
+That 19 = 19 is a coincidence between round 7's *total* and round 11's *low-resolution subset*.
+
+So the finding is not a typo:
+
+> **`rotamer outliers_post ≤ outliers_pre + 4 pp` and the `5×` clashscore-ratio gate have not been
+> re-tested since round 7, while the set they are quoted against grew from 19 to 37.** Eighteen
+> entries — including every entry added at the high-resolution end — have never been checked against
+> either clause.
+
+Both quoted worst cases (3.60 pp, 4.26×) are older still: they come from the original 8-entry set.
+
+**Why this round does not simply re-run them.** The X-ray §4 set is one of the four that is
+irrecoverable — only **16 of 37** entries are identifiable (§1), and the ~21 unnamed include the
+low-resolution batch that produces the other clauses' quoted maxima. A re-run on the 16 would be a
+**new measurement on a smaller set**, not a re-validation of the published figures, and reporting it
+as the latter is precisely the error this arc has been unwinding. The row is marked with the
+diagnosis instead, and the re-measurement is left as a scoped backlog item.
+
+Worth noting what this says about the audit method: round 17 found the discrepancy by comparing two
+adjacent rows, and could not tell which was wrong. Tracing the *rounds* rather than the *rows*
+answered it in one pass — and turned "a count is stale" into "two clauses are untested", which is a
+materially different claim.
