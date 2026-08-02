@@ -221,6 +221,26 @@ a 200 MB map and a multi-hour refinement.
 > **17 CC_mask degradations among 58 recorded deltas** (17–22 including the five measured but never
 > written down).
 
+## Self-review findings, filed as issues
+
+Reviewing this PR's own diff turned up four defects, all introduced by round 19's edits and all fixed
+in the same PR ([#71](https://github.com/realmarcin/protstruct_review/issues/71)–[#74](https://github.com/realmarcin/protstruct_review/issues/74)):
+
+- **#71** the §4 map-model row quoted **two different set sizes** — the CC_mask half updated to 69,
+  the `d_FSC_model` half left at 53.
+- **#72** `ρ = +0.397 over 44 entries` was round-16 vintage and unlabelled, and a second `44` was
+  being used as a *live* denominator. Recomputed on the grown set: **ρ = +0.361, n = 58, p = 0.005** —
+  the correlation survives round 19's ten entries essentially unchanged, which is worth more than the
+  relabelling would have been.
+- **#73** round 14's premise-failure lesson still cited 10EH's +0.1268 when 10DP's +0.1476 now
+  supersedes it.
+- **#74** a doubled parenthetical left the counting argument unreadable.
+
+Three of the four are the same failure: **round 19 updated one instance of a figure and missed its
+siblings in the same row.** That is round 18's "when the set grows, re-test every clause it backs"
+applied to prose rather than to clauses — and it argues the §4 map-model row is now too long to edit
+safely by hand.
+
 ## Scope limits
 
 - **P4's falsification is two degradations, not a distribution.** This round produced only two

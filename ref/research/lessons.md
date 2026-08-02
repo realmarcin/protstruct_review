@@ -216,7 +216,7 @@ that is the evidence, and round 14 added 8 entries containing none of it. A roun
 every count in the tolerance row while strengthening nothing.
 
 Two corollaries, both found the hard way. First, the *premise* can fail: the benchmark asserts a
-deposited model sits at its optimum, but 10EH gained **+0.1268** on a null re-refinement — twice the
+deposited model sits at its optimum, but 10DP gained **+0.1476** on a null re-refinement (round 19; 10EH's +0.1268 in round 15 was the previous worst) — more than twice the
 width of the band measuring it — so Δ mixes refinement noise with deposition headroom. Second,
 **frequency and magnitude can point at opposite resolutions** (#61): degradation is more common below
 3.0 Å but 3–7× larger above it, and only magnitude re-fits a band. Getting that backwards inverted a
