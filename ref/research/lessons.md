@@ -1,4 +1,4 @@
-# Lessons from eighteen rounds of tolerance benchmarking
+# Lessons from nineteen rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| A reproduced extreme is binding, not disposable | 19 |
+| A prediction confirmed once describes the round that confirmed it | 19 |
 | Confirm a suspected gap by running, not by reading | 18 |
 | When the set grows, re-test every clause it backs | 18 |
 | An attrition rate needs its denominator, so record what passed | 18 |
@@ -60,6 +62,27 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 19 adds the rule that decides what to do with an inconvenient number: **a reproduced extreme is
+binding, not disposable.** `d_FSC_model`'s band exists for one entry — 10BU, +4.786 % — which now
+stands **3.24× above the next-largest degradation ever recorded and 30.6× the median**, and whose own
+3.0–3.5 Å window has since been sampled 22 times with a second-worst of +0.277 %, seventeen times
+smaller. Every instinct says outlier, drop it, tighten the band. **Round 17 had already re-run 10BU
+from a clean directory and got a byte-identical refined model**, so it is not an estimator artefact
+or a bad run: it is a real degradation that a tighter band would fail on immediately. Reproducibility
+is what converts an inconvenient observation from *suspect* into *binding*. The useful output is not
+a smaller band but a precisely located one — `× 1.05` sits 1.0448× above one verified extreme and
+~18× above everything else, and knowing that is worth more than pretending the extreme away.
+
+Its companion is about how long a confirmation lasts: **a prediction confirmed once describes the
+round that confirmed it.** Round 16 registered "the largest `d_FSC_model` degradation exceeds 1.1 %",
+confirmed it at +1.476 %, and concluded that the large-degradation tail **"was sampled thinly rather
+than being thin"**. Round 19 registered the identical threshold, sampled the same low-resolution
+regime with ten fresh entries from ten distinct publications, and **falsified it** — both degradations
+came in at +0.012 % and +0.277 %. Pooled, the answer is both halves at once: 2 of 8 recorded
+degradations exceed 1.1 %, so the tail was under-sampled *and* it is thin. This is the "a band is only
+as good as the last entry added to its set" rule applied to a *finding* rather than a tolerance — and
+the fix is the same, re-register rather than cite.
 
 Round 18 adds a correction to round 17's own audit, and it points the opposite way from everything
 else here: **confirm a suspected gap by running, not by reading.** The audit marked the DockQ row a
