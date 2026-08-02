@@ -62,3 +62,4 @@ UNKNOWN-R13-4	13								LOST: id never recorded
 10FL	16								skipped: atom type absent from the electron scattering table: O1-
 10FJ	16								skipped: atom type absent from the electron scattering table: O1-
 28JV	16								skipped: unparameterised ligand: 38 atoms with unknown nonbonded energy types (no monomer-library restraints)
+10DP	19	3.25	0.7554	0.903	0.1476	2.973699056249323	2.962862805031874	-0.363	measured

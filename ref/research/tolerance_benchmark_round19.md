@@ -75,6 +75,43 @@ not cover what it claims to — which is more useful than another entry.
 fresh, independently drawn set lands in the same range, the bin describes the quantity; if not, it
 described that set. The interval is fixed here, before the draw.
 
+## The fetch, and the canary
+
+**13 entries attempted, 10 kept.** Three were rejected at fetch time, none of them expensively:
+
+| entry | rejected for | cost |
+|---|---|---|
+| 3JAH | model 26 MB exceeds `--max-model-mb 8` | one model download |
+| 6JHS | map 415 MB exceeds `--max-map-mb 300` | one map download |
+| 10TQ | **formal charges** absent from the electron scattering table (`O1-×36`) | one model download |
+
+10TQ is the round-16/18 screen working on live data: it would previously have cost a 200–300 MB map
+download and a `real_space_refine` attempt before failing. The ligand screen rejected nothing this
+round. All 13 outcomes — the 10 kept as well as the 3 rejected — are recorded in
+`ref/research/data/em_fetch_attrition.tsv`, with the charge inventory that produced the refusal.
+
+The 10 kept entries span **3.05–3.45 Å**, come from **10 distinct publications**, and overlap no
+prior entry.
+
+### Canary
+
+One entry (10DP, the smallest map at 16 MB) was run **end to end through the same script, the same
+cache and the same committed TSV** before the other nine were launched. Verified on side effects
+rather than exit code:
+
+| check | result |
+|---|---|
+| benchmark JSON holds a complete row | ✅ CC_mask 0.7554 → 0.9030, `d_FSC_model` −0.363 % |
+| committed TSV grew by exactly one row | ✅ `+1 insertion`, no duplicate |
+| that row's values are non-empty | ✅ pre, post, Δ and both `d_FSC_model` values written |
+| the `--round 19` label was written | ✅ |
+| the refined model is on disk and non-empty | ✅ 2 087 961 bytes |
+
+**What the canary did not exercise**, and is therefore still unverified going into the batch: the
+larger maps (131–187 MB) under time and memory pressure, and both refinement-stage failure paths —
+no entry in this set carries an unparameterised ligand or a charge, so P5 is tested by the batch, not
+by the canary.
+
 ## Not asked
 
 **No rate question.** Round 17 established that comparing per-round degradation *rates* needs ~20
