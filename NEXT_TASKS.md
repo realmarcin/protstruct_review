@@ -49,8 +49,8 @@ floors row.
 | 16 | [#66](https://github.com/realmarcin/protstruct_review/pull/66) (2026-07-30) | per-entry record made durable; all 5 predictions held; `d_FSC_model` tail shown to be sampled thinly, not thin |
 | 17 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-30) | rate question closed as underpowered; 10BU verified byte-identical; registry audited (7 rows marked partial); ligand screen moved to fetch time |
 | 18 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-31) | every benchmark commits its set + gate; bond-angle recovered and DockQ mark withdrawn; fetch attrition made durable; §4 staleness diagnosed as two untested clauses |
-| 20 | (2026-08-03) | the two §4 clauses untested since round 7 re-measured: both hold, both worst cases reproduce exactly; the clashscore ratio gate found undefined at `pre = 0` and given a low-end guard; `phenix.refine` shown deterministic 8/8 |
 | 19 | [#82](https://github.com/realmarcin/protstruct_review/pull/82) (2026-08-01) | EM set 59→69 named entries; all bands held; P4 falsified and round 16's tail reading corrected; 10BU located at 3.24× the next-largest; zero refinement-stage attrition |
+| 20 | [#86](https://github.com/realmarcin/protstruct_review/pull/86) (2026-08-02) | the two §4 clauses untested since round 7 re-measured: both hold, both worst cases reproduce exactly; the clashscore ratio gate found undefined at `pre = 0` and given a low-end guard; `phenix.refine` shown deterministic 8/8 |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -96,8 +96,8 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
 identifiable entries: the rotamer `+4 pp` band and the 5× clashscore gate both hold, and both
 published worst cases (28SW +3.60 pp, 30TW 4.26×) reproduce exactly and are not exceeded by the 8
 entries added since round 5. The clashscore gate gained a **low-end guard** — it is undefined at
-`clashscore_pre = 0`, and 9LLO is such an entry. `phenix.refine` was also shown deterministic, 8 of 8
-exact against round 5, so no §4 X-ray Δ is version-dependent. The ~21 unidentifiable entries remain
+`clashscore_pre = 0`, and 9LLO is such an entry. `phenix.refine` was also shown reproducible, 8 of 8
+exact against round 5 — though on the **same pinned binary**, so version-dependence stays untested. The ~21 unidentifiable entries remain
 unidentifiable, and the quoted "starting clashscore 17.2" is confirmed unreproducible.
 
 Round 19 executed the lead item — the first entries added to any benchmark since round 16. **The EM

@@ -71,7 +71,7 @@ carefully documents that it fails *above* `pre ≈ 20`, where damage drives clas
 it started at. It says nothing about the bottom. Round 20 found the limiting case on its first pass
 through the recoverable set: **9LLO starts at clashscore 0.00**, so the ratio is undefined and any
 clash at all reads as infinite degradation — on a model whose post-refinement clashscore is **0.67**,
-comfortably inside the registry's own ≤ 4 quality bar. Three of 16 entries trip the gate at a
+comfortably inside the registry's own ≤ 4 quality bar. Three of 16 entries are fragile enough to trip the gate at a
 post-clashscore within 2× that bar, and the fragility is **systematically high-resolution** (median
 starting clashscore 2.28 below 2.5 Å against 8.96 above), so the models the gate mis-serves are the
 good ones. A ratio is only meaningful over the range where its denominator is; when a quantity's

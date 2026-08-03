@@ -63,8 +63,8 @@ about the bottom.
 
 **P3 tests determinism on a different tool.** Rounds 16 and 17 established that
 `real_space_refine` reproduces byte-identically. `phenix.refine` is a different program on different
-data, and the round-5 values were produced by an older PHENIX. If P3 fails, every Δ in the §4 X-ray
-row is version-dependent, which would matter more than either clause.
+data. If P3 fails, every Δ in the §4 X-ray row is unreproducible, which would matter more than
+either clause.
 
 **P5 tests round 18's diagnosis** rather than a tolerance: it predicts the quoted "starting
 clashscores up to 17.2" is *not* reproducible from the recoverable set, because it came from an entry
@@ -125,8 +125,11 @@ It is not an isolated edge case. The trip point of a 5× ratio gate is `5 × pre
 | 30TW | 1.17 | 5.85 |
 | 12LO | 1.18 | 5.90 |
 
-**Three of 16 entries trip within 2× §2's quality bar of 4.** A model can sit near the absolute
-standard the registry itself sets and still be called degraded by the relative one.
+**One entry's ratio is undefined, and three have a trip point within 2× §2's quality bar of 4.**
+The distinction matters: only 9LLO is undefined. 30TW's ratio this round was 4.26× and 12LO's was 0×
+(it improved) — neither tripped anything. What the three share is *fragility*: a small absolute rise
+in clashes would trip the gate on a model still sitting near the absolute standard the registry
+itself sets.
 
 **And the fragility is systematically high-resolution**, which is the direction registered in P2:
 
@@ -157,14 +160,21 @@ reconstructed, but the half that can be is consistent with them.
 the highest in the recoverable 16 is **13.61**. That figure came from one of the ~21 entries whose
 identity was lost, exactly as round 18 inferred — and it therefore cannot be checked by anyone, ever.
 
-## `phenix.refine` is deterministic too
+## `phenix.refine` reproduces too — but not across a version change
 
 **All 8 of the original entries reproduce round 5's published values exactly** — Cα shift, clashscore,
-favored % and rotamer % — across roughly fifteen rounds and a PHENIX upgrade.
+favored % and rotamer % — roughly fifteen rounds later.
 
-Rounds 16 and 17 established determinism for `real_space_refine` on cryo-EM. This extends it to a
-**different program on different data**, and it retires a live risk: had P3 failed, every Δ in the §4
-X-ray row would have been version-dependent, which would have mattered more than either clause.
+Rounds 16 and 17 established this for `real_space_refine` on cryo-EM; it now holds for a **different
+program on different data**. It retires a live risk: had P3 failed, every Δ in the §4 X-ray row would
+have been unreproducible.
+
+**What it does not establish is version-independence, and an earlier draft of this section claimed it
+did** (#88). `bench_refinement_deltas.py` has hardcoded `phenix-2.0-5936` since round 5 created the
+file, and `git log` shows that line was added once and never changed — so round 5 and round 20 ran the
+**same binary**. What is tested is same-binary reproducibility across fifteen rounds of everything else
+changing, which rules out environmental drift and refinement non-determinism. **Whether a PHENIX
+upgrade would move these values is untested**, because the pin has never moved.
 
 ## A registration error, recorded rather than quietly fixed
 
@@ -187,6 +197,28 @@ checkable or it is decoration.
 > ratio is undefined at `clashscore_pre = 0` and 9LLO is such an entry.
 >
 > **Determinism now covers `phenix.refine`**, 8 of 8 exact.
+
+## Self-review findings, filed as issues
+
+Reviewing this PR's own diff found four defects, all fixed here
+([#87](https://github.com/realmarcin/protstruct_review/issues/87)–[#90](https://github.com/realmarcin/protstruct_review/issues/90)):
+
+- **#88 (high)** — the determinism result was written as holding "across a PHENIX upgrade". There was
+  no upgrade: `bench_refinement_deltas.py` has pinned `phenix-2.0-5936` since round 5 and the line has
+  been modified zero times. It is same-binary reproducibility, and version-dependence is **untested**.
+  The unearned version-independence conclusion had already reached the registry.
+- **#89 (medium-high)** — "three of 16 entries trip the gate" counted two entries (30TW at 4.26×,
+  12LO which *improved*) that did not trip. One ratio is undefined; three are fragile.
+- **#87 (medium)** — the "median starting clashscore" figures were not medians: 2.49 was the 7th of
+  12 sorted values and 11.27 the 3rd of 4. Correct: **2.28** and **8.96**. The claim survives with a
+  smaller effect.
+- **#90 (low)** — the round table row was out of order, unlinked and misdated.
+
+Two of the four (#88, #89) are the same failure: **stating a stronger version of a true result.** The
+refinement really does reproduce, and the gate really is undefined at zero — but "across a version
+upgrade" and "three entries tripped" were both reaches beyond what was run, and both had already been
+copied into the permanent registry row. This series is practised at doubting other people's numbers;
+these were its own, in the same PR that produced them.
 
 ## Scope limits
 
