@@ -81,8 +81,8 @@ here depended on a fix made three rounds earlier for an unrelated reason.
 Its companion is a genuine surprise: **publication bias can preserve the half that matters.**
 Everywhere else in this series, recording only the interesting cases destroyed the evidence and kept
 the anecdote — round 16's biased prior, round 17's unrecoverable identities. Here the two datasets
-that **breach** the ±0.02 band, 9PLC at 0.047 and 30IZ at 0.030, are both among the five an author
-happened to tabulate as "worst cases". For a band whose evidence *is* its breaches, selective
+that **breach** the ±0.02 band are named outright in the old trail — *"2 / 27 (30IZ +0.030,
+9PLC −0.047)"* — and all five datasets it tabulated reproduce to the published digit. For a band whose evidence *is* its breaches, selective
 recording kept exactly the observations the argument needs and lost only the denominator. That is
 luck, not method, and it does not soften the general rule — but it is worth knowing that *which* half
 a partial record keeps determines how badly it hurts.

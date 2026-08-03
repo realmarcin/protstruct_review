@@ -78,9 +78,23 @@ sample sizes deserve.
 
 This is the round's real finding, and it inverts the usual pattern.
 
-The two datasets that exceed ±0.02 are **9PLC (0.047)** and **30IZ (0.030)**. Both are among the
-**five** the old trail happened to name. So the historical "25/27 inside ±0.02" had **2 breaches, and
-both are recoverable** — the published maximum of 0.047 is 9PLC's, reproduced here to four decimals.
+The two datasets that exceed ±0.02 are **9PLC (−0.047)** and **30IZ (+0.030)**. This is not an
+inference from the maximum: `tolerance_benchmark_l_test.md` **names both explicitly** —
+*"exceeding ±0.02 | 2 / 27 (30IZ +0.030, 9PLC −0.047)"* — so the historical breach set is fully
+identified, and round 21 reproduces both to the published digit.
+
+In fact **all five** datasets the old trail tabulated reproduce exactly:
+
+| dataset | published Δ | round 21 Δ |
+|---|---:|---:|
+| 9PLC | −0.047 | **−0.0470** |
+| 30IZ | +0.030 | **+0.0300** |
+| 9RWI | −0.016 | **−0.0160** |
+| 12LO | −0.014 | **−0.0140** |
+| 9LLR | −0.013 | **−0.0130** |
+
+So the *overlap* between the old set and the new one is verified dataset by dataset, which is
+stronger than the aggregate agreement above: the two runs are measuring the same thing the same way.
 
 Everywhere else in this series, selective recording destroyed the evidence and kept the anecdote.
 Here it did the opposite: an author tabulating "the worst cases" preserved **exactly the observations
