@@ -132,8 +132,8 @@ standard the registry itself sets and still be called degraded by the relative o
 
 | regime | median starting clashscore |
 |---|---:|
-| `d_min < 2.5 Å` | **2.49** |
-| `d_min ≥ 2.5 Å` | **11.27** |
+| `d_min < 2.5 Å` (n = 12) | **2.28** |
+| `d_min ≥ 2.5 Å` (n = 4) | **8.96** |
 
 Well-ordered high-resolution models start near zero, so their ratios are the unstable ones — while
 the clause's only stated caveat concerns models starting above 20, i.e. the opposite end. **The gate

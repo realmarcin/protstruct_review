@@ -73,7 +73,7 @@ through the recoverable set: **9LLO starts at clashscore 0.00**, so the ratio is
 clash at all reads as infinite degradation — on a model whose post-refinement clashscore is **0.67**,
 comfortably inside the registry's own ≤ 4 quality bar. Three of 16 entries trip the gate at a
 post-clashscore within 2× that bar, and the fragility is **systematically high-resolution** (median
-starting clashscore 2.49 below 2.5 Å against 11.27 above), so the models the gate mis-serves are the
+starting clashscore 2.28 below 2.5 Å against 8.96 above), so the models the gate mis-serves are the
 good ones. A ratio is only meaningful over the range where its denominator is; when a quantity's
 floor is zero, the gate needs a floor too. Note the asymmetry that hid this: the clause was written
 from experience with *bad* models, and its author guarded the end they had seen.
