@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
+import os
 import shutil
 import sys
 import urllib.error
@@ -228,6 +229,108 @@ def charge_screen(model: Path) -> tuple[str | None, dict[str, int]]:
     return None, counts
 
 
+# `real_space_refine` aborts on a residue it has no restraints for, reporting "Number
+# of atoms with unknown nonbonded energy type symbols: N". That was 3 of the 6 skips
+# across rounds 14-16, and unlike the charge case it cost a model download, a 200-300 MB
+# map download and a refinement attempt before failing -- all of it avoidable, because
+# whether a component has restraints is a property of the model alone.
+#
+# PHENIX resolves restraints from two libraries shipped under `chem_data`: GeoStd
+# (`geostd/<c>/data_<CODE>.cif`, ~44 000 components) and the CCP4 monomer library
+# (`mon_lib/<c>/<CODE>.cif`, ~220). A component in neither has no restraints.
+#
+# Standard polymer residues are exempted via gemmi's own residue table rather than a
+# hand-written list, because they are NOT in either library under their PDB names --
+# DT, DA, DC and DG are all absent, and cctbx resolves them through a separate
+# nucleic-acid path. Checking file existence alone therefore flags every DNA chain,
+# which on 28JV means 1431 atoms instead of the 38 that actually failed.
+#
+# VALIDATED AGAINST THE AUTHORITATIVE CODE PATH. This screen is a reimplementation, so
+# it was checked against `phenix.pdb_interpretation` -- the same cctbx interpretation
+# `real_space_refine` runs -- over all 37 cached models from rounds 14-16. The two
+# agree on every model, including the exact atom counts on the three known failures
+# (11MR 128, 10EG 195, 28JV 38) and on four never-benchmarked entries (10GJ/GK/GL/GM,
+# 23 each). Zero disagreements. Re-run that comparison if the screen is ever changed:
+# an in-repo reimplementation that silently drifts from the tool it stands in for is
+# worse than no screen, because it rejects entries that would have refined.
+# Relative to a PHENIX install root. The Python minor version moves between
+# releases, so it is globbed rather than pinned.
+CHEM_DATA_REL = "lib/python3*/site-packages/chem_data"
+# Fallback when $PHENIX is unset: any phenix-* install under the home directory.
+CHEM_DATA_GLOB = f"phenix-*/{CHEM_DATA_REL}"
+
+
+def _monomer_libraries() -> tuple[Path, Path] | None:
+    """(geostd, mon_lib) roots, or None if PHENIX's libraries cannot be found.
+
+    `$PHENIX` is honoured first so a non-default install works. It has to be
+    globbed to the same depth as the home fallback -- an earlier version tested
+    `$PHENIX/lib`, which never matches, so the variable silently did nothing and
+    the only working lookup was a single hardcoded version in one home directory.
+    On any other install the screen then disabled itself without saying so, which
+    puts the ligand failures back on the expensive path (#75).
+    """
+    roots = []
+    if os.environ.get("PHENIX"):
+        roots += sorted(Path(os.environ["PHENIX"]).glob(CHEM_DATA_REL))
+    roots += sorted(Path.home().glob(CHEM_DATA_GLOB))
+    for chem_data in roots:
+        geostd, mon_lib = chem_data / "geostd", chem_data / "mon_lib"
+        if geostd.is_dir() and mon_lib.is_dir():
+            return geostd, mon_lib
+    return None
+
+
+def ligand_screen(model: Path) -> tuple[str | None, dict[str, int]]:
+    """(refusal reason, {component: atom count}) for components with no restraints.
+
+    Returns (None, {}) when the model is usable. When PHENIX's libraries cannot be
+    found the screen is **skipped rather than guessed** — refusing an entry on a
+    library that is not there would drop good entries silently.
+    """
+    libs = _monomer_libraries()
+    if libs is None:
+        # Refusing on a library that is not there would drop good entries, so the
+        # screen skips -- but it says so. A silent skip is indistinguishable from
+        # "no entry carried a ligand", which is how a disabled screen goes unnoticed
+        # until entries start failing at refinement again (#75).
+        print("  ! ligand screen skipped: PHENIX monomer libraries not found "
+              "(set $PHENIX)", file=sys.stderr)
+        return None, {}
+    geostd, mon_lib = libs
+    try:
+        import gemmi
+        structure = gemmi.read_structure(str(model))
+    except Exception:                 # unreadable model: not a restraint problem
+        return None, {}
+
+    def parameterised(code: str) -> bool:
+        code = code.strip().upper()
+        if not code:
+            return True
+        try:
+            info = gemmi.find_tabulated_residue(code)
+            if info is not None and info.is_standard():
+                return True
+        except Exception:
+            pass
+        bucket = code[0].lower()
+        return ((geostd / bucket / f"data_{code}.cif").exists()
+                or (mon_lib / bucket / f"{code}.cif").exists())
+
+    missing: dict[str, int] = {}
+    for chain in structure[0] if len(structure) else []:
+        for residue in chain:
+            if not parameterised(residue.name):
+                missing[residue.name] = missing.get(residue.name, 0) + len(residue)
+    if missing:
+        total = sum(missing.values())
+        named = ", ".join(f"{k}×{v}" for k, v in sorted(missing.items()))
+        return (f"unparameterised ligand: {total} atoms with no monomer-library "
+                f"restraints ({named})", missing)
+    return None, missing
+
+
 def fetch_map(pdb_id: str, accession: str, cache: Path,
               max_map_mb: float) -> tuple[Path | None, str | None]:
     """Download and decompress the primary EMDB map. Returns (path, skip_reason)."""
@@ -308,6 +411,13 @@ def collect(pdb_ids: list[str], cache: Path, max_map_mb: float, max_model_mb: fl
             print(f"  ! {charge_reason}", file=sys.stderr)
             model.unlink(missing_ok=True)
             continue
+        ligand_reason, unparameterised = ligand_screen(model)
+        if ligand_reason is not None:
+            skipped.append({"pdb_id": pdb_id, "reason": ligand_reason,
+                            "unparameterised": unparameterised})
+            print(f"  ! {ligand_reason}", file=sys.stderr)
+            model.unlink(missing_ok=True)
+            continue
         map_file, reason = fetch_map(pdb_id, accession, cache, max_map_mb)
         if map_file is None:
             skipped.append({"pdb_id": pdb_id, "reason": reason})
@@ -320,6 +430,62 @@ def collect(pdb_ids: list[str], cache: Path, max_map_mb: float, max_model_mb: fl
         print(f"  {resolution} Å, EMD-{accession}, "
               f"{map_file.stat().st_size / 1e6:.0f} MB", file=sys.stderr)
     return entries, skipped
+
+
+# Fetch-stage outcomes go to a committed TSV, for the reason round 16 gave for the
+# refinement-stage one: a result that exists only in a temporary cache is a result that
+# will be lost, and an unrecoverable identity is an unrecoverable piece of evidence.
+#
+# `em_refinement_deltas.tsv` records attrition from the refinement attempt onward. It
+# cannot record attrition that happens BEFORE that, which is now most of it -- both
+# screens deliberately reject entries before any refinement. Round 17 found four models
+# (10GJ, 10GK, 10GL, 10GM) sitting in round 14's cache carrying an unparameterised
+# ligand and appearing in no durable record at all.
+#
+# The charge inventory lands here too. Round 16 recorded a publication-clustering
+# hypothesis for the `O1-` failures and noted the inventory was "stored on every kept
+# entry so a future round can test it" -- it was stored in `entries.json`, inside the
+# cache, which does not survive the round. Storing what a screen saw is not the same as
+# keeping it.
+FETCH_RECORD = "ref/research/data/em_fetch_attrition.tsv"
+
+FETCH_HEADER = ("pdb_id\tround\tresolution\temdb\toutcome\tcharges\t"
+                "unparameterised\tpublication\n")
+
+
+def _cell(value: Any) -> str:
+    """One TSV cell: dicts as `k×n` pairs, empty for nothing, never a stray tab."""
+    if not value:
+        return ""
+    if isinstance(value, dict):
+        value = ", ".join(f"{k}×{v}" for k, v in sorted(value.items()))
+    return str(value).replace("\t", " ").replace("\n", " ")
+
+
+def append_fetch_record(entries: list[dict], skipped: list[dict], path: Path,
+                        round_label: str = "") -> None:
+    """Append this fetch run's outcomes — kept and rejected alike — deduplicated by id."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    existing = path.read_text() if path.exists() else ""
+    seen = {line.split("\t")[0] for line in existing.splitlines()[1:] if line.strip()}
+    lines = [] if existing else [FETCH_HEADER]
+    for e in entries:
+        if e["pdb_id"].upper() in seen:
+            continue
+        lines.append("\t".join([
+            e["pdb_id"].upper(), round_label, _cell(e.get("resolution")),
+            _cell(e.get("emdb")), "kept", _cell(e.get("charges")), "",
+            _cell(e.get("publication"))]) + "\n")
+    for s in skipped:
+        if s["pdb_id"].upper() in seen:
+            continue
+        lines.append("\t".join([
+            s["pdb_id"].upper(), round_label, "", "",
+            f"rejected: {_cell(s.get('reason'))}", _cell(s.get("charges")),
+            _cell(s.get("unparameterised")), ""]) + "\n")
+    if lines:
+        with path.open("a") as fh:
+            fh.writelines(lines)
 
 
 def main() -> int:
@@ -347,6 +513,11 @@ def main() -> int:
                          "default: clustering was tested and does not predict a "
                          "similar null delta, permutation p = 0.38)")
     ap.add_argument("--json", dest="json_out")
+    ap.add_argument("--round", default="",
+                    help="round label written to the fetch-attrition TSV")
+    ap.add_argument("--fetch-tsv", default=FETCH_RECORD,
+                    help="cumulative fetch-stage record, appended to and committed; "
+                         "empty string disables")
     args = ap.parse_args()
 
     exclude = {i.strip().upper() for i in args.exclude.split(",") if i.strip()}
@@ -379,6 +550,8 @@ def main() -> int:
         skipped.extend(miss)
 
     (cache / "entries.json").write_text(json.dumps(entries, indent=2) + "\n")
+    if args.fetch_tsv:
+        append_fetch_record(entries, skipped, Path(args.fetch_tsv), args.round)
     report = {"entries": entries, "skipped": skipped,
               "window": [args.min_res, args.max_res], "excluded": sorted(exclude),
               "n_publications": len({e["publication"] for e in entries})}

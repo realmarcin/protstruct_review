@@ -102,6 +102,22 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     }
 
 
+# The 5 NMR ensembles the ordered-core sensitivity was measured on, plus the one that
+# failed outright, committed in round 18. Recovered from the per-entry table in
+# `ref/research/tolerance_benchmark_selection_sensitivity.md`, which gives every
+# ensemble's mean RMSF at every cutoff from 1.0 to 4.0 A -- so unlike most rows in the
+# registry, this one's numbers can be recounted.
+#
+# This script takes model FILES rather than ids, so the set cannot be a runnable
+# default; it is recorded here because a set that exists only in a markdown table is one
+# reorganisation away from the position the L-test set is already in.
+DEFAULT_SET = ["1D3Z", "1G6J", "1XPW", "2K39", "2N54"]
+SET_IS_COMPLETE = True
+SET_FAILED = ["2JZ4"]        # reported as failing outright; kept so the set is 6 attempts
+# Ensembles are passed as file paths, not ids, so the set cannot drive a run.
+SET_NOT_RUNNABLE = "takes model files rather than PDB ids"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("models", nargs="+", type=Path)

@@ -248,6 +248,27 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     }
 
 
+# INCOMPLETE: 12 of the 17 models, committed in round 18 as the most that can be
+# recovered. `ref/research/tolerance_benchmark_round6.md` tables the per-model
+# disagreement rate for the 12 models with a NONZERO rate; the 5 that agreed perfectly
+# are named nowhere, because a table of interesting cases is not a record of a set.
+#
+# That is exactly the defect the round-17 audit was looking for, and it bites here: the
+# quoted "worst model 16.4 %" (30IZ, 12/73) is recoverable, but the 7.5 % aggregate rate
+# it sits in is NOT -- it is 48 disagreements over 639 residues across all 17 models,
+# and 5 of those models cannot be re-run because nothing says what they were.
+#
+# Note also this set includes 9LK0, which is absent from the 17-model sets used by
+# `bench_t05_bond_rmsd.py` and `bench_t05_restraint_library.py`. The sibling benchmarks
+# are NOT interchangeable sources for it.
+DEFAULT_SET = [
+    "30IZ", "9PN7", "24MR", "9LK0", "9HX9", "9HW2", "11AF", "30TW", "37AP", "37AS",
+    "37BG", "28SV",
+]
+SET_IS_COMPLETE = False
+SET_SHORTFALL = "12 of 17 -- the 5 models with ZERO flip disagreements were never named"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
@@ -261,7 +282,10 @@ def main() -> int:
         payload = json.loads(Path(args.ids_file).read_text())
         ids += payload if isinstance(payload, list) else [i for v in payload.values() for i in v]
     if not ids:
-        ap.error("give PDB IDs or --ids-file")
+        ids = list(DEFAULT_SET)
+        print(f"WARNING: the committed set is INCOMPLETE -- {SET_SHORTFALL}.\n"
+              f"Running {len(ids)} entries; published figures used more.",
+              file=sys.stderr)
 
     cache = Path(args.cache) if args.cache else Path(tempfile.gettempdir()) / "bench_cache_t14"
     rows, skipped = collect(ids, cache)

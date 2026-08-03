@@ -209,6 +209,16 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     }
 
 
+# The 10 models the clashscore agreement tolerance was measured on, committed in round
+# 18. Recovered from the per-entry table in
+# `ref/research/tolerance_benchmark_clashscore_h.md`, which tabulates cctbx, standalone
+# electron-cloud and standalone nuclear values for every one of them.
+DEFAULT_SET = [
+    "24MR", "37AS", "37AP", "11AF", "28SZ", "37BG", "12LO", "30IZ", "9LLR", "9PN7",
+]
+SET_IS_COMPLETE = True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
@@ -222,7 +232,9 @@ def main() -> int:
         payload = json.loads(Path(args.ids_file).read_text())
         ids += payload if isinstance(payload, list) else [i for v in payload.values() for i in v]
     if not ids:
-        ap.error("give PDB IDs or --ids-file")
+        ids = list(DEFAULT_SET)
+        print(f"using the committed benchmark set ({len(ids)} entries)",
+              file=sys.stderr)
 
     for tool in (REDUCE, PROBE):
         if not tool.exists():

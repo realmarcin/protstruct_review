@@ -1,4 +1,4 @@
-# Lessons from fifteen rounds of tolerance benchmarking
+# Lessons from eighteen rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,13 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| Confirm a suspected gap by running, not by reading | 18 |
+| When the set grows, re-test every clause it backs | 18 |
+| An attrition rate needs its denominator, so record what passed | 18 |
+| Check the power before hunting the mechanism | 17 |
+| Registering a prediction does not protect you from registering a bad test | 17 |
+| Recoverability is an accident unless the script commits its input set | 17 |
+| A reimplementation must be validated against the tool it stands in for | 17 |
 | A selectively recorded history biases the priors built on it | 16 |
 | Prose in an audit trail is not a record | 16 |
 | Measuring a caveat can dissolve it | 16 |
@@ -41,7 +48,9 @@ round 5 were breached by re-refining a deposited model against its own data, wit
 change at all.
 
 Carry the same suspicion into anything added next: a tolerance that has never been run is a
-hypothesis, and in this repo the hypothesis lost 21 times out of 21. Round 6 adds a corollary —
+hypothesis, and in this repo the hypothesis lost 21 times out of 21 — that 21 is the count of
+benchmarked *tolerances*, which is one more than the 20 `[benchmark]` *rows* because the map-model
+row carries both CC_mask and `d_FSC_model`. Round 6 adds a corollary —
 **a "blocked" item is also a hypothesis**. Two of the three blockers dissolved on re-examination:
 `reduce2` reports flips once `add_flip_movers=True` is passed (it defaults off), and the §4
 false-negative side was testable all along by damaging models rather than refining them.
@@ -51,6 +60,84 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 18 adds a correction to round 17's own audit, and it points the opposite way from everything
+else here: **confirm a suspected gap by running, not by reading.** The audit marked the DockQ row a
+partial record because the script's `plausible_mappings(..., limit=8)` could score eight mappings per
+complex while the trail showed six — so two looked computed and unpublished. Re-running on the
+now-committed set shows `limit` is a cap that was never reached: 4HHB has 4 plausible mappings and
+1BRS has 2, `n_mappings_scored` equals what was published in both, and every value reproduces
+exactly. The row is a full record and the mark is withdrawn. Inferring a gap from a bound in the
+*code* is the same error as inferring a distribution from a published *extreme* — reading an upper
+limit as a quantity. This series is well practised at doubting numbers; it should doubt its own
+suspicions on the same terms, and it was cheap to check.
+
+Round 18's second is about coverage when a benchmark grows: **when the set grows, re-test every
+clause it backs, not just the one you are working on.** Round 17 spotted that the §4 geometry row
+says 19 entries where the ΔRMSD row above it says 37 and could not tell which was stale. Tracing the
+*rounds* rather than the *rows* answered it: the ΔRMSD figure is right, and rounds 8, 10 and 11 grew
+the set 19 → 26 → 32 → 37 while re-testing **only the Cα-shift and favored clauses**. So the
+rotamer-outlier band and the 5× clashscore gate have not been checked since round 7, against a set
+that has since nearly doubled — and the tempting reading that "19" is really the `< 2.5 Å` branch is
+ruled out, because neither clause was ever resolution-split. What looked like a stale *count* is
+actually two *untested clauses*, which is a materially different claim. Each round naturally
+re-validates the band it is widening; the siblings sharing that set go quietly unchecked, and nothing
+in the file says how long it has been.
+
+Round 18's third is about which half of a record to keep: **an attrition rate needs its denominator,
+so record what passed, not only what failed.** Fetch-stage rejections were landing in a JSON inside a
+temporary cache, so the two screens — which now reject most entries *before* any refinement — were
+producing evidence that did not survive the round. Recording only the rejections would have fixed
+half of it and left the rate unrecoverable, which is the numerator-without-denominator shape that
+round 16's biased prior already demonstrated. `em_fetch_attrition.tsv` records kept and rejected
+alike, with the charge and ligand inventories the screens actually saw. Six models found on disk in
+old caches are backfilled as `unrecorded` rather than as rejections: the screen verdicts on them were
+computed in round 18 and are not the reason they were dropped at the time, and writing a plausible
+reason into a record is how a record stops being one.
+
+Round 17 adds the rule that should run *before* any of the others about mechanisms: **check the power
+before hunting the mechanism.** The backlog asked why round 15 degraded CC_mask in 4 of 8 entries and
+round 16 in 1 of 9 — a four-fold rate difference across two adjacent windows. Registered as the gate
+on that item, **P0 asked whether the difference was real at all, and it is not: Fisher's exact test
+gives p = 0.131.** Holding those rates, the comparison first clears 0.05 at **20 entries per round**;
+rounds carry 8–9. The question was unanswerable before any predictor was chosen, and the two earlier
+mechanism hunts (round 7's coverage story, round 15's clustering story) were also launched at a
+phenomenon nobody had first shown to exist. The score for mechanism hunts here is **0 for 3**. When a
+round proposes to explain something, size the effect and the sample first; if the phenomenon is not
+established, the mechanism cannot be.
+
+Its companion is uncomfortable, because it is a limit on this file's own favourite rule:
+**registering a prediction does not protect you from registering a bad test.** Round 17's P2 —
+that CC_mask Δ correlates negatively with the starting CC_mask — was registered in advance and
+**held**, at ρ = −0.445, p = 0.026. It is still wrong. Correlating a *change* against its own
+*baseline* is negatively biased by construction, because the baseline sits on both sides of the
+comparison with opposite signs. Under Oldham's correction (change against the *mean* of the two
+measurements) it collapses to p = 0.18; ρ(post, Δ) is −0.05; and it fails leave-one-out. Registration
+stops you fitting a story to the data. It does nothing about a test that was the wrong test when you
+wrote it down — so state the test's known artefacts in the registration, where they can be checked
+against the result rather than invented after it.
+
+Round 17's audit of every `[benchmark]` row generalises round 16's record lesson one level up:
+**recoverability is an accident unless the script commits its input set.** Of the 20 `[benchmark]`
+rows — §3 and §4 hold 21 tolerance rows, but §4's absolute geometry floors are `[literature]` — eleven
+were fully backed, two recoverable, and **seven quoted a figure from a set that cannot be
+reconstructed** —
+not because anyone chose to record less, but because only four bench scripts hardcode the entries
+they ran on. The rest take `--ids-file <ids.json>` or glob an uncommitted cache, and no `ids.json` is
+committed anywhere in this repo. Where a row *is* recoverable it is because an author happened to
+paste a table into the audit trail. The most expensive instance is the two §4 X-ray bands: **+0.35 Å**
+and **−6 pp** are each set just above a null maximum (0.285 Å, 5.26 pp) produced by ~11
+low-resolution entries that are named nowhere. Round 16 fixed this for the EM benchmark's *values*;
+the *inputs* of every other benchmark are still in the position round 13's entries were in.
+
+And one about building tools rather than measuring with them: **a reimplementation must be validated
+against the tool it stands in for.** Round 17 moved the unparameterised-ligand skip off the expensive
+path by checking components against PHENIX's monomer libraries at fetch time — a reimplementation of
+what cctbx does at refinement. A file-existence check alone looked right and was not: DT, DA, DC and
+DG are in neither library under those names, so it flagged every DNA chain, reporting 1431 atoms on
+28JV where 38 had actually failed. Checked against `phenix.pdb_interpretation` over all 37 cached
+models the corrected screen agrees exactly, including atom counts. A screen that silently drifts from
+the tool it replaces is worse than no screen, because it rejects entries that would have refined.
 
 Round 16 adds the rule with the widest reach, because it is about the record rather than any
 measurement: **a selectively recorded history biases the priors built on it, not just the counts.**

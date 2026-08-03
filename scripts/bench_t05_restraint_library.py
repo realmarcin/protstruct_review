@@ -165,6 +165,22 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     return out
 
 
+# The 17 models the library decomposition was measured on, committed in round 18.
+# Recovered from `ref/research/tolerance_benchmark_bond_rmsd.md`, whose per-entry table
+# covers the same set (`tolerance_benchmark_restraint_library.md` states "same 17
+# deposited models"; the two id lists were verified identical).
+#
+# NOTE the angle figures this script produces are the ones the bond-angle tolerance
+# quotes (median 0.265 deg, max 0.471 deg), and NO per-entry angle value was ever
+# published -- the trail tables only the bond columns. `collect()` already computes
+# them per entry into `--json`; re-running with this set regenerates them.
+DEFAULT_SET = [
+    "30TW", "9PLB", "28SX", "28SW", "28SV", "9LLR", "9PN7", "9HW2", "28SZ", "11AF",
+    "30IZ", "12LO", "9HX9", "37BG", "24MR", "37AP", "37AS",
+]
+SET_IS_COMPLETE = True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
@@ -178,7 +194,9 @@ def main() -> int:
         payload = json.loads(Path(args.ids_file).read_text())
         ids += payload if isinstance(payload, list) else [i for v in payload.values() for i in v]
     if not ids:
-        ap.error("give PDB IDs or --ids-file")
+        ids = list(DEFAULT_SET)
+        print(f"using the committed benchmark set ({len(ids)} entries)",
+              file=sys.stderr)
 
     cache = Path(args.cache) if args.cache else Path(tempfile.gettempdir()) / "bench_cache_t05lib"
     rows, skipped = collect(ids, cache)

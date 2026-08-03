@@ -494,6 +494,31 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     }
 
 
+# INCOMPLETE: 11 of the 17 entries, committed in round 18 as the most recoverable.
+#
+# This script backs several tolerance rows with DIFFERENT denominators, and they are not
+# equally recorded:
+#   - completeness and R-free (n = 9): FULLY recorded. The 9-entry table in
+#     `ref/research/tolerance_benchmark_vs_deposited.md` gives every value, so those
+#     figures are reproducible. Those 9 are the first nine ids below.
+#   - Ramachandran/rotamer favored % (n = 17): NO per-entry value was ever written down,
+#     not even the worst. The row's median 0.00 / p90 0.02 / max 0.16 pp cannot be
+#     recounted.
+#   - Ramachandran/rotamer outlier % (n = 17): only the 4 entries with nonzero outliers
+#     are named (24MR, 28SW, 28SZ, 9PN7 -- the last two ids below). The 13 that compare
+#     0.00 to 0.00 are unnamed, which matters because the row itself says those 13 are
+#     the uninformative ones.
+#
+# So a re-run on this set reproduces the completeness and R-free rows exactly, and
+# under-counts the Ramachandran rows by 6 entries.
+DEFAULT_SET = [
+    "12LO", "30TW", "9LK0", "30IZ", "37AP", "24MR", "11AF", "28SW", "28SX", "28SZ",
+    "9PN7",
+]
+SET_IS_COMPLETE = False
+SET_SHORTFALL = "11 of 17 -- the Ramachandran/rotamer figures ran on 17 entries, 6 unnamed"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
@@ -508,7 +533,10 @@ def main() -> int:
         payload = json.loads(Path(args.ids_file).read_text())
         ids += payload if isinstance(payload, list) else [i for v in payload.values() for i in v]
     if not ids:
-        ap.error("give PDB IDs or --ids-file")
+        ids = list(DEFAULT_SET)
+        print(f"WARNING: the committed set is INCOMPLETE -- {SET_SHORTFALL}.\n"
+              f"Running {len(ids)} entries; published figures used more.",
+              file=sys.stderr)
 
     cache = Path(args.cache) if args.cache else Path(tempfile.gettempdir()) / "bench_cache_dep"
     rows, skipped = collect(ids, cache, Path(args.mvd_cache) if args.mvd_cache else None)

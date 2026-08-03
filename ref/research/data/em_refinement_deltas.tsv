@@ -1,64 +1,64 @@
-pdb_id	resolution	cc_mask_pre	cc_mask_post	cc_mask_delta	d_fsc_model_pre	d_fsc_model_post	d_fsc_model_delta_pct	status
-10SE	2.41			0.0024				delta-only (per-entry pre/post not published)
-27WR	2.7			-0.0065				delta-only (per-entry pre/post not published)
-21BQ	2.7			-0.0139				delta-only (per-entry pre/post not published)
-24UM	2.7			-0.006				delta-only (per-entry pre/post not published)
-10SG	2.84			-0.0019				delta-only (per-entry pre/post not published)
-9VJD	2.86			0.0084				delta-only (per-entry pre/post not published)
-9V35	2.97			0.0061				delta-only (per-entry pre/post not published)
-10SH	2.97			0.0001				delta-only (per-entry pre/post not published)
-9VTW	3.0			0.0154				delta-only (per-entry pre/post not published)
-9OID	3.0			0.0595				delta-only (per-entry pre/post not published)
-9ELS	3.02			0.0061				delta-only (per-entry pre/post not published)
-9V4D	3.07			0.0115				delta-only (per-entry pre/post not published)
-10SF	3.08			-0.0371				delta-only (per-entry pre/post not published)
-9OIF	3.1			-0.0217				delta-only (per-entry pre/post not published)
-10SD	3.11			-0.0421				delta-only (per-entry pre/post not published)
-10GX	3.2			0.0041				delta-only (per-entry pre/post not published)
-9PGD	3.2			0.0155				delta-only (per-entry pre/post not published)
-9UPM	3.21			-0.0475				delta-only (per-entry pre/post not published)
-10QT	3.4			0.0118				delta-only (per-entry pre/post not published)
-9UPO	3.71			-0.0402				delta-only (per-entry pre/post not published)
-9V3C	3.82			0.0139				delta-only (per-entry pre/post not published)
-9VAM	3.88			0.0085				delta-only (per-entry pre/post not published)
-9O9K	2.9			-0.0311				delta-only (per-entry pre/post not published)
-11NJ	2.4	0.8471	0.8666	0.0195	2.3623	2.3591	-0.135	measured
-11QC	2.4	0.8311	0.8315	0.0004	2.3983	2.3983	0.000	measured
-10XZ	2.6	0.8797	0.8798	0.0001	2.5182	2.5182	0.000	measured
-10YA	2.7	0.9061	0.9077	0.0016	2.6087	2.6087	0.000	measured
-11JF	2.85	0.8053	0.8152	0.0099	2.8602	2.857	-0.112	measured
-21AO	2.85	0.8338	0.8344	0.0006				measured
-10ES	3.0	0.7491	0.7909	0.0418	3.011	2.974	-1.229	measured
-10IJ	3.1	0.7893	0.8137	0.0244	2.7217	2.7036	-0.665	measured
-10ET	3.0	0.7822	0.7471	-0.0351	3.1805	3.1558	-0.777	measured
-10BU	3.2	0.7577	0.7278	-0.0299	4.3513	4.5596	4.787	measured
-10EO	3.2	0.8707	0.8486	-0.0221	3.0969	3.0892	-0.249	measured
-10EQ	3.3	0.7162	0.7765	0.0603	3.4466	3.3654	-2.356	measured
-10FI	3.3	0.8181	0.8155	-0.0026	3.2645	3.2644	-0.003	measured
-10EH	3.5	0.6531	0.7799	0.1268	3.5554	3.5287	-0.751	measured
-10RI	3.6	0.7481	0.7596	0.0115	3.2378	3.2522	0.445	measured
-10DQ	3.9	0.7536	0.7687	0.0151	3.904	3.904	0.000	measured
-11MR								skipped: unparameterised ligand (128 atoms)
-10EG								skipped: unparameterised ligand (195 atoms)
-10EN								skipped: atom type absent from electron scattering table (O1-)
-9VXE								skipped: real_space_refine failed
-13GH								skipped: real_space_refine failed
-9TZY								skipped: real_space_refine failed
-9Z4O								skipped: real_space_refine failed
-9H7U	2.96				4.0604	2.5924	-36.150	d_FSC only (round 13 never published its CC_mask delta)
-UNKNOWN-R13-1								LOST: round 13 measured 4 further entries whose ids were never recorded
-UNKNOWN-R13-2								LOST: id never recorded
-UNKNOWN-R13-3								LOST: id never recorded
-UNKNOWN-R13-4								LOST: id never recorded
-21EO	3.91	0.7076	0.7683	0.0607	3.814407486247678	3.8150663670089724	0.018	measured
-10ME	4.0	0.8149	0.8286	0.0137	3.7542096562935092	3.809575605239372	1.476	measured
-32FE	3.81	0.7947	0.7944	-0.0003	3.840438033602942	3.839906082655453	-0.013	measured
-10ZU	4.0	0.7577	0.7773	0.0196	3.661624477942059	3.6629335037388606	0.036	measured
-5YKE	4.11	0.7604	0.7831	0.0227	4.059737066013651	4.037942347599758	-0.537	measured
-10EU	3.0	0.7542	0.7698	0.0156	3.22874829958778	3.193762239974019	-1.084	measured
-10EP	3.2	0.8032	0.8129	0.0097	3.305334910035378	3.281022827106049	-0.735	measured
-10MJ	3.3	0.847	0.8847	0.0377	3.221585042456416	3.2223212097815725	0.022	measured
-10YG	3.4	0.8513	0.8965	0.0452	2.854109354783229	2.854109354783229	0.0	measured
-10FL								skipped: atom type absent from the electron scattering table: O1-
-10FJ								skipped: atom type absent from the electron scattering table: O1-
-28JV								skipped: unparameterised ligand: 38 atoms with unknown nonbonded energy types (no monomer-library restraints)
+pdb_id	round	resolution	cc_mask_pre	cc_mask_post	cc_mask_delta	d_fsc_model_pre	d_fsc_model_post	d_fsc_model_delta_pct	status
+10SE	12	2.41			0.0024				delta-only (per-entry pre/post not published)
+27WR	12	2.7			-0.0065				delta-only (per-entry pre/post not published)
+21BQ	12	2.7			-0.0139				delta-only (per-entry pre/post not published)
+24UM	12	2.7			-0.006				delta-only (per-entry pre/post not published)
+10SG	12	2.84			-0.0019				delta-only (per-entry pre/post not published)
+9VJD	12	2.86			0.0084				delta-only (per-entry pre/post not published)
+9V35	12	2.97			0.0061				delta-only (per-entry pre/post not published)
+10SH	12	2.97			0.0001				delta-only (per-entry pre/post not published)
+9VTW	12	3.0			0.0154				delta-only (per-entry pre/post not published)
+9OID	12	3.0			0.0595				delta-only (per-entry pre/post not published)
+9ELS	12	3.02			0.0061				delta-only (per-entry pre/post not published)
+9V4D	12	3.07			0.0115				delta-only (per-entry pre/post not published)
+10SF	12	3.08			-0.0371				delta-only (per-entry pre/post not published)
+9OIF	12	3.1			-0.0217				delta-only (per-entry pre/post not published)
+10SD	12	3.11			-0.0421				delta-only (per-entry pre/post not published)
+10GX	12	3.2			0.0041				delta-only (per-entry pre/post not published)
+9PGD	12	3.2			0.0155				delta-only (per-entry pre/post not published)
+9UPM	12	3.21			-0.0475				delta-only (per-entry pre/post not published)
+10QT	12	3.4			0.0118				delta-only (per-entry pre/post not published)
+9UPO	12	3.71			-0.0402				delta-only (per-entry pre/post not published)
+9V3C	12	3.82			0.0139				delta-only (per-entry pre/post not published)
+9VAM	12	3.88			0.0085				delta-only (per-entry pre/post not published)
+9O9K	13	2.9			-0.0311				delta-only (per-entry pre/post not published)
+11NJ	14	2.4	0.8471	0.8666	0.0195	2.3622753657431814	2.3590903981548212	-0.1348	measured
+11QC	14	2.4	0.8311	0.8315	0.0004	2.3983385423407744	2.3983385423407744	0.0000	measured
+10XZ	14	2.6	0.8797	0.8798	0.0001	2.518168123444973	2.518168123444973	0.0000	measured
+10YA	14	2.7	0.9061	0.9077	0.0016	2.6086917618205465	2.6086917618205465	0.0000	measured
+11JF	14	2.85	0.8053	0.8152	0.0099	2.860180720461619	2.8570276699501407	-0.1102	measured
+21AO	14	2.85	0.8338	0.8344	0.0006	2.812499371582172	2.812499371582172	0.0000	measured
+10ES	14	3.0	0.7491	0.7909	0.0418	3.0110005097021664	2.973979057227583	-1.2295	measured
+10IJ	14	3.1	0.7893	0.8137	0.0244	2.721720392928241	2.703620508794614	-0.6650	measured
+10ET	15	3.0	0.7822	0.7471	-0.0351	3.1805322824964932	3.155765339334303	-0.7787	measured
+10BU	15	3.2	0.7577	0.7278	-0.0299	4.3513179439314325	4.559556403675602	4.7856	measured
+10EO	15	3.2	0.8707	0.8486	-0.0221	3.0969355219108263	3.089150924811778	-0.2514	measured
+10EQ	15	3.3	0.7162	0.7765	0.0603	3.446562017509321	3.3654422777076407	-2.3536	measured
+10FI	15	3.3	0.8181	0.8155	-0.0026	3.264513685069884	3.264418733519786	-0.0029	measured
+10EH	15	3.5	0.6531	0.7799	0.1268	3.5554341588116367	3.528686474336552	-0.7523	measured
+10RI	15	3.6	0.7481	0.7596	0.0115	3.237783650448178	3.2521631250810787	0.4441	measured
+10DQ	15	3.9	0.7536	0.7687	0.0151	3.90397864692332	3.90397864692332	0.0000	measured
+11MR	14								skipped: unparameterised ligand (128 atoms)
+10EG	15								skipped: unparameterised ligand (195 atoms)
+10EN	15								skipped: atom type absent from electron scattering table (O1-)
+9VXE	<=12								skipped: real_space_refine failed
+13GH	<=12								skipped: real_space_refine failed
+9TZY	<=12								skipped: real_space_refine failed
+9Z4O	13								skipped: real_space_refine failed
+9H7U	13	2.96				4.0604	2.5924	-36.150	d_FSC only (round 13 never published its CC_mask delta)
+UNKNOWN-R13-1	13								LOST: round 13 measured 4 further entries whose ids were never recorded
+UNKNOWN-R13-2	13								LOST: id never recorded
+UNKNOWN-R13-3	13								LOST: id never recorded
+UNKNOWN-R13-4	13								LOST: id never recorded
+21EO	16	3.91	0.7076	0.7683	0.0607	3.814407486247678	3.8150663670089724	0.018	measured
+10ME	16	4.0	0.8149	0.8286	0.0137	3.7542096562935092	3.809575605239372	1.476	measured
+32FE	16	3.81	0.7947	0.7944	-0.0003	3.840438033602942	3.839906082655453	-0.013	measured
+10ZU	16	4.0	0.7577	0.7773	0.0196	3.661624477942059	3.6629335037388606	0.036	measured
+5YKE	16	4.11	0.7604	0.7831	0.0227	4.059737066013651	4.037942347599758	-0.537	measured
+10EU	16	3.0	0.7542	0.7698	0.0156	3.22874829958778	3.193762239974019	-1.084	measured
+10EP	16	3.2	0.8032	0.8129	0.0097	3.305334910035378	3.281022827106049	-0.735	measured
+10MJ	16	3.3	0.847	0.8847	0.0377	3.221585042456416	3.2223212097815725	0.022	measured
+10YG	16	3.4	0.8513	0.8965	0.0452	2.854109354783229	2.854109354783229	0.0	measured
+10FL	16								skipped: atom type absent from the electron scattering table: O1-
+10FJ	16								skipped: atom type absent from the electron scattering table: O1-
+28JV	16								skipped: unparameterised ligand: 38 atoms with unknown nonbonded energy types (no monomer-library restraints)

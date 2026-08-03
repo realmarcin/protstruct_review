@@ -11,6 +11,7 @@ mocked: a fake oracle would only test the mock.
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
 from pathlib import Path
 
@@ -780,7 +781,21 @@ check("a later run appends instead of replacing", "AAAA" in _second and "BBBB" i
 check("only one header line exists after two runs",
       sum(1 for l in _second.splitlines() if l.startswith("pdb_id")), 1)
 check("a skipped entry is recorded with its reason, not omitted",
-      "CCCC\t\t\t\t\t\t\t\tskipped: no restraints" in _second, True)
+      "CCCC\t\t\t\t\t\t\t\t\tskipped: no restraints" in _second, True)
+
+# Round 17: the round label. Without it, a cross-round analysis has to reconstruct
+# which round measured what by matching prose in the audit trails against row order in
+# the TSV -- which is the same "prose is not a record" failure one level up.
+_r17 = _tsv_dir / "labelled.tsv"
+refem.append_results([_row("EEEE", -0.01)], [{"pdb_id": "FFFF", "reason": "ligand"}],
+                     _r17, "17")
+_labelled = _r17.read_text()
+check("the header carries the round column",
+      _labelled.splitlines()[0].split("\t")[1], "round")
+check("a measured row records which round measured it",
+      _labelled.splitlines()[1].split("\t")[1], "17")
+check("and so does a skipped one -- attrition is per-round evidence too",
+      _labelled.splitlines()[2].split("\t")[1], "17")
 
 # Re-running an entry must not duplicate it: the benchmark caches and re-runs freely,
 # so without dedup the file would accumulate copies and inflate every count taken
@@ -842,5 +857,219 @@ check("the inventory records it", _anion_counts, {"N1-": 1})
 # on an unverified rule, in a benchmark whose problem is too little evidence.
 check("a cation alone is reported, not refused", _cation_reason, None)
 check("but it is still recorded for a future round to test", _cation_counts, {"N1+": 1})
+
+# --- Round 17: the ligand screen moves that skip off the expensive path -------------
+
+# The three ligand skips in rounds 14-16 each cost a model download, a 200-300 MB map
+# download and a `real_space_refine` attempt before failing. Whether a component has
+# restraints is a property of the model alone, so the screen runs at fetch time.
+#
+# These are logic tests. The screen's *agreement with PHENIX* is not testable here --
+# it needs the monomer libraries and real entries -- and was established separately
+# against `phenix.pdb_interpretation` on 37 cached models with zero disagreements
+# (`ref/research/tolerance_benchmark_round17.md`).
+
+def _ligand_model(residue_name: str, n_atoms: int, hetero: bool = True):
+    """A one-residue model carrying `residue_name`."""
+    import gemmi
+    st = gemmi.Structure()
+    model, chain = gemmi.Model("1"), gemmi.Chain("A")
+    residue = gemmi.Residue()
+    residue.name = residue_name
+    residue.seqid = gemmi.SeqId("1")
+    residue.het_flag = "H" if hetero else "A"
+    for i in range(n_atoms):
+        atom = gemmi.Atom()
+        atom.name = f"C{i}"
+        atom.element = gemmi.Element("C")
+        atom.pos = gemmi.Position(float(i), 0.0, 0.0)
+        residue.add_atom(atom)
+    chain.add_residue(residue)
+    model.add_chain(chain)
+    st.add_model(model)
+    path = _tsv_dir / f"lig_{residue_name}.cif"
+    st.make_mmcif_document().write_file(str(path))
+    return fetchem.ligand_screen(path)
+
+
+if fetchem._monomer_libraries() is None:
+    print("SKIP  ligand screen: PHENIX monomer libraries not installed here")
+else:
+    check("a standard amino acid passes", _ligand_model("ALA", 5, hetero=False)[0], None)
+    # The regression that motivates using gemmi's residue table rather than file
+    # existence alone: DT, DA, DC and DG are in NEITHER library under those names, so a
+    # bare file check flags every DNA chain -- 1431 atoms on 28JV instead of the 38
+    # that actually failed.
+    check("a DNA residue passes despite being absent from both libraries",
+          _ligand_model("DT", 20, hetero=False)[0], None)
+    check("a library ligand passes", _ligand_model("ATP", 31)[0], None)
+
+    # The refusal case points the screen at empty stub libraries rather than picking a
+    # code that happens to be missing: GeoStd ships ~44 000 components, so almost any
+    # three-letter code exists, and a test keyed on one that does not would start
+    # failing the day PHENIX adds it.
+    _stub = Path(_tf.mkdtemp())
+    (_stub / "geostd").mkdir()
+    (_stub / "mon_lib").mkdir()
+    _real_libs = fetchem._monomer_libraries
+    fetchem._monomer_libraries = lambda: (_stub / "geostd", _stub / "mon_lib")
+    try:
+        _unk_reason, _unk_counts = _ligand_model("LIG", 7)
+        check("a component in neither library is refused", _unk_reason is not None, True)
+        check("and the refusal names the component and its atom count",
+              _unk_reason, "unparameterised ligand: 7 atoms with no monomer-library "
+                           "restraints (LIG×7)")
+        check("the inventory records what was missing", _unk_counts, {"LIG": 7})
+        # Standard residues are exempted by gemmi's table, not by the libraries, so
+        # they still pass when the libraries hold nothing at all.
+        check("a standard residue still passes with empty libraries",
+              _ligand_model("ALA", 5, hetero=False)[0], None)
+    finally:
+        fetchem._monomer_libraries = _real_libs
+
+    # The library RESOLUTION itself, not just the screen that consumes it. Every test
+    # above monkeypatches `_monomer_libraries` wholesale, which is exactly why a broken
+    # $PHENIX branch survived review once (#75): the escape hatch tested
+    # `$PHENIX/lib/geostd` when the libraries live at
+    # `$PHENIX/lib/python3*/site-packages/chem_data/geostd`, so it never matched and the
+    # only working lookup was one hardcoded version in one home directory.
+    _fake_phenix = Path(_tf.mkdtemp())
+    _cd = _fake_phenix / "lib" / "python3.9" / "site-packages" / "chem_data"
+    (_cd / "geostd").mkdir(parents=True)
+    (_cd / "mon_lib").mkdir(parents=True)
+    _saved_env = os.environ.get("PHENIX")
+    _saved_glob = fetchem.CHEM_DATA_GLOB
+    os.environ["PHENIX"] = str(_fake_phenix)
+    fetchem.CHEM_DATA_GLOB = "phenix-does-not-exist/lib/python3*/site-packages/chem_data"
+    try:
+        _found = fetchem._monomer_libraries()
+        check("$PHENIX locates the libraries when the home glob cannot",
+              _found is not None and _found[0] == _cd / "geostd", True)
+    finally:
+        fetchem.CHEM_DATA_GLOB = _saved_glob
+        if _saved_env is None:
+            os.environ.pop("PHENIX", None)
+        else:
+            os.environ["PHENIX"] = _saved_env
+
+    # A screen that cannot find the libraries must not refuse anything: dropping good
+    # entries silently is worse than the download it would have saved.
+    fetchem._monomer_libraries = lambda: None
+    try:
+        check("with no libraries installed the screen refuses nothing",
+              _ligand_model("LIG", 7)[0], None)
+    finally:
+        fetchem._monomer_libraries = _real_libs
+
+    check("a passing model reports an empty inventory",
+          _ligand_model("ATP", 31)[1], {})
+
+
+# --- Round 18: every benchmark commits the entry set it ran on ---------------------
+
+# The round-17 audit found 7 of the registry's 20 `[benchmark]` rows quoting a figure
+# from a set that could not be reconstructed, and the cause was systemic: the scripts
+# took their entries from an uncommitted `--ids-file` or globbed a cache. These pin the
+# recovered sets so a later edit cannot silently change what a tolerance was measured
+# on. `scripts/validate.sh` separately gates that a set is DECLARED at all.
+#
+# The counts are the published denominators. Where a set is short of its denominator the
+# script says so via SET_IS_COMPLETE = False, and that shortfall is asserted too --
+# an incomplete set quietly promoted to complete is exactly the failure being guarded.
+
+_SETS = {
+    #  script                        published n   recovered   complete
+    "bench_t05_bond_rmsd":          (17, 17, True),
+    "bench_t05_restraint_library":  (17, 17, True),
+    "bench_t05_clashscore_h":       (10, 10, True),
+    "bench_t06_r_offset":           (15, 15, True),
+    "bench_t13_wilson_b":           (24, 24, True),
+    "bench_t17_ordered_core":       (5, 5, True),
+    "bench_t14_flip_sets":          (17, 12, False),
+    "bench_vs_deposited":           (17, 11, False),
+    "bench_refinement_deltas":      (37, 16, False),
+}
+
+for _name, (_published, _recovered, _complete) in _SETS.items():
+    _mod = load(_name)
+    _set = _mod.DEFAULT_SET
+    check(f"{_name}: set has the recovered size", len(_set), _recovered)
+    check(f"{_name}: no duplicate ids", len(set(_set)), len(_set))
+    check(f"{_name}: completeness is declared honestly", _mod.SET_IS_COMPLETE, _complete)
+    if not _complete:
+        # A partial set must say how far short it falls, in the script, where whoever
+        # re-runs it will see it -- not only in an audit trail they may never open.
+        check(f"{_name}: shortfall is stated", bool(getattr(_mod, "SET_SHORTFALL", "")), True)
+        check(f"{_name}: shortfall names the denominator",
+              str(_published) in _mod.SET_SHORTFALL, True)
+
+# The L-test is the one benchmark whose set was never expressible: the script has no id
+# argument at all, it reads whatever logs a prior Wilson B run left behind. It records
+# what is known rather than pretending to a default.
+_lt = load("bench_t13_l_test")
+check("bench_t13_l_test: published denominator recorded", _lt.PUBLISHED_N, 27)
+check("bench_t13_l_test: only the 5 named datasets are claimed", len(_lt.KNOWN_IDS), 5)
+check("bench_t13_l_test: not claimed complete", _lt.SET_IS_COMPLETE, False)
+
+# Two benchmarks are documented as sharing one set. If that stops being true the
+# bond-angle row loses its only route to recovery, so it is asserted rather than trusted.
+check("bond-length and restraint-library share one set",
+      sorted(load("bench_t05_bond_rmsd").DEFAULT_SET),
+      sorted(load("bench_t05_restraint_library").DEFAULT_SET))
+
+# 9LK0 is in the flip-set benchmark and in neither sibling 17-model set. The audit found
+# this by hand; pinning it stops a future round "tidying" the sets into one list.
+check("the flip-set benchmark is not interchangeable with its siblings",
+      "9LK0" in load("bench_t14_flip_sets").DEFAULT_SET
+      and "9LK0" not in load("bench_t05_bond_rmsd").DEFAULT_SET, True)
+
+
+# --- Round 18: fetch-stage attrition must outlive the cache too --------------------
+
+# `em_refinement_deltas.tsv` records attrition from the refinement attempt onward, which
+# is now the smaller half: both screens reject entries BEFORE any refinement, so their
+# rejections were landing only in a JSON inside a temporary cache. Round 17 found four
+# models in round 14's cache carrying an unparameterised ligand and appearing in no
+# durable record at all.
+_fetch_tsv = _tsv_dir / "fetch.tsv"
+fetchem.append_fetch_record(
+    [{"pdb_id": "1AAA", "resolution": 3.2, "emdb": "EMD-1", "publication": "10.1/x",
+      "charges": {"N1+": 4}}],
+    [{"pdb_id": "2BBB", "reason": "unparameterised ligand: 38 atoms",
+      "unparameterised": {"VM6": 38}}],
+    _fetch_tsv, "18")
+_ft = _fetch_tsv.read_text()
+
+check("a kept entry is recorded, not only the rejected ones",
+      _ft.splitlines()[1].split("\t")[0], "1AAA")
+check("and its outcome says so", _ft.splitlines()[1].split("\t")[4], "kept")
+# The charge inventory is the specific thing round 16 said it was storing "so a future
+# round can test it" and then stored in a file that does not survive the round.
+check("the charge inventory survives the cache",
+      _ft.splitlines()[1].split("\t")[5], "N1+×4")
+check("a rejected entry keeps its reason",
+      _ft.splitlines()[2].split("\t")[4],
+      "rejected: unparameterised ligand: 38 atoms")
+check("and what the screen actually saw", _ft.splitlines()[2].split("\t")[6], "VM6×38")
+check("both rows carry the round", [l.split("\t")[1] for l in _ft.splitlines()[1:]],
+      ["18", "18"])
+
+# Same dedup contract as the refinement record: the fetcher is re-run freely, and
+# duplicate rows would inflate any attrition count taken from the file.
+fetchem.append_fetch_record([{"pdb_id": "1AAA", "resolution": 3.2}],
+                            [{"pdb_id": "3CCC", "reason": "map too large"}],
+                            _fetch_tsv, "18")
+_ft2 = _fetch_tsv.read_text()
+check("re-fetching an entry does not duplicate it",
+      sum(1 for l in _ft2.splitlines() if l.startswith("1AAA")), 1)
+check("while a new rejection is still added", "3CCC" in _ft2, True)
+check("only one header after two runs",
+      sum(1 for l in _ft2.splitlines() if l.startswith("pdb_id")), 1)
+
+# A reason containing a tab or newline would silently shift every later column.
+_cells = fetchem._cell("a\treason\nwith control chars")
+check("a reason cannot break the column layout",
+      "\t" not in _cells and "\n" not in _cells, True)
+
 
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

@@ -296,8 +296,18 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
 
 RESULTS_TSV = "ref/research/data/em_refinement_deltas.tsv"
 
+# This benchmark's entry set is the TSV itself, not a hardcoded list. That is the
+# stronger form: the file is cumulative, it records the skips alongside the
+# measurements, and it carries the round each entry belongs to -- so "which entries did
+# this benchmark run on" is answerable per round rather than in aggregate. Declared here
+# because `scripts/validate.sh` requires every bench script to commit its set, and a
+# list duplicated from the TSV would be one more thing to drift.
+SET_RECORD = "ref/research/data/em_refinement_deltas.tsv"
+SET_IS_COMPLETE = False   # rounds <=13 are partly unrecoverable; see the LOST rows
 
-def append_results(rows: list[dict], skipped: list[dict], path: Path) -> None:
+
+def append_results(rows: list[dict], skipped: list[dict], path: Path,
+                   round_label: str = "") -> None:
     """Append this run's per-entry values to a committed, cumulative TSV.
 
     Round 16 found that round 13's entry IDs do not exist anywhere in the repo. Its
@@ -312,7 +322,7 @@ def append_results(rows: list[dict], skipped: list[dict], path: Path) -> None:
     interesting, which is exactly the subset that cannot be used to recount anything.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
-    header = ("pdb_id\tresolution\tcc_mask_pre\tcc_mask_post\tcc_mask_delta\t"
+    header = ("pdb_id\tround\tresolution\tcc_mask_pre\tcc_mask_post\tcc_mask_delta\t"
               "d_fsc_model_pre\td_fsc_model_post\td_fsc_model_delta_pct\tstatus\n")
     existing = path.read_text() if path.exists() else ""
     seen = {line.split("\t")[0] for line in existing.splitlines()[1:] if line.strip()}
@@ -321,13 +331,14 @@ def append_results(rows: list[dict], skipped: list[dict], path: Path) -> None:
         if r["pdb_id"] in seen:
             continue
         lines.append("\t".join(str(x) for x in [
-            r["pdb_id"], r["resolution"], r["cc_mask_pre"], r["cc_mask_post"],
-            r["cc_mask_delta"], r.get("d_fsc_model_pre"), r.get("d_fsc_model_post"),
-            r.get("d_fsc_model_delta_pct"), "measured"]) + "\n")
+            r["pdb_id"], round_label, r["resolution"], r["cc_mask_pre"],
+            r["cc_mask_post"], r["cc_mask_delta"], r.get("d_fsc_model_pre"),
+            r.get("d_fsc_model_post"), r.get("d_fsc_model_delta_pct"),
+            "measured"]) + "\n")
     for s in skipped:
         if s["pdb_id"] in seen:
             continue
-        lines.append("\t".join([s["pdb_id"], "", "", "", "", "", "", "",
+        lines.append("\t".join([s["pdb_id"], round_label, "", "", "", "", "", "", "",
                                  f"skipped: {s['reason']}"]) + "\n")
     if lines:
         with path.open("a") as fh:
@@ -342,6 +353,10 @@ def main() -> int:
     ap.add_argument("--results-tsv", default=RESULTS_TSV,
                     help="cumulative per-entry record, appended to and committed; "
                          "empty string disables")
+    ap.add_argument("--round", default="",
+                    help="round label written to the TSV's `round` column. Without it "
+                         "a later cross-round analysis has to reconstruct which round "
+                         "measured what by matching prose against row order")
     args = ap.parse_args()
 
     cache = Path(args.cache)
@@ -350,7 +365,7 @@ def main() -> int:
 
     rows, skipped = collect(entries, cache)
     if args.results_tsv:
-        append_results(rows, skipped, Path(args.results_tsv))
+        append_results(rows, skipped, Path(args.results_tsv), args.round)
     summary = summarize(rows)
     if args.json_out:
         Path(args.json_out).write_text(
