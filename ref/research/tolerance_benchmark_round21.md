@@ -47,6 +47,58 @@ scale (0.500 → 0.375). A larger excursion on an independently drawn set would 
 worse than recorded — and unlike most figures in this file, this one cannot be checked against its
 original set, so a new maximum simply replaces it.
 
+### Results — all six held, and the replication is close
+
+24 of 24 datasets processed. The full per-dataset table is regenerable with
+`bench_t13_wilson_b.py --cache DIR` followed by `bench_t13_l_test.py --cache DIR`.
+
+| | published (27, unreconstructable) | round 21 (24, re-derivable) |
+|---|---|---|
+| median \|Δ\| | 0.006 | **0.0065** |
+| inside ±0.02 | 25/27 (93 %) | **22/24 (92 %)** |
+| max \|Δ\| | 0.047 | **0.047** |
+| twin/no-twin call agrees | 27/27 | **24/24** |
+| matched resolution range | 0 of 18 reporting | **0 of 15 reporting** |
+
+| # | Prediction | Outcome |
+|---|---|---|
+| P1 | twin call agrees on all 24 | ✅ 24/24 |
+| P2 | median \|Δ\| in [0.003, 0.012] | ✅ **0.0065** |
+| P3 | ≥ 21 of 24 inside ±0.02 | ✅ **22** |
+| P4 | at least one exceeds ±0.02 | ✅ **two** — 9PLC 0.047, 30IZ 0.030 |
+| P5 | 0 datasets match the resolution range | ✅ 0 of 24 |
+| P6 | max does not exceed 0.047 | ✅ **exactly 0.047** |
+
+**All six holding is itself worth distrusting**, as round 16 established. P1 and P5 were near-certain
+— both restate structural facts about the two programs rather than sampling anything. The informative
+ones were P2, P3 and P6, and their agreement with the historical figures is closer than the
+sample sizes deserve.
+
+### The breaching datasets were both already named
+
+This is the round's real finding, and it inverts the usual pattern.
+
+The two datasets that exceed ±0.02 are **9PLC (0.047)** and **30IZ (0.030)**. Both are among the
+**five** the old trail happened to name. So the historical "25/27 inside ±0.02" had **2 breaches, and
+both are recoverable** — the published maximum of 0.047 is 9PLC's, reproduced here to four decimals.
+
+Everywhere else in this series, selective recording destroyed the evidence and kept the anecdote.
+Here it did the opposite: an author tabulating "the worst cases" preserved **exactly the observations
+a breach-counting argument needs**, and lost only the denominator. For a band whose evidence *is* its
+breaches, that is the more useful half to have kept — by luck, not design.
+
+It does not make the 27 reconstructable. Three or more datasets remain unidentifiable, and the
+*rate* (2 in 27 versus 2 in 24) still cannot be checked against the original.
+
+### What changes
+
+The row no longer rests solely on a set nobody can rebuild. It now carries a **24-dataset measurement
+anyone can regenerate from a clean checkout**, which agrees with the historical figures on every
+quantity. The historical 27 stays as corroboration rather than as the only evidence.
+
+The `⚠ partial record` mark stays on the *historical* figures, because they are still unverifiable in
+their own right. What has changed is that the row is no longer *only* that.
+
 ## Item 2 — the EM benchmark's all-or-nothing write
 
 `bench_refinement_deltas_em.py` calls `append_results()` **once, after every entry has finished**.
@@ -58,3 +110,13 @@ cache, which is precisely the failure mode rounds 16–18 spent three rounds clo
 all-or-nothing step in the pipeline.
 
 No prediction is registered: this is a code change, not a measurement.
+
+### Done
+
+`collect()` now takes a `record` callback and calls it after **every** entry, on all five exit paths
+— the four skip paths as well as the success path. `main()` wires it to `append_results`, whose
+dedup by id makes the retained end-of-run call an idempotent safety net rather than a second write.
+
+Tested by simulating a crash at entry 3 of 5: the two completed entries are on disk with their round
+label. The no-callback path is pinned too, so removing the wiring surfaces as a failing test rather
+than as a silently empty file after a nine-hour run.

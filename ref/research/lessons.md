@@ -1,4 +1,4 @@
-# Lessons from twenty rounds of tolerance benchmarking
+# Lessons from twenty-one rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| A lost set can sometimes be replaced instead of recovered | 21 |
+| Publication bias can preserve the half that matters | 21 |
 | A relative gate needs bounds at both ends | 20 |
 | A clause nobody re-tests is not a clause that held | 20 |
 | A reproduced extreme is binding, not disposable | 19 |
@@ -64,6 +66,26 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 21 adds the cheerful counterpart to three rounds of record-loss lessons: **a lost set can
+sometimes be replaced instead of recovered.** The L-test row reported 27 datasets and named 5, and
+round 18's proposal was to *retire* the unverifiable half. But the script's inputs are whatever a
+prior Wilson B run leaves in a cache, and **Wilson B's set had been committed in round 18** — so
+re-running it and then the L-test over the same cache produced a **24-dataset measurement anyone can
+regenerate from a clean checkout**, agreeing with the historical figures on every quantity (median
+0.0065 vs 0.006, 22/24 vs 25/27 inside the band, max 0.047 vs 0.047, twin call unanimous both times).
+The original 27 are still gone. What changed is that the row no longer rests *only* on them. Before
+retiring an unverifiable figure, check whether the measurement can simply be made again — the answer
+here depended on a fix made three rounds earlier for an unrelated reason.
+
+Its companion is a genuine surprise: **publication bias can preserve the half that matters.**
+Everywhere else in this series, recording only the interesting cases destroyed the evidence and kept
+the anecdote — round 16's biased prior, round 17's unrecoverable identities. Here the two datasets
+that **breach** the ±0.02 band, 9PLC at 0.047 and 30IZ at 0.030, are both among the five an author
+happened to tabulate as "worst cases". For a band whose evidence *is* its breaches, selective
+recording kept exactly the observations the argument needs and lost only the denominator. That is
+luck, not method, and it does not soften the general rule — but it is worth knowing that *which* half
+a partial record keeps determines how badly it hurts.
 
 Round 20 adds a rule about the *shape* of a gate rather than its size: **a relative gate needs bounds
 at both ends.** §4 gates clashscore degradation on the ratio `post / pre ≥ 5×`, and the clause

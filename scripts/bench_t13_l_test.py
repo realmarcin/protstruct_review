@@ -147,10 +147,25 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
 #
 # What IS reproducible: the twin/no-twin call agreed 27/27, and that is the load-bearing
 # half of the tolerance. What is not: the median |Δ| 0.006 and the max 0.047.
-PUBLISHED_N = 27
-KNOWN_IDS = ["9PLC", "30IZ", "9RWI", "12LO", "9LLR"]
+PUBLISHED_N = 27           # the original benchmark, whose set cannot be rebuilt
+HISTORICAL_NAMED = ["9PLC", "30IZ", "9RWI", "12LO", "9LLR"]   # the 5 the old trail tabulated
+
+# Round 21 gave this benchmark a set after all, without recovering the original 27.
+# The inputs are whatever `bench_t13_wilson_b.py` leaves in the cache, and THAT set is
+# committed -- so running Wilson B on its `DEFAULT_SET` and then this script over the
+# same cache is a measurement anyone can regenerate from a clean checkout:
+#
+#     python3 scripts/bench_t13_wilson_b.py --cache DIR
+#     python3 scripts/bench_t13_l_test.py   --cache DIR
+#
+# That produced median |delta| 0.0065, 22/24 inside +-0.02, max 0.047, twin call 24/24 --
+# agreeing with the historical 27 on every quantity. Both breaching datasets (9PLC, 30IZ)
+# are in HISTORICAL_NAMED, so the breach evidence was recoverable even though the
+# denominator was not.
+KNOWN_IDS = HISTORICAL_NAMED
 SET_IS_COMPLETE = False
-SET_SHORTFALL = "5 of 27 named -- only the worst cases were tabulated"
+SET_SHORTFALL = ("5 of the original 27 named; round 21 re-measured 24 re-derivable "
+                 "datasets instead of recovering them")
 # This script takes no ids: it parses whatever xt_*/ct_* logs a prior Wilson B run
 # left in --cache, so KNOWN_IDS is a record of what was named, not a runnable default.
 SET_NOT_RUNNABLE = "no id argument exists; the set is whatever the cache holds"
