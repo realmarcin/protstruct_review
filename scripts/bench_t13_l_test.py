@@ -141,9 +141,12 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
 # expressible, let alone recorded, and the trail tables only the 5 worst cases. The
 # other 22 are named nowhere.
 #
-# The set is NOT Wilson B's 24, even though the same two tools produce both rows: this
-# benchmark reports n = 27. At least three datasets are therefore unique to it and
-# cannot be identified even by cross-referencing the sibling benchmark.
+# The historical 27 is not the same as Wilson B's 24 -- at least three datasets are unique
+# to it -- but the two sets almost certainly OVERLAP ALMOST ENTIRELY rather than differing:
+# all five named datasets are in Wilson B's DEFAULT_SET, and both runs report exactly 9
+# datasets where ctruncate printed no range, with 18 - 15 = 3 = 27 - 24. Round 21's 24 is
+# therefore best read as a subset re-run, which is why its agreement with the published
+# figures is reproducibility rather than corroboration (#93).
 #
 # What IS reproducible: the twin/no-twin call agreed 27/27, and that is the load-bearing
 # half of the tolerance. What is not: the median |Δ| 0.006 and the max 0.047.

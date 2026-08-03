@@ -19,9 +19,10 @@ That does not recover the original 27. It replaces "5 of 27 named" with "24 name
 which is a different and better position: the published figures stay unverifiable, and the row gains
 numbers anyone can regenerate from a clean checkout.
 
-**Note the set is not the same one.** The L-test row reports n = 27 and Wilson B's is 24 — at least
-three datasets are unique to the L-test and cannot be identified even by cross-reference. So this is a
-**new measurement with its own denominator**, exactly as round 20's was.
+**Note what this is and is not.** The L-test row reports n = 27 and Wilson B's is 24, so at least three
+datasets are unique to the L-test. But the 24 is almost certainly a **subset** of the 27, not a fresh
+draw — see "This is a re-run, not a replication" below, which was written after the results and
+corrects the framing this section originally carried.
 
 ### Predictions, registered before the data
 
@@ -66,22 +67,46 @@ original set, so a new maximum simply replaces it.
 | P2 | median \|Δ\| in [0.003, 0.012] | ✅ **0.0065** |
 | P3 | ≥ 21 of 24 inside ±0.02 | ✅ **22** |
 | P4 | at least one exceeds ±0.02 | ✅ **two** — 9PLC 0.047, 30IZ 0.030 |
-| P5 | 0 datasets match the resolution range | ✅ 0 of 24 |
+| P5 | 0 datasets match the resolution range | ✅ **0 of the 15** where ctruncate reported one (the other 9 are `unknown`, not mismatches) |
 | P6 | max does not exceed 0.047 | ✅ **exactly 0.047** |
 
-**All six holding is itself worth distrusting**, as round 16 established. P1 and P5 were near-certain
-— both restate structural facts about the two programs rather than sampling anything. The informative
-ones were P2, P3 and P6, and their agreement with the historical figures is closer than the
-sample sizes deserve.
+**All six holding is itself worth distrusting**, as round 16 established — and here the reason is
+concrete rather than a hedge. See the next section: the agreement is closer than the sample sizes
+deserve because the samples are mostly the same samples.
 
-### The breaching datasets were both already named
+### This is a re-run, not a replication — and the round originally said otherwise
 
-This is the round's real finding, and it inverts the usual pattern.
+**The 24 is a subset of the 27.** This section corrects the framing above, which was written before
+the results and treated the measurement as an independent draw. It is not:
 
-The two datasets that exceed ±0.02 are **9PLC (−0.047)** and **30IZ (+0.030)**. This is not an
-inference from the maximum: `tolerance_benchmark_l_test.md` **names both explicitly** —
-*"exceeding ±0.02 | 2 / 27 (30IZ +0.030, 9PLC −0.047)"* — so the historical breach set is fully
-identified, and round 21 reproduces both to the published digit.
+| | historical (27) | round 21 (24) |
+|---|---:|---:|
+| ctruncate reported a range | 18 | 15 |
+| ctruncate printed **no** range | **9** | **9** |
+
+The "no range" count is **exactly 9 in both runs**, and 18 − 15 = 3 = 27 − 24, so the three extra
+historical datasets all sit in the reporting group. All five historically-named datasets are in
+Wilson B's committed 24. Both benchmarks read the same Wilson B cache, so the historical L-test set
+was that era's Wilson B set plus whatever else was in the directory.
+
+**So the agreement on median, breach count, max and twin call is largely guaranteed** — the same
+deposited structures through the same two deterministic programs. P2 and P6, registered at 70 %, were
+not meaningfully uncertain for the entries that determine the median and the maximum.
+
+What round 21 **does** establish, and it is worth having:
+
+- **The historical figures are reproducible.** All five named datasets return their published values
+  to the digit, fifteen-odd rounds later.
+- **The L-test has a committed, re-runnable set** — the actual objective, and it stands regardless.
+
+What it does **not** establish is independent corroboration of the band. The row should say so.
+
+### The breaching datasets were already named — and that is structural, not lucky
+
+The two datasets that exceed ±0.02 are **9PLC (−0.047)** and **30IZ (+0.030)**, and
+`tolerance_benchmark_l_test.md` **named both before this round ran** —
+*"exceeding ±0.02 | 2 / 27 (30IZ +0.030, 9PLC −0.047)"*. Round 21 reproduces both to the published
+digit but did not discover them.
 
 In fact **all five** datasets the old trail tabulated reproduce exactly:
 
@@ -96,10 +121,15 @@ In fact **all five** datasets the old trail tabulated reproduce exactly:
 So the *overlap* between the old set and the new one is verified dataset by dataset, which is
 stronger than the aggregate agreement above: the two runs are measuring the same thing the same way.
 
-Everywhere else in this series, selective recording destroyed the evidence and kept the anecdote.
-Here it did the opposite: an author tabulating "the worst cases" preserved **exactly the observations
-a breach-counting argument needs**, and lost only the denominator. For a band whose evidence *is* its
-breaches, that is the more useful half to have kept — by luck, not design.
+The useful observation is not that this was lucky but that it is **structural**. Breaches are by
+construction the largest-magnitude entries, and a "worst cases" table is sorted by magnitude — so
+**any worst-N table contains every breach whenever the breach count is ≤ N.** With 2 breaches and
+N = 5, preservation was close to guaranteed.
+
+That is a better rule than the coincidence it was first written up as: worst-case tabulation
+*reliably* keeps breach evidence and *reliably* loses the denominator. For a one-sided band, whose
+evidence **is** its breach count, the half that survives is the half that matters — predictably, and
+without anyone intending it.
 
 It does not make the 27 reconstructable. Three or more datasets remain unidentifiable, and the
 *rate* (2 in 27 versus 2 in 24) still cannot be checked against the original.
@@ -107,11 +137,36 @@ It does not make the 27 reconstructable. Three or more datasets remain unidentif
 ### What changes
 
 The row no longer rests solely on a set nobody can rebuild. It now carries a **24-dataset measurement
-anyone can regenerate from a clean checkout**, which agrees with the historical figures on every
-quantity. The historical 27 stays as corroboration rather than as the only evidence.
+anyone can regenerate from a clean checkout**. That measurement is a **re-run of most of the original
+set**, not an independent check of it, so it does not corroborate the historical figures — it makes
+them **reproducible**, which is a different and more modest claim.
 
-The `⚠ partial record` mark stays on the *historical* figures, because they are still unverifiable in
-their own right. What has changed is that the row is no longer *only* that.
+The `⚠ partial record` mark stays on the row: the historical 27 is still unreconstructable, and the
+new 24 inherits rather than replaces that limitation. What has changed is that anyone can now
+regenerate the numbers the row quotes.
+
+## Self-review findings, filed as issues
+
+Reviewing this PR's own diff found six defects
+([#93](https://github.com/realmarcin/protstruct_review/issues/93)–[#98](https://github.com/realmarcin/protstruct_review/issues/98)),
+all fixed here. The first two are the round's own headline claims:
+
+- **#93 (high)** — the measurement was framed as an **independent** one agreeing with the historical
+  figures. It is a **subset re-run**: same structures, same deterministic programs, so the agreement
+  was largely guaranteed. The round even noticed the agreement was "closer than the sample sizes
+  deserve" and reached for a hedge instead of the one-line check that explains it.
+- **#94 (medium-high)** — "publication bias preserved the half that matters" was written as a
+  discovery and a piece of luck. The breaching datasets were **already named in the old trail**, and
+  their preservation is **structural**: a worst-N table contains every breach whenever breaches ≤ N.
+- **#96 (medium)** — the backlog said six rows carry the partial-record mark; the registry literally
+  has seven, and the L-test keeps its own.
+- **#95, #97, #98 (low)** — round table out of order again (as in #90), a denominator switched between
+  two lines, and a stale comment implying the two sets are mostly disjoint.
+
+**Both headline defects point the same way: the round wanted its result to be stronger than it was.**
+That is the failure round 20 recorded as "stating a stronger version of a true result", repeated one
+round later on a different subject — and this time it took an outside reading to catch, because the
+supporting arithmetic was all correct. Numbers being right is not the same as the story being right.
 
 ## Item 2 — the EM benchmark's all-or-nothing write
 

@@ -13,7 +13,7 @@ maxims.
 | Rule | Round |
 |---|---|
 | A lost set can sometimes be replaced instead of recovered | 21 |
-| Publication bias can preserve the half that matters | 21 |
+| Worst-case tabulation predictably keeps the breaches and loses the denominator | 21 |
 | A relative gate needs bounds at both ends | 20 |
 | A clause nobody re-tests is not a clause that held | 20 |
 | A reproduced extreme is binding, not disposable | 19 |
@@ -72,20 +72,24 @@ sometimes be replaced instead of recovered.** The L-test row reported 27 dataset
 round 18's proposal was to *retire* the unverifiable half. But the script's inputs are whatever a
 prior Wilson B run leaves in a cache, and **Wilson B's set had been committed in round 18** — so
 re-running it and then the L-test over the same cache produced a **24-dataset measurement anyone can
-regenerate from a clean checkout**, agreeing with the historical figures on every quantity (median
-0.0065 vs 0.006, 22/24 vs 25/27 inside the band, max 0.047 vs 0.047, twin call unanimous both times).
-The original 27 are still gone. What changed is that the row no longer rests *only* on them. Before
+regenerate from a clean checkout**, returning the historical figures (median 0.0065 vs 0.006, 22/24
+vs 25/27 inside the band, max 0.047 vs 0.047, twin call unanimous both times). Read that as
+**reproducibility, not corroboration** — the 24 is almost certainly a subset of the 27, so it is the
+same structures through the same deterministic programs, and this round's first draft wrongly called
+it an independent measurement. The original 27 are still gone; what changed is that anyone can now
+regenerate the numbers the row quotes. Before
 retiring an unverifiable figure, check whether the measurement can simply be made again — the answer
 here depended on a fix made three rounds earlier for an unrelated reason.
 
-Its companion is a genuine surprise: **publication bias can preserve the half that matters.**
-Everywhere else in this series, recording only the interesting cases destroyed the evidence and kept
-the anecdote — round 16's biased prior, round 17's unrecoverable identities. Here the two datasets
-that **breach** the ±0.02 band are named outright in the old trail — *"2 / 27 (30IZ +0.030,
-9PLC −0.047)"* — and all five datasets it tabulated reproduce to the published digit. For a band whose evidence *is* its breaches, selective
-recording kept exactly the observations the argument needs and lost only the denominator. That is
-luck, not method, and it does not soften the general rule — but it is worth knowing that *which* half
-a partial record keeps determines how badly it hurts.
+Its companion sharpens three rounds of record-loss lessons rather than softening them: **worst-case
+tabulation predictably keeps the breaches and loses the denominator.** The L-test's two breaching
+datasets are named outright in the old trail — *"2 / 27 (30IZ +0.030, 9PLC −0.047)"* — and all five it
+tabulated reproduce to the published digit. That looks like luck until you notice it is forced:
+breaches are by construction the largest-magnitude entries and a worst-cases table is sorted by
+magnitude, so **any worst-N table contains every breach whenever breaches ≤ N**. For a one-sided
+band, whose evidence *is* its breach count, the surviving half is therefore the half that matters —
+predictably, and without anyone intending it. The denominator is what reliably dies, which is why the
+*rate* still cannot be checked while the *breaches* can.
 
 Round 20 adds a rule about the *shape* of a gate rather than its size: **a relative gate needs bounds
 at both ends.** §4 gates clashscore degradation on the ratio `post / pre ≥ 5×`, and the clause

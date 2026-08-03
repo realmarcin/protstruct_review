@@ -50,8 +50,8 @@ floors row.
 | 17 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-30) | rate question closed as underpowered; 10BU verified byte-identical; registry audited (7 rows marked partial); ligand screen moved to fetch time |
 | 18 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-31) | every benchmark commits its set + gate; bond-angle recovered and DockQ mark withdrawn; fetch attrition made durable; §4 staleness diagnosed as two untested clauses |
 | 19 | [#82](https://github.com/realmarcin/protstruct_review/pull/82) (2026-08-01) | EM set 59→69 named entries; all bands held; P4 falsified and round 16's tail reading corrected; 10BU located at 3.24× the next-largest; zero refinement-stage attrition |
-| 21 | (2026-08-03) | L-test given a re-derivable 24-dataset set instead of being retired — agrees with the historical 27 on every quantity; EM benchmark now writes per-entry results as it goes |
 | 20 | [#86](https://github.com/realmarcin/protstruct_review/pull/86) (2026-08-02) | the two §4 clauses untested since round 7 re-measured: both hold, both worst cases reproduce exactly; the clashscore ratio gate found undefined at `pre = 0` and given a low-end guard; `phenix.refine` shown deterministic 8/8 |
+| 21 | [#92](https://github.com/realmarcin/protstruct_review/pull/92) (2026-08-03) | L-test made re-derivable on a committed 24-dataset set instead of being retired — a subset re-run, so reproducible rather than corroborating; EM benchmark now writes per-entry results as it goes |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -101,11 +101,13 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
 The **L-test** was re-measured rather than retired. Round 18 had proposed dropping its unverifiable
 figures; round 19 spotted that the inputs were already committed, and round 21 ran it: Wilson B's
 committed 24-dataset set regenerates L-test inputs, giving a measurement anyone can reproduce from a
-clean checkout. It agrees with the historical 27 on **every** quantity — median |Δ| 0.0065 vs 0.006,
-22/24 vs 25/27 inside ±0.02, max 0.047 vs 0.047, twin call unanimous both times. Both breaching
-datasets turned out to be among the five the old trail named, so the breach evidence was recoverable
-even though the denominator was not. The original 27 remain unreconstructable; the row simply no
-longer rests only on them.
+clean checkout. It returns the historical figures — median |Δ| 0.0065 vs 0.006, 22/24 vs 25/27
+inside ±0.02, max 0.047 vs 0.047, twin call unanimous both times — but that is **reproducibility, not
+corroboration**: the 24 is almost certainly a *subset* of the 27, so the same structures went through
+the same deterministic programs. Both breaching datasets were already named in the old trail, which
+turns out to be structural rather than lucky — a worst-N table contains every breach whenever
+breaches ≤ N. The original 27 remain unreconstructable; what changed is that anyone can now
+regenerate the numbers the row quotes.
 
 The **EM benchmark** now appends each entry's result as it completes, on all five exit paths. The
 last all-or-nothing step in the pipeline is gone — a crash nine hours into a batch no longer takes
@@ -116,11 +118,13 @@ the completed entries with it. Tested by simulating a crash at entry 3 of 5.
 **No item is open.** The registry's live gaps are the ones that cannot be closed from here, and they
 are listed below rather than as tasks. For anyone picking this up, the three worth knowing:
 
-- **Six rows are still `⚠ partial record`** (H-placement, Ramachandran/rotamer favored %,
-  Ramachandran/rotamer outlier %, §4 ΔRMSD, §4 geometry Δ, §4 map-model). Each quotes a figure from a
-  set that cannot be rebuilt. The L-test showed one route out — re-measure on a committed set rather
-  than recover — and it worked because a sibling benchmark's set happened to be committed. **Check
-  whether the same trick applies to the others before assuming it does not.**
+- **Seven rows still carry `⚠ partial record`**: H-placement, Ramachandran/rotamer favored %,
+  Ramachandran/rotamer outlier %, L-test, §4 ΔRMSD, §4 geometry Δ, §4 map-model. Each quotes a figure
+  from a set that cannot be rebuilt. **The L-test keeps its mark even after round 21** — the
+  re-measurement re-ran most of the original set rather than replacing it, so the row is now
+  *reproducible* but still not independently corroborated. That is the honest ceiling of the trick,
+  and it is worth trying on the others anyway: making a figure regenerable from a clean checkout is
+  worth having even when it cannot make it independent.
 - **The §4 X-ray band widths still rest on ~11 entries named nowhere.** Round 20 re-measured what it
   could (16 of 37) and both clauses held, but the two quoted maxima that actually size the bands come
   from the lost batch.
