@@ -89,7 +89,7 @@ audit inferred a gap from reading the *code's upper bound* rather than its *outp
 error as inferring a distribution from its published extreme, made about a script instead of a
 dataset. A `limit=` is not a count.
 
-### Bond-angle RMSD: recovered, and every published figure reproduces
+### Bond-angle RMSD: recovered, and three of its four figures reproduce
 
 This one was a genuine gap. `bench_t05_restraint_library.py` computes per-entry angle figures into
 its `--json`, and the trail tabulated only the **bond** columns — so the bond-angle tolerance's
@@ -116,9 +116,17 @@ processed with no skips:
 | 11AF | 1.904 | 1.964 | 2.104 | 0.060 | 0.140 | 0.200 |
 | 9PLB | 1.191 | 1.191 | 1.210 | **0.000** | 0.019 | 0.019 |
 
-**Every published number reproduces**: library-effect median **0.2648°** (published 0.265), max
-**0.4711°** (published 0.471), and the library's share of the cross-library gap **51.1 %**
-(published 51 %). The row was right; it simply had nothing behind it that anyone could check.
+**Three published numbers reproduce exactly**: library-effect median **0.2648°** (published
+0.265), max **0.4711°** (published 0.471), and the library's share of the cross-library gap
+**51.1 %** (published 51 %). The row was right on those; it simply had nothing behind them that
+anyone could check.
+
+**The fourth was not reproduced, and this section originally claimed it was** (#81). The row also
+quotes *56 % on matched-count models*, and that subset cannot be reconstructed from this run —
+`collect()` emits no bond-count-match flag per entry, so the matched-count models cannot be
+separated after the fact. It stands unverified until a re-run records the flag. Writing "every
+published figure reproduces" over a cell containing four figures, having checked three, is the
+same over-reach this round caught in the DockQ mark — in the opposite direction.
 
 Two things the aggregate hid, now visible:
 
