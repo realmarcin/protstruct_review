@@ -3,7 +3,7 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-03** (round 21). Rounds 17–18 merged as
+**Last reconciled: 2026-08-03** (round 22). Rounds 17–18 merged as
 [#69](https://github.com/realmarcin/protstruct_review/pull/69); rounds 19 and 20 followed in
 [#82](https://github.com/realmarcin/protstruct_review/pull/82) and its successor. **Check the issue
 tracker for open issues; this file does not mirror it in real time.** There is no CI in this
@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Twenty-one rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Twenty-two rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -52,12 +52,13 @@ floors row.
 | 19 | [#82](https://github.com/realmarcin/protstruct_review/pull/82) (2026-08-01) | EM set 59→69 named entries; all bands held; P4 falsified and round 16's tail reading corrected; 10BU located at 3.24× the next-largest; zero refinement-stage attrition |
 | 20 | [#86](https://github.com/realmarcin/protstruct_review/pull/86) (2026-08-02) | the two §4 clauses untested since round 7 re-measured: both hold, both worst cases reproduce exactly; the clashscore ratio gate found undefined at `pre = 0` and given a low-end guard; `phenix.refine` shown deterministic 8/8 |
 | 21 | [#92](https://github.com/realmarcin/protstruct_review/pull/92) (2026-08-03) | L-test made re-derivable on a committed 24-dataset set instead of being retired — a subset re-run, so reproducible rather than corroborating; EM benchmark now writes per-entry results as it goes |
+| 22 | (2026-08-03) | 10BU shown to be a genuine statistical outlier; a candidate mechanism supported but not established (n = 2), with the successor test specified; flip-set row shown **not** to be fixable by round 21's route |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-one rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-two rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -87,6 +88,9 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
   where it is, precisely located rather than defended.
 - **A prediction confirmed once describes the round that confirmed it.** Round 16 confirmed
   "largest degradation > 1.1 %"; round 19 registered the same threshold and falsified it.
+- **Whether a subset re-run helps depends on which members were lost.** The L-test's missing
+  datasets were unremarkable; the flip-set row's are the zero-disagreement models, i.e. the
+  denominator — re-running there manufactures a contradiction rather than resolving one.
 - **A lost set can sometimes be replaced instead of recovered.** Round 18 proposed retiring the
   L-test's unverifiable half; round 21 re-measured it on a committed set instead, because a fix made
   three rounds earlier for an unrelated reason had made the inputs reproducible.
@@ -113,24 +117,41 @@ The **EM benchmark** now appends each entry's result as it completes, on all fiv
 last all-or-nothing step in the pipeline is gone — a crash nine hours into a batch no longer takes
 the completed entries with it. Tested by simulating a crash at entry 3 of 5.
 
-### Where the remaining risk is
+### Open
 
-**No item is open.** The registry's live gaps are the ones that cannot be closed from here, and they
-are listed below rather than as tasks. For anyone picking this up, the three worth knowing:
+Round 22 turned one of the three standing risks into a scoped, registerable task and closed another
+as unfixable-in-principle.
 
-- **Seven rows still carry `⚠ partial record`**: H-placement, Ramachandran/rotamer favored %,
-  Ramachandran/rotamer outlier %, L-test, §4 ΔRMSD, §4 geometry Δ, §4 map-model. Each quotes a figure
-  from a set that cannot be rebuilt. **The L-test keeps its mark even after round 21** — the
-  re-measurement re-ran most of the original set rather than replacing it, so the row is now
-  *reproducible* but still not independently corroborated. That is the honest ceiling of the trick,
-  and it is worth trying on the others anyway: making a figure regenerable from a clean checkout is
-  worth having even when it cannot make it independent.
-- **The §4 X-ray band widths still rest on ~11 entries named nowhere.** Round 20 re-measured what it
-  could (16 of 37) and both clauses held, but the two quoted maxima that actually size the bands come
-  from the lost batch.
-- **The `d_FSC_model` band still rests on one verified extreme**, 10BU at +4.786 %, 3.24× above
-  anything else on record. It is real and reproducible, so the band stays — but a single entry is
-  what stands between it and a re-fit.
+#### [ ] Test the `d_FSC_model` crossing-quality hypothesis on a targeted set
+
+Round 22 found that the two entries whose FSC crossing starts furthest beyond their map's own
+resolution (`pre / d_min` > 1.3 — 9H7U at 1.372, 10BU at 1.360) are the **two largest excursions in
+the benchmark**, −36.15 % and +4.786 %, with median |Δ| of **20.5 %** above that ratio against
+**0.112 %** below it. The correlation over all 36 entries is ρ = +0.346, p = 0.039, found *against*
+the arithmetic bias. **It is n = 2 and fails on removing either entry** (ρ = +0.288, p = 0.094), so it is a hypothesis.
+
+**Execute:** the predictor is measurable from `mtriage` **before** refinement, so entries can be
+selected on it without circularity. Fetch EM entries with `pre / d_min` > 1.3, register the
+prediction that their |Δ| exceeds the ≤ 1.3 population's 0.112 % median by one to two orders of
+magnitude, then refine. **Canary one entry first.** If it holds, the `d_FSC_model` Δ becomes
+conditionable on a measurable property instead of resting on 10BU alone; if it fails, 10BU is simply
+singular and the band stays as it is.
+
+### Standing risk, not tasks
+
+- **Seven rows carry `⚠ partial record`.** Round 21 showed one route out (re-measure on a committed
+  subset) and round 22 showed its limit: **it works only when the lost members were unremarkable.**
+  For the flip-set row it is now established *not* to work — the five missing models are the
+  zero-disagreement ones, so a 12-model re-run would report a higher rate than the published 7.5 %
+  purely because the denominator shrank. Ask what the lost members contributed before trying it.
+- **The §4 X-ray band widths still rest on ~11 entries named nowhere.** Round 20 re-measured the 16
+  that are identifiable and both clauses held, but the two maxima that actually size the bands come
+  from the lost batch. Only a fresh low-resolution X-ray measurement would give them a checkable
+  basis — a real project, not a round.
+- **`d_FSC_model` still rests on one verified extreme.** 10BU is an outlier by every criterion tried — **3.24×
+  the next-largest degradation**, which needs no distributional assumption, and above the 1.5 × IQR
+  fence under all three quartile conventions (3.017 / 2.370 / 1.724, on n = 8). It also reproduces
+  byte-identically. The item above is the cheapest way to find out whether that is explicable.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 
