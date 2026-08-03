@@ -1072,4 +1072,58 @@ check("a reason cannot break the column layout",
       "\t" not in _cells and "\n" not in _cells, True)
 
 
+# --- Round 21: a crash mid-batch must not lose the completed entries ---------------
+
+# collect() used to hand its whole result to append_results once, at the end. Round 19
+# ran for about nine hours; a crash at entry 9 of 10 would have left the committed TSV
+# empty and eight completed refinements recoverable only by whoever still had the
+# cache -- the exact failure rounds 16-18 closed everywhere else.
+_crash_tsv = _tsv_dir / "crash.tsv"
+_entries = [{"pdb_id": f"E{i:03d}", "resolution": 3.0} for i in range(5)]
+
+
+def _fake_measure(model, map_file, resolution, work, tag):
+    # The third entry dies partway, as a real refinement would. collect() lowercases
+    # the id when building the path, so match on that rather than the display form.
+    if "e002" in str(model).lower():
+        raise RuntimeError("simulated crash mid-batch")
+    return {"cc_mask": 0.80, "d_fsc_model_masked": 3.0, "d_fsc_model_plausible": True}
+
+
+_saved = (refem.measure, refem.refine)
+refem.measure = _fake_measure
+refem.refine = lambda model, map_file, resolution, work, tag: (model, None)
+_cache = Path(_tf.mkdtemp())
+for e in _entries:                       # collect() requires both files to exist
+    (_cache / f"{e['pdb_id'].lower()}.cif").write_text("x")
+    (_cache / f"{e['pdb_id'].lower()}.map").write_text("x")
+try:
+    try:
+        refem.collect(_entries, _cache,
+                      record=lambda r, s: refem.append_results(r, s, _crash_tsv, "21"))
+    except RuntimeError:
+        pass                             # the crash we simulated
+finally:
+    refem.measure, refem.refine = _saved
+
+_written = [l.split("\t")[0] for l in _crash_tsv.read_text().splitlines()[1:] if l.strip()]
+check("entries completed before a crash are on disk", _written, ["E000", "E001"])
+check("and they carry the round label",
+      {l.split("\t")[1] for l in _crash_tsv.read_text().splitlines()[1:] if l.strip()}, {"21"})
+
+# Without the callback the old behaviour returns: nothing is written until the caller
+# does it, so a crash loses everything. Pinned so the regression is visible, not silent.
+_nocb = _tsv_dir / "nocb.tsv"
+refem.measure = _fake_measure
+refem.refine = lambda model, map_file, resolution, work, tag: (model, None)
+try:
+    try:
+        refem.collect(_entries, _cache)
+    except RuntimeError:
+        pass
+finally:
+    refem.measure, refem.refine = _saved
+check("with no recorder, a crash leaves nothing on disk", _nocb.exists(), False)
+
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

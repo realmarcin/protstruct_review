@@ -1,4 +1,4 @@
-# Lessons from twenty rounds of tolerance benchmarking
+# Lessons from twenty-one rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| A lost set can sometimes be replaced instead of recovered | 21 |
+| Worst-case tabulation predictably keeps the breaches and loses the denominator | 21 |
 | A relative gate needs bounds at both ends | 20 |
 | A clause nobody re-tests is not a clause that held | 20 |
 | A reproduced extreme is binding, not disposable | 19 |
@@ -64,6 +66,30 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 21 adds the cheerful counterpart to three rounds of record-loss lessons: **a lost set can
+sometimes be replaced instead of recovered.** The L-test row reported 27 datasets and named 5, and
+round 18's proposal was to *retire* the unverifiable half. But the script's inputs are whatever a
+prior Wilson B run leaves in a cache, and **Wilson B's set had been committed in round 18** — so
+re-running it and then the L-test over the same cache produced a **24-dataset measurement anyone can
+regenerate from a clean checkout**, returning the historical figures (median 0.0065 vs 0.006, 22/24
+vs 25/27 inside the band, max 0.047 vs 0.047, twin call unanimous both times). Read that as
+**reproducibility, not corroboration** — the 24 is almost certainly a subset of the 27, so it is the
+same structures through the same deterministic programs, and this round's first draft wrongly called
+it an independent measurement. The original 27 are still gone; what changed is that anyone can now
+regenerate the numbers the row quotes. Before
+retiring an unverifiable figure, check whether the measurement can simply be made again — the answer
+here depended on a fix made three rounds earlier for an unrelated reason.
+
+Its companion sharpens three rounds of record-loss lessons rather than softening them: **worst-case
+tabulation predictably keeps the breaches and loses the denominator.** The L-test's two breaching
+datasets are named outright in the old trail — *"2 / 27 (30IZ +0.030, 9PLC −0.047)"* — and all five it
+tabulated reproduce to the published digit. That looks like luck until you notice it is forced:
+breaches are by construction the largest-magnitude entries and a worst-cases table is sorted by
+magnitude, so **any worst-N table contains every breach whenever breaches ≤ N**. For a one-sided
+band, whose evidence *is* its breach count, the surviving half is therefore the half that matters —
+predictably, and without anyone intending it. The denominator is what reliably dies, which is why the
+*rate* still cannot be checked while the *breaches* can.
 
 Round 20 adds a rule about the *shape* of a gate rather than its size: **a relative gate needs bounds
 at both ends.** §4 gates clashscore degradation on the ratio `post / pre ≥ 5×`, and the clause

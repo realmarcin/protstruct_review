@@ -3,7 +3,7 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-03** (round 20). Rounds 17–18 merged as
+**Last reconciled: 2026-08-03** (round 21). Rounds 17–18 merged as
 [#69](https://github.com/realmarcin/protstruct_review/pull/69); rounds 19 and 20 followed in
 [#82](https://github.com/realmarcin/protstruct_review/pull/82) and its successor. **Check the issue
 tracker for open issues; this file does not mirror it in real time.** There is no CI in this
@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Twenty rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Twenty-one rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -51,12 +51,13 @@ floors row.
 | 18 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-31) | every benchmark commits its set + gate; bond-angle recovered and DockQ mark withdrawn; fetch attrition made durable; §4 staleness diagnosed as two untested clauses |
 | 19 | [#82](https://github.com/realmarcin/protstruct_review/pull/82) (2026-08-01) | EM set 59→69 named entries; all bands held; P4 falsified and round 16's tail reading corrected; 10BU located at 3.24× the next-largest; zero refinement-stage attrition |
 | 20 | [#86](https://github.com/realmarcin/protstruct_review/pull/86) (2026-08-02) | the two §4 clauses untested since round 7 re-measured: both hold, both worst cases reproduce exactly; the clashscore ratio gate found undefined at `pre = 0` and given a low-end guard; `phenix.refine` shown deterministic 8/8 |
+| 21 | [#92](https://github.com/realmarcin/protstruct_review/pull/92) (2026-08-03) | L-test made re-derivable on a committed 24-dataset set instead of being retired — a subset re-run, so reproducible rather than corroborating; EM benchmark now writes per-entry results as it goes |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-one rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -86,58 +87,50 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
   where it is, precisely located rather than defended.
 - **A prediction confirmed once describes the round that confirmed it.** Round 16 confirmed
   "largest degradation > 1.1 %"; round 19 registered the same threshold and falsified it.
+- **A lost set can sometimes be replaced instead of recovered.** Round 18 proposed retiring the
+  L-test's unverifiable half; round 21 re-measured it on a committed set instead, because a fix made
+  three rounds earlier for an unrelated reason had made the inputs reproducible.
 - **A relative gate needs bounds at both ends.** The 5× clashscore ratio was guarded above
   `pre ≈ 20` and not below; at `pre = 0` it is undefined and fires on a model well inside the
   absolute quality bar.
 
 ## Open
 
-**Round 20 closed the §4 item.** Both clauses untested since round 7 were re-measured on the 16
-identifiable entries: the rotamer `+4 pp` band and the 5× clashscore gate both hold, and both
-published worst cases (28SW +3.60 pp, 30TW 4.26×) reproduce exactly and are not exceeded by the 8
-entries added since round 5. The clashscore gate gained a **low-end guard** — it is undefined at
-`clashscore_pre = 0`, and 9LLO is such an entry. `phenix.refine` was also shown reproducible, 8 of 8
-exact against round 5 — though on the **same pinned binary**, so version-dependence stays untested. The ~21 unidentifiable entries remain
-unidentifiable, and the quoted "starting clashscore 17.2" is confirmed unreproducible.
+**Round 21 closed both remaining items.**
 
-Round 19 executed the lead item — the first entries added to any benchmark since round 16. **The EM
-set grew 59 → 69 named entries, all bands held, and the round falsified a prediction round 16 had
-confirmed.** (Named entries, not refinement attempts — the registry's long-published "53" was the
-latter; §4 now states every denominator so the two cannot be confused again.)
+The **L-test** was re-measured rather than retired. Round 18 had proposed dropping its unverifiable
+figures; round 19 spotted that the inputs were already committed, and round 21 ran it: Wilson B's
+committed 24-dataset set regenerates L-test inputs, giving a measurement anyone can reproduce from a
+clean checkout. It returns the historical figures — median |Δ| 0.0065 vs 0.006, 22/24 vs 25/27
+inside ±0.02, max 0.047 vs 0.047, twin call unanimous both times — but that is **reproducibility, not
+corroboration**: the 24 is almost certainly a *subset* of the 27, so the same structures went through
+the same deterministic programs. Both breaching datasets were already named in the old trail, which
+turns out to be structural rather than lucky — a worst-N table contains every breach whenever
+breaches ≤ N. The original 27 remain unreconstructable; what changed is that anyone can now
+regenerate the numbers the row quotes.
 
-**Closed.** `d_FSC_model` was targeted in 10BU's own window (3.05–3.45 Å, 10 entries, 10 distinct
-publications) and produced a worst degradation of **+0.277 %** against the 5 % band — an 18× margin.
-CC_mask `≥ 3.0 Å` held at −0.0378. **Attrition moved as designed**: 3 rejections at fetch time (one
-by the charge screen), **zero** at the refinement stage, against 6 of 31 in rounds 14–16.
+The **EM benchmark** now appends each entry's result as it completes, on all five exit paths. The
+last all-or-nothing step in the pipeline is gone — a crash nine hours into a batch no longer takes
+the completed entries with it. Tested by simulating a crash at entry 3 of 5.
 
-**Do not tighten `d_FSC_model` on the strength of round 19.** 10BU now stands 3.24× above the
-next-largest degradation on record, which looks like an outlier and is not one — round 17 re-ran it to
-a byte-identical refined model. A tighter band would fail on a verified observation.
+### Where the remaining risk is
 
-### [ ] Fix the L-test set rather than retire it — it is cheaper than round 18 assumed
+**No item is open.** The registry's live gaps are the ones that cannot be closed from here, and they
+are listed below rather than as tasks. For anyone picking this up, the three worth knowing:
 
-Round 18 proposed retiring the L-test's unrecoverable half. **Re-measuring now looks like the better
-option**, because the inputs are already committed: `bench_t13_l_test.py` reads the `xt_*.log` /
-`ct_*.log` pairs that `bench_t13_wilson_b.py` leaves in a cache, and **Wilson B's 24-dataset set is
-committed** (round 18). CCP4 is installed at
-`/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm`, so a Wilson B re-run regenerates L-test inputs
-for 24 of the 27 datasets — turning "5 of 27 named" into "24 named and re-derivable".
-
-That does not recover the original 27, so the published median \|Δ\| 0.006 / max 0.047 stay
-unverifiable; the result would be a new measurement with a committed denominator. Worth it: this is
-xtriage and ctruncate runs, not refinements. **The remaining three benchmarks** (flip-sets 12/17,
-vs-deposited 11/17, X-ray §4 16/37) still need the re-measure-or-retire decision round 18 framed.
-
-### [ ] Make the EM benchmark write per-entry results as it goes
-
-`bench_refinement_deltas_em.py` calls `append_results()` **once, after every entry has finished**.
-Round 19 ran for roughly nine hours; a crash at entry 9 would have left the committed TSV with
-nothing, losing the durable record for eight completed refinements. The values would be
-re-derivable from the cached logs — but only by whoever still had the cache, which is the exact
-failure mode rounds 16–18 spent three rounds closing.
-
-**Execute:** append each row as its entry completes, keeping the existing dedup. Small change, and
-it removes the last all-or-nothing step in the pipeline.
+- **Seven rows still carry `⚠ partial record`**: H-placement, Ramachandran/rotamer favored %,
+  Ramachandran/rotamer outlier %, L-test, §4 ΔRMSD, §4 geometry Δ, §4 map-model. Each quotes a figure
+  from a set that cannot be rebuilt. **The L-test keeps its mark even after round 21** — the
+  re-measurement re-ran most of the original set rather than replacing it, so the row is now
+  *reproducible* but still not independently corroborated. That is the honest ceiling of the trick,
+  and it is worth trying on the others anyway: making a figure regenerable from a clean checkout is
+  worth having even when it cannot make it independent.
+- **The §4 X-ray band widths still rest on ~11 entries named nowhere.** Round 20 re-measured what it
+  could (16 of 37) and both clauses held, but the two quoted maxima that actually size the bands come
+  from the lost batch.
+- **The `d_FSC_model` band still rests on one verified extreme**, 10BU at +4.786 %, 3.24× above
+  anything else on record. It is real and reproducible, so the band stays — but a single entry is
+  what stands between it and a re-fit.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 
