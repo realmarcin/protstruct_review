@@ -1,0 +1,92 @@
+# Tolerance benchmark — round 23: testing the crossing-quality hypothesis
+
+Round 22 left one open item. `d_FSC_model`'s band rests on 10BU, and the candidate explanation is
+that **its FSC crossing was poorly determined to begin with**: when the crossing sits far beyond the
+map's own stated resolution, the curve is flat where it is read, so a small model change moves it a
+long way. The two entries on record with `pre / d_min` > 1.3 are the two largest excursions in the
+benchmark — but that is n = 2, and round 8's rule applies.
+
+The successor test was specified because the predictor is measurable **before** refinement, so a set
+can be selected on it without circularity. This round runs it.
+
+## Design, and the feasibility problem it has to confront first
+
+**There is no targeting shortcut.** Analysing the 36 existing measurements before designing this
+round:
+
+| d_min band | n | median `pre` | median ratio | n with ratio > 1.3 |
+|---|---:|---:|---:|---:|
+| 2.3–2.9 Å | 6 | 2.56 | 0.986 | 0 |
+| 2.9–3.2 Å | 10 | 3.04 | 0.986 | 1 |
+| 3.2–3.6 Å | 13 | 3.31 | 0.989 | 1 |
+| 3.6–4.2 Å | 7 | 3.81 | 0.976 | 0 |
+
+The median ratio is **~0.98 in every band** — the crossing tracks the map's stated resolution almost
+exactly for typical entries — and the two high-ratio cases are scattered rather than concentrated.
+`pre` is not floored at some fixed value either; it rises with `d_min`. **So high-ratio entries
+cannot be enriched by choosing a resolution window.** They must be found by screening.
+
+Base rate: **2 of 36 = 5.6 %**.
+
+### What that costs, and whether the test is even possible
+
+Screening is cheap relative to refining — a map download plus `mtriage`, no `real_space_refine` — but
+it is not free, and the yield is low. Registering the arithmetic before spending anything:
+
+- To expect **3** high-ratio entries requires screening ≈ **54**.
+- To expect **2** requires ≈ 36. Screening **24** gives P(at least one) ≈ **75 %**, P(at least two) ≈ **39 %**.
+
+And the comparison's own power, with perfect separation (every high-ratio entry above every control),
+one-sided Mann–Whitney:
+
+| high-ratio n | controls n | best achievable p |
+|---:|---:|---:|
+| 1 | 19 | 0.050 |
+| **2** | **6** | **0.036** |
+| 2 | 5 | 0.048 |
+| 3 | 5 | 0.018 |
+
+**So the test is feasible at 2 high-ratio entries against 6 controls, but only if separation is
+perfect** — which is what the hypothesis predicts (a ~180× median gap), so it is a fair test rather
+than a rigged one. At **1** high-ratio entry the test cannot reach significance against any control
+group I can afford, and the round would have to report that instead.
+
+This is round 17's lesson applied before the fact rather than after: **the power is computed first,
+and the outcome where the round cannot answer the question is written down in advance as a real
+possible result.**
+
+### Method
+
+```bash
+# screen: fetch + mtriage only, no refinement
+python3 scripts/fetch_em_entries.py --cache <dir> --min-res 2.4 --max-res 4.2 --limit 24 \
+    --round 23 --exclude <every prior entry>
+python3 scripts/screen_dfsc_ratio.py --cache <dir>     # d_FSC_model_pre / d_min per entry
+# refine only the high-ratio entries plus matched controls
+python3 scripts/bench_refinement_deltas_em.py --cache <dir> --entries <selected> --round 23
+```
+
+Selection is on a **pre-refinement** quantity, so it is not circular. Controls are drawn from the
+**same screened batch**, so they share the fetch criteria and differ only in the ratio.
+
+**Every screened entry is reported**, whether or not it is refined — the base rate is a result in its
+own right and the denominator must not go missing (rounds 16–18).
+
+## Predictions, registered before any fetching
+
+| # | Prediction | Falsified if | P |
+|---|---|---|---|
+| **P0** | The base rate of `ratio > 1.3` in a fresh batch is **3–15 %**, consistent with the 5.6 % on record. | It falls outside that interval. | 70 % |
+| **P1** | At least **one** high-ratio entry appears in 24 screened. | None does. | 75 % |
+| **P2** | **The hypothesis:** every high-ratio entry refined has \|Δ\| **at least 10×** the control median. | Any high-ratio entry falls below that. | 55 % |
+| **P3** | The controls' median \|Δ\| lands in **[0.02, 0.5] %**, replicating the 0.112 % of the ≤ 1.3 population. | It falls outside. | 70 % |
+| **P4** | Screening finds at least one entry with `ratio > 1.3` whose Δ is an **improvement**, not a degradation — i.e. the effect is on \|movement\|, not on direction. | Every high-ratio entry degrades. | 50 % |
+
+**P2 is the hypothesis and P4 is what distinguishes it from a band problem.** Round 22's two
+high-ratio entries moved in *opposite* directions — 9H7U improved by 36 %, 10BU degraded by 4.8 %. If
+crossing quality drives *magnitude* regardless of sign, then a poorly determined crossing is a
+**measurement-reliability** caveat, not evidence the band is mis-sized. P4 tests that reading
+directly.
+
+**If P1 fails the round reports a base rate and nothing else**, and says so rather than reaching for
+whatever the screened set happens to show.
