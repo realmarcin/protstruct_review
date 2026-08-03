@@ -536,6 +536,18 @@ def main() -> int:
     skipped: list[dict[str, Any]] = []
     seen_pubs: set[str] = set()
     pub_counts: dict[str, int] = {}
+    # Write after EVERY candidate, not once at the end. A fetch is a long sequence
+    # of large downloads, and an interrupted run used to leave `entries.json`
+    # unwritten and the attrition record empty -- so the maps were on disk but
+    # nothing said which entries they belonged to or what had already been
+    # rejected. Round 21 fixed exactly this in `bench_refinement_deltas_em.py` and
+    # did not check the sibling script, which is round 15's rule about fixing one
+    # instance of a failure class and leaving the others (#105).
+    def flush() -> None:
+        (cache / "entries.json").write_text(json.dumps(entries, indent=2) + "\n")
+        if args.fetch_tsv:
+            append_fetch_record(entries, skipped, Path(args.fetch_tsv), args.round)
+
     for pdb_id in candidates:
         if len(entries) >= args.limit:
             break
@@ -548,10 +560,9 @@ def main() -> int:
                 seen_pubs.add(key)
         entries.extend(got)
         skipped.extend(miss)
+        flush()
 
-    (cache / "entries.json").write_text(json.dumps(entries, indent=2) + "\n")
-    if args.fetch_tsv:
-        append_fetch_record(entries, skipped, Path(args.fetch_tsv), args.round)
+    flush()          # safety net; append_fetch_record dedups by id, so this is idempotent
     report = {"entries": entries, "skipped": skipped,
               "window": [args.min_res, args.max_res], "excluded": sorted(exclude),
               "n_publications": len({e["publication"] for e in entries})}
