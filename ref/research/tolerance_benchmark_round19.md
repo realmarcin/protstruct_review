@@ -186,7 +186,7 @@ So the band's position is now precisely characterised rather than merely defende
 1.0448× above one verified extreme, and roughly 18× above everything else.** Every clause below the
 extreme is comfortable; the band exists for one entry, and that entry is real. Keeping it is the
 conservative choice, and this round is the evidence that the choice is not costing detection power
-across the rest of the distribution — 8 of the 10 entries here moved `d_FSC_model` by under 0.4 %.
+across the rest of the distribution — 9 of the 10 entries here moved `d_FSC_model` by under 0.4 % (only 6O1M, at −1.362 %, moved more).
 
 ## Two other things the entries showed
 
@@ -235,6 +235,23 @@ in the same PR ([#71](https://github.com/realmarcin/protstruct_review/issues/71)
 - **#73** round 14's premise-failure lesson still cited 10EH's +0.1268 when 10DP's +0.1476 now
   supersedes it.
 - **#74** a doubled parenthetical left the counting argument unreadable.
+
+A second review pass, run against the rebuilt branch after #69 merged, found three more
+([#83](https://github.com/realmarcin/protstruct_review/issues/83)–[#85](https://github.com/realmarcin/protstruct_review/issues/85)),
+also fixed here:
+
+- **#84** — the §4 EM set size went **53 → 69** for a round that added **10** entries, because the
+  headline silently switched from the *refinement-attempt* count to the *named-entry* count. Both are
+  computable from the same file and neither is wrong; presenting the change as "+10 this round" was.
+  The row now states all four denominators (69 named / 63 attempted / 58 with a Δ / 35 fully
+  measured) so a later round cannot re-drift.
+- **#85** — "8 of the 10 entries moved `d_FSC_model` by under 0.4 %" was an off-by-one; it is 9,
+  with only 6O1M at −1.362 % moving more. The error understated this round's own case.
+- **#83** — the backlog header was stamped 2026-08-01 while describing events from 08-03, and its
+  "no issues open" clause read as current while four were open.
+
+The conflict resolution that rebuilt this branch on `main` was checked separately and **lost
+nothing**: all seven of #69's late fixes survive.
 
 Three of the four are the same failure: **round 19 updated one instance of a figure and missed its
 siblings in the same row.** That is round 18's "when the set grows, re-test every clause it backs"

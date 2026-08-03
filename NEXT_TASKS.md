@@ -3,12 +3,12 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-01** (round 19). No GitHub issues were open as of that
-reconciliation; later rounds file their own, so check the tracker rather than this line.
-Rounds 17–18 merged as [#69](https://github.com/realmarcin/protstruct_review/pull/69);
-round 19 follows in [#82](https://github.com/realmarcin/protstruct_review/pull/82)
-(which replaced #70, auto-closed when #69's branch was deleted). There is no CI in this repo — `bash scripts/validate.sh`
-is the gate, and it must exit 0 before a merge.
+**Last reconciled: 2026-08-03** (round 19). Rounds 17–18 merged as
+[#69](https://github.com/realmarcin/protstruct_review/pull/69); round 19 follows in
+[#82](https://github.com/realmarcin/protstruct_review/pull/82), which replaced #70 — GitHub
+auto-closes a PR when its base branch is deleted rather than retargeting it. **Check the issue
+tracker for open issues; this file does not mirror it in real time.** There is no CI in this
+repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
 
 ## Where the tolerance work stands
 
@@ -50,7 +50,7 @@ floors row.
 | 16 | [#66](https://github.com/realmarcin/protstruct_review/pull/66) (2026-07-30) | per-entry record made durable; all 5 predictions held; `d_FSC_model` tail shown to be sampled thinly, not thin |
 | 17 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-30) | rate question closed as underpowered; 10BU verified byte-identical; registry audited (7 rows marked partial); ligand screen moved to fetch time |
 | 18 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-31) | every benchmark commits its set + gate; bond-angle recovered and DockQ mark withdrawn; fetch attrition made durable; §4 staleness diagnosed as two untested clauses |
-| 19 | [#82](https://github.com/realmarcin/protstruct_review/pull/82) (2026-08-01) | EM set 59→69; all bands held; P4 falsified and round 16's tail reading corrected; 10BU located at 3.24× the next-largest; zero refinement-stage attrition |
+| 19 | [#82](https://github.com/realmarcin/protstruct_review/pull/82) (2026-08-01) | EM set 59→69 named entries; all bands held; P4 falsified and round 16's tail reading corrected; 10BU located at 3.24× the next-largest; zero refinement-stage attrition |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -90,7 +90,9 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
 ## Open
 
 Round 19 executed the lead item — the first entries added to any benchmark since round 16. **The EM
-set grew 59 → 69, all bands held, and the round falsified a prediction round 16 had confirmed.**
+set grew 59 → 69 named entries, all bands held, and the round falsified a prediction round 16 had
+confirmed.** (Named entries, not refinement attempts — the registry's long-published "53" was the
+latter; §4 now states every denominator so the two cannot be confused again.)
 
 **Closed.** `d_FSC_model` was targeted in 10BU's own window (3.05–3.45 Å, 10 entries, 10 distinct
 publications) and produced a worst degradation of **+0.277 %** against the 5 % band — an 18× margin.
