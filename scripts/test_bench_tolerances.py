@@ -11,6 +11,7 @@ mocked: a fake oracle would only test the mock.
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
 from pathlib import Path
 
@@ -925,6 +926,31 @@ else:
               _ligand_model("ALA", 5, hetero=False)[0], None)
     finally:
         fetchem._monomer_libraries = _real_libs
+
+    # The library RESOLUTION itself, not just the screen that consumes it. Every test
+    # above monkeypatches `_monomer_libraries` wholesale, which is exactly why a broken
+    # $PHENIX branch survived review once (#75): the escape hatch tested
+    # `$PHENIX/lib/geostd` when the libraries live at
+    # `$PHENIX/lib/python3*/site-packages/chem_data/geostd`, so it never matched and the
+    # only working lookup was one hardcoded version in one home directory.
+    _fake_phenix = Path(_tf.mkdtemp())
+    _cd = _fake_phenix / "lib" / "python3.9" / "site-packages" / "chem_data"
+    (_cd / "geostd").mkdir(parents=True)
+    (_cd / "mon_lib").mkdir(parents=True)
+    _saved_env = os.environ.get("PHENIX")
+    _saved_glob = fetchem.CHEM_DATA_GLOB
+    os.environ["PHENIX"] = str(_fake_phenix)
+    fetchem.CHEM_DATA_GLOB = "phenix-does-not-exist/lib/python3*/site-packages/chem_data"
+    try:
+        _found = fetchem._monomer_libraries()
+        check("$PHENIX locates the libraries when the home glob cannot",
+              _found is not None and _found[0] == _cd / "geostd", True)
+    finally:
+        fetchem.CHEM_DATA_GLOB = _saved_glob
+        if _saved_env is None:
+            os.environ.pop("PHENIX", None)
+        else:
+            os.environ["PHENIX"] = _saved_env
 
     # A screen that cannot find the libraries must not refuse anything: dropping good
     # entries silently is worse than the download it would have saved.

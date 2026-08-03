@@ -253,14 +253,28 @@ def charge_screen(model: Path) -> tuple[str | None, dict[str, int]]:
 # 23 each). Zero disagreements. Re-run that comparison if the screen is ever changed:
 # an in-repo reimplementation that silently drifts from the tool it stands in for is
 # worse than no screen, because it rejects entries that would have refined.
-CHEM_DATA_GLOB = "phenix-2.0-5936/lib/python3*/site-packages/chem_data"
+# Relative to a PHENIX install root. The Python minor version moves between
+# releases, so it is globbed rather than pinned.
+CHEM_DATA_REL = "lib/python3*/site-packages/chem_data"
+# Fallback when $PHENIX is unset: any phenix-* install under the home directory.
+CHEM_DATA_GLOB = f"phenix-*/{CHEM_DATA_REL}"
 
 
 def _monomer_libraries() -> tuple[Path, Path] | None:
-    """(geostd, mon_lib) roots, or None if PHENIX is not installed here."""
-    root = Path(os.environ["PHENIX"]) if os.environ.get("PHENIX") else None
-    candidates = [root / "lib"] if root else []
-    for chem_data in list(Path.home().glob(CHEM_DATA_GLOB)) + candidates:
+    """(geostd, mon_lib) roots, or None if PHENIX's libraries cannot be found.
+
+    `$PHENIX` is honoured first so a non-default install works. It has to be
+    globbed to the same depth as the home fallback -- an earlier version tested
+    `$PHENIX/lib`, which never matches, so the variable silently did nothing and
+    the only working lookup was a single hardcoded version in one home directory.
+    On any other install the screen then disabled itself without saying so, which
+    puts the ligand failures back on the expensive path (#75).
+    """
+    roots = []
+    if os.environ.get("PHENIX"):
+        roots += sorted(Path(os.environ["PHENIX"]).glob(CHEM_DATA_REL))
+    roots += sorted(Path.home().glob(CHEM_DATA_GLOB))
+    for chem_data in roots:
         geostd, mon_lib = chem_data / "geostd", chem_data / "mon_lib"
         if geostd.is_dir() and mon_lib.is_dir():
             return geostd, mon_lib
@@ -276,6 +290,12 @@ def ligand_screen(model: Path) -> tuple[str | None, dict[str, int]]:
     """
     libs = _monomer_libraries()
     if libs is None:
+        # Refusing on a library that is not there would drop good entries, so the
+        # screen skips -- but it says so. A silent skip is indistinguishable from
+        # "no entry carried a ligand", which is how a disabled screen goes unnoticed
+        # until entries start failing at refinement again (#75).
+        print("  ! ligand screen skipped: PHENIX monomer libraries not found "
+              "(set $PHENIX)", file=sys.stderr)
         return None, {}
     geostd, mon_lib = libs
     try:

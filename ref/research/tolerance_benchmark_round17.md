@@ -327,8 +327,12 @@ nothing here — that is a different cause with its own screen. Cost is ~0.1 s p
 ~9 s the authoritative check takes and the hours the failure used to.
 
 10GJ, 10GK, 10GL and 10GM are an incidental finding: four models sitting in round 14's cache carrying
-an unparameterised ligand, which appear in **no durable record at all**. They were rejected before a
+an unparameterised ligand, which appeared in **no durable record at all**. They were dropped before a
 refinement attempt, and this file records attrition only from the refinement stage onward.
+
+> **Closed in round 18.** All four are now in `ref/research/data/em_fetch_attrition.tsv`, recorded as
+> `unrecorded` rather than as rejections — the screen verdicts on them were computed in round 18 and
+> are not why they were dropped at the time.
 
 ## Applied
 

@@ -3,7 +3,8 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-07-31** (round 18). No open GitHub issues. PR
+**Last reconciled: 2026-07-31** (round 18). No GitHub issues were open as of that reconciliation;
+later rounds file their own, so check the tracker rather than this line. PR
 [#69](https://github.com/realmarcin/protstruct_review/pull/69) is open and carries **both** rounds 17
 and 18 — round 18 is the fix for what round 17 found, and #69 had not merged in between. There is no
 CI in this repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
