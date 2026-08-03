@@ -83,10 +83,16 @@ def outlier_fences(values: list[float]) -> dict[str, dict[str, float]]:
     for name, q in (("exclusive", statistics.quantiles(ordered, n=4, method="exclusive")),
                     ("inclusive", statistics.quantiles(ordered, n=4, method="inclusive"))):
         out[name] = {"q1": q[0], "q3": q[2], "fence": q[2] + 1.5 * (q[2] - q[0])}
-    # Tukey's original hinges: median of each half, lower half including the
-    # median when n is odd.
+    # Tukey's original hinges: median of each half, with the median itself in
+    # BOTH halves when n is odd. An earlier version split strictly and excluded
+    # it from both, which is a third convention that coincides with Tukey only
+    # for even n -- and the whole point of this function is that the convention
+    # matters (#104).
     half = len(ordered) // 2
-    lo, hi = ordered[:half], ordered[-half:]
+    if len(ordered) % 2:
+        lo, hi = ordered[:half + 1], ordered[half:]
+    else:
+        lo, hi = ordered[:half], ordered[half:]
     q1, q3 = statistics.median(lo), statistics.median(hi)
     out["hinges"] = {"q1": q1, "q3": q3, "fence": q3 + 1.5 * (q3 - q1)}
     return out
