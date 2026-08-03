@@ -5,3 +5,16 @@ pdb_id	round	resolution	emdb	outcome	charges	unparameterised	publication
 10GM	14			unrecorded: fetched but never benchmarked; no record says why (fails the round-18 ligand screen)		8OG×23	
 10TP	16			unrecorded: fetched but never benchmarked; no record says why (fails the charge screen)	N1+×46, O1-×36		
 10UA	16			unrecorded: fetched but never benchmarked; no record says why (passes both screens)			
+36QD	19	3.05	EMD-77765	kept			Cryo-EM of rPFFs
+6FKF	19	3.15	EMD-4270	kept			10.1126/science.aat4318
+10DP	19	3.25	EMD-75094	kept			10.1016/j.omta.2026.201694
+11FW	19	3.35	EMD-75669	kept			Cryo-EM study of bacteriophage N4 virion RNA polymerase
+6IFU	19	3.05	EMD-9657	kept			10.1016/j.cell.2018.10.052
+6LX3	19	3.15	EMD-30004	kept			10.1038/s41422-020-0336-3
+13LT	19	3.25	EMD-77144	kept			10.1038/s41467-026-74687-5
+12QJ	19	3.35	EMD-76684	kept			BROADLY REACTIVE HUMAN MONOCLONAL ANTIBODY TARGETING CONSERVED PNEUMOCOCCAL CHOLINE BINDING DOMAIN INCREASES PROTECTION AGAINST LETHAL PNEUMOCOCCAL INFECTION
+5O5J	19	3.45	EMD-3748	kept			10.1016/j.celrep.2017.06.029
+6O1M	19	3.15	EMD-0592	kept			10.7554/eLife.43158
+3JAH	19			rejected: model 26 MB exceeds --max-model-mb 8			
+10TQ	19			rejected: formal charges absent from the electron scattering table: O1-×36	N1+×46, O1-×36		
+6JHS	19			rejected: map 415 MB exceeds --max-map-mb 300			
