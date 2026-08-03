@@ -212,33 +212,56 @@ def refine(model: Path, map_file: Path, resolution: float, work: Path,
     return None, refine_failure_reason(log)
 
 
-def collect(entries: list[dict], cache: Path) -> tuple[list[dict], list[dict]]:
-    """Refine and re-measure each EM entry."""
+def collect(entries: list[dict], cache: Path,
+            record=None) -> tuple[list[dict], list[dict]]:
+    """Refine and re-measure each EM entry.
+
+    `record(rows, skipped)` is called after **every** entry, with only that
+    entry's result. Without it the caller only learns anything once the whole
+    batch finishes -- and round 19's batch ran for about nine hours, so a crash
+    at entry 9 of 10 would have left the committed TSV empty and the record for
+    eight completed refinements recoverable only by whoever still had the cache.
+    That is the failure mode rounds 16-18 spent three rounds closing, and it was
+    the last all-or-nothing step in the pipeline.
+    """
     rows, skipped = [], []
+
+    def emit(row: dict | None = None, skip: dict | None = None) -> None:
+        if record:
+            record([row] if row else [], [skip] if skip else [])
+
     for entry in entries:
         pdb_id, resolution = entry["pdb_id"].lower(), float(entry["resolution"])
         model, map_file = cache / f"{pdb_id}.cif", cache / f"{pdb_id}.map"
         print(f"[{pdb_id.upper()}]", file=sys.stderr)
         if not model.exists() or not map_file.exists():
-            skipped.append({"pdb_id": pdb_id.upper(), "reason": "model or map missing"})
+            skip = {"pdb_id": pdb_id.upper(), "reason": "model or map missing"}
+            skipped.append(skip)
+            emit(skip=skip)
             continue
         pre = measure(model, map_file, resolution, cache, f"{pdb_id}_pre")
         if pre["cc_mask"] is None:
             reason = failure_reason(cache / f"mc_{pdb_id}_pre.log", "map_correlations")
             print(f"  ! {reason}", file=sys.stderr)
-            skipped.append({"pdb_id": pdb_id.upper(), "reason": reason})
+            skip = {"pdb_id": pdb_id.upper(), "reason": reason}
+            skipped.append(skip)
+            emit(skip=skip)
             continue
         refined, reason = refine(model, map_file, resolution, cache, pdb_id)
         if refined is None:
             print(f"  ! {reason}", file=sys.stderr)
-            skipped.append({"pdb_id": pdb_id.upper(), "reason": reason})
+            skip = {"pdb_id": pdb_id.upper(), "reason": reason}
+            skipped.append(skip)
+            emit(skip=skip)
             continue
         post = measure(refined, map_file, resolution, cache, f"{pdb_id}_post")
         if post["cc_mask"] is None:
             reason = failure_reason(cache / f"mc_{pdb_id}_post.log",
                                     "map_correlations (post)")
             print(f"  ! {reason}", file=sys.stderr)
-            skipped.append({"pdb_id": pdb_id.upper(), "reason": reason})
+            skip = {"pdb_id": pdb_id.upper(), "reason": reason}
+            skipped.append(skip)
+            emit(skip=skip)
             continue
         row = {"pdb_id": pdb_id.upper(), "resolution": resolution,
                "cc_mask_pre": pre["cc_mask"], "cc_mask_post": post["cc_mask"],
@@ -256,6 +279,7 @@ def collect(entries: list[dict], cache: Path) -> tuple[list[dict], list[dict]]:
                 # Positive only: how much WORSE the fit got. Improvements report 0.
                 row["d_fsc_model_degradation_pct"] = max(0.0, row["d_fsc_model_delta_pct"])
         rows.append(row)
+        emit(row=row)
         print(f"  CC_mask {pre['cc_mask']}→{post['cc_mask']} (Δ {row['cc_mask_delta']:+.4f})"
               f" | d_FSC_model {pre['d_fsc_model_masked']}→{post['d_fsc_model_masked']}",
               file=sys.stderr)
@@ -363,9 +387,14 @@ def main() -> int:
     entries_path = Path(args.entries) if args.entries else cache / "entries.json"
     entries = json.loads(entries_path.read_text())
 
-    rows, skipped = collect(entries, cache)
-    if args.results_tsv:
-        append_results(rows, skipped, Path(args.results_tsv), args.round)
+    tsv = Path(args.results_tsv) if args.results_tsv else None
+    # Append as each entry finishes rather than after the batch. The final call
+    # below is retained as a no-op safety net -- append_results dedups by id, so
+    # re-offering rows already written changes nothing.
+    record = ((lambda r, s: append_results(r, s, tsv, args.round)) if tsv else None)
+    rows, skipped = collect(entries, cache, record=record)
+    if tsv:
+        append_results(rows, skipped, tsv, args.round)
     summary = summarize(rows)
     if args.json_out:
         Path(args.json_out).write_text(
