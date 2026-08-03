@@ -127,8 +127,8 @@ as unfixable-in-principle.
 Round 22 found that the two entries whose FSC crossing starts furthest beyond their map's own
 resolution (`pre / d_min` > 1.3 — 9H7U at 1.372, 10BU at 1.360) are the **two largest excursions in
 the benchmark**, −36.15 % and +4.786 %, with median |Δ| of **20.5 %** above that ratio against
-**0.112 %** below it. The correlation over all 36 entries is ρ = +0.343, p = 0.041, found *against*
-the arithmetic bias. **It is n = 2 and fails on removing either entry**, so it is a hypothesis.
+**0.112 %** below it. The correlation over all 36 entries is ρ = +0.346, p = 0.039, found *against*
+the arithmetic bias. **It is n = 2 and fails on removing either entry** (ρ = +0.288, p = 0.094), so it is a hypothesis.
 
 **Execute:** the predictor is measurable from `mtriage` **before** refinement, so entries can be
 selected on it without circularity. Fetch EM entries with `pre / d_min` > 1.3, register the
@@ -148,9 +148,10 @@ singular and the band stays as it is.
   that are identifiable and both clauses held, but the two maxima that actually size the bands come
   from the lost batch. Only a fresh low-resolution X-ray measurement would give them a checkable
   basis — a real project, not a round.
-- **`d_FSC_model` still rests on one verified extreme.** 10BU is a genuine statistical outlier
-  (4.786 % against an upper Tukey fence of 3.017), reproduces byte-identically, and is 3.24× above
-  anything else. The item above is the cheapest way to find out whether that is explicable.
+- **`d_FSC_model` still rests on one verified extreme.** 10BU is an outlier by every criterion tried — **3.24×
+  the next-largest degradation**, which needs no distributional assumption, and above the 1.5 × IQR
+  fence under all three quartile conventions (3.017 / 2.370 / 1.724, on n = 8). It also reproduces
+  byte-identically. The item above is the cheapest way to find out whether that is explicable.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 

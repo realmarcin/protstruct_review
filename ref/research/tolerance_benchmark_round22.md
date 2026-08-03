@@ -68,10 +68,10 @@ delta.
 
 | # | Prediction | Outcome |
 |---|---|---|
-| **P0** | 10BU is a statistical outlier | ✅ **4.786 % against an upper fence of 3.017** (Q3 1.218) |
+| **P0** | 10BU is a statistical outlier | ✅ **on 8 degradations**, and under **every** quartile convention — fence 3.017 (exclusive), 2.370 (hinges), 1.724 (inclusive), against 4.786 %. Assumption-free: **3.24× the next value** |
 | **P1** | 10BU has the highest pre/resolution ratio | ❌ **falsified — it is 2nd** |
-| **P2** | ratio predicts \|excursion\| | ✅ ρ = **+0.343**, p = 0.041 |
-| **P3** | P2 survives removing 10BU | ❌ **falsified** — ρ = +0.284, p = 0.098 |
+| **P2** | ratio predicts \|excursion\| | ✅ ρ = **+0.346**, p = 0.039 |
+| **P3** | P2 survives removing 10BU | ❌ **falsified** — ρ = +0.288, p = 0.094 |
 
 **P3 failing is the honest headline: this is the fourth mechanism hunt in the series and it does not
 establish its mechanism either.** It was registered at 30 % for exactly that reason.
@@ -100,15 +100,17 @@ rank 3 is **0.284**; from rank 1 to rank 2 it is **0.012**.
 | > 1.3 | **2** | **20.468 %** |
 | ≤ 1.3 | 34 | **0.112 %** |
 
-A ~180× difference in median excursion, Mann–Whitney p = 0.010.
+A ~180× difference in median excursion. A rank test here is **near-tautological** — the high group
+*is* the two largest |Δ| in the set, chosen after seeing the gap — so the descriptive contrast is the
+honest output. For completeness: Mann–Whitney **p = 0.010 one-sided, 0.020 two-sided**.
 
 ### Why that is a hypothesis and not a finding
 
 **n = 2.** Round 8's rule applies directly and by name: *a mechanism inferred from two data points is a
 hypothesis.* Everything above rests on 9H7U and 10BU, and:
 
-- The correlation fails on removing **either** of them (both leave ρ = +0.284, p = 0.098), and drops
-  to ρ = +0.219, p = 0.214 without both.
+- The correlation fails on removing **either** of them (both leave ρ = +0.288, p = 0.094), and drops
+  to ρ = +0.222, p = 0.206 without both.
 - The 1.3 split was chosen **after seeing the gap**, so the Mann–Whitney p is post-hoc on n = 2 vs 34.
 - 10ME, the 4th-largest excursion at 1.476 %, ranks **29th of 36** on the ratio — a direct
   counterexample.
@@ -135,6 +137,42 @@ instead of resting on one entry. If it fails, 10BU stays what it is: real, repro
 > **No band changed.** The `d_FSC_model` row gains a **caveat**, not a gate: when the pre-refinement
 > crossing sits far beyond the map's own resolution the curve is flat where it is read, and the two
 > such entries on record are the two largest excursions in the set. **n = 2 — this is a hypothesis.**
+
+## Self-review findings, filed as issues
+
+Reviewing this PR's own diff found four defects
+([#100](https://github.com/realmarcin/protstruct_review/issues/100)–[#103](https://github.com/realmarcin/protstruct_review/issues/103)),
+all fixed here. The first is a repeat of a defect this series fixed five rounds ago.
+
+- **#101 (high)** — the published ρ/p figures were **not what the cited script outputs**. They were
+  recomputed from the JSON's `entries` array, which this script rounds to 4 dp for readability; three
+  ratios that are distinct at full precision (0.984281, 0.984253, 0.984304) **tie at 0.9843** and
+  shift the rank correlation. Published 0.343/0.041 and 0.284/0.098; the script gives **0.346/0.039**
+  and **0.288/0.094**.
+
+  **This is round 17's backfill artefact, repeated.** That round found `d_FSC_model`'s headline
+  +4.787 % was a ratio recomputed from 4-dp-rounded values, corrected it to +4.786 %, and wrote the
+  lesson down. Round 22 then did the same thing to a rank correlation. Verdicts are unaffected, but
+  in a repo whose premise is that every figure is re-derivable from a committed script, **a published
+  number the script does not produce is the defect**, whatever its size. Every robustness check is
+  now computed *inside* `analyze_dfsc_outlier.py`, so one artefact produces every quoted figure.
+
+- **#100 / #103 (medium)** — P0's Tukey fence was quoted as a single number without saying it rests
+  on **8 values**, and without noting it is **method-dependent**: 3.017 (exclusive), 2.370 (hinges),
+  1.724 (inclusive). The conclusion survives all three — and the assumption-free statement, **3.24×
+  the next-largest degradation**, carries it without any convention at all. That now leads instead.
+  The registry's caveat and the backlog bullet were also stating the n = 2 hypothesis more flatly
+  than the analysis supports.
+
+- **#102 (low-medium)** — the Mann–Whitney p was one-sided and unlabelled, and is near-tautological
+  anyway: the high group *is* the two largest |Δ|, selected after seeing the gap. Both sidednesses
+  are now reported with the caveat attached.
+
+**The pattern across rounds 20, 21 and 22 is consistent and worth naming**: the arithmetic keeps
+being right while the *presentation* claims more than the arithmetic does — a version upgrade that
+never happened, an independent replication that was a subset re-run, a fence stated as though one
+convention were canonical. Round 22 adds a fourth variant: a figure quoted from the wrong precision
+of the right computation.
 
 ## Item 2 — make a partial row regenerable
 

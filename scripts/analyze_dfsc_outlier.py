@@ -70,16 +70,34 @@ def load(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def outlier_fence(values: list[float]) -> tuple[float, float]:
-    """(Q3, upper Tukey fence) — the standard 1.5 x IQR criterion."""
-    q1, q3 = statistics.quantiles(values, n=4)[0], statistics.quantiles(values, n=4)[2]
-    return q3, q3 + 1.5 * (q3 - q1)
+def outlier_fences(values: list[float]) -> dict[str, dict[str, float]]:
+    """Upper 1.5 x IQR fence under each common quartile convention.
+
+    There is no single "standard" quartile definition, and on n = 8 the choice
+    moves the fence by nearly 2x -- so reporting one number would overstate the
+    criterion. All three are returned and the write-up quotes the range (#100,
+    #103). `statistics.quantiles` defaults to the exclusive method.
+    """
+    ordered = sorted(values)
+    out = {}
+    for name, q in (("exclusive", statistics.quantiles(ordered, n=4, method="exclusive")),
+                    ("inclusive", statistics.quantiles(ordered, n=4, method="inclusive"))):
+        out[name] = {"q1": q[0], "q3": q[2], "fence": q[2] + 1.5 * (q[2] - q[0])}
+    # Tukey's original hinges: median of each half, lower half including the
+    # median when n is odd.
+    half = len(ordered) // 2
+    lo, hi = ordered[:half], ordered[-half:]
+    q1, q3 = statistics.median(lo), statistics.median(hi)
+    out["hinges"] = {"q1": q1, "q3": q3, "fence": q3 + 1.5 * (q3 - q1)}
+    return out
 
 
 def analyze(rows: list[dict[str, Any]]) -> dict[str, Any]:
     degradations = sorted(r["delta_pct"] for r in rows if r["delta_pct"] > 0)
-    q3, fence = outlier_fence(degradations)
+    fences = outlier_fences(degradations)
     worst = max(rows, key=lambda r: r["delta_pct"])
+    # The assumption-free statement: how far clear of the next value it sits.
+    ratio_to_next = worst["delta_pct"] / degradations[-2] if len(degradations) > 1 else None
 
     ranked = sorted(rows, key=lambda r: -r["pre_over_res"])
     rank_10bu = next((i + 1 for i, r in enumerate(ranked) if r["pdb_id"] == "10BU"), None)
@@ -91,13 +109,25 @@ def analyze(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 "holds": bool(rho > 0 and p < ALPHA)}
 
     without = [r for r in rows if r["pdb_id"] != "10BU"]
+    # Every robustness figure the write-up quotes is produced HERE, at full
+    # precision. Round 22 first computed these from the rounded `entries` array
+    # this script emits for readability, which ties three ratios at 4 dp and
+    # shifts the rank correlation -- the round-17 backfill artefact, repeated
+    # (#101). One artefact now produces every quoted number.
+    top_two = sorted(rows, key=lambda r: -r["pre_over_res"])[:2]
     return {
         "n_entries": len(rows),
         "P0_10bu_is_an_outlier": {
             "n_degradations": len(degradations),
             "worst": worst["pdb_id"], "worst_pct": worst["delta_pct"],
-            "q3": round(q3, 4), "upper_fence": round(fence, 4),
-            "holds": bool(worst["delta_pct"] > fence),
+            "fences": {k: {kk: round(vv, 4) for kk, vv in v.items()}
+                       for k, v in fences.items()},
+            # Reported because it needs no distributional assumption at all, and
+            # carries the same conclusion as every fence convention.
+            "ratio_to_next_largest": round(ratio_to_next, 3) if ratio_to_next else None,
+            "holds_under_all_conventions": bool(
+                all(worst["delta_pct"] > v["fence"] for v in fences.values())),
+            "holds": bool(worst["delta_pct"] > fences["exclusive"]["fence"]),
         },
         "P1_10bu_has_highest_ratio": {
             "rank": rank_10bu, "of": len(rows),
@@ -106,6 +136,35 @@ def analyze(rows: list[dict[str, Any]]) -> dict[str, Any]:
         },
         "P2_ratio_predicts_excursion": spearman(rows),
         "P3_survives_without_10bu": spearman(without),
+        "robustness": {
+            "without_9H7U": spearman([r for r in rows if r["pdb_id"] != "9H7U"]),
+            "without_top_two": spearman(
+                [r for r in rows if r["pdb_id"] not in {t["pdb_id"] for t in top_two}]),
+        },
+        "high_ratio_split": _split(rows),
+    }
+
+
+def _split(rows: list[dict[str, Any]], cut: float = 1.3) -> dict[str, Any]:
+    """|delta| above vs below a pre/resolution cut.
+
+    The cut is POST-HOC -- chosen after seeing the gap at 1.372 / 1.360 / 1.076 --
+    and the high group is by construction the two largest |delta| in the set, so a
+    rank test here is close to tautological. The descriptive medians are the
+    honest output; the p-value is reported with its sidedness stated (#102).
+    """
+    hi = [abs(r["delta_pct"]) for r in rows if r["pre_over_res"] > cut]
+    lo = [abs(r["delta_pct"]) for r in rows if r["pre_over_res"] <= cut]
+    u_one = stats.mannwhitneyu(hi, lo, alternative="greater")
+    u_two = stats.mannwhitneyu(hi, lo, alternative="two-sided")
+    return {
+        "cut": cut, "n_above": len(hi), "n_below": len(lo),
+        "median_abs_delta_above": round(statistics.median(hi), 4),
+        "median_abs_delta_below": round(statistics.median(lo), 4),
+        "mannwhitney_p_one_sided": round(float(u_one.pvalue), 4),
+        "mannwhitney_p_two_sided": round(float(u_two.pvalue), 4),
+        "caveat": "cut is post-hoc; the high group IS the two largest |delta|, "
+                  "so this test is near-tautological",
     }
 
 

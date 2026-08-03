@@ -84,7 +84,7 @@ they are the denominator, the trick manufactures a contradiction instead of reso
 Round 22's second is about what a failed hunt is worth: **a failed mechanism hunt can still leave a
 testable successor.** The fourth hunt in this series failed like the first three — the proposed
 predictor for 10BU's excursion (how far the FSC crossing starts beyond the map's own resolution)
-correlates at ρ = +0.343, p = 0.041 over 36 entries and **fails on removing either of the top two**.
+correlates at ρ = +0.346, p = 0.039 over 36 entries and **fails on removing either of the top two**.
 That is n = 2, and round 8's rule applies by name. But unlike rounds 7, 15 and 17, this one ends with
 a **sharp, pre-specifiable test**: the predictor is measurable *before* refinement, so a future round
 can select entries on it without circularity and check whether they move more. The difference is not
