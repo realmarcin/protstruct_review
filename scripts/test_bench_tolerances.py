@@ -1126,4 +1126,33 @@ finally:
 check("with no recorder, a crash leaves nothing on disk", _nocb.exists(), False)
 
 
+# --- Round 23: an interrupted FETCH must not lose its record either -----------------
+
+# Round 21 fixed the all-or-nothing write in the refinement benchmark and called it the
+# last one. It was not: fetch_em_entries.py had the same shape, and an interrupted
+# round-23 fetch left entries.json unwritten and the attrition record empty after 8
+# model and 7 map downloads (#105). Round 15's rule -- fixing one instance of a failure
+# class and leaving its siblings hides the class.
+_fetch_dir = Path(_tf.mkdtemp())
+_fetch_rec = _fetch_dir / "attrition.tsv"
+
+# append_fetch_record is what flush() calls; the contract that matters is that a
+# partial batch already on disk survives, and that re-offering it does not duplicate.
+fetchem.append_fetch_record([{"pdb_id": "AAAA", "resolution": 3.0}],
+                            [{"pdb_id": "BBBB", "reason": "map too large"}],
+                            _fetch_rec, "23")
+_partial = [l.split("\t")[0] for l in _fetch_rec.read_text().splitlines()[1:] if l.strip()]
+check("a partial fetch's outcomes are on disk before the run ends", _partial, ["AAAA", "BBBB"])
+
+# The end-of-run flush() re-offers everything, including what was already written.
+fetchem.append_fetch_record([{"pdb_id": "AAAA", "resolution": 3.0},
+                             {"pdb_id": "CCCC", "resolution": 3.5}],
+                            [{"pdb_id": "BBBB", "reason": "map too large"}],
+                            _fetch_rec, "23")
+_final = [l.split("\t")[0] for l in _fetch_rec.read_text().splitlines()[1:] if l.strip()]
+check("re-offering them at the end is idempotent", _final, ["AAAA", "BBBB", "CCCC"])
+check("and one header survives",
+      sum(1 for l in _fetch_rec.read_text().splitlines() if l.startswith("pdb_id")), 1)
+
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")
