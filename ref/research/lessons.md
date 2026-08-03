@@ -1,4 +1,4 @@
-# Lessons from twenty-one rounds of tolerance benchmarking
+# Lessons from twenty-two rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| Whether a subset re-run helps depends on which members were lost | 22 |
+| A failed mechanism hunt can still leave a testable successor | 22 |
 | A lost set can sometimes be replaced instead of recovered | 21 |
 | Worst-case tabulation predictably keeps the breaches and loses the denominator | 21 |
 | A relative gate needs bounds at both ends | 20 |
@@ -66,6 +68,29 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 22 qualifies round 21's route with the question that decides whether it works: **whether a
+subset re-run helps depends on *which* members were lost, not how many.** The L-test's missing
+datasets were unremarkable middle-of-distribution ones, so re-running the committed subset reproduced
+the published figures closely. The flip-set row looks similar — 12 of 17 committed — and is the
+opposite case: the five missing models are exactly those with **zero** disagreements, so they
+contribute nothing to the numerator and everything they have to the denominator. Re-running the 12
+would reproduce all 48 disagreements over fewer than 639 residues and report a **higher** rate than
+the published 7.5 %, and anyone comparing the two would see a discrepancy that is purely an artefact
+of which models survived the record. So that row keeps its mark and does not get a re-run — a result
+rather than a deferral. Before applying round 21's trick, ask what the lost members contributed: if
+they are the denominator, the trick manufactures a contradiction instead of resolving one.
+
+Round 22's second is about what a failed hunt is worth: **a failed mechanism hunt can still leave a
+testable successor.** The fourth hunt in this series failed like the first three — the proposed
+predictor for 10BU's excursion (how far the FSC crossing starts beyond the map's own resolution)
+correlates at ρ = +0.343, p = 0.041 over 36 entries and **fails on removing either of the top two**.
+That is n = 2, and round 8's rule applies by name. But unlike rounds 7, 15 and 17, this one ends with
+a **sharp, pre-specifiable test**: the predictor is measurable *before* refinement, so a future round
+can select entries on it without circularity and check whether they move more. The difference is not
+that the hypothesis is better — it is that the quantity is observable in advance, which is what makes
+a hypothesis cheap to kill. When a hunt fails, ask whether it leaves something selectable; that is
+worth more than the correlation would have been.
 
 Round 21 adds the cheerful counterpart to three rounds of record-loss lessons: **a lost set can
 sometimes be replaced instead of recovered.** The L-test row reported 27 datasets and named 5, and

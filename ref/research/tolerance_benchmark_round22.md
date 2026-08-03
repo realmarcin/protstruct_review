@@ -61,6 +61,81 @@ as a *failure* rather than written up as support.
 **If P0 fails there is nothing to explain** and P1–P3 become decoration, exactly as round 17's P0
 made P1–P3 decoration.
 
+### Results
+
+`scripts/analyze_dfsc_outlier.py`, over the 36 entries carrying both a `d_FSC_model` pre value and a
+delta.
+
+| # | Prediction | Outcome |
+|---|---|---|
+| **P0** | 10BU is a statistical outlier | ✅ **4.786 % against an upper fence of 3.017** (Q3 1.218) |
+| **P1** | 10BU has the highest pre/resolution ratio | ❌ **falsified — it is 2nd** |
+| **P2** | ratio predicts \|excursion\| | ✅ ρ = **+0.343**, p = 0.041 |
+| **P3** | P2 survives removing 10BU | ❌ **falsified** — ρ = +0.284, p = 0.098 |
+
+**P3 failing is the honest headline: this is the fourth mechanism hunt in the series and it does not
+establish its mechanism either.** It was registered at 30 % for exactly that reason.
+
+But the shape of the failure is more interesting than the previous three.
+
+### The entry above 10BU is the largest excursion in the set — in the opposite direction
+
+| rank | entry | d_min | pre | **pre / resolution** | Δ |
+|---:|---|---:|---:|---:|---:|
+| 1 | **9H7U** | 2.96 Å | 4.060 | **1.372** | **−36.150 %** |
+| 2 | **10BU** | 3.20 Å | 4.351 | **1.360** | **+4.786 %** |
+| 3 | 10EU | 3.00 Å | 3.229 | 1.076 | −1.084 % |
+| 4 | 10ET | 3.00 Å | 3.180 | 1.060 | −0.779 % |
+
+P1 was falsified by **9H7U**, whose crossing sits 1.372× its map resolution — and which is the
+**largest single excursion ever recorded in this benchmark**, a 36 % *improvement*. So the two entries
+whose crossing sits furthest beyond their map's stated resolution are the two largest movements in the
+set, one up and one down.
+
+The ratio distribution has a clean gap there: **1.372, 1.360, then 1.076.** The step from rank 2 to
+rank 3 is **0.284**; from rank 1 to rank 2 it is **0.012**.
+
+| ratio | n | median \|Δ\| |
+|---|---:|---:|
+| > 1.3 | **2** | **20.468 %** |
+| ≤ 1.3 | 34 | **0.112 %** |
+
+A ~180× difference in median excursion, Mann–Whitney p = 0.010.
+
+### Why that is a hypothesis and not a finding
+
+**n = 2.** Round 8's rule applies directly and by name: *a mechanism inferred from two data points is a
+hypothesis.* Everything above rests on 9H7U and 10BU, and:
+
+- The correlation fails on removing **either** of them (both leave ρ = +0.284, p = 0.098), and drops
+  to ρ = +0.219, p = 0.214 without both.
+- The 1.3 split was chosen **after seeing the gap**, so the Mann–Whitney p is post-hoc on n = 2 vs 34.
+- 10ME, the 4th-largest excursion at 1.476 %, ranks **29th of 36** on the ratio — a direct
+  counterexample.
+
+So the registered verdict is: **P2 holds against the arithmetic bias, P3 fails, and the mechanism is
+not established.** What has changed is that "10BU is unexplained" becomes "here is a specific,
+pre-specifiable test that would settle it".
+
+### The successor test, specified now
+
+A future round can settle this cheaply, because the prediction is sharp and the sampling is targeted:
+
+> **Fetch EM entries whose deposited `d_FSC_model` crossing exceeds ~1.3× their map resolution** —
+> measurable from `mtriage` before any refinement — and refine them. If the hypothesis holds, their
+> \|Δ\| should be one to two orders of magnitude above the ≤ 1.3 population's median of 0.112 %.
+> **Register that before fetching**, and note that the screen is a *pre*-refinement quantity, so the
+> set can be selected on it without circularity.
+
+If it holds on a targeted set, the `d_FSC_model` Δ becomes conditionable on a measurable property
+instead of resting on one entry. If it fails, 10BU stays what it is: real, reproducible and singular.
+
+### Applied
+
+> **No band changed.** The `d_FSC_model` row gains a **caveat**, not a gate: when the pre-refinement
+> crossing sits far beyond the map's own resolution the curve is flat where it is read, and the two
+> such entries on record are the two largest excursions in the set. **n = 2 — this is a hypothesis.**
+
 ## Item 2 — make a partial row regenerable
 
 Round 21 showed the route: a row whose set cannot be rebuilt can still be given figures **anyone can
@@ -80,5 +155,29 @@ missing models are exactly the ones that showed *no* disagreement, so the publis
 same shape as the L-test, and the same reason it might be recoverable in substance even if not in
 membership.
 
-No prediction is registered for item 2 until item 1's result is in; if the flip-set re-run happens
-this round it gets its own registration first.
+### The trick does not transfer, and the reason is worth recording
+
+**Round 21's route does not apply to the flip-set row — and running it anyway would produce a number
+that looks like it contradicts the published one.**
+
+The published figure is **7.5 %**, being **48 disagreements over 639 flippable residues across 17
+models**. The five missing models are precisely those with **zero** disagreements. So they contribute
+**nothing to the numerator and everything they have to the denominator**.
+
+A re-run on the committed 12 would therefore reproduce all 48 disagreements over **fewer than 639**
+residues, and report a **higher** rate than 7.5 % — not because anything disagreed, but because the
+denominator shrank. Anyone comparing the two would see a discrepancy that is purely an artefact of
+which models survived the record.
+
+That is the difference from the L-test, where the missing datasets were unremarkable
+middle-of-distribution ones and the surviving subset reproduced the aggregate closely. **Whether a
+subset re-run helps depends on *which* members were lost**, not on how many:
+
+| row | what was lost | subset re-run gives |
+|---|---|---|
+| L-test | ~3 unremarkable datasets | the same figures — reproducibility |
+| flip sets | the 5 **zero-disagreement** models | a **higher, incomparable** rate |
+
+So the flip-set row keeps its `⚠ partial record` mark and does **not** get a re-run. That is a
+result, not a deferral: the row's 7.5 % is unrecoverable *in principle* from the committed set,
+because the lost models are the denominator.
