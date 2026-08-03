@@ -106,7 +106,7 @@ working on live data.
 ## The finding: the ratio gate has an unguarded singularity
 
 **9LLO starts at clashscore 0.00 and ends at 0.67.** `clashscore_post / clashscore_pre` is a division
-by zero. The clause reads:
+by zero. The clause read, before this round changed it:
 
 > **Clashscore: gate on the ratio, not the difference, while `clashscore_pre ≲ 20`** — `post / pre ≥ 5×`
 > is evidence of degradation … **Above pre ≈ 20 the gate fails**: compare the absolute post-clashscore
@@ -213,6 +213,17 @@ Reviewing this PR's own diff found four defects, all fixed here
   12 sorted values and 11.27 the 3rd of 4. Correct: **2.28** and **8.96**. The claim survives with a
   smaller effect.
 - **#90 (low)** — the round table row was out of order, unlinked and misdated.
+
+A second pass, over the fix commits themselves, found a fifth
+([#91](https://github.com/realmarcin/protstruct_review/issues/91)): the low-end guard had been added to
+the *body* of the clashscore clause while its **bolded lead still said `while clashscore_pre ≲ 20`** —
+the one-sided, pre-round-20 condition. In a row this long the lead is what gets read, so the defect
+this round exists to fix was still live in the place it would be met. Fixed by making the lead state
+`1 ≲ clashscore_pre ≲ 20`.
+
+That is worth its own note: **fixing a finding in the body of a long row is not fixing it.** The two
+§4 rows are thousands of words each, and a correction that lands anywhere but the opening sentence
+can be read past indefinitely.
 
 Two of the four (#88, #89) are the same failure: **stating a stronger version of a true result.** The
 refinement really does reproduce, and the gate really is undefined at zero — but "across a version
