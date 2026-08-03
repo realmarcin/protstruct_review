@@ -6,7 +6,8 @@ carries the execution detail. Keep in sync — close a GitHub issue and check th
 **Last reconciled: 2026-08-01** (round 19). No GitHub issues were open as of that
 reconciliation; later rounds file their own, so check the tracker rather than this line.
 Rounds 17–18 merged as [#69](https://github.com/realmarcin/protstruct_review/pull/69);
-round 19 follows in its own PR. There is no CI in this repo — `bash scripts/validate.sh`
+round 19 follows in [#82](https://github.com/realmarcin/protstruct_review/pull/82)
+(which replaced #70, auto-closed when #69's branch was deleted). There is no CI in this repo — `bash scripts/validate.sh`
 is the gate, and it must exit 0 before a merge.
 
 ## Where the tolerance work stands
@@ -49,7 +50,7 @@ floors row.
 | 16 | [#66](https://github.com/realmarcin/protstruct_review/pull/66) (2026-07-30) | per-entry record made durable; all 5 predictions held; `d_FSC_model` tail shown to be sampled thinly, not thin |
 | 17 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-30) | rate question closed as underpowered; 10BU verified byte-identical; registry audited (7 rows marked partial); ligand screen moved to fetch time |
 | 18 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-31) | every benchmark commits its set + gate; bond-angle recovered and DockQ mark withdrawn; fetch attrition made durable; §4 staleness diagnosed as two untested clauses |
-| 19 | [#70](https://github.com/realmarcin/protstruct_review/pull/70) (2026-08-01) | EM set 59→69; all bands held; P4 falsified and round 16's tail reading corrected; 10BU located at 3.24× the next-largest; zero refinement-stage attrition |
+| 19 | [#82](https://github.com/realmarcin/protstruct_review/pull/82) (2026-08-01) | EM set 59→69; all bands held; P4 falsified and round 16's tail reading corrected; 10BU located at 3.24× the next-largest; zero refinement-stage attrition |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
