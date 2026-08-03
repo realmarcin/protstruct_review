@@ -320,10 +320,12 @@ runs — over **all 37 cached models from rounds 14–16**:
 | 10EG | 195 atoms (CL0) | 195 |
 | 28JV | 38 atoms (VM6) | 38 |
 | 10GJ/GK/GL/GM | 23 atoms (8OG) | 23 |
-| 30 models that refined cleanly | pass | 0 |
+| 30 models with no unparameterised component | pass | 0 |
 
-**Zero disagreements.** The two charge failures in the set (10EN, 10FL, 10FJ) correctly report
-nothing here — that is a different cause with its own screen. Cost is ~0.1 s per model against the
+**Zero disagreements.** The **three** charge failures in the set (10EN, 10FL, 10FJ) correctly report
+nothing here — that is a different cause with its own screen. Note the 30-model bucket is *models
+with no ligand hit*, not *models that refined*: 25 of them refined cleanly, and the other five are
+the three charge rejections plus 10TP and 10UA, which never reached a refinement attempt. Cost is ~0.1 s per model against the
 ~9 s the authoritative check takes and the hours the failure used to.
 
 10GJ, 10GK, 10GL and 10GM are an incidental finding: four models sitting in round 14's cache carrying

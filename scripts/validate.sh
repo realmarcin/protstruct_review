@@ -208,7 +208,7 @@ fi
 # and say so via SET_IS_COMPLETE = False. A declared-but-incomplete set is the honest
 # state and passes; an undeclared one does not.
 if ! setless="$(python3 -c '
-import pathlib, re, sys
+import ast, pathlib, re, sys
 
 repo = pathlib.Path(sys.argv[1])
 missing = []
@@ -221,7 +221,31 @@ for script in sorted((repo / "scripts").glob("bench_*.py")):
     text = script.read_text()
     # DEFAULT_PAIRS covers the superposition benchmark, whose unit is a pair of ids;
     # KNOWN_IDS covers benchmarks whose set is recorded but not runnable as a default.
-    if re.search(r"^(DEFAULT_SET|DEFAULT_PAIRS|KNOWN_IDS)\s*=", text, re.M):
+    declared = re.search(r"^(DEFAULT_SET|DEFAULT_PAIRS|KNOWN_IDS)\s*=", text, re.M)
+    if declared:
+        # A DECLARED set is not a USED one. bench_refinement_deltas.py declared its
+        # set, mentioned it only inside a warning string, and went on globbing the
+        # cache -- so the guarantee this gate exists to enforce was false for the one
+        # script behind the most expensive partial record in the registry (#78).
+        # Require at least one reference outside the assignment and outside a print().
+        name = declared.group(1)
+        tree = ast.parse(text)
+        prints = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call) and getattr(node.func, "id", None) == "print":
+                prints.update(id(n) for n in ast.walk(node))
+        used = any(isinstance(n, ast.Name) and n.id == name
+                   and isinstance(n.ctx, ast.Load) and id(n) not in prints
+                   for n in ast.walk(tree))
+        if used:
+            continue
+        # Two benchmarks record a set they cannot run from: the L-test has no id
+        # argument at all (it reads a prior run logs), and the ordered-core script
+        # takes file paths. They opt out via SET_NOT_RUNNABLE, which carries the
+        # reason in the file rather than as a special case hidden in this gate.
+        if re.search(r"^SET_NOT_RUNNABLE\s*=\s*" + chr(34), text, re.M):
+            continue
+        missing.append(script.name + " (" + name + " declared but never used)")
         continue
     # SET_RECORD names a committed data file holding the set instead -- the EM
     # benchmark keeps its entries in a cumulative TSV, which is stronger than a

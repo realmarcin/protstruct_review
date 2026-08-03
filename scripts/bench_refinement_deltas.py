@@ -359,15 +359,20 @@ def main() -> int:
     args = ap.parse_args()
 
     cache = Path(args.cache)
-    pairs = find_pairs(cache, args.pdb_ids or None)
+    # Fall back to the committed set rather than to whatever the cache happens to
+    # hold. Globbing a directory is how this benchmark's set was lost in the first
+    # place, and an earlier version of this block only *warned* about that while
+    # still globbing -- so the set was declared but never used, and validate.sh's
+    # gate did not notice because it checked for a declaration (#78).
+    ids = args.pdb_ids or list(DEFAULT_SET)
+    pairs = find_pairs(cache, ids)
     if not pairs:
         raise SystemExit(f"no <id>.pdb + <id>_g_obs.mtz pairs found in {cache}")
     if not args.pdb_ids:
-        # Globbing a cache is how the set was lost. Say what the published benchmark
-        # used, so a run over some other directory is not silently read as a reproduction.
-        print(f"WARNING: running whatever is in {cache} ({len(pairs)} pairs). The "
-              f"published benchmark used 37 entries, of which only {len(DEFAULT_SET)} "
-              f"are recoverable -- {SET_SHORTFALL}.", file=sys.stderr)
+        print(f"using the committed benchmark set ({len(ids)} entries, {len(pairs)} "
+              f"present in {cache}).\nWARNING: the set is INCOMPLETE -- "
+              f"{SET_SHORTFALL}. This is a new measurement, not a reproduction of the "
+              f"published figures.", file=sys.stderr)
     work = Path(args.work) if args.work else cache / "refine"
 
     if args.detection_test:

@@ -43,6 +43,18 @@ than a reproduction.
 is the honest state and passes; undeclared does not. Verified in both directions: removing a
 `DEFAULT_SET` fails the gate, restoring it passes.
 
+**The gate checks *use*, not just declaration — because the first version did not.** Self-review of
+this PR found that `bench_refinement_deltas.py` declared its `DEFAULT_SET`, mentioned it only inside a
+warning string, and went on globbing the cache. It passed the gate. That is the one script behind the
+**most expensive partial record in the registry**, so the guarantee this whole round claims was false
+exactly where it mattered most (#78). The gate now parses each script and requires a reference to the
+set outside its assignment and outside a `print()`; two benchmarks whose sets genuinely cannot drive
+a run — the L-test, which has no id argument, and the ordered-core script, which takes file paths —
+opt out via an explicit `SET_NOT_RUNNABLE` carrying the reason, rather than being special-cased
+inside the gate.
+
+Both directions are tested: breaking a set's *use* fails the gate, and restoring it passes.
+
 `bench_refinement_deltas_em.py` is the one script that legitimately has no list, because its set is
 the cumulative `em_refinement_deltas.tsv` — a stronger form, since that file also records the skips
 and the round. The gate accepts a `SET_RECORD` pointing at a committed file **and checks the file

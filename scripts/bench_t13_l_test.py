@@ -151,6 +151,9 @@ PUBLISHED_N = 27
 KNOWN_IDS = ["9PLC", "30IZ", "9RWI", "12LO", "9LLR"]
 SET_IS_COMPLETE = False
 SET_SHORTFALL = "5 of 27 named -- only the worst cases were tabulated"
+# This script takes no ids: it parses whatever xt_*/ct_* logs a prior Wilson B run
+# left in --cache, so KNOWN_IDS is a record of what was named, not a runnable default.
+SET_NOT_RUNNABLE = "no id argument exists; the set is whatever the cache holds"
 
 
 def main() -> int:

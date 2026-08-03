@@ -114,6 +114,8 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
 DEFAULT_SET = ["1D3Z", "1G6J", "1XPW", "2K39", "2N54"]
 SET_IS_COMPLETE = True
 SET_FAILED = ["2JZ4"]        # reported as failing outright; kept so the set is 6 attempts
+# Ensembles are passed as file paths, not ids, so the set cannot drive a run.
+SET_NOT_RUNNABLE = "takes model files rather than PDB ids"
 
 
 def main() -> int:
