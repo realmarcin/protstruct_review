@@ -3,16 +3,15 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-03** (round 19). Rounds 17–18 merged as
-[#69](https://github.com/realmarcin/protstruct_review/pull/69); round 19 follows in
-[#82](https://github.com/realmarcin/protstruct_review/pull/82), which replaced #70 — GitHub
-auto-closes a PR when its base branch is deleted rather than retargeting it. **Check the issue
+**Last reconciled: 2026-08-03** (round 20). Rounds 17–18 merged as
+[#69](https://github.com/realmarcin/protstruct_review/pull/69); rounds 19 and 20 followed in
+[#82](https://github.com/realmarcin/protstruct_review/pull/82) and its successor. **Check the issue
 tracker for open issues; this file does not mirror it in real time.** There is no CI in this
 repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
 
 ## Where the tolerance work stands
 
-Nineteen rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Twenty rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -50,13 +49,14 @@ floors row.
 | 16 | [#66](https://github.com/realmarcin/protstruct_review/pull/66) (2026-07-30) | per-entry record made durable; all 5 predictions held; `d_FSC_model` tail shown to be sampled thinly, not thin |
 | 17 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-30) | rate question closed as underpowered; 10BU verified byte-identical; registry audited (7 rows marked partial); ligand screen moved to fetch time |
 | 18 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-31) | every benchmark commits its set + gate; bond-angle recovered and DockQ mark withdrawn; fetch attrition made durable; §4 staleness diagnosed as two untested clauses |
+| 20 | (2026-08-03) | the two §4 clauses untested since round 7 re-measured: both hold, both worst cases reproduce exactly; the clashscore ratio gate found undefined at `pre = 0` and given a low-end guard; `phenix.refine` shown deterministic 8/8 |
 | 19 | [#82](https://github.com/realmarcin/protstruct_review/pull/82) (2026-08-01) | EM set 59→69 named entries; all bands held; P4 falsified and round 16's tail reading corrected; 10BU located at 3.24× the next-largest; zero refinement-stage attrition |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — nineteen rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -86,8 +86,19 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
   where it is, precisely located rather than defended.
 - **A prediction confirmed once describes the round that confirmed it.** Round 16 confirmed
   "largest degradation > 1.1 %"; round 19 registered the same threshold and falsified it.
+- **A relative gate needs bounds at both ends.** The 5× clashscore ratio was guarded above
+  `pre ≈ 20` and not below; at `pre = 0` it is undefined and fires on a model well inside the
+  absolute quality bar.
 
 ## Open
+
+**Round 20 closed the §4 item.** Both clauses untested since round 7 were re-measured on the 16
+identifiable entries: the rotamer `+4 pp` band and the 5× clashscore gate both hold, and both
+published worst cases (28SW +3.60 pp, 30TW 4.26×) reproduce exactly and are not exceeded by the 8
+entries added since round 5. The clashscore gate gained a **low-end guard** — it is undefined at
+`clashscore_pre = 0`, and 9LLO is such an entry. `phenix.refine` was also shown deterministic, 8 of 8
+exact against round 5, so no §4 X-ray Δ is version-dependent. The ~21 unidentifiable entries remain
+unidentifiable, and the quoted "starting clashscore 17.2" is confirmed unreproducible.
 
 Round 19 executed the lead item — the first entries added to any benchmark since round 16. **The EM
 set grew 59 → 69 named entries, all bands held, and the round falsified a prediction round 16 had
@@ -102,24 +113,6 @@ by the charge screen), **zero** at the refinement stage, against 6 of 31 in roun
 **Do not tighten `d_FSC_model` on the strength of round 19.** 10BU now stands 3.24× above the
 next-largest degradation on record, which looks like an outlier and is not one — round 17 re-ran it to
 a byte-identical refined model. A tighter band would fail on a verified observation.
-
-### [ ] Re-measure the two §4 clauses that have been untested since round 7
-
-Unchanged from round 18, and now the oldest open item. The ΔRMSD row is correct at 37 entries;
-rounds 8, 10 and 11 grew the X-ray set 19 → 26 → 32 → 37 while re-testing **only** the Cα-shift and
-favored clauses. So:
-
-- `rotamer outliers_post ≤ outliers_pre + 4 pp` (quoted `0/19`, worst rise 3.60 pp)
-- the `clashscore_post / clashscore_pre ≥ 5×` gate (quoted max 4.26×, starting clashscore up to 17.2)
-
-**have not been checked against the 18 entries added since round 7**, and both worst cases come from
-the original 8. The "19 is really the `< 2.5 Å` branch" reading is ruled out — neither clause was ever
-resolution-split.
-
-**Scope it honestly.** Only **16 of the 37** entries are identifiable, so a run is a *new measurement
-on a smaller set*, not a re-validation. The gain is identifiability: whatever it reports can be
-re-derived, which is true of neither figure it would replace. **Canary one entry first** — this is an
-X-ray `phenix.refine` batch, the same shape of cost as round 19's.
 
 ### [ ] Fix the L-test set rather than retire it — it is cheaper than round 18 assumed
 

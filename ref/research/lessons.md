@@ -1,4 +1,4 @@
-# Lessons from nineteen rounds of tolerance benchmarking
+# Lessons from twenty rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| A relative gate needs bounds at both ends | 20 |
+| A clause nobody re-tests is not a clause that held | 20 |
 | A reproduced extreme is binding, not disposable | 19 |
 | A prediction confirmed once describes the round that confirmed it | 19 |
 | Confirm a suspected gap by running, not by reading | 18 |
@@ -62,6 +64,27 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 20 adds a rule about the *shape* of a gate rather than its size: **a relative gate needs bounds
+at both ends.** §4 gates clashscore degradation on the ratio `post / pre ≥ 5×`, and the clause
+carefully documents that it fails *above* `pre ≈ 20`, where damage drives clashscore to ~100 whatever
+it started at. It says nothing about the bottom. Round 20 found the limiting case on its first pass
+through the recoverable set: **9LLO starts at clashscore 0.00**, so the ratio is undefined and any
+clash at all reads as infinite degradation — on a model whose post-refinement clashscore is **0.67**,
+comfortably inside the registry's own ≤ 4 quality bar. Three of 16 entries trip the gate at a
+post-clashscore within 2× that bar, and the fragility is **systematically high-resolution** (median
+starting clashscore 2.49 below 2.5 Å against 11.27 above), so the models the gate mis-serves are the
+good ones. A ratio is only meaningful over the range where its denominator is; when a quantity's
+floor is zero, the gate needs a floor too. Note the asymmetry that hid this: the clause was written
+from experience with *bad* models, and its author guarded the end they had seen.
+
+Its companion is about how long an untested clause keeps its credit: **a clause nobody re-tests is
+not a clause that held.** The rotamer band and the clashscore gate went **eleven rounds** without an
+entry added, while the set they were quoted against grew 19 → 37 and every round re-validated only
+the two clauses it happened to be working on. When round 20 finally ran them, both held and both
+published worst cases reproduced exactly — so the outcome was benign. That is luck, not process: the
+same eleven rounds of silence would have looked identical if one had been breached at entry 20.
+Round 18's rule says re-test every clause the set backs; this is the reason it is worth the cost.
 
 Round 19 adds the rule that decides what to do with an inconvenient number: **a reproduced extreme is
 binding, not disposable.** `d_FSC_model`'s band exists for one entry — 10BU, +4.786 % — which now
