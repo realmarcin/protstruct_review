@@ -1,4 +1,4 @@
-# Lessons from twenty-nine rounds of tolerance benchmarking
+# Lessons from thirty rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| The gap is adherence, not invention | 30 |
+| Squash-merging makes staleness unauditable | 30 |
 | A falsified prediction can cancel the work that motivated the round | 29 |
 | A spot fix that silently misses looks exactly like one that worked | 28 |
 | A counting rule has a domain; state which unit you are using | 28 |
@@ -123,6 +125,21 @@ list survives untouched — a section header reading "the ninth miscount" seven 
 reading "Tenth", where "ninth" had been correct until its pair moved. Verify by **quantity, not by
 string**. Three distinct failure modes in one method in one round is itself the lesson: a repair
 technique deserves the same adversarial reading as the code it repairs.
+
+Round 30 classified every figure found wrong across rounds 24–29 and found the intervention round 28
+proposed addresses **one failure in five**: 6 stale against 24 wrong-at-write. **The gap is adherence,
+not invention.** Of the 24, 62 % were counts restated from memory when the source was one command
+away — against a rule this repo already states, *every figure a document quotes must come from a
+committed, re-runnable script* — and 38 % were incomplete edits, against a remedy round 28 had already
+produced. Adding a third convention to a set already not followed would have been motion rather than
+progress, so nothing was written. Two consecutive rounds have now declined the work that motivated
+them after measuring it.
+
+Its companion is a cost nobody had priced: **squash-merging makes staleness unauditable.** Each round
+lands as one commit and its branch is deleted, so for a figure written mid-round the state it was
+written against cannot be recovered. Four figures could not be classified at all for that reason —
+including one that lived only in a PR body, which is not a file in the repo. Whatever else squash
+merges buy, they cost the ability to ask *was this true when it was written?*
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
