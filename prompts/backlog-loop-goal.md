@@ -66,6 +66,18 @@ If the change produces a measurement or tests a hypothesis:
   - Predict the comparison you care about, not an interval around a point estimate.
   - Every figure a document quotes must come from a committed, re-runnable script.
 
+CHECK THE BRANCH AGAIN BEFORE YOU STAGE. Rule 2 guards the START of the work; this guards the end,
+and the two are separated by however long the work took — which is exactly when "I branched, so I am
+on the branch" stops being true. Immediately before `git add`:
+
+    git branch --show-current && git status --short
+
+and read the staged list back before committing. Confirm it is the work you mean and NOTHING ELSE.
+An intervening `git checkout` — to read a file, to check another PR — leaves you somewhere else with
+no warning, and `git add -A` does not care. This has happened here: a 20-file audit round landed on
+an unrelated docs branch and had to be cherry-picked back onto main. It was recoverable only because
+it had not been pushed yet.
+
 Commit messages state what changed, WHY, and what failure it prevents. Push, then open a PR whose
 body a reviewer could act on without reading the diff first.
 </work>
