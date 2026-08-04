@@ -145,8 +145,12 @@ def parse_ctruncate(text: str, log_path: str) -> dict:
         out["twin_operators_found"] = int(any(
             not re.match(r"\s*No operators found", text[h.end():]) for h in headers))
     else:
-        # No section at all: fall back to ctruncate's first-principles line if present,
-        # and otherwise report none rather than inventing a result.
+        # No section at all means none found. There is deliberately no fallback to the
+        # "First principles calculation has found no potential twinning operators"
+        # line: it is redundant with this branch -- both say zero -- and #121 was
+        # exactly the harm of keeping a second signal around that looks like it decides
+        # something. A comment describing a check that is not there is the same defect
+        # one level up (#138), so this says what the code does.
         out["twin_operators_found"] = 0
 
     # Moments of I
