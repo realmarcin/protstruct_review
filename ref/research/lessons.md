@@ -1,4 +1,4 @@
-# Lessons from twenty-seven rounds of tolerance benchmarking
+# Lessons from twenty-eight rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| Measure a defect class before mechanising it | 28 |
+| A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
 | "Same as the one we already trust" is a claim to verify | 27 |
 | A default bucket makes "unrecognised" and "miscounted" independent | 26 |
@@ -78,6 +80,25 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 28 swept ~326 numeric claims by hand instead of adding a third gate, and **two of its four
+predictions were falsified — the two that would have justified building one.** **Measure a defect
+class before mechanising it.** The plan was a contradiction-checker, on the reasoning that a figure
+stated twice can be checked without knowing which statement is right. The sweep found **two** live
+self-contradictions and **six** figures simply wrong against their source, with nothing to contradict
+them; the registry had **zero** contradictions in 227 claims. The cheap general guard would have
+addressed a quarter of the problem. This series has now mechanised four classes and measured one, and
+the one measurement overturned the plan — which is an argument about the other four, not just this one.
+
+Its companion is why the errors sit where they do: **a write-once document rots; a re-read one does
+not.** The registry carries ~185 verifiable figures at a ~1.1 % error rate; the round trails carry ~65
+at ~4.6 %, and the trails have no gate while the registry has fourteen checks. But the causal story is
+not the gate. Every round opens the registry and nobody ever reopens a finished trail, so its figures
+are correct on the day and rot unobserved. Round 26's "12 checked, 11 not" was true when written and
+reads as a present-tense claim two rounds later. The implication is a convention rather than a check —
+state a finished document's figures as snapshots, with their denominator and their date — and it is
+deliberately **not** implemented in the round that measured it, because building on a measurement in
+the round that produced it is the mistake the pre-registration existed to prevent.
 
 Round 27 gated the counts these summary files quote, after eight of them had shipped wrong across
 three rounds. Two lessons came out of it, and both are about the guard rather than the counts.

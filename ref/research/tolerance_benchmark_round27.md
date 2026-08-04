@@ -1,6 +1,6 @@
 # Tolerance benchmark — round 27: gating the counts, and the gate that shipped two false passes
 
-Eight self-referential miscounts had shipped across rounds 24–26 — #130, #135, #147, #150, #155,
+Nine self-referential miscounts had shipped across rounds 24–26 — counting distinct wrong NUMBERS rather than issues filed, since #150 carried two (#164) — #130, #135, #147, #150, #155,
 #156, and two more in #158. Every one was a number restated from memory when the source was
 committed and one command away. This round makes them checkable.
 
@@ -176,7 +176,7 @@ Reviewing the candidate table added at the end of this round found two wrong cou
 **Mine, and new.** The table said the `scripts/` audit had *"found defects every time — 12, then 5,
 then 5"*. Forty lines below, the same file says **12, then 2, then 5**. I wrote pass 6's figure for
 pass 4 — the identical mistake #158 corrected three commits earlier — in a table whose subject is how
-reliably audits find defects. Ninth of the class.
+reliably audits find defects. Tenth of the class, under that rule.
 
 **Pre-existing.** The 1.074 fence base rate was stated as *"3 of 60"* in one place and *"4 of 60 =
 6.7 %"* in another. Derived from the data: 4 of 60 above 1.074, 2 of 60 above 1.3. So 4 is right, the
@@ -186,12 +186,13 @@ rather than checking.
 
 **Neither would have been caught by this round's gate.** `check_summary_coverage.py` derives only
 `**N defects** (#A–#B)` claims and the spelled-out round count; neither of these matches that form.
-The scope limits below already said only four figures are derived. This is what that limitation costs,
+The scope limits below already said only three figures are derived. This is what that limitation costs,
 measured two commits after it was written rather than asserted.
 
 ## Scope limits
 
-- **Coverage is representation, counts are derivation, and only four figures are derived.** Every
+- **Coverage is representation, counts are derivation, and only three figures are derived**
+  (the round count and two defect counts; the two coverage checks are representation, not derivation). Every
   other number in `NEXT_TASKS.md` is unchecked. Eight miscounts shipped; this catches the two shapes
   that recurred, not the class.
 - **The expected-claims list is itself a hand-maintained figure.** `EXPECTED_DEFECT_CLAIMS` must be
