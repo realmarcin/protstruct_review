@@ -182,6 +182,14 @@ check("but a real round token in prose still counts",
                            ["27"])["status"], "OK")
 check("and a range names every round in it, not just its ends",
       sorted(cov.round_tokens("1–5"), key=int), ["1", "2", "3", "4", "5"])
+# #162: a DESCENDING range covered nothing -- range(5,2) is empty and the range text is
+# stripped before the fallback scan, so it lost both endpoints too. That was strictly
+# worse than the digit scan #161 replaced.
+check("a descending range is read as the range it names, not as nothing",
+      sorted(cov.round_tokens("5-1"), key=int), ["1", "2", "3", "4", "5"])
+check("an issue-reference-only cell names no round",
+      cov.round_tokens("#27"), set())
+check("and an empty cell does not raise", cov.round_tokens(""), set())
 
 
 # --- table scoping ------------------------------------------------------------------

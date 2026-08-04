@@ -127,8 +127,14 @@ def round_tokens(cell: str) -> set[str]:
     """
     cell = re.sub(r"#\d+", "", cell)
     covered: set[str] = set()
-    for lo, hi in re.findall(r"(\d+)\s*[–-]\s*(\d+)", cell):
-        covered.update(str(n) for n in range(int(lo), int(hi) + 1))
+    for a, b in re.findall(r"(\d+)\s*[–-]\s*(\d+)", cell):
+        # Endpoints are ORDERED before expanding. `range(5, 2)` is empty, and the range
+        # text is stripped before the fallback digit scan, so a descending "5-1" covered
+        # NOTHING -- strictly less than the bare digit scan this replaced, which at least
+        # found both endpoints (#162). A descending range is a typo; reading it as the
+        # range its author meant is the useful interpretation and is never less safe.
+        lo, hi = sorted((int(a), int(b)))
+        covered.update(str(n) for n in range(lo, hi + 1))
     covered.update(re.findall(r"\d+", re.sub(r"\d+\s*[–-]\s*\d+", "", cell)))
     return covered
 

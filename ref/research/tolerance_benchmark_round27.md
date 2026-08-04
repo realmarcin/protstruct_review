@@ -145,6 +145,20 @@ every Round cell holding only round numbers. The hardcoded test fixtures, `spell
 and now the parsing itself — all the same instinct, and only enumeration found them. Reading found
 none of the four.
 
+## #162 — the fix for #161 had the shape a fifth time
+
+`round_tokens`, added by #161, expands `N–M` ranges. A **descending** range covered nothing:
+`range(5, 2)` is empty, and the range text is stripped before the fallback digit scan, so both
+endpoints were lost as well — **strictly worse than the bare digit scan #161 replaced**, which at
+least credited 5 and 1.
+
+Latent, loud, no masked gap. Filed and fixed anyway because it is a regression rather than an
+inherited gap, and because the cause is the round's recurring one for the fifth time: the expansion
+was written for the ranges this file happens to contain, and every one of them ascends.
+
+Endpoints are now ordered before expanding — a descending range is a typo, and reading it as the range
+its author meant is never less safe than the old behaviour.
+
 ## Scope limits
 
 - **Coverage is representation, counts are derivation, and only four figures are derived.** Every
