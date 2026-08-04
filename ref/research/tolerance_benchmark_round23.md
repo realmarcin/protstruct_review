@@ -182,6 +182,30 @@ cheap.
 > with 57 of 60 in 0.73–1.01, so the sustained-crossing estimator tracks stated resolution closely in
 > the ordinary case. The outlier fence is **1.074**, not the 1.3 inherited from n = 2.
 
+## Self-review finding: a stale statistic, re-derived and confirmed
+
+Reviewing this PR turned up something unrelated to the round's own work
+([#107](https://github.com/realmarcin/protstruct_review/issues/107)). The registry characterised the
+CC_mask rate question with figures computed in **round 17 on 25 entries**; round 19 added 10, so the
+current data gives **35** and materially different numbers — Mann–Whitney p 0.32 → **0.18**, and
+ρ(pre, Δ) −0.445 → **−0.506, p = 0.0019**. None carried its n, so all read as current.
+
+**Re-running round 17's own robustness checks on the grown set confirms its verdict rather than
+overturning it:**
+
+| check | round 17 (n = 25) | now (n = 35) |
+|---|---:|---:|
+| ρ(pre, Δ) | −0.445, p = 0.026 | **−0.506, p = 0.0019** |
+| ρ(mean, Δ) — Oldham | −0.279, p = 0.18 | **−0.281, p = 0.10** |
+| ρ(post, Δ) | −0.05 | **−0.006** |
+
+**The raw correlation strengthened and the corrected one did not.** That is exactly the signature
+round 17 used to diagnose arithmetic coupling rather than an effect, now holding on 40 % more data —
+a stronger result than round 17 could claim. The figures are updated and labelled with their n.
+
+This is round 18's rule applied to statistics rather than clauses, and the second instance after #72.
+A quoted statistic ages the moment the set grows, and nothing in the pipeline notices.
+
 ## Scope limits
 
 - **The hypothesis is untested, not weakened.** Screening found no candidates; it did not examine any.
