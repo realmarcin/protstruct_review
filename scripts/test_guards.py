@@ -185,7 +185,20 @@ check("the registry check fires too, but blames the registry",
 # The vocabulary is imported from the writer, never re-declared here.
 _prefixes, _is_known = figures._status_vocabulary()
 check("the vocabulary comes from the script that writes the file", sorted(_prefixes),
-      ["LOST", "d_FSC only", "delta-only", "measured", "screened only", "skipped: "])
+      ["LOST: ", "d_FSC only (", "delta-only (", "measured", "screened only (", "skipped: "])
+
+# #148: a bare `startswith` absorbed anything sharing a prefix with a declared status,
+# so `measured-partially` passed as known and then joined `attempted` by default --
+# the very hazard this vocabulary exists to close. Matching now requires the delimiter
+# a payload-carrying status actually uses, and `measured` matches exactly.
+for _s in ["measured", "skipped: reason", "LOST: id never recorded",
+           "screened only (round 23): x", "delta-only (y)", "d_FSC only (z)"]:
+    check(f"  declared status accepted: {_s[:24]!r}", _is_known(_s), True)
+for _s in ["measured-partially", "measured_v2", "LOSTISH", "screened only later", ""]:
+    check(f"  undeclared look-alike rejected: {_s[:24]!r}", _is_known(_s), False)
+check("and a look-alike is reported by the vocabulary check, not absorbed",
+      figures.vocabulary_check(
+          [{**ROWS[0], "status": "measured-partially"}])["status"], "UNDECLARED")
 
 
 # --- Round 26: a round document's claims about its own findings ------------------
@@ -229,6 +242,37 @@ check("a severity quoted mid-sentence is not mistaken for the declaration",
           "**Severity: medium** (a wrong published count)."), "medium")
 check("an issue with no severity line is recorded as unstated, not defaulted",
       roundfig.severity_of("no severity here"), "unstated")
+
+# #149, three defects in this gate, each verified by running it.
+# 1. A FENCED block sits at column 0 too, so the line anchor alone did not stop an
+#    issue that quotes another issue's severity from reporting the quoted value.
+check("a severity inside a fenced block is not mistaken for the declaration",
+      roundfig.severity_of("quoting:\n\n```\n**Severity: high**\n```\n\n**Severity: low**\n"),
+      "low")
+# 2. A citation the regex did not anticipate produced NO result item -- unchecked and
+#    unmentioned. Anything claim-shaped is now reported.
+check("a mis-capitalised citation is checked, not dropped",
+      [r["status"] for r in roundfig.severity_claims("**#130 (High)** x", FINDINGS)],
+      ["STALE"])
+check("an unrecognised severity word is reported rather than ignored",
+      [r["status"] for r in roundfig.severity_claims("**#130 (bogus)** x", FINDINGS)],
+      ["UNRECOGNISED"])
+check("and UNRECOGNISED is a failure, unlike UNCHECKABLE",
+      roundfig.severity_claims("**#130 (bogus)** x", FINDINGS)[0]["status"]
+      not in ("OK", "UNCHECKABLE"), True)
+# 3. An empty pass-1 subset reported a traceback instead of a diagnostic.
+check("an empty record reports instead of raising",
+      "re-run --refresh" in roundfig.round25_checks([])[0][2], True)
+# A quoted counter-example is not a claim, whatever formatting it carries. #144 fixed
+# the un-bolded case by requiring bold; this round then quoted a BOLDED example inside
+# backticks and the gate reported it. Code formatting is the discriminator, not bold.
+check("a claim quoted inside backticks is not checked as a claim",
+      roundfig.severity_claims("the regex missed (`**#130 (High)**`) entirely", FINDINGS), [])
+check("nor one inside a fenced block",
+      roundfig.severity_claims("example:\n\n```\n**#130 (high)**\n```\n", FINDINGS), [])
+check("while a claim in running prose still is",
+      [r["status"] for r in roundfig.severity_claims("**#130 (medium)** — a real claim", FINDINGS)],
+      ["OK"])
 
 # The record must not contain pull requests. `gh issue view <n>` resolves a PR number
 # happily, so a numeric range pulled #128 and #129 in as `unstated`.

@@ -52,3 +52,5 @@ issue	severity	state	title
 145	high	open	The #139 fix made the output key dynamic and summarize() still reads the old literal — the script raises KeyError on every run
 146	medium-high	open	P4 and P2 verdict labels claim more than the pre-registration supports, both in the flattering direction
 147	medium	open	PR body says 42 guard checks (it is 50), and the HIGH_RATIO duplication is described inaccurately
+148	medium-high	open	status_is_known absorbs an undeclared status that shares a prefix with a declared one
+149	medium	open	check_round_figures: fenced-block severities, silently-dropped citations, and a ValueError on an empty record

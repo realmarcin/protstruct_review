@@ -53,6 +53,9 @@ HEADER = "issue\tseverity\tstate\ttitle\n"
 _SEVERITY = re.compile(r"^\*\*Severity:\s*([a-z-]+)", re.MULTILINE)
 
 
+_FENCED = re.compile(r"^```.*?^```", re.MULTILINE | re.DOTALL)
+
+
 def severity_of(body: str) -> str:
     """The severity an issue body declares, or `unstated`.
 
@@ -60,7 +63,12 @@ def severity_of(body: str) -> str:
     thing (the wontfix ones often have one anyway) and recording it as `unstated` keeps
     it visible; defaulting it to `low` would quietly shrink whatever count uses it.
     """
-    m = _SEVERITY.search(body or "")
+    # Fenced blocks are stripped first. Anchoring to line start fixed the INLINE-quote
+    # case, but a fenced block sits at column 0 too, and this repo's issues routinely
+    # quote prior text that way -- #130 does. Without this, an issue quoting another
+    # issue's severity reports the QUOTED value, which is #121's shape a third time
+    # (#149).
+    m = _SEVERITY.search(_FENCED.sub("", body or ""))
     return m.group(1) if m else "unstated"
 
 
@@ -141,6 +149,11 @@ def _pass1(rows):
 def round25_checks(rows: list[dict]) -> list[tuple[str, str, str]]:
     """(label, literal required in the doc, value derived from the record)."""
     p1 = _pass1(rows)
+    if not p1:
+        # Reachable via a botched partial --refresh. Report it; do not raise a traceback
+        # from min() over an empty sequence and lose the diagnostic (#149).
+        return [("pass-1 finding count", "Twelve defects, filed as #116–#127.",
+                 "<the record contains no issues in #116–#127; re-run --refresh>")]
     high = [r for r in p1 if r["severity"] == "high"]
     return [
         ("pass-1 finding count",
@@ -169,7 +182,24 @@ def _word(n: int) -> str:
 # severity. Matching both made the gate report STALE on correct prose describing what
 # the gate does (#144), and a guard that fires on correct input trains people to ignore
 # it. The bold marker is the convention every real claim already follows.
-_SEVERITY_CLAIM = re.compile(r"\*\*#(\d+) \((medium-high|low-medium|high|medium|low)\)")
+# Captures ANY parenthesised token, not only the known severities. Restricting the
+# alternation meant a citation the regex did not anticipate -- `**#130 (High)** -- produced
+# NO result item at all: not MISSING, not STALE, simply unchecked and unmentioned. A gate
+# that silently declines to look is worse than one that complains (#149).
+_SEVERITY_CLAIM = re.compile(r"\*\*#(\d+) \(([^)]{1,20})\)")
+_KNOWN_SEVERITIES = {"high", "medium", "low", "medium-high", "low-medium"}
+# Code formatting marks a QUOTATION, not a claim. #144 fixed one instance of this by
+# requiring the bolded form -- and then this round quoted `**#130 (High)**` inside
+# backticks, as the counter-example illustrating that very defect, and the gate reported
+# it. Bold cannot discriminate, because a quoted example carries its own bold. Stripping
+# fenced blocks and inline code spans can, and it is the same rule `severity_of` uses on
+# issue bodies, so the two agree instead of each having their own idea of a quotation.
+_CODE_SPAN = re.compile(r"`[^`\n]*`")
+
+
+def _prose_only(doc: str) -> str:
+    """The document with fenced blocks and inline code spans removed."""
+    return _CODE_SPAN.sub("", _FENCED.sub("", doc))
 
 
 def severity_claims(doc: str, rows: list[dict]) -> list[dict[str, Any]]:
@@ -186,8 +216,16 @@ def severity_claims(doc: str, rows: list[dict]) -> list[dict[str, Any]]:
     """
     by_issue = {r["issue"]: r for r in rows}
     results = []
-    for m in re.finditer(_SEVERITY_CLAIM, doc):
+    for m in re.finditer(_SEVERITY_CLAIM, _prose_only(doc)):
         issue, claimed = m.group(1), m.group(2)
+        if claimed.lower() not in _KNOWN_SEVERITIES:
+            results.append({
+                "check": f"severity of #{issue}", "status": "UNRECOGNISED",
+                "detail": (f"the document writes #{issue} ({claimed!r}), which is not one "
+                           f"of {sorted(_KNOWN_SEVERITIES)} — fix the citation or add the "
+                           f"level; it is not being checked")})
+            continue
+        claimed = claimed.lower()
         actual = by_issue.get(issue, {}).get("severity")
         if actual == "unstated":
             # The issue carries no `**Severity:` line. That convention starts at #116;
@@ -289,6 +327,8 @@ def main() -> int:
                 if not r["check"].startswith(Path(args.doc).stem.replace(
                     "tolerance_benchmark_", "") + ":")]
     # UNCHECKABLE is a coverage statement, not a failure.
+    # UNCHECKABLE is a coverage statement (no source to check against).
+    # UNRECOGNISED is a defect: the document wrote something unparseable.
     bad = [r for r in results if r["status"] not in ("OK", "UNCHECKABLE")]
     for r in results:
         print(f"  {r['status']:<12} {r['check']:<26} {r['detail']}",

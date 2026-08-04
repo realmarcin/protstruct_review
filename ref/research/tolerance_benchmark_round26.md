@@ -296,6 +296,53 @@ all 7 checkable round-document figures match the findings record;
 
 That line is the honest summary of what this guard is worth: **7 checked, 11 not.**
 
+### The guards themselves needed a second pass
+
+A further review found four defects in the guards this round built, and one of them is the round's
+own thesis turned on its author.
+
+**#148 (medium-high) — the vocabulary guard absorbed undeclared statuses.** `status_is_known` was a
+bare `startswith`, and `measured` was declared as both a literal and a prefix:
+
+```
+status_is_known('measured-partially')  = True
+status_is_known('LOSTISH')             = True
+status_is_known('screened only later') = True
+```
+
+`measured-partially` is exactly the shape a future round would add. It passed as known and
+`_attempted()` then counted it — **a new status still reaching a published denominator silently**,
+which is the entire hazard the guard was built to close. So the guard caught the typo case
+(`skipped:` → `skip:`) and left the extension case open, while the write-up claimed it turned
+"unknown status is quietly counted" into "unknown status fails the gate". That claim was true only
+for statuses not sharing a prefix with a declared one. Fixed by matching on the delimiter each
+payload-carrying status actually uses, and exactly for `measured`.
+
+**#149 (medium) — three defects in the round-figure gate.** A severity inside a **fenced** block still
+defeated the line anchor, so an issue quoting another issue's severity reported the quoted value —
+#121's shape for the third time, via a third quoting style. A citation the claim regex did not
+anticipate (`**#130 (High)**`) produced **no result item at all**: not `MISSING`, not `STALE`, simply
+unchecked and unmentioned. And an empty pass-1 subset raised a traceback instead of reporting.
+
+**And fixing #149 immediately reproduced #144.** Making the claim matcher case-insensitive brought
+into scope a string this very document quotes — `` `**#130 (High)**` `` — as the counter-example
+illustrating that defect. The gate reported it. #144 had been fixed by requiring the **bolded** form,
+and a quoted example carries its own bold, so bold cannot discriminate. The discriminator is *code
+formatting*: a fenced block or a backtick span is a quotation, running prose is a claim. That rule is
+now shared with `severity_of()`, so the two halves of the gate agree on what a quotation is instead of
+each holding an opinion.
+
+The pattern across #148 and #149 is worth stating plainly: **both guards were written to catch a
+specific instance and tested against that instance.** Each passed its own test and failed the class it
+claimed to close. A guard demonstrated on the case that motivated it has been shown to work on one
+input — and #144 has now been "fixed" twice, because the first fix was also tested only against the
+case that prompted it.
+
+**The findings record went stale a third time** in the course of these fixes, and the gate caught it
+before the commit rather than after. That is the design working as intended and also its cost: a
+snapshot record plus a document that cites issues filed during the round means every issue-filing
+commit needs a refresh. It is structural, not forgetfulness.
+
 ### The record went stale again, one commit later — and the guard caught it
 
 Immediately after fixing #143, the same defect recurred: filing #145, #146 and #147 and citing them in
