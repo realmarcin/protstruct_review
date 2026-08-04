@@ -82,6 +82,12 @@ mechanism inferred from two data points is a hypothesis.** Round 7 explained a d
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
 
+Round 28 also showed, after merge, that **stating a counting rule is not the same as following it**:
+the document defined "one distinct numeric statement", applied it to its measurement, and two sections
+later summarised its own defects by counting *issues* instead — nine where the rule gives fifteen, and
+in the flattering direction (#174). A rule declared once and not restated at each use is a rule that
+lapses exactly where nobody is looking.
+
 Round 28's own review added a third: **a spot fix that silently misses looks exactly like one that
 worked.** Five fixes in that round each corrected the first occurrence and left the rest — one of them
 creating a fresh self-contradiction in the registry, in the file being corrected, falsifying two of the
