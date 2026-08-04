@@ -436,8 +436,10 @@ after refreshing the record reproduces it. The scope limits below say so.
 - **Four self-referential miscounts occurred in this round** (#130, #135, #147, #150) against one
   caught by the gate (#143's recurrence). The guard covers a narrow slice of the class it is named
   for; the honest reading is that it helps and does not close it.
-- **The findings record is a snapshot, not a live view**, and it went stale twice in this round —
-  once before review (#143) and once again immediately after fixing it. Any round that files an issue
+- **The findings record is a snapshot, not a live view**, and it went stale **three times** in this round —
+  on arrival (#143), again immediately after that was fixed, and a third time during the #148/#149
+  work, which the body records and this tally originally missed (#158: the scope limits said "twice"
+  while the body six sections above said "a third time", and NEXT_TASKS inherited a fourth number). Any round that files an issue
   after refreshing reproduces this. What the gate enforces is that everything the documents *cite* is
   present; it cannot know about a finding nobody wrote down, and it cannot tell a fresh snapshot from
   an old one that happens to cover the citations.

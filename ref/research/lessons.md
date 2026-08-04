@@ -1,4 +1,4 @@
-# Lessons from twenty-six rounds of tolerance benchmarking
+# Lessons from twenty-seven rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| A guard that cannot be tested has not been checked | 27 |
+| "Same as the one we already trust" is a claim to verify | 27 |
 | A default bucket makes "unrecognised" and "miscounted" independent | 26 |
 | Register the consequence you will check, not one you assume follows | 26 |
 | A guard must assert against the artefact it polices | 25 |
@@ -76,6 +78,24 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 27 gated the counts these summary files quote, after eight of them had shipped wrong across
+three rounds. Two lessons came out of it, and both are about the guard rather than the counts.
+
+**A guard that cannot be tested has not been checked.** The two round-coverage checks lived inside
+`validate.sh` as embedded python. Nothing exercised their failure modes because nothing *could*, and
+both matched any `| ... |` line anywhere in the file — so an unrelated table with a numeric cell, or a
+fenced documentation example, silently satisfied coverage for a round that had no row at all. Moving
+them into a script cost a few lines; the unit tests that became possible are what found the holes, one
+PR after the gate merged. If a check has no failure case you can run, its passing tells you nothing.
+
+**"Same as the one we already trust" is a claim to verify, not a reason to stop.** The PR adding that
+check described it as "representation only, exactly like its sibling". It was not: the sibling matches
+the round in a row's *last* cell, the new one matched the *first*, and they shared a flaw from
+opposite ends — so the reassurance was doing the work an inspection should have done. This is the
+second time the move has cost something: #142 sat unexamined because `oracle_family` was believed
+schema-enforced, and it was enforced on one class of three. An equivalence asserted between a new
+guard and an old one is exactly as trustworthy as the reading behind it.
 
 Round 26 tested three of round 25's parting claims. Two of its four predictions resolved cleanly; the
 other two did not, and the useful output is a prediction that failed in a way I had not allowed for: **a default bucket makes "unrecognised" and "miscounted"

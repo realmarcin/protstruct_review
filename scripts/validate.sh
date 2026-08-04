@@ -193,85 +193,22 @@ if [[ "${QUIET}" == "0" ]]; then
   echo "published views in sync with ref/catalog.yaml"
 fi
 
-# Every benchmark round must leave its lesson in ref/research/lessons.md. Two
-# consecutive reconciliations found rounds 14-15 and then round 16 missing from it:
-# the lesson gets written into the round's own audit trail, where nothing later reads
-# it, and the round closes. That is a process gap, not an oversight, so it is checked
-# rather than remembered.
-#
-# This checks REPRESENTATION, not completeness -- a round that yielded four lessons
-# and recorded one still passes. There is no ground truth for how many lessons a round
-# should have produced, so representation is the strongest mechanisable check; do not
-# read a pass as "no lesson was lost".
-if ! missing_lessons="$(python3 -c '
-import pathlib, re, sys
-
-repo = pathlib.Path(sys.argv[1])
-lessons = (repo / "ref/research/lessons.md").read_text()
-
-# The index rows end with the round(s) a lesson came from. That column is prose as
-# often as not -- "11, back-tested 13" -- so the round is matched as a token in the
-# final cell rather than as a whole cell, which would miss every multi-round entry.
-covered = set()
-for row in re.findall(r"^\|.*\|\s*$", lessons, re.M):
-    cells = [c.strip() for c in row.strip("|").split("|")]
-    if len(cells) >= 2:
-        covered.update(re.findall(r"\d+", cells[-1]))
-
-# De-duplicated: a round can have several files (round 26 has both its trail and its
-# pre-registration), and without this the failure message names it once per file.
-rounds = sorted(
-    {re.search(r"round(\d+)", p.name).group(1)
-     for p in (repo / "ref/research").glob("tolerance_benchmark_round*.md")},
-    key=int)
-print(" ".join(r for r in rounds if r not in covered))
-' "${REPO_ROOT}")"; then
-  fail "could not check lessons coverage"
+# The two summary files -- NEXT_TASKS.md and ref/research/lessons.md -- must cover every
+# round, and the counts they quote must match the record. Both checks used to live here
+# as embedded python and were un-testable, which is how #157 shipped: each matched any
+# `| ... |` line anywhere in the file, so an unrelated table or a fenced example row
+# silently satisfied coverage for a round that was genuinely missing. They now live in a
+# script with unit tests.
+if ! python3 "${REPO_ROOT}/scripts/test_summary_coverage.py" > /dev/null; then
+  python3 "${REPO_ROOT}/scripts/test_summary_coverage.py" >&2 || true
+  fail "summary coverage unit tests"
 fi
-if [[ -n "${missing_lessons// /}" ]]; then
-  fail "ref/research/lessons.md has no index entry for round(s): ${missing_lessons}"
+if ! python3 "${REPO_ROOT}/scripts/check_summary_coverage.py" > /dev/null 2>&1; then
+  python3 "${REPO_ROOT}/scripts/check_summary_coverage.py" >&2 || true
+  fail "summary files do not cover every round, or quote a count the record contradicts"
 fi
 if [[ "${QUIET}" == "0" ]]; then
-  echo "every benchmark round is represented in ref/research/lessons.md"
-fi
-
-# ...and in NEXT_TASKS.md, which is a different file and was not covered.
-#
-# The gate above was added by #68, whose title was "Reconcile NEXT_TASKS after round 16
-# -- and gate the gap that keeps recurring". It reconciled NEXT_TASKS BY HAND and gated
-# its NEIGHBOUR. Ten rounds later NEXT_TASKS was two rounds stale again, for the sixth
-# reconcile in this repo's history (#58, #64, #68, and two earlier). A guard aimed one
-# file to the left of the problem is the round-24/25 lesson: state a gate's scope as
-# carefully as its result, and check that it covers the thing it was named for.
-#
-# REPRESENTATION only, exactly like the lessons check: a round needs a row in the round
-# table, not a particular description. There is no ground truth for what a round's
-# summary should say, so a pass here does NOT mean the summary is accurate.
-if ! missing_tasks="$(python3 -c '
-import pathlib, re, sys
-
-repo = pathlib.Path(sys.argv[1])
-tasks = (repo / "NEXT_TASKS.md").read_text()
-
-# The round table rows open with "| <n> |". Matched on the leading cell rather than
-# anywhere in the line, so a round MENTIONED in prose does not satisfy the check.
-covered = set(re.findall(r"^\|\s*(\d+)\s*\|", tasks, re.M))
-
-# De-duplicated: a round can have several files (round 26 has both its trail and its
-# pre-registration), and without this the failure message names it once per file.
-rounds = sorted(
-    {re.search(r"round(\d+)", p.name).group(1)
-     for p in (repo / "ref/research").glob("tolerance_benchmark_round*.md")},
-    key=int)
-print(" ".join(r for r in rounds if r not in covered))
-' "${REPO_ROOT}")"; then
-  fail "could not check NEXT_TASKS round coverage"
-fi
-if [[ -n "${missing_tasks// /}" ]]; then
-  fail "NEXT_TASKS.md has no round-table row for round(s): ${missing_tasks}"
-fi
-if [[ "${QUIET}" == "0" ]]; then
-  echo "every benchmark round is represented in NEXT_TASKS.md"
+  echo "summary files cover every round and their counts match the record"
 fi
 
 # Every bench_*.py must commit the entry set it ran on. The round-17 audit found that
