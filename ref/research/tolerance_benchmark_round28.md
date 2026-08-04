@@ -228,8 +228,13 @@ shape rather than this one.
 It understates by one, in the direction that makes the problem look smaller — the bias this repo says
 to check hardest — inside a sentence whose only job is counting instances of a defect class.
 
-**Eleven issues were found in the round's own work** (#164–#167, #169–#174, #176) — three review
-passes before merge and one after,
+**Twelve issues as of the post-merge review** (#164–#167, #169–#174, #176, #177) — three review passes
+before merge and one after. **This is a lower bound, not a total**: it counts defects found in this
+round's own work, so every further pass increments it, *including the passes that correct this very
+figure*. It has already been wrong four times for exactly that reason — "nine" (#174), "fifteen"
+(#176), "ten" (#177), "eleven" (#179) — each correction being itself a change to the round's work.
+Stated as of a point in time, in the same form as `d_FSC_model`'s *"17 degraded — a lower bound, not a
+count"*, which is the convention this file already had and did not apply.
 **every one in the prose and none in the measurement.** The unit is *issues*, which is exact and
 checkable; see below for why the statement-level rule is not used here. That split is the round's most durable result and is worth
 stating as such: the measurement (P1–P4, the sweep, the seven corrected figures) has not moved through
@@ -290,9 +295,35 @@ a gate failure; it is the cost of representation checks, now paid rather than pr
 The third *"nine"* was in fact derivable all along — the #170 sweep searched nine superseded values and
 misjudged one of their matches — so the fix is to say what it counts rather than to soften it.
 
-**Eleven issues in this round's own work, one after merge.** The measurement (P1–P4, the sweep, the
-corrected figures) has still not moved through any of the four passes. Every defect has been in the
+**Twelve issues in this round's own work as of the post-merge review, and rising by construction.**
+The measurement (P1–P4, the sweep, the corrected figures) has still not moved through any of the four
+passes. Every defect has been in the
 prose about it, and the last six have been counts.
+
+## #179 — the count has no fixed value, which is why it kept being wrong
+
+Reviewing the #177 fix found that its *"Eleven issues"* excluded **#177 itself** — which meets the
+identical criterion that put #176 in the list. Twelve.
+
+But writing "twelve" would have been wrong the moment this review filed anything, and **that is the
+finding**. The tally has been wrong four times, always the same way:
+
+| stated | omitted | filed as |
+|---|---|---|
+| nine | conflated issues with the statement rule | #174 |
+| fifteen | `#166:2` where the table shows three | #176 |
+| ten | #176 itself | #177 |
+| eleven | #177 itself | #179 |
+
+Every correction is a change to round 28's own work; if the review of that correction finds anything,
+it produces an issue that increments the count the correction just fixed. **A count of defects found
+in your own work has no fixed value while review continues.** It is not hard arithmetic — it is a
+figure with no total while the process producing it is running, and all four corrections treated it as
+though it had one.
+
+It is now written as a **lower bound as of a moment**, which is the form this file already used for
+*"17 degraded — a lower bound, not a count"* and for the `scripts/` audit's *"lower bound, not a
+total"*. The convention existed here and was not applied to the round's own tally.
 
 ## Scope limits
 
