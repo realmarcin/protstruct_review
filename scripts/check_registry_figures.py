@@ -80,11 +80,21 @@ def _status_is(row, token: str) -> bool:
     independently; the denominators were right because a separate check happened to fail
     first, which is a backstop rather than correctness. One rule, one copy.
     """
-    for declared, (rule, _) in _VOCAB.items():
-        if declared.startswith(token):
-            return row["status"] == declared if rule == "exact" else \
-                row["status"].startswith(declared)
-    raise KeyError(f"{token!r} is not a declared status token")
+    matches = [(d, rule) for d, (rule, _) in _VOCAB.items() if d.startswith(token)]
+    if not matches:
+        raise KeyError(f"{token!r} is not a declared status token")
+    if len(matches) > 1:
+        # An AMBIGUOUS token resolved silently by dict order, which is the same shape as
+        # the defects this function was written to fix (#153). No two declared statuses
+        # share a prefix today; the trigger is someone adding one, i.e. exactly what the
+        # vocabulary exists to support. Fail rather than pick.
+        raise KeyError(
+            f"{token!r} matches {len(matches)} declared statuses "
+            f"({[d for d, _ in matches]}) — the predicate cannot tell which is meant; "
+            f"use the full status token")
+    declared, rule = matches[0]
+    return row["status"] == declared if rule == "exact" else \
+        row["status"].startswith(declared)
 
 
 def _named(rows):

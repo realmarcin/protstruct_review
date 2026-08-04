@@ -387,6 +387,12 @@ backtick could delete a claim. The gate now **classifies each match in place** â
 mis-classify the match it touches and can no longer erase a different one. That is a structural answer
 rather than a fifth patch, and it is what should have been done at #144.
 
+**#153 (low-medium), found reviewing the fix itself.** `_status_is()` raises loudly for an *unknown*
+status token and resolved an **ambiguous** one silently, by dict order â€” the same shape as the defects
+it was written to fix, inside the fix. Latent: no two declared statuses share a prefix today, and the
+trigger is adding one, which is exactly what the vocabulary exists to support. It now fails rather
+than picks.
+
 **What is still not closed.** This remains a heuristic for "is this markdown text a quotation", and
 markdown has more constructs than are enumerated here. The honest position is that the gate now
 handles every construct these documents actually use, has a partition map in `test_guards.py` rather

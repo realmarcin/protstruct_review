@@ -387,5 +387,23 @@ check("and the published denominators are unchanged by the rewrite",
 check("the denominator predicates reject an undeclared token outright",
       _raises_keyerror(figures), True)
 
+# #153: an AMBIGUOUS token used to resolve by dict order. No two declared statuses share
+# a prefix today, so this constructs the case a future round would create.
+_saved_vocab = figures._VOCAB
+try:
+    figures._VOCAB = dict(_saved_vocab)
+    figures._VOCAB["skipped-early: "] = ("prefix", "a future status")
+    _ambiguous = False
+    try:
+        figures._status_is({"status": "skipped-early: x"}, "skipped")
+    except KeyError as _e:
+        _ambiguous = "matches 2 declared statuses" in str(_e)
+    check("an ambiguous status token fails rather than picking one", _ambiguous, True)
+finally:
+    figures._VOCAB = _saved_vocab
+check("and the real vocabulary has no ambiguous token today",
+      [tok for tok in ("measured", "skipped", "screened only")
+       if len([d for d in figures._VOCAB if d.startswith(tok)]) != 1], [])
+
 
 print(f"\nall guard unit tests passed ({PASSED} checks)")

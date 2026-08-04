@@ -57,3 +57,4 @@ issue	severity	state	title
 150	medium	open	Round 26 quotes a stale count of the gate's own output (7, now 12), and the PR body's guard-check count is stale again
 151	high	open	check_round_figures' quotation detection fails on four more markdown constructs, two as silent false negatives
 152	medium	open	_named/_attempted still use the bare startswith that #148 removed from status_is_known
+153	low-medium	open	_status_is resolves an ambiguous status token silently by dict order
