@@ -186,8 +186,9 @@ present value beside it.
 
 ## #172 — the sweep's third failure mode: blind to synonyms
 
-A third review pass found one more, and it is the fourth instance of the headline-vs-body shape in
-this round:
+A third review pass found one more, and it is the **fifth** instance of the headline-vs-body shape
+in this round — #170's table above lists four (the merged-table row is #150's conflation shape, not
+this one), and this is the next:
 
 ```
 round27.md:172 (header)  ## #163 — the ninth miscount, and what the gate does not reach
@@ -215,6 +216,23 @@ historical quotation, the new registry caveat verifies against the TSV (9VAM has
 `d_fsc_model_pre`; 10BU's 4.3513 is the largest recorded crossing), both tables balance exactly, round
 26's 15-vs-13 split is a genuine two-denominator distinction rather than an error, and all four gates
 exit 0.
+
+## #173 — and the sentence counting the instances miscounted them
+
+Reviewing the #172 fix found that its own opening sentence called #172 the *"fourth instance"* of the
+headline-vs-body shape. #170's table, four lines above in the same document, lists **four** such
+instances already — so #172 is the **fifth**. The count skipped the `lessons.md` row and appears to
+have substituted the merged-table row, which that table explicitly labels as #150's *conflation*
+shape rather than this one.
+
+It understates by one, in the direction that makes the problem look smaller — the bias this repo says
+to check hardest — inside a sentence whose only job is counting instances of a defect class.
+
+**Nine of the round's own defects have now been found across three review passes, every one in the
+prose and none in the measurement.** That split is the round's most durable result and is worth
+stating as such: the measurement (P1–P4, the sweep, the seven corrected figures) has not moved through
+any pass. What keeps failing is the writing *about* it — and each failure has been a count, in a round
+whose subject is that counts fail.
 
 ## Scope limits
 
