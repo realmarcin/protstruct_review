@@ -240,7 +240,7 @@ fi
 # The gate above was added by #68, whose title was "Reconcile NEXT_TASKS after round 16
 # -- and gate the gap that keeps recurring". It reconciled NEXT_TASKS BY HAND and gated
 # its NEIGHBOUR. Ten rounds later NEXT_TASKS was two rounds stale again, for the sixth
-# reconcile in this repo's history (#58, #64, #68, and three earlier). A guard aimed one
+# reconcile in this repo's history (#58, #64, #68, and two earlier). A guard aimed one
 # file to the left of the problem is the round-24/25 lesson: state a gate's scope as
 # carefully as its result, and check that it covers the thing it was named for.
 #
