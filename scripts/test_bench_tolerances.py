@@ -1126,4 +1126,75 @@ finally:
 check("with no recorder, a crash leaves nothing on disk", _nocb.exists(), False)
 
 
+# --- Round 23: an interrupted FETCH must not lose its record either -----------------
+
+# Round 21 fixed the all-or-nothing write in the refinement benchmark and called it the
+# last one. It was not: fetch_em_entries.py had the same shape, and an interrupted
+# round-23 fetch left entries.json unwritten and the attrition record empty after 8
+# model and 7 map downloads (#105). Round 15's rule -- fixing one instance of a failure
+# class and leaving its siblings hides the class.
+_fetch_dir = Path(_tf.mkdtemp())
+_fetch_rec = _fetch_dir / "attrition.tsv"
+
+# The FIX is the per-candidate flush() inside main(); an earlier version of this test
+# only exercised append_fetch_record's dedup -- unchanged code -- so it would have
+# passed even if flush() had never been wired into the loop (#109). This drives main()
+# and interrupts it, the way round 21's test does for the refinement benchmark.
+_int_cache = Path(_tf.mkdtemp())
+_int_tsv = _fetch_dir / "interrupted.tsv"
+_calls = {"n": 0}
+
+
+def _collect_then_die(pdb_ids, cache, *a, **k):
+    """Succeed for two candidates, then die -- as a network failure would."""
+    _calls["n"] += 1
+    if _calls["n"] > 2:
+        raise RuntimeError("simulated interruption mid-fetch")
+    pid = pdb_ids[0]
+    return ([{"pdb_id": pid, "resolution": 3.0, "emdb": "EMD-1",
+              "publication": f"doi/{pid}", "charges": None}], [])
+
+
+_saved_collect = fetchem.collect
+fetchem.collect = _collect_then_die
+_saved_argv = sys.argv
+sys.argv = ["fetch", "--cache", str(_int_cache), "--ids", "AAAA,BBBB,CCCC,DDDD",
+            "--limit", "4", "--round", "23", "--fetch-tsv", str(_int_tsv)]
+try:
+    try:
+        fetchem.main()
+    except RuntimeError:
+        pass                              # the interruption we simulated
+finally:
+    fetchem.collect = _saved_collect
+    sys.argv = _saved_argv
+
+check("an interrupted fetch still wrote entries.json",
+      (_int_cache / "entries.json").exists(), True)
+check("and it holds the candidates completed before the interruption",
+      [e["pdb_id"] for e in __import__("json").loads((_int_cache / "entries.json").read_text())],
+      ["AAAA", "BBBB"])
+check("the committed attrition record has them too",
+      [l.split("\t")[0] for l in _int_tsv.read_text().splitlines()[1:] if l.strip()],
+      ["AAAA", "BBBB"])
+
+# append_fetch_record is what flush() calls; the contract that matters is that a
+# partial batch already on disk survives, and that re-offering it does not duplicate.
+fetchem.append_fetch_record([{"pdb_id": "AAAA", "resolution": 3.0}],
+                            [{"pdb_id": "BBBB", "reason": "map too large"}],
+                            _fetch_rec, "23")
+_partial = [l.split("\t")[0] for l in _fetch_rec.read_text().splitlines()[1:] if l.strip()]
+check("a partial fetch's outcomes are on disk before the run ends", _partial, ["AAAA", "BBBB"])
+
+# The end-of-run flush() re-offers everything, including what was already written.
+fetchem.append_fetch_record([{"pdb_id": "AAAA", "resolution": 3.0},
+                             {"pdb_id": "CCCC", "resolution": 3.5}],
+                            [{"pdb_id": "BBBB", "reason": "map too large"}],
+                            _fetch_rec, "23")
+_final = [l.split("\t")[0] for l in _fetch_rec.read_text().splitlines()[1:] if l.strip()]
+check("re-offering them at the end is idempotent", _final, ["AAAA", "BBBB", "CCCC"])
+check("and one header survives",
+      sum(1 for l in _fetch_rec.read_text().splitlines() if l.startswith("pdb_id")), 1)
+
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

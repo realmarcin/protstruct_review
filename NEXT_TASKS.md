@@ -3,7 +3,7 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-03** (round 22). Rounds 17–18 merged as
+**Last reconciled: 2026-08-03** (round 23). Rounds 17–18 merged as
 [#69](https://github.com/realmarcin/protstruct_review/pull/69); rounds 19 and 20 followed in
 [#82](https://github.com/realmarcin/protstruct_review/pull/82) and its successor. **Check the issue
 tracker for open issues; this file does not mirror it in real time.** There is no CI in this
@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Twenty-two rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Twenty-three rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -53,12 +53,13 @@ floors row.
 | 20 | [#86](https://github.com/realmarcin/protstruct_review/pull/86) (2026-08-02) | the two §4 clauses untested since round 7 re-measured: both hold, both worst cases reproduce exactly; the clashscore ratio gate found undefined at `pre = 0` and given a low-end guard; `phenix.refine` shown deterministic 8/8 |
 | 21 | [#92](https://github.com/realmarcin/protstruct_review/pull/92) (2026-08-03) | L-test made re-derivable on a committed 24-dataset set instead of being retired — a subset re-run, so reproducible rather than corroborating; EM benchmark now writes per-entry results as it goes |
 | 22 | (2026-08-03) | 10BU shown to be a genuine statistical outlier; a candidate mechanism supported but not established (n = 2), with the successor test specified; flip-set row shown **not** to be fixable by round 21's route |
+| 23 | (2026-08-03) | crossing-quality test **could not be run at the 1.3 cut** — 0 of 24 screened; at the data-driven 1.074 fence one already-refined near-miss (10EU) leans against it; estimator characterised over 60 crossings; the fetcher's all-or-nothing write fixed |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-two rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-three rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -88,6 +89,9 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
   where it is, precisely located rather than defended.
 - **A prediction confirmed once describes the round that confirmed it.** Round 16 confirmed
   "largest degradation > 1.1 %"; round 19 registered the same threshold and falsified it.
+- **Price the sampling before promising the test.** Round 22 called its successor test cheap because
+  the selector was measurable before refinement. The candidates occur at 3.3 %, so screening 24 found
+  none; three candidates need ~60–90 screened entries. A cheap selector is not a cheap experiment.
 - **Whether a subset re-run helps depends on which members were lost.** The L-test's missing
   datasets were unremarkable; the flip-set row's are the zero-disagreement models, i.e. the
   denominator — re-running there manufactures a contradiction rather than resolving one.
@@ -122,20 +126,27 @@ the completed entries with it. Tested by simulating a crash at entry 3 of 5.
 Round 22 turned one of the three standing risks into a scoped, registerable task and closed another
 as unfixable-in-principle.
 
-#### [ ] Test the `d_FSC_model` crossing-quality hypothesis on a targeted set
+#### [ ] Crossing-quality hypothesis — untested, and now priced
 
-Round 22 found that the two entries whose FSC crossing starts furthest beyond their map's own
-resolution (`pre / d_min` > 1.3 — 9H7U at 1.372, 10BU at 1.360) are the **two largest excursions in
-the benchmark**, −36.15 % and +4.786 %, with median |Δ| of **20.5 %** above that ratio against
-**0.112 %** below it. The correlation over all 36 entries is ρ = +0.346, p = 0.039, found *against*
-the arithmetic bias. **It is n = 2 and fails on removing either entry** (ρ = +0.288, p = 0.094), so it is a hypothesis.
+Round 23 ran the test as specified and **could not complete it**: 24 entries screened on the
+pre-refinement ratio, **zero** above 1.3. That is consistent with the 5.6 % base rate rather than
+evidence against it (Fisher p = 0.512; a 25 % chance of seeing none), so the hypothesis is **neither
+supported nor refuted**.
 
-**Execute:** the predictor is measurable from `mtriage` **before** refinement, so entries can be
-selected on it without circularity. Fetch EM entries with `pre / d_min` > 1.3, register the
-prediction that their |Δ| exceeds the ≤ 1.3 population's 0.112 % median by one to two orders of
-magnitude, then refine. **Canary one entry first.** If it holds, the `d_FSC_model` Δ becomes
-conditionable on a measurable property instead of resting on 10BU alone; if it fails, 10BU is simply
-singular and the band stays as it is.
+**The cost is now measured rather than guessed.** Combined base rate is **2 of 60 = 3.3 %** at the
+1.3 cut, or 3 of 60 at the data-driven fence of 1.074. Three candidates — the minimum for a powered
+comparison — needs **~60–90 screened entries**, each costing a 100–250 MB map download and a few
+minutes of `mtriage`. **That is a project, not a round**, and it should not be picked up as though it
+were cheap.
+
+Round 23 also found the 1.3 cut, inherited from n = 2, is **too conservative**: the Tukey fence on the
+combined 60 sits at **1.074**, and **4 of 60** clear it — including **10EU, already refined in round 16**,
+whose Δ of −1.084 % just fails the hypothesis's own 10× bar (1.102 %). So the hypothesis has one
+near-miss on existing data, leaning mildly against it.
+
+A future attempt should use the data-driven cut, where the base rate is **4 of 60 = 6.7 %** and two
+members (10EU, 6PMJ) are already identified. 6PMJ was not refined here because one candidate against
+three controls has a best achievable p of 0.25 — an observation, not a test.
 
 ### Standing risk, not tasks
 

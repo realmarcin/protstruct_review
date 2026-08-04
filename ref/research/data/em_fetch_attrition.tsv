@@ -18,3 +18,45 @@ pdb_id	round	resolution	emdb	outcome	charges	unparameterised	publication
 3JAH	19			rejected: model 26 MB exceeds --max-model-mb 8			
 10TQ	19			rejected: formal charges absent from the electron scattering table: O1-×36	N1+×46, O1-×36		
 6JHS	19			rejected: map 415 MB exceeds --max-map-mb 300			
+30EP	23	2.55	EMD-57673	kept			10.64898/2026.06.04.730248
+30OD	23	3.75	EMD-57888	kept			10.64898/2026.05.07.723526
+10FF	23			rejected: formal charges absent from the electron scattering table: O1-×259	N1+×241, O1-×259		
+6TH6	23			rejected: model 19 MB exceeds --max-model-mb 8			
+3J80	23			rejected: model 9 MB exceeds --max-model-mb 8			
+5OAF	23			rejected: formal charges absent from the electron scattering table: O1-×26	N1+×14, O1-×26		
+11RN	23	2.4	EMD-75980	kept			10.1038/s41467-026-74283-7
+6X3T	23	2.55	EMD-22032	kept			10.1038/s41586-020-2654-5
+10YC	23	2.7	EMD-75524	kept			Nucleosome containing a nick at SHL-4
+21FY	23			rejected: formal charges absent from the electron scattering table: O1-×170	N1+×150, O1-×170		
+5XYU	23			rejected: formal charges absent from the electron scattering table: O1-×1635	N1+×377, O1-×1635		
+12OY	23			rejected: map 314 MB exceeds --max-map-mb 250			
+3JAJ	23			rejected: model 26 MB exceeds --max-model-mb 8			
+5APN	23			rejected: model 15 MB exceeds --max-model-mb 8			
+5OYG	23	4.06	EMD-3861	kept			10.1038/nature24652
+12JT	23	2.4	EMD-76493	kept			Functional and Structural Basis of Omicron BA.3.2.1 Spike
+7CUB	23			rejected: unparameterised ligand: 59 atoms with no monomer-library restraints (HEO×59)		HEO×59	
+11HK	23			rejected: formal charges absent from the electron scattering table: O1-×52	N1+×58, O1-×52		
+23SR	23			rejected: unparameterised ligand: 34 atoms with no monomer-library restraints (A1E59×34)		A1E59×34	
+10GN	23			rejected: unparameterised ligand: 23 atoms with no monomer-library restraints (8OG×23)		8OG×23	
+6VQX	23	3.15	EMD-21360	kept			10.1073/pnas.1922638117
+10MK	23	3.3	EMD-75288	kept			10.1073/pnas.2609228123
+6AHC	23	3.45	EMD-9623	kept			10.1038/s41467-019-12427-8
+22OF	23	3.6	EMD-68536	kept			Cryo-EM structure of nematode TECR and HACD complex
+3JAN	23			rejected: model 26 MB exceeds --max-model-mb 8			
+6GTC	23	3.91	EMD-0061	kept			10.1016/j.cell.2018.10.045
+6AYE	23	4.06	EMD-7018	kept			10.1038/nsmb.3502
+20ZG	23	2.4	EMD-67429	kept			10.1038/s41586-026-10228-w
+7M4W	23			rejected: model 16 MB exceeds --max-model-mb 8			
+11HN	23			rejected: formal charges absent from the electron scattering table: O1-×33	N1+×39, O1-×33		
+6KNG	23			rejected: map 372 MB exceeds --max-map-mb 250			
+10MI	23	3.0	EMD-75286	kept			10.1073/pnas.2609228123
+6WTZ	23	3.15	EMD-21900	kept			10.1038/s41592-020-01021-2
+11BC	23	3.3	EMD-75601	kept			10.1016/j.jbc.2026.113120
+6D6Q	23	3.45	EMD-7808	kept			10.1016/j.cell.2018.05.041
+22XK	23	3.6	EMD-67812	kept			10.1107/S2053230X26001202
+5LZU	23			rejected: model 25 MB exceeds --max-model-mb 8			
+6PMJ	23	3.91	EMD-20395	kept			10.15252/embj.2020104389
+6EDU	23	4.06	EMD-9038	kept			10.1016/j.chom.2018.09.003
+20ZH	23	2.4	EMD-67430	kept			10.1038/s41586-026-10228-w
+7RW6	23	2.55	EMD-24709	kept			10.1126/sciadv.abm2827
+13HR	23	2.7	EMD-77072	kept			10.64898/2026.05.09.724024
