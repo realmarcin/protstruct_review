@@ -13,6 +13,8 @@ maxims.
 | Rule | Round |
 |---|---|
 | A spot fix that silently misses looks exactly like one that worked | 28 |
+| A counting rule has a domain; state which unit you are using | 28 |
+| A count of your own defects has no fixed value while review continues | 28 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -91,6 +93,13 @@ the quantity it was being applied to: a two-row table that fails to balance is o
 five defects called "one behaviour" are five or one, and nothing in the rule decides. **A counting
 rule has a domain.** Outside it, pick a unit that is exact — issues, files, commits — and say which,
 rather than manufacturing precision the rule cannot support.
+
+And the sharpest form of it: **a count of defects found in your own work has no fixed value while
+review continues.** Round 28's tally of its own defects was wrong four times — nine, fifteen, ten,
+eleven — not because the arithmetic was hard but because each correction was itself a change to the
+work being counted, which the next pass could then find a defect in. A self-referential tally is a
+*lower bound as of a moment*, and must be written that way; this repo already had the convention
+("17 degraded — a lower bound, not a count") and simply did not apply it to itself.
 
 Round 28's own review added a third: **a spot fix that silently misses looks exactly like one that
 worked.** Five fixes in that round each corrected the first occurrence and left the rest — one of them
