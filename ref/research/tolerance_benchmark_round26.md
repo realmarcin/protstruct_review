@@ -296,15 +296,39 @@ all 7 checkable round-document figures match the findings record;
 
 That line is the honest summary of what this guard is worth: **7 checked, 11 not.**
 
+### The record went stale again, one commit later — and the guard caught it
+
+Immediately after fixing #143, the same defect recurred: filing #145, #146 and #147 and citing them in
+this document left `round_findings.tsv` behind again, because it is a snapshot and the round kept
+producing findings after the snapshot was taken.
+
+Two things are worth recording rather than quietly re-refreshing.
+
+**The guard worked.** `validate.sh` went red on the next run with
+`MISSING  round26: severity of #145`. That is the first time in this series that a self-referential
+miscount was caught by a check rather than by a reviewer — #130 and #135 were both found by reading.
+The guard's value is not that the record is now correct; it is that being wrong is no longer quiet.
+
+**I pushed while it was red.** The commit adding the #145 section was made after my last gate run and
+before the next one, so a red gate reached the remote. The prompt's rule — re-run the gate and the
+tests before committing — is not new, and I did not follow it. Stated here because a round about
+guards that were never aimed at their own work should not omit the instance where the author skipped
+the check.
+
+The staleness is structural, not an oversight to be remembered away: any round that files an issue
+after refreshing the record reproduces it. The scope limits below say so.
+
 ## Scope limits
 
 - **The round-figure gate now checks every round document, but only for severity claims.** The
   per-document literal checks (counts, ranges) remain round-25-specific, because each round's
   phrasings are its own. So of 18 severity claims across all round documents, **7 are checked and 11
   are UNCHECKABLE** — their issues predate the `**Severity:` convention that starts at #116.
-- **The findings record is a snapshot, not a live view.** It must be refreshed (`--refresh`) at round
-  close or it goes stale exactly as it did here (#143). Nothing enforces that it was refreshed
-  *recently* — only that what the documents cite is present.
+- **The findings record is a snapshot, not a live view**, and it went stale twice in this round —
+  once before review (#143) and once again immediately after fixing it. Any round that files an issue
+  after refreshing reproduces this. What the gate enforces is that everything the documents *cite* is
+  present; it cannot know about a finding nobody wrote down, and it cannot tell a fresh snapshot from
+  an old one that happens to cover the citations.
 - **It cannot check a claim nobody wrote down as a number.** "Four high" is checkable; "the audit was
   thorough" is not.
 - **The vocabulary guard protects one column of one file.** Pass 4 checked the others it could find —

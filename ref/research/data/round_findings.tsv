@@ -49,3 +49,6 @@ issue	severity	state	title
 142	medium-high	open	oracle_family is schema-enforced on Finding only, not on the MeasurementValue that qds_emit actually reads
 143	medium-high	open	round_findings.tsv is stale on arrival: it omits #139, #140 and #142, the findings of the round that ships it
 144	medium	open	severity_claims() cannot distinguish a claim from a quoted counter-example, and its alternation order truncates medium-high
+145	high	open	The #139 fix made the output key dynamic and summarize() still reads the old literal — the script raises KeyError on every run
+146	medium-high	open	P4 and P2 verdict labels claim more than the pre-registration supports, both in the flattering direction
+147	medium	open	PR body says 42 guard checks (it is 50), and the HIGH_RATIO duplication is described inaccurately
