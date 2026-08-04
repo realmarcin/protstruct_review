@@ -129,6 +129,20 @@ check("a stale round count is caught",
 check("and it reports the HIGHEST round, not the number of trail files",
       f"highest round on disk is {ROUNDS[-1]}" in
       cov.round_count_claim(TASKS.replace(CURRENT, STALE_PHRASE), ROUNDS)["detail"], True)
+# #160: _WORDS held only {20, 30}, so spell() raised a bare KeyError at 40 and below 20
+# -- a gate crashing without a diagnosis thirteen rounds out. Tested across the whole
+# supported range, not just the value the repo happens to sit on.
+check("spell covers every round from 20 to 99",
+      [cov.spell(n) for n in (20, 27, 30, 40, 41, 99)],
+      ["twenty", "twenty-seven", "thirty", "forty", "forty-one", "ninety-nine"])
+for _bad in (19, 100):
+    _raised = False
+    try:
+        cov.spell(_bad)
+    except ValueError as _e:
+        _raised = str(_bad) in str(_e)
+    check(f"  and refuses {_bad} by name rather than a bare KeyError", _raised, True)
+
 check("a removed round count goes MISSING",
       cov.round_count_claim(TASKS.replace(CURRENT, "many rounds of"),
                             ROUNDS)["status"], "MISSING")

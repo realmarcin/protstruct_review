@@ -110,6 +110,20 @@ Both were caught by the gate rather than by reading, because the assertions flip
 The pattern is worth naming: **a test fixture that hardcodes a value the change under test modifies is
 a test that stops testing exactly when the change lands.**
 
+## #160 — a lookup sized to today's values
+
+`spell()` converts the round number to the form the summary file uses. Its tens table held exactly
+`{20: "twenty", 30: "thirty"}`, so it raised a bare `KeyError` below 20 and at 40 and above — the gate
+would crash with a traceback at round 40, thirteen rounds out.
+
+It fails **closed**, which is the right direction, but with a stack trace where a diagnosis belongs,
+and a gate that crashes is one somebody disables rather than debugs. Now covers 20–99 and refuses
+anything else by name.
+
+The shape is the round's own recurring one, a third time: **code sized to the range the repo currently
+occupies is a fixture pretending to be a function.** `EXPECTED_DEFECT_CLAIMS` is the same instinct
+(and is disclosed below), and both test fixtures had already been corrected for it in this round.
+
 ## Scope limits
 
 - **Coverage is representation, counts are derivation, and only four figures are derived.** Every

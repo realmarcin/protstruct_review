@@ -170,13 +170,29 @@ def defect_counts(tasks: str, findings: list[dict]) -> list[dict[str, Any]]:
     return results
 
 
-_WORDS = {20: "twenty", 30: "thirty"}
-_UNITS = {1: "-one", 2: "-two", 3: "-three", 4: "-four", 5: "-five", 6: "-six",
-          7: "-seven", 8: "-eight", 9: "-nine", 0: ""}
+# Covers 20-99. The first version held only {20, 30} -- exactly the range the repo
+# occupied -- and raised a bare KeyError at 40 and below 20 (#160). A lookup sized to
+# today's values is a fixture pretending to be a function, which is the same instinct
+# this round had to correct twice in its own test fixtures.
+_TENS = {2: "twenty", 3: "thirty", 4: "forty", 5: "fifty", 6: "sixty", 7: "seventy",
+         8: "eighty", 9: "ninety"}
+_UNITS = {0: "", 1: "-one", 2: "-two", 3: "-three", 4: "-four", 5: "-five", 6: "-six",
+          7: "-seven", 8: "-eight", 9: "-nine"}
 
 
 def spell(n: int) -> str:
-    return _WORDS[n // 10 * 10] + _UNITS[n % 10]
+    """The spelled-out form of a round number, 20-99.
+
+    Below 20 the summary file's phrasing ("twenty-six rounds of rules") does not apply,
+    and above 99 nothing here is meaningful. Both raise with the number named rather
+    than a bare KeyError, because this runs inside a gate and a crash without a
+    diagnosis is one somebody disables rather than debugs.
+    """
+    if not 20 <= n <= 99:
+        raise ValueError(
+            f"cannot spell round {n}: this covers 20-99, which is the range the "
+            f"summary file's phrasing applies to")
+    return _TENS[n // 10] + _UNITS[n % 10]
 
 
 def round_count_claim(tasks: str, rounds: list[str]) -> dict[str, Any]:
