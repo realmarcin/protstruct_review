@@ -159,6 +159,16 @@ was written for the ranges this file happens to contain, and every one of them a
 Endpoints are now ordered before expanding — a descending range is a typo, and reading it as the range
 its author meant is never less safe than the old behaviour.
 
+## The #157 fix earned itself immediately
+
+Adding a candidate-options table to `NEXT_TASKS.md` put a **second table** in the file — the exact
+construct that false-passed before #157, when the check matched any `| … |` line anywhere. Under the
+scoped check it is inert: the round table still resolves to exactly its 27 rows, every first cell a
+digit, and nothing from the new table leaks in.
+
+That is not a hypothetical partition being defended; it is the first ordinary edit after the fix
+landing on the case the fix was for.
+
 ## Scope limits
 
 - **Coverage is representation, counts are derivation, and only four figures are derived.** Every

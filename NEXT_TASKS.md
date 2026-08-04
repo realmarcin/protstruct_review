@@ -148,6 +148,22 @@ the completed entries with it. Tested by simulating a crash at entry 3 of 5.
 
 ### Open
 
+**Nothing here is round-sized.** That is the state as of round 27, and it is worth saying plainly
+rather than leaving someone to discover it: the one item carrying a checkbox is priced as a project,
+and the two other candidates are the same. Detail for each lives where it already lives — this is the
+menu, not a second copy of it.
+
+| candidate | cost | the constraint |
+|---|---|---|
+| **Crossing-quality hypothesis** (below) | ~60–90 screened entries, each a 100–250 MB map download plus `mtriage` | base rate 3.3 % at the 1.3 cut, 6.7 % at the data-driven 1.074 fence; three candidates is the minimum for a powered comparison. **Multi-round.** |
+| **Fresh low-resolution X-ray measurement** (*Standing risk*, below) | a new refinement set below 2.5 Å | the only way to give the §4 band widths a checkable basis; the two maxima that size them come from ~11 entries named nowhere and cannot be recounted. **Multi-round.** |
+| **Another `scripts/` audit pass with a new lens** (*Standing risk*, below) | one round | has found defects **every time** — 12, then 5, then 5 — but the lens must differ each pass, and there is **no defined endpoint**. Cheap per pass, unbounded in total. |
+
+The asymmetry is the point. The first two are expensive and *bounded* — you can say in advance what
+would settle them. The third is cheap and *unbounded* — it has never come back empty, which is a
+reason to keep doing it and not a reason to expect it to finish. Picking it repeatedly is a choice to
+spend rounds on assurance rather than on measurement, and that trade should be made deliberately.
+
 Round 22 turned one of the three standing risks into a scoped, registerable task and closed another
 as unfixable-in-principle.
 
