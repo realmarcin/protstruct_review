@@ -86,6 +86,45 @@ So "silent defaults flatter" is **not** a rule this round earned. Three of six i
 watching, not a finding. What all six *do* share is more mundane and more useful: every one produces a
 **well-formed, plausible value** rather than an error, which is why none was noticed.
 
+## Self-review: the audit's own fixes needed auditing
+
+Reviewing this round's diff found three more defects, two of them in the fixes themselves. Recorded
+because the pattern across them is the more useful output.
+
+**#136 (high) — the #119 fix reintroduced the failure it sits next to.** Putting the resolution into
+the cache key made `measure()` write `mc_<id>_pre_<res>A.log`. `collect()` went on rebuilding
+`mc_<id>_pre.log` by hand:
+
+```python
+pre = measure(model, map_file, resolution, cache, f"{pdb_id}_pre")
+if pre["cc_mask"] is None:
+    reason = failure_reason(cache / f"mc_{pdb_id}_pre.log", "map_correlations")
+```
+
+`failure_reason()` took its missing-file branch and returned `"map_correlations produced no log"` —
+discarding the unparameterised-ligand and scattering-table causes it exists to surface. That string is
+written into `em_refinement_deltas.tsv` as the row's `status`, so the attrition record would have
+filled with entries saying nothing about themselves.
+
+It is the **10EN failure that `failure_reason`'s own docstring memorialises**, reintroduced by a fix
+three functions above it. The cause is worth naming: **two copies of a naming rule**, one in the
+writer and one in the reader. Fixed by returning the log path from `measure()`, so there is only one.
+Re-synchronising the copies would have left the mechanism intact.
+
+No existing test caught it — the `cache_key` tests exercise the function in isolation, and the
+mid-batch crash test monkeypatches `measure` wholesale, so the real function never ran.
+
+**#130 (medium) — this document said "three high" when four are.** The table above it already led
+with all four. A headline disagreeing with the body beneath it is the #91 shape.
+
+**#135 (low) — a "20-file" that is 19**, written into the process document that exists to stop
+unverified counts.
+
+The last two are the same mistake twice in consecutive passes: **recounting from memory instead of
+from the command.** Both were also wrong in the direction that flatters — fewer high-severity findings
+reads as a cleaner audit. That is the bias this repo tells you to check hardest, and it appeared in a
+round whose own write-up says so.
+
 ## Scope limits
 
 - **Three fixes are not pinned by a test**, and deliberately:
@@ -108,4 +147,9 @@ watching, not a finding. What all six *do* share is more mundane and more useful
   the caches live in temp directories, so no committed figure is implicated, but neither is any
   committed figure *proven* unaffected by re-running it.
 - **Coverage is not completeness.** Four reviewers over 37 files found twelve defects on the first
-  pass. That is a lower bound on what is there.
+  pass; a second pass over those fixes found three more, one of them high. That is a lower bound on
+  what is there, and the rate at which reviewing the fixes finds new defects is itself evidence that
+  one pass is not enough.
+- **#136 is the second time this round a fix was checked only in isolation.** The `cache_key` unit
+  tests passed while the caller was broken. A unit test on the helper does not test the contract
+  between the helper and the code that used to do the work itself.
