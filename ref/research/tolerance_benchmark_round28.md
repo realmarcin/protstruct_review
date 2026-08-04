@@ -8,26 +8,43 @@ The instinct was to add a third literal→derivation pair. Predictions were regi
 (`tolerance_benchmark_round28_preregistration.md`, in a commit containing no results), and **two of
 the four were falsified — the two that would have justified building that third gate.**
 
-**No tolerance, band or measurement changed.** Seven wrong figures were corrected.
+**No tolerance, band or measurement changed.** Seven wrong figures were verified and corrected; one more is flagged at low confidence and left filed.
 
 ## The measurement
 
 Every numeric claim about the work, in seven documents, verified by hand against its source.
 Excluded by the registered method: tolerance values, entry resolutions, ids, issue numbers, dates.
 
-| documents | claims | verifiable | correct | **wrong** |
-|---|---:|---:|---:|---:|
-| `ref/thresholds_and_standards.md` + `lessons.md` | ~227 | ~223 | ~221 | **3** |
-| `NEXT_TASKS.md` + round 24–27 trails | ~99 | ~84 | ~78 | **5** |
-| **total** | **~326** | **~307** | **~299** | **8 (~2.6 %)** |
+**The counting rule, stated first**, because not stating it is what produced #164 and #169: a *wrong
+figure* is **one distinct numeric statement that was wrong**. Two numbers in one sentence corrected
+together count once; the same quantity restated in two places counts once.
 
-The counts are approximate by ~±3 where two sweeps overlapped on the same claim; the wrong ones are
-exact and individually verified.
+| documents | claims | verifiable | correct | **wrong** | contested |
+|---|---:|---:|---:|---:|---:|
+| `ref/thresholds_and_standards.md` + `lessons.md` | ~227 | ~223 | ~220 | **2** | 1 |
+| `NEXT_TASKS.md` + round 24–27 trails | ~99 | ~84 | ~77 | **5** | 2 |
+| **total** | **~326** | **~307** | **~297** | **7** | **3** |
+
+**The `contested` column is load-bearing and was missing from the first version of this table** — both
+sweeps reported a third category (one *low-confidence*, two *contested/ambiguous*) which was folded
+into `wrong` for one row and dropped from the other. The rows then failed to balance by +1 and −1, and
+the total balanced only because the two errors cancelled (#169). That is #115's shape — figures
+individually plausible, the relationship broken, invisible unless you add across a row — in the round
+whose subject is that class.
+
+**The exact figures, as distinct from the approximate ones:** **7 wrong statements verified by hand
+and corrected** — registry 2 (10RI; the range sentence), round 27 doc 2 (the tally; "four figures"),
+round 26 doc 2 (the quoted gate output; the scope-limits figure), `NEXT_TASKS` 1 (the round count).
+Three further are **contested**: `lessons.md`'s round-9 *"19/19 at 1.4–2.9 Å"* and two ambiguous
+attributions in the trails, none independently settled, all left filed. The aggregate
+`claims`/`verifiable`/`correct` counts are approximate to ±2; both sweeps reported them with "≈".
+
+7 of ~307 verifiable is **~2.3 %**.
 
 ## P1 — "the class is not closed": **confirmed**
 
-Eight wrong figures were sitting on `main`, none previously filed. Every one had passed through at
-least one review pass at the time it was written.
+Seven wrong statements were sitting on `main` and are now corrected, plus three contested — none previously filed, and every one had passed through at least one review pass at the
+time it was written.
 
 ## P2 — "self-contradiction is the dominant shape": **falsified**
 
@@ -35,12 +52,12 @@ Registered because three of the historical nine were internal contradictions, an
 contradiction is checkable **without knowing the right answer** — which would have made a cheap,
 general guard.
 
-Of the eight found, **two** are self-contradictions. **Six are a figure that is simply wrong or stale
+Of the seven established, **two** are self-contradictions. **Five are a figure that is simply wrong or stale
 against its source, with no second statement anywhere to contradict it.** The registry sweep found
 **zero** live self-contradictions in 227 claims.
 
-A contradiction-checker would therefore have caught **a quarter** of what is actually there. The
-shape I was about to mechanise is the minority shape.
+A contradiction-checker would therefore have caught **two of seven** — under a third of what is
+actually there. The shape I was about to mechanise is the minority shape.
 
 ## P3 — "the errors are in the gate-covered files": **falsified**
 
@@ -52,9 +69,9 @@ The opposite holds:
 | | verifiable | wrong | rate |
 |---|---:|---:|---:|
 | registry (gated since round 24, re-read every round) | ~185 | 2 | **~1.1 %** |
-| round trails 24–27 (written once, never revisited) | ~65 | 3 | **~4.6 %** |
+| round trails 24–27 (written once, never revisited) | ~65 | 4 | **~6.2 %** |
 
-**The registry is roughly four times cleaner than the round trails**, and the trails have no gate at
+**The registry is roughly five times cleaner than the round trails**, and the trails have no gate at
 all. Coverage is not the constraint; **being re-read is**. The registry's figures are wrong less often
 not because they are checked more, but because every round rereads that file and nobody ever rereads a
 finished trail.
@@ -91,7 +108,7 @@ applied to one function and not its neighbour, again.
 
 ## What this argues for, and what it argues against
 
-**Against** the third gate. P2 says a contradiction-checker addresses a quarter of the problem. P3
+**Against** the third gate. P2 says a contradiction-checker addresses two of seven. P3
 says extending coverage addresses the wrong files. Both were the plausible next moves and both are
 now measured to be poor ones — which is what the pre-registration was for.
 
