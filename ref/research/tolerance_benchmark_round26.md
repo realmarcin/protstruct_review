@@ -290,11 +290,19 @@ issues carry no machine-readable severity. Failing on them would have repeated #
 they report `UNCHECKABLE` — a coverage statement, not a pass. The gate now says so explicitly:
 
 ```
-all 7 checkable round-document figures match the findings record;
+all 12 checkable round-document figures match the findings record;
 11 predate the severity convention and are NOT checked
 ```
 
-That line is the honest summary of what this guard is worth: **7 checked, 11 not.**
+That line is the honest summary of what this guard is worth: **12 checked, 11 not** — and it moved
+from 7 to 12 during this round as the fixes added citations, which is itself the point. It was quoted
+as 7 until review caught it (#150), the **fourth** self-referential miscount in this round after #130,
+#135 and #147.
+
+**That figure is deliberately not gated, and the reason is circularity**: the summary counts the
+results, so a check validating the summary would change the number it validates. The gate cannot
+police its own output line without chasing a fixed point, so this one figure is refreshed by hand and
+is stated here as uncovered rather than left to look covered.
 
 ### The guards themselves needed a second pass
 
@@ -371,6 +379,12 @@ after refreshing the record reproduces it. The scope limits below say so.
   per-document literal checks (counts, ranges) remain round-25-specific, because each round's
   phrasings are its own. So of 18 severity claims across all round documents, **7 are checked and 11
   are UNCHECKABLE** — their issues predate the `**Severity:` convention that starts at #116.
+- **The gate cannot check a figure quoted from its own output** (circular: the summary counts the
+  results), nor anything outside the repo — a PR body is not a file, and its guard-check count went
+  stale twice in this PR. Both are refreshed by hand, and both have already been wrong once.
+- **Four self-referential miscounts occurred in this round** (#130, #135, #147, #150) against one
+  caught by the gate (#143's recurrence). The guard covers a narrow slice of the class it is named
+  for; the honest reading is that it helps and does not close it.
 - **The findings record is a snapshot, not a live view**, and it went stale twice in this round —
   once before review (#143) and once again immediately after fixing it. Any round that files an issue
   after refreshing reproduces this. What the gate enforces is that everything the documents *cite* is
