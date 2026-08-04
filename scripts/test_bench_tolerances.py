@@ -1290,4 +1290,45 @@ check("an entry PISA could not serve is recorded, not dropped",
 check("and it contributes no rows", _rows, [])
 
 
+# --- Round 25 self-review: a failure must keep its reason across the cache-key change ---
+# #136: measure() rebinds `tag` through cache_key(), so the log it writes is
+# mc_<id>_pre_<res>A.log -- while collect() still rebuilt "mc_<id>_pre.log" by hand and
+# asked failure_reason() about a path that no longer exists. Every CC_mask failure then
+# recorded the generic "produced no log" instead of the unparameterised-ligand or
+# scattering-table reason, INTO the committed TSV. That is the 10EN failure this
+# module's own docstring memorialises, reintroduced by a fix in the same file.
+#
+# The existing crash test monkeypatches refem.measure wholesale, so it never exercises
+# the rebind. This one drives the real function with a stub `run()` and asserts the
+# reason survives the round trip.
+
+_fr_dir = Path(__import__("tempfile").mkdtemp())
+_LIGAND_LOG = ("Sorry: Fatal problems interpreting model file\n"
+               "  Number of atoms with unknown nonbonded energy type symbols: 38\n")
+
+_real_run = refem.run
+def _stub_run(cmd, log, pattern, work):
+    """Write a PHENIX-style failure log wherever measure() asks for one."""
+    log.parent.mkdir(parents=True, exist_ok=True)
+    log.write_text(_LIGAND_LOG)
+    return _LIGAND_LOG
+try:
+    refem.run = _stub_run
+    _res = refem.measure(_fr_dir / "m.cif", _fr_dir / "m.map", 2.73, _fr_dir, "1abc_pre")
+finally:
+    refem.run = _real_run
+
+check("a failed measurement reports no CC_mask", _res["cc_mask"], None)
+check("and hands back the log it actually wrote", _res["cc_log"].name,
+      f"mc_{refem.cache_key('1abc_pre', 2.73)}.log")
+check("so the caller recovers the REAL reason, not 'produced no log'",
+      refem.failure_reason(_res["cc_log"], "map_correlations"),
+      "unparameterised ligand: 38 atoms with unknown nonbonded energy types "
+      "(no monomer-library restraints)")
+# Prove the assertion above is not vacuous: the pre-fix path is what regressed.
+check("whereas the pre-fix hand-built path finds nothing",
+      refem.failure_reason(_fr_dir / "mc_1abc_pre.log", "map_correlations"),
+      "map_correlations produced no log")
+
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

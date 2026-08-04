@@ -156,6 +156,12 @@ def measure(model: Path, map_file: Path, resolution: float, work: Path,
         "cc_mask": float(cc.group(1)) if cc else None,
         "d_fsc_model_masked": d_value,
         "d_fsc_model_plausible": plausible,
+        # The caller needs this to explain a failure, and used to rebuild it from the
+        # tag by hand. When #119 put the resolution into the key, the two copies of the
+        # naming rule fell out of step and every CC_mask failure started reporting
+        # "map_correlations produced no log" instead of its real cause (#136).
+        # Returning the path removes the duplication rather than re-syncing it.
+        "cc_log": cc_log,
     }
 
 
@@ -263,7 +269,7 @@ def collect(entries: list[dict], cache: Path,
             continue
         pre = measure(model, map_file, resolution, cache, f"{pdb_id}_pre")
         if pre["cc_mask"] is None:
-            reason = failure_reason(cache / f"mc_{pdb_id}_pre.log", "map_correlations")
+            reason = failure_reason(pre["cc_log"], "map_correlations")
             print(f"  ! {reason}", file=sys.stderr)
             skip = {"pdb_id": pdb_id.upper(), "reason": reason}
             skipped.append(skip)
@@ -278,8 +284,7 @@ def collect(entries: list[dict], cache: Path,
             continue
         post = measure(refined, map_file, resolution, cache, f"{pdb_id}_post")
         if post["cc_mask"] is None:
-            reason = failure_reason(cache / f"mc_{pdb_id}_post.log",
-                                    "map_correlations (post)")
+            reason = failure_reason(post["cc_log"], "map_correlations (post)")
             print(f"  ! {reason}", file=sys.stderr)
             skip = {"pdb_id": pdb_id.upper(), "reason": reason}
             skipped.append(skip)

@@ -137,15 +137,16 @@ def parse_ctruncate(text: str, log_path: str) -> dict:
     # evidence of anything. Keying on it gave the right answer only because the
     # first-principles literal below happened to match first; reword that one line in
     # a later ctruncate and a "No operators found" log reported operators (#121).
-    m = re.search(r"Twin fraction estimates by twinning operator\s*\n(.*)",
-                  text, re.DOTALL)
-    if m and re.match(r"\s*No operators found", m.group(1)):
-        out["twin_operators_found"] = 0
-    elif m:
-        out["twin_operators_found"] = 1
-    elif "First principles calculation has found no potential twinning operators" in text:
-        out["twin_operators_found"] = 0
+    # EVERY occurrence, not just the first (#137). Keying on `re.search` would let a
+    # leading "No operators found" section mask a later one carrying a real table --
+    # the same shape of unexamined premise as the header-presence test this replaced.
+    headers = list(re.finditer(r"Twin fraction estimates by twinning operator[^\n]*\n", text))
+    if headers:
+        out["twin_operators_found"] = int(any(
+            not re.match(r"\s*No operators found", text[h.end():]) for h in headers))
     else:
+        # No section at all: fall back to ctruncate's first-principles line if present,
+        # and otherwise report none rather than inventing a result.
         out["twin_operators_found"] = 0
 
     # Moments of I

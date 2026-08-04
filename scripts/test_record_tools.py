@@ -72,6 +72,21 @@ check("an actual operator table does set the flag", operators(_with_table), 1)
 check("a log with no twinning section at all reports none",
       operators("Resolution range of data: 50.0 - 1.5 A\n"), 0)
 
+# #137: the section is checked at EVERY occurrence. A first section saying "No
+# operators found" must not mask a later one carrying a real table.
+_twice = REAL.replace(
+    "Twin fraction estimates by twinning operator\n\nNo operators found",
+    "Twin fraction estimates by twinning operator\n\nNo operators found\n\n"
+    "Twin fraction estimates by twinning operator\n\n  h,-k,-l      0.021      0.019",
+    1)
+check("a later section with a real table is not masked by an earlier empty one",
+      operators(_twice), 1)
+check("and two empty sections still report none",
+      operators(REAL.replace(
+          "Twin fraction estimates by twinning operator\n\nNo operators found",
+          "Twin fraction estimates by twinning operator\n\nNo operators found\n\n"
+          "Twin fraction estimates by twinning operator\n\nNo operators found", 1)), 0)
+
 
 # --- #126: squared units are numeric ----------------------------------------------
 
