@@ -8,9 +8,16 @@ selection". No second implementation is installed, so a cross-tool benchmark is 
 available — but the claim the precondition rests on *is* measurable: sweep the
 ordered-core cutoff and see how far the reported precision moves.
 
-`scripts/t17_nmr_ensemble.py` defines the ordered core as residues with per-residue
-Cα RMSF ≤ 2.0 Å. This re-uses its own functions, so the sweep measures the harness's
-metric rather than a re-implementation of it.
+`scripts/t17_nmr_ensemble.py` defines the ordered core; its cutoff is read from
+`_ORDERED_CORE_RMSF_CUTOFF` rather than restated here, and the harness's own
+`ordered_core_precision()` computes the value at that cutoff, so the "harness" column
+IS the harness's metric.
+
+That sentence used to claim this and was false (#139): the module was imported only for
+`run_precision()`, the filter was reimplemented inline, and `2.0` was hardcoded as a
+string key. The two copies also disagreed on rounding (`sum/len` to 3 dp against
+`fmean` to 4) and on empty cores (loud failure against a silent `None`), so the sweep
+was a re-implementation labelled as the original.
 
 Usage:
     python3 scripts/bench_t17_ordered_core.py ENSEMBLE.pdb [...] --json out.json
@@ -28,8 +35,10 @@ from typing import Any
 REPO = Path(__file__).resolve().parent.parent
 
 # Cutoffs spanning plausible choices: OLDERADO/PSVS-style ordered-core definitions
-# vary, and 2.0 Å is only the harness's pick.
-CUTOFFS = [1.0, 1.5, 2.0, 2.5, 3.0, 4.0]
+# vary, and the harness's pick is only one of them -- which is the point of the sweep.
+# The harness's own value is NOT listed here; it is read from the harness and added to
+# the sweep at run time, so changing it there moves this benchmark with it (#139).
+SWEEP_CUTOFFS = [1.0, 1.5, 2.0, 2.5, 3.0, 4.0]
 
 
 def load_t17():
@@ -57,13 +66,28 @@ def collect(models: list[Path]) -> tuple[list[dict], list[dict]]:
             continue
 
         whole_chain = statistics.fmean(rmsf)
+        # The harness's own cutoff, read from the harness. Merged into the sweep so the
+        # sweep always contains it, whatever it is set to.
+        harness_cutoff = t17._ORDERED_CORE_RMSF_CUTOFF
         per_cutoff = {}
-        for cutoff in CUTOFFS:
+        for cutoff in sorted(set(SWEEP_CUTOFFS) | {harness_cutoff}):
             core = [v for v in rmsf if v <= cutoff]
             per_cutoff[str(cutoff)] = {
                 "mean_rmsf": round(statistics.fmean(core), 4) if core else None,
                 "n_core": len(core),
             }
+        # The harness column is computed by the HARNESS, not re-derived here: it rounds
+        # to 3 dp via sum/len and fails loudly on an empty core, and a benchmark that
+        # quietly used fmean/4 dp and `None` was measuring something else (#139).
+        try:
+            # Cutoff passed EXPLICITLY. `ordered_core_precision`'s default argument is
+            # bound at def time, so calling it bare would use the value the module had
+            # when it was imported and silently ignore `harness_cutoff` -- two copies
+            # again, by a subtler route than the one #139 was filed for.
+            harness_mean, harness_n = t17.ordered_core_precision(rmsf, harness_cutoff)
+        except SystemExit as exc:
+            harness_mean, harness_n = None, 0
+            print(f"  ! harness ordered core: {exc}", file=sys.stderr)
         means = [v["mean_rmsf"] for v in per_cutoff.values() if v["mean_rmsf"] is not None]
         rows.append({
             "model": model.name,
@@ -71,9 +95,14 @@ def collect(models: list[Path]) -> tuple[list[dict], list[dict]]:
             "whole_chain_mean_rmsf": round(whole_chain, 4),
             "by_cutoff": per_cutoff,
             "spread_across_cutoffs": round(max(means) - min(means), 4) if means else None,
-            "whole_chain_minus_2A_core": round(
-                whole_chain - per_cutoff["2.0"]["mean_rmsf"], 4)
-            if per_cutoff["2.0"]["mean_rmsf"] is not None else None,
+            # Named for the cutoff it used, not for a literal that can go stale: at
+            # cutoff 2.0 this key is `whole_chain_minus_2.0A_core`, and it MOVES if the
+            # harness's cutoff moves rather than silently reporting the old bucket.
+            "harness_cutoff": harness_cutoff,
+            "harness_ordered_core_mean_rmsf": harness_mean,
+            "harness_ordered_core_n": harness_n,
+            f"whole_chain_minus_{harness_cutoff}A_core": (
+                round(whole_chain - harness_mean, 4) if harness_mean is not None else None),
         })
         print(f"  whole-chain {whole_chain:.4f} Å; cutoff sweep "
               + ", ".join(f"{c}→{per_cutoff[c]['mean_rmsf']}" for c in per_cutoff)

@@ -1,0 +1,22 @@
+issue	severity	state	title
+116	high	closed	check_registry_figures: nesting_check never reads the registry, and 59/35/63 are pinned to no literal
+117	high	closed	t15_ss_agreement: truncated DSSP output is silently accepted (guard uses `and`, not `or`)
+118	high	closed	check_referential_integrity: the structure_ref check its docstring promises was never implemented
+119	medium	closed	bench_refinement_deltas_em: measure()/refine() cache keys omit resolution
+120	medium-high	closed	append_results / append_fetch_record silently discard a re-measurement of an id already on file
+121	medium	closed	t13_data_quality: twin-operator flag keys on a section header ctruncate prints unconditionally
+122	medium	closed	t17_restraint_summary: missing violation attributes are fabricated as 0.0 instead of failing
+123	medium	closed	validate.sh: record loop covers one hardcoded provider though its comment claims all of data/<provider>/<system>/
+124	low-medium	closed	bench_refinement_deltas: MACRO_CYCLES is absent from the refinement cache prefix
+125	low-medium	closed	qds_emit: a missing oracle_family yields gap_status 'open — cctbx only' with an empty cctbx list
+126	low	closed	tsv_to_records: the unit regex has no Å², so BSA and Wilson-B cells become value_text
+127	high	closed	bench_t16_bsa_vs_pisa: entries dropped on PISA/RCSB failure are recorded nowhere, unlike every sibling
+130	medium	closed	Round 25 write-up says "three high" findings; four of the twelve are labelled high
+131	medium	closed	prompts/backlog-loop-goal.md is referenced nowhere in the repo
+132	medium	closed	The goal prompt says branch-before-editing but never says verify-the-branch-before-committing
+133	low	closed	prompts/ now mixes kebab-case and snake_case filenames
+134	low	closed	PR #128's body describes in-flight work that has since been committed elsewhere
+135	low	closed	The #132 fix says "20-file audit round"; it is 19
+136	high	closed	The #119 cache-key fix broke failure diagnosis: collect() looks for the pre-fix log filename
+137	low	closed	The #121 twin-operator fix inspects only the first header occurrence
+138	low	closed	The #137 rewrite left a comment describing a first-principles fallback it no longer has

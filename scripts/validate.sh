@@ -303,6 +303,46 @@ if [[ "${QUIET}" == "0" ]]; then
   echo "every bench_*.py commits its entry set"
 fi
 
+# The external tool paths are written independently in nine files -- PHENIX_BIN in five,
+# CCP4_SETUP in four (#140). A PHENIX or CCP4 upgrade updates whichever script the author
+# is touching and not the others, which is the class this repo already recorded in #105:
+# "Round 21 fixed exactly this ... and did not check the sibling script."
+#
+# The bad case is the quiet one. If the old install is REMOVED the stale scripts crash,
+# which is harmless. If it is left on disk -- installers do not remove the previous
+# version -- they keep running against an older build, and benchmark numbers get computed
+# with mismatched tool versions with nothing to say so. §4 claims same-binary
+# reproducibility against `phenix-2.0-5936` pinned since round 5; that pin is only as
+# good as its nine copies agreeing.
+#
+# Gated rather than refactored: these are standalone scripts run as `python3 scripts/x.py`
+# from the repo root, so `scripts/` is not on sys.path and sharing a constant would need
+# importlib in nine files -- more machinery than the risk warrants.
+if ! divergent="$(python3 -c '
+import pathlib, re, sys
+
+repo = pathlib.Path(sys.argv[1])
+problems = []
+for const in ("PHENIX_BIN", "CCP4_SETUP"):
+    seen = {}
+    for script in sorted((repo / "scripts").glob("*.py")):
+        m = re.search("^" + const + r"\s*=\s*(.+)$", script.read_text(), re.M)
+        if m:
+            seen.setdefault(m.group(1).strip(), []).append(script.name)
+    if len(seen) > 1:
+        for value, files in sorted(seen.items()):
+            problems.append(const + " = " + value + "  <- " + ", ".join(files))
+print(" | ".join(problems))
+' "${REPO_ROOT}")"; then
+  fail "could not check external tool paths"
+fi
+if [[ -n "${divergent// /}" ]]; then
+  fail "external tool paths disagree between scripts: ${divergent}"
+fi
+if [[ "${QUIET}" == "0" ]]; then
+  echo "external tool paths agree across scripts"
+fi
+
 # The registry quotes figures computed from ref/research/data/em_refinement_deltas.tsv,
 # and that file grows every round -- so those figures age silently. Three instances were
 # caught (#72, #107, #113), all three by accident during reviews of unrelated work.
@@ -317,4 +357,21 @@ if ! python3 "${REPO_ROOT}/scripts/check_registry_figures.py" > /dev/null 2>&1; 
 fi
 if [[ "${QUIET}" == "0" ]]; then
   echo "registry figures match the per-entry data"
+fi
+
+# A round document's claims about its OWN findings age and mis-state the same way the
+# registry's did. #130 ("three high" when four were labelled high) and #135 ("a 20-file
+# audit round" that was 19) were both caught by review rather than by a check, and both
+# were wrong in the direction that flatters the round.
+#
+# The findings themselves live in a committed TSV rather than being fetched at gate
+# time: `gh` is not available or authenticated everywhere, and a check that silently
+# skips is a guard that does not guard. Refresh it deliberately with
+# `python3 scripts/check_round_figures.py --refresh`.
+if ! python3 "${REPO_ROOT}/scripts/check_round_figures.py" > /dev/null 2>&1; then
+  python3 "${REPO_ROOT}/scripts/check_round_figures.py" >&2 || true
+  fail "a round document's figures no longer match ref/research/data/round_findings.tsv"
+fi
+if [[ "${QUIET}" == "0" ]]; then
+  echo "round-document figures match the findings record"
 fi

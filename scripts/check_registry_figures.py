@@ -37,6 +37,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import statistics
@@ -216,6 +217,40 @@ def nesting_check(registry: str, rows: list[dict]) -> dict[str, Any]:
     }
 
 
+def _status_vocabulary():
+    """The declared `status` vocabulary, imported from the script that WRITES it.
+
+    Not re-declared here. Every predicate in this file keys on a status prefix, and
+    before round 26 those prefixes were the only definition of the vocabulary that
+    existed -- spread across four functions, in the reader, while the writer that
+    produces the values lived in another file. That is the shape of #136.
+    """
+    spec = importlib.util.spec_from_file_location(
+        "bench_em_status", Path(__file__).resolve().parent / "bench_refinement_deltas_em.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.STATUS_PREFIXES, module.status_is_known
+
+
+def vocabulary_check(rows: list[dict]) -> dict[str, Any]:
+    """Every `status` in the file must match the declared vocabulary.
+
+    `attempted` is defined by subtraction (`not startswith("skipped")`), so a status
+    nobody declared does not raise -- it joins the attempted count silently and moves a
+    published denominator. This check is what stops that being invisible.
+    """
+    prefixes, is_known = _status_vocabulary()
+    unknown = sorted({r["status"] for r in rows if not is_known(r["status"])})
+    return {
+        "check": "status vocabulary",
+        "status": "OK" if not unknown else "UNDECLARED",
+        "detail": (f"all {len(rows)} rows carry one of {len(prefixes)} declared statuses"
+                   if not unknown else
+                   f"{len(unknown)} status value(s) match no declared prefix — they are "
+                   f"being counted as `attempted` by default: {unknown}"),
+    }
+
+
 def run(registry: str, rows: list[dict]) -> list[dict[str, Any]]:
     results = []
     for label, literal, derive in CHECKS:
@@ -236,6 +271,7 @@ def run(registry: str, rows: list[dict]) -> list[dict[str, Any]]:
             status, detail = "OK", derived
         results.append({"check": label, "status": status, "detail": detail})
     results.append(nesting_check(registry, rows))
+    results.append(vocabulary_check(rows))
     return results
 
 

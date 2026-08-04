@@ -144,4 +144,98 @@ for _p in _real:
           integrity.check_structure_refs(_doc, _p.relative_to(REPO), set()), [])
 
 
+# --- Round 26: the status vocabulary is declared, not inferred from predicates -----
+# Before #139 the vocabulary existed only as prefixes spread across four predicates in
+# the READER, while the WRITER that produces the values lived in another file -- the
+# shape of #136. 28 of the 97 rows matched none of those prefixes and were counted as
+# `attempted` by DEFAULT (`not startswith("skipped")`), which happened to be right for
+# them and would not be for the next status added.
+
+import copy
+
+check("every committed status matches the declared vocabulary",
+      figures.vocabulary_check(ROWS)["status"], "OK")
+
+_drifted = copy.deepcopy(ROWS)
+_drifted.append({**_drifted[0], "pdb_id": "9XXX", "cc_mask_delta": "",
+                 "status": "failed: real_space_refine timeout"})
+check("an undeclared status is reported, not absorbed",
+      figures.vocabulary_check(_drifted)["status"], "UNDECLARED")
+check("and it would otherwise have joined `attempted` silently",
+      len(figures._attempted(_drifted)) - len(figures._attempted(ROWS)), 1)
+
+# The case the guard really exists for: a typo in an EXISTING status. This moves a
+# published denominator by 10 entries.
+_typo = copy.deepcopy(ROWS)
+for _r in _typo:
+    _r["status"] = _r["status"].replace("skipped:", "skip:", 1)
+check("a typo in a known status is caught", figures.vocabulary_check(_typo)["status"],
+      "UNDECLARED")
+check("and it moves `attempted` by 10", len(figures._attempted(_typo)), 69)
+
+# Scope, stated rather than implied: the registry literals ALSO go STALE on that typo.
+# They are not redundant with each other -- the registry check blames the REGISTRY
+# ("registry says 59, data gives 69"), which invites correcting a figure that is right,
+# i.e. #113's failure mode. The vocabulary check names the cause. It also covers counts
+# the registry does not pin, where nothing else would fire at all.
+_reg_statuses = {r["check"]: r["status"] for r in figures.run(REGISTRY_TEXT, _typo)}
+check("the registry check fires too, but blames the registry",
+      _reg_statuses["refinement-attempt count"], "STALE")
+
+# The vocabulary is imported from the writer, never re-declared here.
+_prefixes, _is_known = figures._status_vocabulary()
+check("the vocabulary comes from the script that writes the file", sorted(_prefixes),
+      ["LOST", "d_FSC only", "delta-only", "measured", "screened only", "skipped: "])
+
+
+# --- Round 26: a round document's claims about its own findings ------------------
+# #130 ("three high" when four were) and #135 ("a 20-file audit round" that was 19)
+# were both caught by review, not by a check, and both flattered the round. The rule
+# -- every quoted figure comes from a committed, re-runnable script -- had never been
+# applied to a round document's claims about ITSELF.
+
+roundfig = load("check_round_figures")
+FINDINGS = roundfig.load(roundfig.RECORD)
+ROUND25_DOC = Path(roundfig.ROUND25).read_text()
+
+def _round_statuses(doc):
+    return {r["check"]: r["status"] for r in roundfig.run(doc, FINDINGS)}
+
+check("round 25's document matches its findings record",
+      sorted({v for v in _round_statuses(ROUND25_DOC).values()}), ["OK"])
+
+# Each mutation must fire, or the check above passes for the wrong reason.
+check("the exact #130 miscount is caught",
+      _round_statuses(ROUND25_DOC.replace("Four high (#116, #117, #118, #127).",
+                                          "Three high (#116, #117, #118)."))
+      ["pass-1 high count"], "MISSING")
+check("a wrong per-issue severity is caught",
+      _round_statuses(ROUND25_DOC.replace("**#136 (high)", "**#136 (medium)"))
+      ["severity of #136"], "STALE")
+check("a citation of an issue that does not exist is caught",
+      _round_statuses(ROUND25_DOC.replace("**#130 (medium)", "**#999 (medium)"))
+      ["severity of #999"], "MISSING")
+check("and rewording a covered claim does not silently pass",
+      _round_statuses(ROUND25_DOC.replace("Twelve defects, filed as #116–#127.",
+                                          "A dozen defects were filed."))
+      ["pass-1 finding count"], "MISSING")
+
+# The severity parse is anchored to the start of a line. Unanchored it took the first
+# match anywhere, and #130's body OPENS by quoting the label it reports on -- so the
+# record read `high` for an issue declaring `medium`. That is #121's shape.
+check("a severity quoted mid-sentence is not mistaken for the declaration",
+      roundfig.severity_of(
+          "Four of the twelve are labelled `**Severity: high**`:\n\n"
+          "**Severity: medium** (a wrong published count)."), "medium")
+check("an issue with no severity line is recorded as unstated, not defaulted",
+      roundfig.severity_of("no severity here"), "unstated")
+
+# The record must not contain pull requests. `gh issue view <n>` resolves a PR number
+# happily, so a numeric range pulled #128 and #129 in as `unstated`.
+check("no pull requests in the findings record",
+      [r["issue"] for r in FINDINGS if r["issue"] in {"128", "129"}], [])
+check("and every row carries a stated severity",
+      [r["issue"] for r in FINDINGS if r["severity"] == "unstated"], [])
+
+
 print(f"\nall guard unit tests passed ({PASSED} checks)")

@@ -356,6 +356,38 @@ RESULTS_TSV = "ref/research/data/em_refinement_deltas.tsv"
 SET_RECORD = "ref/research/data/em_refinement_deltas.tsv"
 SET_IS_COMPLETE = False   # rounds <=13 are partly unrecoverable; see the LOST rows
 
+# The `status` vocabulary of that file, declared ONCE, here, next to the writer that
+# produces it. `check_registry_figures.py` imports this rather than carrying its own
+# copy -- one rule, one copy, which is what #136 was about.
+#
+# Before this existed the vocabulary was implicit in a handful of predicates
+# (`startswith("skipped")`, `startswith("screened only")`, `== "measured"`), and 28 of
+# the 97 rows matched NONE of them: 23 `delta-only`, 1 `d_FSC only`, 4 `LOST`. No
+# published denominator was wrong, because `attempted` is defined by SUBTRACTION --
+# `not startswith("skipped")` -- so an unrecognised status silently joins it and
+# happens to be right for these rows, which genuinely were attempted.
+#
+# That is the hazard rather than the bug: the next status added lands in `attempted` by
+# default, silently, whether or not it belongs there. Declaring the vocabulary turns
+# "unknown status is quietly counted" into "unknown status fails the gate".
+STATUS_PREFIXES = {
+    "measured": "refined and re-measured; full pre/post values",
+    "skipped: ": "entered the benchmark, could not be refined; reason follows",
+    "screened only": "measured pre-refinement for a hypothesis, never refined "
+                     "(round 23); NOT part of the benchmark denominator",
+    "delta-only": "a Δ is recorded but the per-entry pre/post values were never "
+                  "published; counts as attempted",
+    "d_FSC only": "round 13 published the d_FSC direction but not the CC_mask Δ; "
+                  "counts as attempted",
+    "LOST": "round 13 measured it and the identity is unrecoverable; excluded from "
+            "the named set by its UNKNOWN pdb_id, not by this status",
+}
+
+
+def status_is_known(status: str) -> bool:
+    """Whether a `status` cell matches the declared vocabulary."""
+    return any(status.startswith(p) for p in STATUS_PREFIXES)
+
 
 def append_results(rows: list[dict], skipped: list[dict], path: Path,
                    round_label: str = "") -> None:
