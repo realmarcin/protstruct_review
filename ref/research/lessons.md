@@ -84,6 +84,13 @@ each dataset-dependent figure and fails when the text no longer matches. By this
 ranking a defect class with no guard outranks the defects themselves, because it hides them; the
 signal to build the guard is the second recurrence, not the third.
 
+A gate's scope is narrower than it sounds, and round 24 proved it on itself: the round built the
+staleness guard and then **shipped a fourth instance of a neighbouring class the guard did not
+cover** (#115 — nested counts that do not nest, since 63 counted 4 rows the 69 excluded). Every
+figure passed its own check because every figure was individually right against the data; nothing
+compared them to *each other*. When adding a guard, state what it does **not** cover as carefully as
+what it does, and expect the next instance to arrive just outside that line.
+
 Its companion is about how such a gate gets defeated: **a gate that only compares numbers is defeated
 by a rewrite.** The check therefore fails in two ways — when the recomputed value differs, and when
 the quoted literal has *disappeared* from the registry. A reworded claim cannot be silently correct,

@@ -64,9 +64,40 @@ Verified in both directions:
 figures cannot age without someone editing a `DEFAULT_SET` — which `validate.sh` already gates
 separately. Adding them here would be duplicated coverage with a second thing to keep in sync.
 
+## Self-review: the gate did not catch the next instance
+
+Reviewing this PR's own diff found **#115**, in the very sentence this round edited.
+
+The registry stated the denominators as a nesting — *"**69** … of which **63** reached a refinement
+attempt, **58** … and **35** …"*. **63 is not a subset of 69.** It counts the 4 `LOST` rows, which
+round 13 did measure and which the 69 explicitly excludes. Attempted *within* the 69 is **59**.
+
+```
+named (excl LOST + screened)   69      <- the registry's 69
+attempted among those 69       59
+all rows - skipped - screened  63      <- the registry's 63
+```
+
+Either figure is defensible alone. The phrase **"of which"** is what made them inconsistent — the
+third instance of this exact family after #84 (a silent convention switch) and #113 (a definition
+that drifted). In all three the numbers were individually right and their *relationship* was not.
+
+**The gate built this round would not have caught it.** It verifies each figure against the data, and
+63/58/35 are not among the eight it checks — but more to the point, nothing compared the figures to
+*each other*. A per-figure check cannot see a broken relationship between figures.
+
+So the gate now carries a ninth check asserting the counts are monotonically nested
+(`named ≥ attempted ≥ with-delta ≥ measured`), and the prose states 59 with the 63 given its own base
+explicitly.
+
+That is worth recording plainly: **this round built a guard for a class and then immediately shipped
+a fourth instance of a neighbouring class that the guard did not cover.** The guard is still worth
+having; the lesson is that "gated" is narrower than it sounds, and the scope of a gate should be
+stated as carefully as its result.
+
 ## Scope limits
 
-- **The gate checks eight figures, not every number in the registry.** It covers what is derived from
+- **The gate checks nine things, not every number in the registry.** It covers what is derived from
   the growing per-entry file. A hand-computed figure, or one derived from a source the gate does not
   read, still ages silently.
 - **It cannot tell a stale figure from a deliberate change.** Updating the data and the text together

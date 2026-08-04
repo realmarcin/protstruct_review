@@ -125,6 +125,27 @@ CHECKS: list[tuple[str, str, Callable[[list[dict]], Any]]] = [
 ]
 
 
+def nesting_check(rows: list[dict]) -> dict[str, Any]:
+    """The nested denominators must actually nest.
+
+    #115: the registry read "69 ... of which 63 reached a refinement attempt", and 63
+    was not a subset of 69 -- it counted the 4 LOST rows that 69 excludes. Every figure
+    was individually right against the data, which is why the per-figure checks above
+    all passed. Nothing compared them to each other.
+    """
+    named = _named(rows)
+    attempted = [r for r in named if not r["status"].startswith("skipped")]
+    with_delta = [r for r in named if r["cc_mask_delta"]]
+    measured = [r for r in named if r["status"] == "measured"]
+    ok = len(named) >= len(attempted) >= len(with_delta) >= len(measured)
+    return {
+        "check": "nested counts nest", "status": "OK" if ok else "BROKEN",
+        "detail": (f"named {len(named)} >= attempted {len(attempted)} >= with-delta "
+                   f"{len(with_delta)} >= measured {len(measured)}"
+                   + ("" if ok else "  <- not monotonically nested")),
+    }
+
+
 def run(registry: str, rows: list[dict]) -> list[dict[str, Any]]:
     results = []
     for label, literal, derive in CHECKS:
@@ -138,6 +159,7 @@ def run(registry: str, rows: list[dict]) -> list[dict[str, Any]]:
         else:
             status, detail = "OK", derived
         results.append({"check": label, "status": status, "detail": detail})
+    results.append(nesting_check(rows))
     return results
 
 
