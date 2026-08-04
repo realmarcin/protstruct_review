@@ -55,14 +55,15 @@ floors row.
 | 22 | (2026-08-03) | 10BU shown to be a genuine statistical outlier; a candidate mechanism supported but not established (n = 2), with the successor test specified; flip-set row shown **not** to be fixable by round 21's route |
 | 23 | (2026-08-03) | crossing-quality test **could not be run at the 1.3 cut** — 0 of 24 screened; at the data-driven 1.074 fence one already-refined near-miss (10EU) leans against it; estimator characterised over 60 crossings; the fetcher's all-or-nothing write fixed |
 | 24 | (2026-08-04) | staleness audit: the registry's `named entries` definition had drifted to yield 93 not 69; a gate now recomputes 8 dataset-dependent figures and fails on a stale value **or** a rewrite |
-| 25 | [#129](https://github.com/realmarcin/protstruct_review/pull/129) (2026-08-04) | first systematic audit of `scripts/` itself — 12 defects, 4 high, including a guard that **could not fail** (it compared four counts it derived itself and never read the registry) and a wwPDB parser fabricating `0.0` violations where the real value is 17.4. No tolerance changed |
-| 26 | [#141](https://github.com/realmarcin/protstruct_review/pull/141) (2026-08-04) | tested round 25's three parting claims: **P1 and P3 confirmed, P2 falsified, P4 indeterminate**. Declared the EM `status` vocabulary once beside its writer; gated a round document's claims about its own findings. Six review passes found 14 defects, several inside the round's own fixes. No tolerance changed |
+| 25 | [#129](https://github.com/realmarcin/protstruct_review/pull/129) (2026-08-04) | first systematic audit of `scripts/` itself — **12 defects** (#116–#127), 4 high, including a guard that **could not fail** (it compared four counts it derived itself and never read the registry) and a wwPDB parser fabricating `0.0` violations where the real value is 17.4. No tolerance changed |
+| 26 | [#141](https://github.com/realmarcin/protstruct_review/pull/141) (2026-08-04) | tested round 25's three parting claims: **P1 and P3 confirmed, P2 falsified, P4 indeterminate**. Declared the EM `status` vocabulary once beside its writer; gated a round document's claims about its own findings. Six review passes found **14 defects** (#139–#153), several inside the round's own fixes. No tolerance changed |
+| 27 | (2026-08-04) | gated the counts the summary files quote, after **8 miscounts** shipped across rounds 24–26; found the round-coverage gate merged one PR earlier had **two false passes** (an unrelated table, and a fenced example row) because it lived in shell and could not be tested |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-six rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-seven rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -184,7 +185,7 @@ three controls has a best achievable p of 0.25 — an observation, not a test.
   from the lost batch. Only a fresh low-resolution X-ray measurement would give them a checkable
   basis — a real project, not a round.
 - **The audit of `scripts/` is a lower bound, not a total.** Round 25 found 12 defects in the first
-  systematic pass; round 26 found 5 more with a *different lens*, and a sixth pass — enumerating each
+  systematic pass; round 26 found 2 more with a *different lens*, and a sixth pass — enumerating each
   guard's input space rather than reading — found 5 more in code the earlier passes had just
   reviewed. Reading finds the defect you can imagine. Nothing establishes where the bottom is, and
   the same argument applies to every further pass.
@@ -192,7 +193,7 @@ three controls has a best achievable p of 0.25 — an observation, not a test.
   decides "is this markdown a quotation" by inspecting a match's immediate context; it handles every
   construct these documents currently use and may be wrong on one nobody has written yet. And its
   findings record is a *snapshot* — any round that files an issue after refreshing it goes stale, as
-  round 26 did four times. Both are recorded in that round's scope limits rather than implied closed.
+  round 26 did three times. Both are recorded in that round's scope limits rather than implied closed.
 - **`d_FSC_model` still rests on one verified extreme.** 10BU is an outlier by every criterion tried — **3.24×
   the next-largest degradation**, which needs no distributional assumption, and above the 1.5 × IQR
   fence under all three quartile conventions (3.017 / 2.370 / 1.724, on n = 8). It also reproduces
