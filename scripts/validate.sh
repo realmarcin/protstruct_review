@@ -52,17 +52,40 @@ if [[ "${QUIET}" == "0" ]]; then echo "OK   ref/structural_criteria.yaml (struct
 # 2. Every record under data/ — both synthetic test fixtures
 #    (data/examples/) and real per-artefact evals + QDS in
 #    data/<provider>/<system>/.
+#
+#    The provider is globbed, not hardcoded. This loop used to name `coscientists`
+#    while the comment above promised `data/<provider>/<system>/`, so records under any
+#    other provider would never have been schema-checked -- silently, because
+#    `nullglob` makes a glob that matches nothing contribute no iterations rather than
+#    an error. The count is asserted below for the same reason: zero files validated
+#    used to be indistinguishable from all files valid (#123).
 shopt -s nullglob globstar
-for f in "${REPO_ROOT}"/data/examples/eval/*.yaml \
-         "${REPO_ROOT}"/data/examples/qds/*.yaml \
-         "${REPO_ROOT}"/data/examples/catalog/*.yaml \
-         "${REPO_ROOT}"/data/coscientists/**/EVAL_*.yaml \
-         "${REPO_ROOT}"/data/coscientists/**/QDS_*.yaml; do
+# The generic provider globs also match data/examples/{eval,qds}/, so the list is
+# deduplicated before validating rather than schema-checking those files twice.
+record_globs=( "${REPO_ROOT}"/data/examples/eval/*.yaml
+               "${REPO_ROOT}"/data/examples/qds/*.yaml
+               "${REPO_ROOT}"/data/examples/catalog/*.yaml
+               "${REPO_ROOT}"/data/*/**/EVAL_*.yaml
+               "${REPO_ROOT}"/data/*/**/QDS_*.yaml )
+# Deduplicated in-loop rather than by piping through `sort -u`: a crash in the
+# producer of a `< <(...)` process substitution is invisible to `set -e`, which is the
+# trap this script already documents at the catalog-id enumeration below.
+n_records=0
+seen_records=""
+for f in "${record_globs[@]+"${record_globs[@]}"}"; do
+  case " ${seen_records} " in *" ${f} "*) continue ;; esac
+  seen_records="${seen_records} ${f}"
   validate_one "${f}"
+  n_records=$((n_records + 1))
 done
 
+if [[ "${n_records}" -eq 0 ]]; then
+  fail "no records matched under data/ — the record globs found nothing, which is a
+        gate failure, not a pass. Check data/ has not been moved or renamed."
+fi
+
 if [[ "${QUIET}" == "0" ]]; then
-  echo "all records valid"
+  echo "all ${n_records} records valid"
 fi
 
 # 3. Referential integrity (metric_definition_ref / oracle_tool_ref /
@@ -105,6 +128,20 @@ fi
 #     ctruncate log parsing; no network, PISA, PHENIX or CCP4 needed).
 if ! python3 "${REPO_ROOT}/scripts/test_bench_tolerances.py"; then
   fail "bench tolerance unit tests"
+fi
+
+# 4g. The guards' own tests. check_registry_figures.py and
+#     check_referential_integrity.py exist to catch other scripts' mistakes, and both
+#     shipped with a hole (#116, #118) — one comparing four counts it derived itself
+#     and never reading the registry, the other promising a structure_ref check in its
+#     docstring that was never written. A guard needs a guard.
+if ! python3 "${REPO_ROOT}/scripts/test_guards.py"; then
+  fail "guard unit tests"
+fi
+
+# 4h. Record-tool parsing tests (ctruncate twin operators, TSV unit conversion).
+if ! python3 "${REPO_ROOT}/scripts/test_record_tools.py"; then
+  fail "record tool unit tests"
 fi
 
 # 5. Published-view drift. ref/tasks_and_evaluations.{tsv,md} are views of

@@ -46,6 +46,19 @@ def load_report(path: Path) -> ET.Element:
         _fail(f"could not parse validation report {path}: {e}")
 
 
+def _required_float(el: ET.Element, attr: str, tag: str) -> float:
+    """Read a numeric attribute that must be present; fail rather than default it."""
+    raw = el.attrib.get(attr)
+    if raw is None:
+        _fail(f"<{tag}> carries no {attr!r} attribute (found: "
+              f"{sorted(el.attrib)}) — this report's schema is not the one this "
+              f"tool parses; refusing to report a fabricated 0.0.")
+    try:
+        return float(raw)
+    except ValueError:
+        _fail(f"<{tag}> {attr}={raw!r} is not a number.")
+
+
 def summarize(root: ET.Element) -> dict[str, Any]:
     """Extract the restraint-violation headline from a parsed report.
 
@@ -59,13 +72,18 @@ def summarize(root: ET.Element) -> dict[str, Any]:
         _fail("this validation report has no restraint data — use a modern NMR entry "
               "with deposited restraints (e.g. 2N54); older entries (1D3Z) predate it.")
 
+    # No numeric defaults here. `.get(attr, 0.0)` turned a report whose schema names
+    # these attributes differently into a summary reading "0.0 in 0.1-0.2 Å; 0.0 in
+    # 0.2-0.5 Å; 0.0 in >0.5 Å" -- a fabricated value, not a missing one, and
+    # fabricated in the flattering direction, since zero violations is the best
+    # possible answer (#122). A missing attribute is a parse failure.
     bins = [
         {"band": b.attrib.get("bins", ""),
-         "per_model": float(b.attrib.get("violations_per_model", 0.0))}
+         "per_model": _required_float(b, "violations_per_model", "residual_distance_violation")}
         for b in root.iter("residual_distance_violation")
     ]
     per_model = [
-        float(m.attrib.get("mean_violation", 0.0))
+        _required_float(m, "mean_violation", "distance_violations_in_model")
         for m in root.iter("distance_violations_in_model")
     ]
     mean_viol = round(sum(per_model) / len(per_model), 3) if per_model else None

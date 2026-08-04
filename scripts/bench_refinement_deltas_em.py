@@ -108,9 +108,30 @@ def run(cmd: str, log: Path, pattern: re.Pattern, work: Path) -> str | None:
     return log.read_text(errors="ignore") if log.exists() else None
 
 
+def cache_key(tag: str, resolution: float) -> str:
+    """Cache key for one measurement or refinement.
+
+    `resolution` belongs in the key. It is passed to map_correlations, mtriage and
+    real_space_refine, and it sets the plausibility bound below -- so two runs of the
+    same entry at different resolutions are different measurements. Keying on `tag`
+    alone meant the second silently adopted the first's logs, FSC curve and refined
+    model, and the row written to the TSV then paired the NEW resolution with values
+    computed at the OLD one (#119).
+
+    The X-ray sibling already bakes `restraints` into its prefix for exactly this
+    reason, with a docstring saying so; the argument was simply never carried across.
+
+    Including the resolution preserves the deliberate sharing between this benchmark
+    and `screen_dfsc_ratio.py` -- they pass the same tag AND the same resolution for a
+    given entry, so they still reuse each other's work whenever it is valid to.
+    """
+    return f"{tag}_{resolution:g}A"
+
+
 def measure(model: Path, map_file: Path, resolution: float, work: Path,
             tag: str) -> dict[str, Any]:
     """CC_mask and masked d_FSC_model(0.143) for one model against one map."""
+    tag = cache_key(tag, resolution)
     cc_log = work / f"mc_{tag}.log"
     cc_text = run(f"{PHENIX_BIN / 'phenix.map_correlations'} {model} {map_file} "
                   f"resolution={resolution}", cc_log, _CC_MASK, work)
@@ -195,6 +216,7 @@ def refine(model: Path, map_file: Path, resolution: float, work: Path,
 
     Returns (refined coordinates, failure reason). Exactly one is None.
     """
+    tag = cache_key(tag, resolution)   # see cache_key: resolution changes the result
     prefix = f"rs_{tag}"
     cached = sorted(work.glob(f"{prefix}_real_space_refined_*.cif"))
     if cached:                       # real_space_refine takes minutes; do not repeat it
@@ -349,24 +371,60 @@ def append_results(rows: list[dict], skipped: list[dict], path: Path,
     header = ("pdb_id\tround\tresolution\tcc_mask_pre\tcc_mask_post\tcc_mask_delta\t"
               "d_fsc_model_pre\td_fsc_model_post\td_fsc_model_delta_pct\tstatus\n")
     existing = path.read_text() if path.exists() else ""
-    seen = {line.split("\t")[0] for line in existing.splitlines()[1:] if line.strip()}
+    seen = {line.split("\t")[0]: line.split("\t")
+            for line in existing.splitlines()[1:] if line.strip()}
     lines = [] if existing else [header]
+    superseded: list[tuple[str, list[str], list[str]]] = []
+
+    def offer(cells: list[str]) -> None:
+        """Write a row, or record that an existing row would have been overwritten.
+
+        Dedup is by `pdb_id` and the drop used to be silent, which is right for the
+        idempotent re-offer this file's incremental writer depends on and wrong for
+        everything else: a corrected measurement, or one of the 10 `skipped:` entries
+        succeeding on a later attempt, was discarded without a word and the stale row
+        stood as the benchmark's record (#120).
+
+        So identical re-offers stay silent and a row whose VALUES differ is announced.
+        Writing it is still not automatic -- this is a cumulative, hand-auditable
+        record and silently rewriting history is the worse failure -- but the operator
+        now learns that a decision is needed instead of learning nothing.
+        """
+        prior = seen.get(cells[0])
+        if prior is None:
+            lines.append("\t".join(cells) + "\n")
+            return
+        # Compare everything but the round label: a re-measurement in a later round is
+        # a change of round, not of value, and only the values matter here.
+        if prior[:1] + prior[2:] != cells[:1] + cells[2:]:
+            superseded.append((cells[0], prior, cells))
+
     for r in rows:
-        if r["pdb_id"] in seen:
-            continue
-        lines.append("\t".join(str(x) for x in [
+        offer([str(x) for x in [
             r["pdb_id"], round_label, r["resolution"], r["cc_mask_pre"],
             r["cc_mask_post"], r["cc_mask_delta"], r.get("d_fsc_model_pre"),
             r.get("d_fsc_model_post"), r.get("d_fsc_model_delta_pct"),
-            "measured"]) + "\n")
+            "measured"]])
     for s in skipped:
-        if s["pdb_id"] in seen:
-            continue
-        lines.append("\t".join([s["pdb_id"], round_label, "", "", "", "", "", "", "",
-                                 f"skipped: {s['reason']}"]) + "\n")
+        offer([s["pdb_id"], round_label, "", "", "", "", "", "", "",
+               f"skipped: {s['reason']}"])
     if lines:
         with path.open("a") as fh:
             fh.writelines(lines)
+    _report_superseded(superseded, path)
+
+
+def _report_superseded(superseded: list[tuple[str, list[str], list[str]]],
+                       path: Path) -> None:
+    """Say loudly which new rows were dropped because the id was already on file."""
+    if not superseded:
+        return
+    print(f"\n!! {len(superseded)} row(s) NOT written to {path}: the id is already on "
+          f"file with DIFFERENT values. Nothing was overwritten — decide per entry and "
+          f"edit the file by hand if the new measurement should stand.", file=sys.stderr)
+    for pdb_id, prior, new in superseded:
+        print(f"   {pdb_id}\n     on file: {'  '.join(prior[2:])}"
+              f"\n     new:     {'  '.join(new[2:])}", file=sys.stderr)
 
 
 def main() -> int:

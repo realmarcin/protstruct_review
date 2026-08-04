@@ -69,9 +69,43 @@ def test_empty_report_fails() -> None:
     raise SystemExit(1)
 
 
+def test_missing_violation_attribute_fails() -> None:
+    """A renamed attribute must fail, not become 0.0 (#122).
+
+    `.get(attr, 0.0)` turned a report whose schema names these attributes differently
+    into "0.0 in 0.1-0.2 Å; 0.0 in 0.2-0.5 Å; 0.0 in >0.5 Å" — a fabricated value, in
+    the flattering direction, since zero violations is the best possible answer. The
+    real 2N54 report gives 17.4 in the first bin, so the gap between right and
+    fabricated is the whole measurement.
+    """
+    for attr, tag in [("violations_per_model", "residual_distance_violation"),
+                      ("mean_violation", "distance_violations_in_model")]:
+        mutated = _WITH_RESTRAINTS.replace(f'{attr}="', f'{attr}_renamed="')
+        try:
+            t17r.summarize(ET.fromstring(mutated))
+        except SystemExit as exc:
+            _check(attr in str(exc), f"the failure names the missing {attr!r}")
+            print(f"PASS  a <{tag}> without {attr!r} fails rather than reporting 0.0")
+            continue
+        print(f"FAIL  missing {attr!r} was silently defaulted to 0.0")
+        raise SystemExit(1)
+
+
+def test_violations_are_read_not_defaulted() -> None:
+    """The happy path must carry the real numbers, or the test above is vacuous."""
+    result = t17r.summarize(ET.fromstring(_WITH_RESTRAINTS))
+    _check([b["per_model"] for b in result["bins"]] == [17.4, 0.0],
+           "both violation bins are read from the report")
+    _check(result["mean_distance_violation"] == 0.14,
+           "the per-model mean is the mean of the models, not a default")
+    print("PASS  violation bins and per-model mean come from the report")
+
+
 def main() -> int:
     test_summarize()
     test_empty_report_fails()
+    test_violations_are_read_not_defaulted()
+    test_missing_violation_attribute_fails()
     print("\nall t17_restraint_summary unit tests passed")
     return 0
 

@@ -10,7 +10,9 @@ mocked: a fake oracle would only test the mock.
 """
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import io
 import os
 import sys
 from pathlib import Path
@@ -1195,6 +1197,97 @@ _final = [l.split("\t")[0] for l in _fetch_rec.read_text().splitlines()[1:] if l
 check("re-offering them at the end is idempotent", _final, ["AAAA", "BBBB", "CCCC"])
 check("and one header survives",
       sum(1 for l in _fetch_rec.read_text().splitlines() if l.startswith("pdb_id")), 1)
+
+
+# --- Round 25 (code audit): the caches must key on everything that moves a result ---
+# #119: the EM measure/refine cache keyed on `tag` alone while `resolution` was passed
+# to map_correlations, mtriage and real_space_refine -- so a corrected resolution
+# silently reused the previous run's logs, FSC curve and refined model, and the row
+# written to the TSV paired the NEW resolution with values computed at the OLD one.
+# #124 is the same defect in the X-ray sibling, for `MACRO_CYCLES`.
+
+check("EM cache keys separate two resolutions",
+      refem.cache_key("10bu_pre", 3.2) != refem.cache_key("10bu_pre", 3.25), True)
+check("and are stable across equivalent spellings of one resolution",
+      refem.cache_key("10bu_pre", 3.2), refem.cache_key("10bu_pre", 3.20))
+check("so the screen and the benchmark still share cached work",
+      refem.cache_key("10bu_pre", 3.2), refem.cache_key("10bu_pre", 3.2))
+# Asserting the prefix merely CONTAINS "3" would pass with the defect present -- "3"
+# also occurs in plenty of model stems. Move the constant and require the prefix to
+# move with it, which is the property that actually prevents the collision.
+_orig_cycles = refdel.MACRO_CYCLES
+try:
+    _at_3 = refdel.refine_prefix("12lo", False)
+    refdel.MACRO_CYCLES = 8
+    _at_8 = refdel.refine_prefix("12lo", False)
+finally:
+    refdel.MACRO_CYCLES = _orig_cycles
+check("X-ray refinement prefixes separate two macro-cycle counts", _at_3 != _at_8, True)
+check("and restrained/unrestrained still separate at one count",
+      refdel.refine_prefix("12lo", True) != refdel.refine_prefix("12lo", False), True)
+
+
+# --- Round 25 (code audit): a superseded row must not vanish quietly ---------------
+# #120: dedup was by pdb_id with a silent `continue`, so a corrected measurement -- or
+# one of the 10 `skipped:` entries succeeding on a later attempt -- was discarded with
+# no message and the stale row stood as the record. Silence on an IDENTICAL re-offer
+# is load-bearing (the incremental writer re-offers everything at the end), so only a
+# value change may speak.
+
+_audit_dir = Path(__import__("tempfile").mkdtemp())
+_sup = _audit_dir / "superseded.tsv"
+_r = lambda cc: {"pdb_id": "10BU", "resolution": 3.2, "cc_mask_pre": 0.7577,
+                 "cc_mask_post": cc, "cc_mask_delta": -0.0299, "d_fsc_model_pre": 4.35,
+                 "d_fsc_model_post": 4.56, "d_fsc_model_delta_pct": 4.7856}
+
+refem.append_results([_r(0.7278)], [], _sup, "15")
+_before = _sup.read_text()
+refem.append_results([_r(0.7278)], [], _sup, "15")
+check("an identical re-offer changes nothing", _sup.read_text(), _before)
+
+refem.append_results([], [{"pdb_id": "11MR", "reason": "unparameterised ligand"}],
+                     _sup, "14")
+_err = io.StringIO()
+with contextlib.redirect_stderr(_err):
+    refem.append_results([{**_r(0.81), "pdb_id": "11MR"}], [], _sup, "25")
+check("a skipped entry that later succeeds is announced, not dropped silently",
+      "11MR" in _err.getvalue() and "NOT written" in _err.getvalue(), True)
+check("and the cumulative record is not rewritten behind the operator",
+      sum(1 for l in _sup.read_text().splitlines() if l.startswith("11MR")), 1)
+
+_fsup = _audit_dir / "superseded_fetch.tsv"
+fetchem.append_fetch_record([{"pdb_id": "AAAA", "resolution": 3.0}], [], _fsup, "23")
+_err = io.StringIO()
+with contextlib.redirect_stderr(_err):
+    fetchem.append_fetch_record([{"pdb_id": "AAAA", "resolution": 3.4}], [], _fsup, "25")
+check("the sibling writer says so too, rather than only one of the pair being fixed",
+      "AAAA" in _err.getvalue() and "NOT written" in _err.getvalue(), True)
+
+
+# --- Round 25 (code audit): a lost entry must leave a record ----------------------
+# #127: collect() returned rows alone and dropped failures at four `continue`s with
+# only a stderr line. This is the one benchmark in the set that depends on a live
+# third-party endpoint at run time, so a transient 5xx could shrink the committed set
+# invisibly -- and the published band is anchored to the observed MAX, which is what a
+# drop biased toward the slow multi-interface entries would remove.
+# No network: an empty PISA payload is written straight into the cache, and fetch()
+# short-circuits on any non-empty cached file.
+
+_pisa_cache = Path(__import__("tempfile").mkdtemp())
+(_pisa_cache / "pisa_1abc.json").write_text('{"1abc": {"assembly": {"interfaces": []}}}')
+_ifaces, _reason = t16.pisa_interfaces("1abc", _pisa_cache)
+check("an empty PISA payload reports WHY it is empty", (_ifaces, _reason),
+      ([], "PISA lists no interfaces"))
+
+(_pisa_cache / "pisa_2abc.json").write_text(
+    '{"2abc": {"assembly": {"interfaces": [{"molecules": []}]}}}')
+check("and a populated one reports no reason", t16.pisa_interfaces("2abc", _pisa_cache)[1], None)
+
+_rows, _skipped = t16.collect(["1abc"], _pisa_cache, pause=0.0)
+check("an entry PISA could not serve is recorded, not dropped", 
+      [(s["pdb_id"], s["reason"]) for s in _skipped],
+      [("1ABC", "PISA lists no interfaces")])
+check("and it contributes no rows", _rows, [])
 
 
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

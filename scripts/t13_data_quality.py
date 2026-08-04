@@ -131,11 +131,22 @@ def parse_ctruncate(text: str, log_path: str) -> dict:
     m = re.search(r"L statistic\s*=\s*([\d.]+)", text)
     if m:
         out["l_statistic"] = float(m.group(1))
-    if "First principles calculation has found no potential twinning operators" in text:
+    # Decide on what follows the header, not on the header itself. ctruncate prints
+    # "Twin fraction estimates by twinning operator" UNCONDITIONALLY and then says
+    # either "No operators found" or lists a table -- so the header's presence is not
+    # evidence of anything. Keying on it gave the right answer only because the
+    # first-principles literal below happened to match first; reword that one line in
+    # a later ctruncate and a "No operators found" log reported operators (#121).
+    m = re.search(r"Twin fraction estimates by twinning operator\s*\n(.*)",
+                  text, re.DOTALL)
+    if m and re.match(r"\s*No operators found", m.group(1)):
+        out["twin_operators_found"] = 0
+    elif m:
+        out["twin_operators_found"] = 1
+    elif "First principles calculation has found no potential twinning operators" in text:
         out["twin_operators_found"] = 0
     else:
-        m = re.search(r"Twin fraction estimates by twinning operator", text)
-        out["twin_operators_found"] = 1 if m else 0
+        out["twin_operators_found"] = 0
 
     # Moments of I
     m = re.search(r"<I\^2>/<I>\^2\s*=\s*([\d.]+)", text)

@@ -264,21 +264,36 @@ def build_cross_tool_coverage(qds_id: str, measurements: list[dict[str, Any]]) -
         t = m.get("catalog_task_ref")
         if not t:
             continue
-        bucket = by_task.setdefault(t, {"cctbx": set(), "non_cctbx": set()})
+        bucket = by_task.setdefault(t, {"cctbx": set(), "non_cctbx": set(),
+                                        "unclassified": set()})
         fam = m.get("oracle_family") or ""
         tool = m.get("oracle_tool_ref") or ""
         if fam == "cctbx":
             bucket["cctbx"].add(tool)
         elif fam == "non_cctbx":
             bucket["non_cctbx"].add(tool)
+        else:
+            # A blank or unrecognised family used to fall through both branches and
+            # land on the "open — cctbx only" default, so a task with NO classified
+            # oracle at all was labelled as having cctbx coverage while
+            # `cctbx_oracles` was empty -- a claim about the one thing this repo
+            # grades on, contradicted by the row carrying it (#125). The schema makes
+            # the field required, but this emitter runs on hand-edited drafts before
+            # `linkml-validate` sees them.
+            bucket["unclassified"].add(tool or "<unnamed oracle>")
     rows = []
     for t in sorted(by_task):
         cctbx = sorted(x for x in by_task[t]["cctbx"] if x)
         non_cctbx = sorted(x for x in by_task[t]["non_cctbx"] if x)
+        unclassified = sorted(by_task[t]["unclassified"])
         if non_cctbx:
             gap = "closed" if cctbx else "non-cctbx only"
-        else:
+        elif cctbx:
             gap = "open — cctbx only"
+        else:
+            gap = "unknown — no oracle_family on any measurement"
+        if unclassified:
+            gap += (f" (oracle_family missing on: {', '.join(unclassified)})")
         rows.append({
             "id": f"{qds_id}_coverage_{t}",
             "catalog_task_ref": t,

@@ -1,4 +1,4 @@
-# Lessons from twenty-four rounds of tolerance benchmarking
+# Lessons from twenty-five rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| A guard must assert against the artefact it polices | 25 |
+| Review the code that makes the number, not only the number | 25 |
 | Catching a class three times by luck is not a process | 24 |
 | A gate that only compares numbers is defeated by a rewrite | 24 |
 | Price the sampling before promising the test | 23 |
@@ -72,6 +74,27 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 25 audited the scripts rather than a tolerance, and found the guard round 24 had just built
+could not fail. **A guard must assert against the artefact it polices.** `nesting_check()` derived
+four counts from the per-entry TSV and compared them *to each other*; both sides came from one file,
+and the inclusions hold by construction of the writer that produces it — `append_results` gives every
+`skipped:` row an empty delta and every `measured` row a value — so no run of the pipeline could
+produce a file that failed the check. It could fire only on a hand-edit. Meanwhile the three figures
+it recomputed were pinned to no literal in the registry at all, so any one of them could drift alone
+while the ordering survived. The test that matters now asserts the *old* behaviour explicitly: drift
+59 → 61 and the ordering check still reports `OK`. When writing a check, ask what it reads and what
+it compares against — if both come from the same place, it is a tautology with a status field.
+
+Its companion is why the defect survived twenty-four rounds: **review the code that makes the number,
+not only the number.** Every round re-read the registry adversarially and re-derived its figures; the
+scripts computing them were read once each, when written. The first systematic pass over `scripts/`
+found twelve defects, three of them high — a `structure_ref` check promised in a docstring and never
+written, a wwPDB parser fabricating `0.0` violations where the real value is 17.4, a truncated DSSP
+run accepted because a guard said `and` where it meant `or`. None of these is subtle; they were simply
+never looked for. Note also what the round did *not* earn: three of the six silent-failure paths fail
+in the flattering direction, one in the alarming one, two neither — a tendency, not the rule it would
+have been satisfying to report.
 
 Round 24 is about when to stop fixing instances: **catching a class three times by luck is not a
 process.** The registry quotes figures derived from a per-entry file that grows every round, and three

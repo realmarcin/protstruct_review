@@ -467,25 +467,47 @@ def append_fetch_record(entries: list[dict], skipped: list[dict], path: Path,
     """Append this fetch run's outcomes — kept and rejected alike — deduplicated by id."""
     path.parent.mkdir(parents=True, exist_ok=True)
     existing = path.read_text() if path.exists() else ""
-    seen = {line.split("\t")[0] for line in existing.splitlines()[1:] if line.strip()}
+    seen = {line.split("\t")[0]: line.split("\t")
+            for line in existing.splitlines()[1:] if line.strip()}
     lines = [] if existing else [FETCH_HEADER]
+    superseded: list[tuple[str, list[str], list[str]]] = []
+
+    def offer(cells: list[str]) -> None:
+        """Write a row, or record that it differs from the one already on file.
+
+        Same contract as `append_results` in bench_refinement_deltas_em.py (#120), and
+        applied here because a fix in one of these two writers and not the other is a
+        trap this repo has fallen into before. Silence on an IDENTICAL re-offer is
+        load-bearing: `collect()` flushes after every candidate and re-offers the whole
+        set at the end, and that idempotency is pinned by a unit test. Only a row whose
+        values differ is announced -- e.g. an entry rejected for an unparameterised
+        ligand that a later monomer library would keep.
+        """
+        prior = seen.get(cells[0])
+        if prior is None:
+            lines.append("\t".join(cells) + "\n")
+            return
+        if prior[:1] + prior[2:] != cells[:1] + cells[2:]:
+            superseded.append((cells[0], prior, cells))
+
     for e in entries:
-        if e["pdb_id"].upper() in seen:
-            continue
-        lines.append("\t".join([
-            e["pdb_id"].upper(), round_label, _cell(e.get("resolution")),
-            _cell(e.get("emdb")), "kept", _cell(e.get("charges")), "",
-            _cell(e.get("publication"))]) + "\n")
+        offer([e["pdb_id"].upper(), round_label, _cell(e.get("resolution")),
+               _cell(e.get("emdb")), "kept", _cell(e.get("charges")), "",
+               _cell(e.get("publication"))])
     for s in skipped:
-        if s["pdb_id"].upper() in seen:
-            continue
-        lines.append("\t".join([
-            s["pdb_id"].upper(), round_label, "", "",
-            f"rejected: {_cell(s.get('reason'))}", _cell(s.get("charges")),
-            _cell(s.get("unparameterised")), ""]) + "\n")
+        offer([s["pdb_id"].upper(), round_label, "", "",
+               f"rejected: {_cell(s.get('reason'))}", _cell(s.get("charges")),
+               _cell(s.get("unparameterised")), ""])
     if lines:
         with path.open("a") as fh:
             fh.writelines(lines)
+    if superseded:
+        print(f"\n!! {len(superseded)} row(s) NOT written to {path}: the id is already "
+              f"on file with DIFFERENT values. Nothing was overwritten — decide per "
+              f"entry and edit the file by hand.", file=sys.stderr)
+        for pdb_id, prior, new in superseded:
+            print(f"   {pdb_id}\n     on file: {'  '.join(prior[2:])}"
+                  f"\n     new:     {'  '.join(new[2:])}", file=sys.stderr)
 
 
 def main() -> int:
