@@ -228,9 +228,9 @@ shape rather than this one.
 It understates by one, in the direction that makes the problem look smaller — the bias this repo says
 to check hardest — inside a sentence whose only job is counting instances of a defect class.
 
-**Nine issues — fifteen distinct wrong statements, under the counting rule stated above — were found
-in the round's own work across three review passes, every one in the prose and none in the
-measurement.** That split is the round's most durable result and is worth
+**Ten issues were found in the round's own work across three review passes** (#164–#167, #169–#174),
+**every one in the prose and none in the measurement.** The unit is *issues*, which is exact and
+checkable; see below for why the statement-level rule is not used here. That split is the round's most durable result and is worth
 stating as such: the measurement (P1–P4, the sweep, the seven corrected figures) has not moved through
 any pass. What keeps failing is the writing *about* it — and each failure has been a count, in a round
 whose subject is that counts fail.
@@ -246,10 +246,25 @@ the top of the measurement section, counts **statements**:
 
 > a *wrong figure* is one distinct numeric statement that was wrong
 
-Under that rule the same set is **fifteen**, not nine — `#164:1 #165:1 #166:2 #167:2 #169:1 #170:5
-#171:1 #172:1 #173:1`. **That is #164 exactly**, whose diagnosis was *"the list counted issues while
-calling them miscounts"*, recurring in this round's own summary of that defect. And nine reads better
-than fifteen, so it erred in the flattering direction again.
+**That is #164 exactly**, whose diagnosis was *"the list counted issues while calling them
+miscounts"*, recurring in this round's own summary of that defect — and in the flattering direction
+again, since a smaller number reads better.
+
+**The first attempt to fix it asserted "fifteen" and that was also wrong** (#176): the breakdown gave
+`#166:2` where the document's own table shows three rows for #166, making the sum sixteen. Chasing the
+right number is what exposed the real problem — **the rule does not decompose for this quantity at
+all**:
+
+- **#169** was a two-row table that failed to balance. One wrong statement, or two? One edit fixed both.
+- **#170** was five defects the issue itself calls *"one behaviour"*. Five, or one?
+- **#167**'s range floor and ceiling are two table rows but one sentence, which is why the table's
+  eight rows collapse to seven.
+
+The rule was built to count **figures in prose**, where a numeric statement is a well-defined unit.
+Applied to **defects**, 15 versus 16 is an artefact of where the line is drawn, not a fact. So this
+document counts *issues* for its own defects — exact and checkable — and reserves the statement-level
+rule for the swept figures, where it means something. **Asserting "sixteen" would have claimed a
+precision the rule cannot deliver**, which is the same overreach as the original "nine".
 
 Both figures now carry their unit. The wider point is unflattering and worth keeping: **stating a
 counting rule is not the same as following it.** This document defined the rule, applied it correctly
