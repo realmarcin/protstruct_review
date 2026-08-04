@@ -95,13 +95,16 @@ def collect(models: list[Path]) -> tuple[list[dict], list[dict]]:
             "whole_chain_mean_rmsf": round(whole_chain, 4),
             "by_cutoff": per_cutoff,
             "spread_across_cutoffs": round(max(means) - min(means), 4) if means else None,
-            # Named for the cutoff it used, not for a literal that can go stale: at
-            # cutoff 2.0 this key is `whole_chain_minus_2.0A_core`, and it MOVES if the
-            # harness's cutoff moves rather than silently reporting the old bucket.
+            # A FIXED key. The first attempt at #139 made this name dynamic --
+            # f"whole_chain_minus_{harness_cutoff}A_core" -- which did not remove the
+            # duplication, it moved it: every reader then had to rebuild the name, and
+            # `summarize()` was still reading the old literal, so the script raised
+            # KeyError on every run (#145). The cutoff is DATA, in `harness_cutoff`
+            # below; it does not also need to be in the identifier.
             "harness_cutoff": harness_cutoff,
             "harness_ordered_core_mean_rmsf": harness_mean,
             "harness_ordered_core_n": harness_n,
-            f"whole_chain_minus_{harness_cutoff}A_core": (
+            "whole_chain_minus_harness_core": (
                 round(whole_chain - harness_mean, 4) if harness_mean is not None else None),
         })
         print(f"  whole-chain {whole_chain:.4f} Å; cutoff sweep "
@@ -115,8 +118,8 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
     if not rows:
         return {"n": 0}
     spreads = [r["spread_across_cutoffs"] for r in rows if r["spread_across_cutoffs"] is not None]
-    gaps = [abs(r["whole_chain_minus_2A_core"]) for r in rows
-            if r["whole_chain_minus_2A_core"] is not None]
+    gaps = [abs(r["whole_chain_minus_harness_core"]) for r in rows
+            if r["whole_chain_minus_harness_core"] is not None]
     return {
         "n_ensembles": len(rows),
         "cutoff_sweep_spread": {

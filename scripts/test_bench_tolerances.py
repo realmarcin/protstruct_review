@@ -1371,4 +1371,44 @@ check("the benchmark passes the cutoff explicitly rather than relying on the def
       (REPO / "scripts" / "bench_t17_ordered_core.py").read_text(), True)
 
 
+# --- Round 26 self-review: collect() and summarize() must agree on the key ---------
+# #145: the #139 fix made the output key dynamic --
+# f"whole_chain_minus_{harness_cutoff}A_core" -- which did not remove the duplication,
+# it moved it. summarize() still read the old literal "whole_chain_minus_2A_core", and
+# since harness_cutoff is a float the writer emitted "...2.0A_core". The script raised
+# KeyError on every run that produced a row.
+#
+# No unit test on either function could see this: the defect lived in the SEAM. This
+# drives the real collect() with a stubbed run_precision (so no biotite is needed) and
+# feeds its output straight into the real summarize().
+
+class _StubT17:
+    _ORDERED_CORE_RMSF_CUTOFF = 2.0
+    @staticmethod
+    def run_precision(model):
+        return {"rmsf_values": [0.5, 0.8, 1.0, 1.2, 1.5, 1.8, 2.2, 2.4, 3.5, 6.0]}
+    @staticmethod
+    def ordered_core_precision(rmsf, cutoff=2.0):
+        core = [v for v in rmsf if v <= cutoff]
+        return round(sum(core) / len(core), 3), len(core)
+
+_real_loader = t17core.load_t17
+try:
+    t17core.load_t17 = lambda: _StubT17
+    _rows, _skipped = t17core.collect([Path("synthetic.pdb")])
+    _summary = t17core.summarize(_rows)          # <- this is what used to raise KeyError
+finally:
+    t17core.load_t17 = _real_loader
+
+check("collect produces one row", len(_rows), 1)
+check("and summarize consumes it without a KeyError", _summary["n_ensembles"], 1)
+check("and reports the gap it read from that key",
+      _summary["whole_chain_vs_ordered_core_gap"]["max"], 0.957)
+check("the harness gap is present and correct", _rows[0]["whole_chain_minus_harness_core"], 0.957)
+check("the key is fixed, not built from the cutoff",
+      [k for k in _rows[0] if k.startswith("whole_chain_minus")],
+      ["whole_chain_minus_harness_core"])
+check("and the cutoff travels as data instead", _rows[0]["harness_cutoff"], 2.0)
+
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

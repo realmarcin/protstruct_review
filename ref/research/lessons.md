@@ -77,8 +77,8 @@ mechanism inferred from two data points is a hypothesis.** Round 7 explained a d
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
 
-Round 26 tested three of round 25's parting claims and the interesting result was a prediction that
-failed in a way I had not allowed for: **a default bucket makes "unrecognised" and "miscounted"
+Round 26 tested three of round 25's parting claims. Two of its four predictions resolved cleanly; the
+other two did not, and the useful output is a prediction that failed in a way I had not allowed for: **a default bucket makes "unrecognised" and "miscounted"
 independent.** The `status` column of the EM per-entry file had no declaration anywhere — it existed
 only as prefixes tested by four predicates in the reader, while the writer that produces the values
 lived in another file. 28 of its 97 rows match none of those prefixes. Every published denominator is
@@ -94,6 +94,15 @@ the first; I registered them as one. The falsification criterion was therefore u
 and a prediction whose failure condition is wrong cannot be falsified honestly. Round 17 taught this
 series to check power before hunting a mechanism; this adds that the *consequence clause* of a
 prediction deserves the same scrutiny as its point estimate.
+
+Its sharper form emerged from this round's own review, in P4: **a prediction resolvable only by a rule
+you invent afterwards was not a well-formed prediction.** P4 registered "fewer than five" instances of
+duplication. Four were counted and a fifth declined — on a criterion ("a research value, not a
+maintained contract") that appears nowhere in the registered method, and that separated two cases which
+are structurally identical, both a canonical value restated as a function default. That single call was
+the whole distance between "confirmed" and "falsified upward", and it went the flattering way. The
+verdict is now recorded as **indeterminate**. When a boundary case decides a verdict, the verdict
+belongs to the boundary rule — so register the rule, or do not register the threshold.
 
 Round 25 audited the scripts rather than a tolerance, and found the guard round 24 had just built
 could not fail. **A guard must assert against the artefact it polices.** `nesting_check()` derived

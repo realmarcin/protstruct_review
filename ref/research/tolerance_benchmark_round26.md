@@ -6,7 +6,7 @@ containing no results.
 
 **No tolerance, band or measurement changed.** Every registry figure was re-derived and is unchanged.
 
-## P2 — the status vocabulary: *falsified in letter, confirmed in consequence*
+## P2 — the status vocabulary: **falsified, and the falsification criterion was itself wrong**
 
 `ref/research/data/em_refinement_deltas.tsv`'s `status` column is written by `append_results` and
 read by four predicates in `check_registry_figures.py`. No declaration of the vocabulary existed
@@ -34,6 +34,13 @@ genuinely right — they *were* attempted. The count is correct **by luck of the
 Those two are not the same claim, and I registered them as if they were. A default bucket makes
 "unrecognised" and "miscounted" independent: the first can be true for years while the second stays
 false, right up until a status arrives that does not belong in the default.
+
+**So both halves failed** (#146). The point estimate was wrong — 28 rows, not 0 — and the registered
+consequence did not follow either: no denominator is wrong today. This section originally carried the
+tag *"falsified in letter, confirmed in consequence"*, which is not what happened. Nothing about the
+registered consequence was confirmed; what is established below is a *different* proposition that was
+never registered — that the counts are right by luck of the default. The body said so and the tag said
+otherwise, which is #91's shape: the headline is what gets read.
 
 ### The guard
 
@@ -149,17 +156,36 @@ is not on `sys.path` and sharing a constant would need `importlib` in nine files
 than the risk warrants. `validate.sh` now fails if the literals disagree, naming both values and
 which files carry each.
 
-## P4 — the class is small: **confirmed**
+## P4 — the class is small: **indeterminate**
 
-Predicted at least one instance beyond filenames and fewer than five. **Three** asserted — the status
-vocabulary (P2), the T17 cutoff (#139), the tool paths (#140) — plus the def-time default found while
-fixing #139, and one **declined**: `HIGH_RATIO = 1.3` appears in both `screen_dfsc_ratio.py` and
-`analyze_dfsc_outlier.py`, but both are round-scoped research constants rather than a maintained
-contract, and the registry already records that round 23 superseded 1.3 with a data-derived 1.074
-fence *without* updating either. Reported here rather than filed, so the judgement is visible.
+Registered: at least one instance beyond filenames, **"falsified upward at five or more"**.
 
-Duplication in this repo is therefore enumerable, not systemic — which is what makes gating each
-instance a proportionate response rather than a refactor.
+**Four** counted — the status vocabulary (P2), the T17 cutoff (#139), the tool paths (#140), and the
+def-time default found while fixing #139. **One declined**: `HIGH_RATIO = 1.3` in
+`screen_dfsc_ratio.py:41` against `cut: float = 1.3` in `analyze_dfsc_outlier.py:154` — the same value,
+a different name, and a default parameter rather than a module constant.
+
+**The verdict turns entirely on that one call, and the call is not defensible as registered** (#146).
+The declined instance is structurally identical to one that was counted:
+
+```python
+def ordered_core_precision(rmsf, cutoff: float = _ORDERED_CORE_RMSF_CUTOFF)   # counted
+def _split(rows, cut: float = 1.3)                                            # declined
+```
+
+Both are a canonical value restated as a function default elsewhere. The criterion used to separate
+them — "round-scoped research value, not a maintained contract" — **was not part of the registered
+method**, which named duplicated derivations, cross-file contracts and input-shape assumptions. It was
+applied after seeing the data, and it is the only thing holding the count at 4 rather than 5, which is
+the only thing separating "confirmed" from "falsified upward".
+
+So P4 is **indeterminate**: the count is 4 or 5 depending on a criterion I did not register, and a
+prediction that can only be resolved by a post-hoc rule was not a well-formed prediction. Recording it
+as confirmed would have been the flattering reading of my own boundary call.
+
+What survives is weaker and still worth having: duplication here is **enumerable rather than
+pervasive** — a handful of instances, not a property of the codebase — which is what makes gating each
+one proportionate rather than refactoring.
 
 ## #142 — a vocabulary two documents believed was schema-enforced
 
@@ -226,6 +252,26 @@ The scope limit as originally written — *"covers round N only if round N is wr
 a decision about phrasing. It was concealing that **not aiming the gate here is what kept the stale
 record invisible**, which is round 24's lesson verbatim.
 
+**#145 (high) — the #139 fix left the script unrunnable, and by the very mechanism #139 was about.**
+The fix renamed the output key to carry the cutoff, `f"whole_chain_minus_{harness_cutoff}A_core"`.
+`summarize()` twenty lines below still read the old literal `whole_chain_minus_2A_core` — and since
+`harness_cutoff` is a float the writer emitted `...2.0A_core`, so the key it read never existed:
+
+```
+$ python3 scripts/bench_t17_ordered_core.py ensemble.pdb --json out.json
+KeyError: 'whole_chain_minus_2A_core'
+```
+
+**Making the key dynamic did not remove the duplication — it moved it**, and obliged every reader to
+rebuild the name. The fix for one rule in two copies created a third. Fixed properly by using a
+*fixed* key, `whole_chain_minus_harness_core`, and letting the cutoff travel as data in
+`harness_cutoff`, which is what #139 should have done first.
+
+Nothing caught it because **the defect lived in the seam**: this script is not in `validate.sh`, and
+the tests I wrote for #139 exercise `ordered_core_precision()` directly. No unit test on either
+function can see a disagreement between them. The new test drives the real `collect()` with a stubbed
+`run_precision` and feeds its output straight into the real `summarize()`.
+
 **#144 (medium) — the gate fired on correct prose.** `severity_claims()` matched every
 `#NNN (severity)` in a document, including the ones this round's P3 table *quotes as counter-examples*
 (`` `#136 (high)` → `#136 (medium)` ``) to demonstrate that the gate catches a wrong severity. It duly
@@ -266,6 +312,8 @@ That line is the honest summary of what this guard is worth: **7 checked, 11 not
   programmatic reader at all, so there is no second copy to drift from. That is a survey, not a proof.
 - **P1 confirms depth is not exhausted; it cannot say where the bottom is.** A fifth pass with a fifth
   lens would be the same argument again. The honest statement stays "lower bound" at every depth.
+- **Two of four predictions did not resolve cleanly**, and both originally carried a more favourable
+  label than the pre-registration supported (#146). P1 and P3 stand as registered.
 - **#142 constrains the range, not the presence.** A record omitting `oracle_family` entirely
   still validates; `qds_emit`'s `unclassified` bucket (#125) remains the thing that catches it.
 - **#140 is gated, not eliminated.** Nine copies still exist; the gate only stops them disagreeing
