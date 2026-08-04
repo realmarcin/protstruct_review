@@ -1,4 +1,4 @@
-# Lessons from twenty-three rounds of tolerance benchmarking
+# Lessons from twenty-four rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| Catching a class three times by luck is not a process | 24 |
+| A gate that only compares numbers is defeated by a rewrite | 24 |
 | Price the sampling before promising the test | 23 |
 | An interval on an observed rate is not a test of that rate | 23 |
 | Whether a subset re-run helps depends on which members were lost | 22 |
@@ -70,6 +72,24 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 24 is about when to stop fixing instances: **catching a class three times by luck is not a
+process.** The registry quotes figures derived from a per-entry file that grows every round, and three
+times one of them was found to have aged — #72 (ρ over "44 entries", round-16 vintage), #107 (the
+CC_mask statistics still at n = 25 after the set reached 35), #113 (a count whose stated definition
+yielded 93 rather than the 69 it claimed). **Every one was found while reviewing something else.**
+Each was fixed as an instance; nothing was added that would find the fourth. The round's output is
+therefore a gate — `scripts/check_registry_figures.py`, wired into `validate.sh` — that recomputes
+each dataset-dependent figure and fails when the text no longer matches. By this repo's own triage
+ranking a defect class with no guard outranks the defects themselves, because it hides them; the
+signal to build the guard is the second recurrence, not the third.
+
+Its companion is about how such a gate gets defeated: **a gate that only compares numbers is defeated
+by a rewrite.** The check therefore fails in two ways — when the recomputed value differs, and when
+the quoted literal has *disappeared* from the registry. A reworded claim cannot be silently correct,
+because nothing verified it; it is flagged for a human instead. This makes the gate brittle on
+purpose, and rewording a covered figure will fail the build — which is the cost of the guarantee, and
+cheaper than the alternative that has already happened three times.
 
 Round 23 adds the cost half of round 17's power lesson: **price the sampling before promising the
 test.** Round 22 specified a successor test and called it cheap because the selector was measurable

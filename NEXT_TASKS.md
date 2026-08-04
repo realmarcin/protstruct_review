@@ -3,7 +3,7 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-03** (round 23). Rounds 17–18 merged as
+**Last reconciled: 2026-08-04** (round 24). Rounds 17–18 merged as
 [#69](https://github.com/realmarcin/protstruct_review/pull/69); rounds 19 and 20 followed in
 [#82](https://github.com/realmarcin/protstruct_review/pull/82) and its successor. **Check the issue
 tracker for open issues; this file does not mirror it in real time.** There is no CI in this
@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Twenty-three rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Twenty-four rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -54,12 +54,13 @@ floors row.
 | 21 | [#92](https://github.com/realmarcin/protstruct_review/pull/92) (2026-08-03) | L-test made re-derivable on a committed 24-dataset set instead of being retired — a subset re-run, so reproducible rather than corroborating; EM benchmark now writes per-entry results as it goes |
 | 22 | (2026-08-03) | 10BU shown to be a genuine statistical outlier; a candidate mechanism supported but not established (n = 2), with the successor test specified; flip-set row shown **not** to be fixable by round 21's route |
 | 23 | (2026-08-03) | crossing-quality test **could not be run at the 1.3 cut** — 0 of 24 screened; at the data-driven 1.074 fence one already-refined near-miss (10EU) leans against it; estimator characterised over 60 crossings; the fetcher's all-or-nothing write fixed |
+| 24 | (2026-08-04) | staleness audit: the registry's `named entries` definition had drifted to yield 93 not 69; a gate now recomputes 8 dataset-dependent figures and fails on a stale value **or** a rewrite |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-three rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-four rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -89,6 +90,9 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
   where it is, precisely located rather than defended.
 - **A prediction confirmed once describes the round that confirmed it.** Round 16 confirmed
   "largest degradation > 1.1 %"; round 19 registered the same threshold and falsified it.
+- **Catching a class three times by luck is not a process.** Three aged figures (#72, #107, #113)
+  were all found while reviewing something else. The signal to build the guard is the second
+  recurrence, not the third.
 - **Price the sampling before promising the test.** Round 22 called its successor test cheap because
   the selector was measurable before refinement. The candidates occur at 3.3 %, so screening 24 found
   none; three candidates need ~60–90 screened entries. A cheap selector is not a cheap experiment.
