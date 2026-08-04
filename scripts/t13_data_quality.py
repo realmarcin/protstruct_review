@@ -131,11 +131,27 @@ def parse_ctruncate(text: str, log_path: str) -> dict:
     m = re.search(r"L statistic\s*=\s*([\d.]+)", text)
     if m:
         out["l_statistic"] = float(m.group(1))
-    if "First principles calculation has found no potential twinning operators" in text:
-        out["twin_operators_found"] = 0
+    # Decide on what follows the header, not on the header itself. ctruncate prints
+    # "Twin fraction estimates by twinning operator" UNCONDITIONALLY and then says
+    # either "No operators found" or lists a table -- so the header's presence is not
+    # evidence of anything. Keying on it gave the right answer only because the
+    # first-principles literal below happened to match first; reword that one line in
+    # a later ctruncate and a "No operators found" log reported operators (#121).
+    # EVERY occurrence, not just the first (#137). Keying on `re.search` would let a
+    # leading "No operators found" section mask a later one carrying a real table --
+    # the same shape of unexamined premise as the header-presence test this replaced.
+    headers = list(re.finditer(r"Twin fraction estimates by twinning operator[^\n]*\n", text))
+    if headers:
+        out["twin_operators_found"] = int(any(
+            not re.match(r"\s*No operators found", text[h.end():]) for h in headers))
     else:
-        m = re.search(r"Twin fraction estimates by twinning operator", text)
-        out["twin_operators_found"] = 1 if m else 0
+        # No section at all means none found. There is deliberately no fallback to the
+        # "First principles calculation has found no potential twinning operators"
+        # line: it is redundant with this branch -- both say zero -- and #121 was
+        # exactly the harm of keeping a second signal around that looks like it decides
+        # something. A comment describing a check that is not there is the same defect
+        # one level up (#138), so this says what the code does.
+        out["twin_operators_found"] = 0
 
     # Moments of I
     m = re.search(r"<I\^2>/<I>\^2\s*=\s*([\d.]+)", text)

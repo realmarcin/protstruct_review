@@ -83,16 +83,26 @@ def fetch(url: str, dest: Path, binary: bool = False) -> Path:
     return dest
 
 
-def pisa_interfaces(pdb_id: str, cache: Path) -> list[dict[str, Any]]:
-    """PISA assembly-1 interface records for `pdb_id` (empty if PISA has no entry)."""
+def pisa_interfaces(pdb_id: str, cache: Path) -> tuple[list[dict[str, Any]], str | None]:
+    """PISA assembly-1 interface records for `pdb_id`, and why the list is empty.
+
+    Returns `(interfaces, reason)`; exactly one is meaningful. An empty list used to
+    mean both "the API failed" and "PISA lists no interfaces here", which are opposite
+    facts — the first loses a committed entry from the denominator, the second is a
+    real measurement of zero. This is the only benchmark in the set that depends on a
+    live third-party endpoint at run time (every sibling reads static RCSB files), so
+    it is the one where a transient 5xx or a rate limit can silently shrink the set
+    (#127).
+    """
     dest = cache / f"pisa_{pdb_id}.json"
     try:
         fetch(PISA_API.format(pdb_id=pdb_id), dest)
     except urllib.error.HTTPError as exc:
         print(f"  ! PISA API {exc.code} for {pdb_id} — skipped", file=sys.stderr)
-        return []
+        return [], f"PISA API HTTP {exc.code}"
     payload = json.loads(dest.read_text()).get(pdb_id, {})
-    return payload.get("assembly", {}).get("interfaces", []) or []
+    interfaces = payload.get("assembly", {}).get("interfaces", []) or []
+    return interfaces, None if interfaces else "PISA lists no interfaces"
 
 
 def fragment_pairs(model: Path) -> set[frozenset[str]]:
@@ -170,19 +180,36 @@ def biotite_bsa(model: Path, chain_a: str, chain_b: str) -> float | None:
     return separated - complex_sasa
 
 
-def collect(pdb_ids: list[str], cache: Path, pause: float = 0.5) -> list[dict[str, Any]]:
-    """Run both oracles over every eligible protein-protein interface in `pdb_ids`."""
+def collect(pdb_ids: list[str], cache: Path,
+            pause: float = 0.5) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """Run both oracles over every eligible protein-protein interface in `pdb_ids`.
+
+    Returns `(rows, skipped)` like every sibling benchmark. It previously returned rows
+    alone and dropped failures at four `continue`s with nothing but a stderr line, so a
+    re-run's completeness was unverifiable from its own output — and the published band
+    is anchored to the observed **max**, which is exactly what a drop biased toward the
+    slow multi-interface entries would remove (#127).
+    """
     rows: list[dict[str, Any]] = []
+    skipped: list[dict[str, str]] = []
     for pdb_id in pdb_ids:
         pdb_id = pdb_id.lower()
         print(f"[{pdb_id}]", file=sys.stderr)
-        interfaces = pisa_interfaces(pdb_id, cache)
+        interfaces, reason = pisa_interfaces(pdb_id, cache)
         if not interfaces:
+            skipped.append({"pdb_id": pdb_id.upper(), "interface": "", "reason": reason})
+            # The pause is a rate limit, so it matters MOST after a failure: leaving it
+            # to the end of the loop body meant a throttled call removed the delay
+            # before the next one, making cascades likelier.
+            time.sleep(pause)
             continue
         try:
             model = fetch(RCSB_PDB.format(pdb_id=pdb_id.upper()), cache / f"{pdb_id}.pdb")
         except urllib.error.HTTPError as exc:
             print(f"  ! RCSB {exc.code} for {pdb_id} — skipped", file=sys.stderr)
+            skipped.append({"pdb_id": pdb_id.upper(), "interface": "",
+                            "reason": f"RCSB HTTP {exc.code}"})
+            time.sleep(pause)
             continue
         intramolecular = fragment_pairs(model)
         for iface in interfaces:
@@ -195,10 +222,14 @@ def collect(pdb_ids: list[str], cache: Path, pause: float = 0.5) -> list[dict[st
             if frozenset((ca, cb)) in intramolecular:
                 print(f"  ! {pdb_id} {ca}/{cb}: fragments of one molecule — skipped",
                       file=sys.stderr)
+                skipped.append({"pdb_id": pdb_id.upper(), "interface": f"{ca}/{cb}",
+                                "reason": "fragments of one molecule"})
                 continue
             bsa = biotite_bsa(model, ca, cb)
             if bsa is None:
                 print(f"  ! {pdb_id} {ca}/{cb}: chain missing from ASU — skipped", file=sys.stderr)
+                skipped.append({"pdb_id": pdb_id.upper(), "interface": f"{ca}/{cb}",
+                                "reason": "chain missing from ASU"})
                 continue
             pisa_total = 2.0 * float(iface["interface_area"])
             mean = (bsa + pisa_total) / 2.0
@@ -219,7 +250,11 @@ def collect(pdb_ids: list[str], cache: Path, pause: float = 0.5) -> list[dict[st
                   f"  Δ {bsa - pisa_total:+7.1f} ({rows[-1]['rel_delta_pct']:+.1f} %)",
                   file=sys.stderr)
         time.sleep(pause)
-    return rows
+    # NOTE the scope: `skipped` records the four paths that can LOSE an entry (PISA or
+    # RCSB failing, fragments of one molecule, a chain absent from the ASU). The two
+    # filters above it — non-protein pairs and symmetry mates — are eligibility rules,
+    # deterministic given the input, and are not failures to record.
+    return rows, skipped
 
 
 def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -256,9 +291,16 @@ def main() -> int:
     # hundred MB of coordinates, and dropping that wherever the user happens to be
     # standing is one `git add -A` away from committing it.
     cache = Path(args.cache) if args.cache else Path(tempfile.gettempdir()) / "bench_cache_t16"
-    rows = collect(args.pdb_ids or DEFAULT_SET, cache)
+    requested = args.pdb_ids or DEFAULT_SET
+    rows, skipped = collect(requested, cache)
     summary = summarize(rows)
-    out = {"rows": rows, "summary": summary}
+    # `requested` and `skipped` ship with the results so a later reader can tell a
+    # complete run from one that lost entries to a flaky PISA endpoint.
+    out = {"requested_ids": list(requested), "rows": rows, "skipped": skipped,
+           "summary": summary}
+    if skipped:
+        print(f"!! {len(skipped)} interface(s)/entr(ies) skipped — see `skipped` in the "
+              f"JSON; this run does NOT cover the full committed set.", file=sys.stderr)
     if args.json_out:
         Path(args.json_out).write_text(json.dumps(out, indent=2) + "\n")
     print(json.dumps(summary, indent=2))

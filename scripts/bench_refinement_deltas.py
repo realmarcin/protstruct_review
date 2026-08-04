@@ -118,8 +118,13 @@ def refine_prefix(model_stem: str, restraints: bool) -> str:
     Restrained and unrestrained runs must not share a prefix: the caching in
     `refine()` keys on the output file, so a collision would make the second run
     silently adopt the first's result and report no difference between protocols.
+
+    `MACRO_CYCLES` is in the prefix for the same reason, and was not (#124): the
+    argument above applies unchanged to any parameter that moves the refinement, and
+    this repo does retune them between rounds -- `restraints` itself was added because
+    round 7's null spreads came from default weights.
     """
-    return f"{'rr' if restraints else 'r'}_{model_stem}"
+    return f"{'rr' if restraints else 'r'}{MACRO_CYCLES}_{model_stem}"
 
 
 def refine(model: Path, mtz: Path, work: Path,

@@ -233,7 +233,44 @@ def test_negative_structured_scopes_without_rows_fail() -> None:
     print("PASS  test_negative_structured_scopes_without_rows_fail")
 
 
+def test_coverage_never_claims_an_absent_family() -> None:
+    """gap_status must not assert coverage the oracle lists contradict (#125).
+
+    A blank `oracle_family` fell through both branches and landed on the
+    "open — cctbx only" default, so a task with NO classified oracle at all was
+    labelled as having cctbx coverage while `cctbx_oracles` was empty. Cross-tool
+    coverage is the thing this repo grades on.
+    """
+    def coverage(measurements):
+        return qds_emit.build_cross_tool_coverage("QDS_x", measurements)["task_coverage"][0]
+
+    row = coverage([{"catalog_task_ref": "T09", "oracle_family": None,
+                     "oracle_tool_ref": "some_tool"}])
+    if row["cctbx_oracles"] or row["non_cctbx_oracles"]:
+        print("FAIL  an unclassified oracle was bucketed anyway")
+        raise SystemExit(1)
+    if "cctbx only" in row["gap_status"]:
+        print(f"FAIL  gap_status claims cctbx coverage with none: {row['gap_status']!r}")
+        raise SystemExit(1)
+    if "some_tool" not in row["gap_status"]:
+        print(f"FAIL  gap_status does not name the unclassified oracle: {row['gap_status']!r}")
+        raise SystemExit(1)
+
+    # The three classified cases must be unchanged, or the fix has moved a real verdict.
+    cc = {"catalog_task_ref": "T09", "oracle_family": "cctbx", "oracle_tool_ref": "phenix"}
+    nc = {"catalog_task_ref": "T09", "oracle_family": "non_cctbx",
+          "oracle_tool_ref": "molprobity"}
+    for measurements, want in [([cc], "open — cctbx only"), ([nc], "non-cctbx only"),
+                               ([cc, nc], "closed")]:
+        got = coverage(measurements)["gap_status"]
+        if got != want:
+            print(f"FAIL  gap_status changed for a classified case: {got!r} != {want!r}")
+            raise SystemExit(1)
+    print("PASS  gap_status reports unknown coverage as unknown, and is otherwise unchanged")
+
+
 def main() -> int:
+    test_coverage_never_claims_an_absent_family()
     test_1sar_geometry_slots_all_present()
     test_synth_local_blocks_present()
     test_negative_site_scope_without_site_decl_fails()

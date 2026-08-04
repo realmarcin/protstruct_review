@@ -67,8 +67,15 @@ def run_dssp(model: Path) -> dict[ResKey, str]:
             [exe, "--output-format", "dssp", str(normalised), str(out_path)],
             capture_output=True, text=True,
         )
-        if proc.returncode != 0 and not out_path.stat().st_size:
-            _fail(f"mkdssp failed: {proc.stderr.strip() or proc.stdout.strip()}")
+        # `or`, not `and`. The two conditions are independent failures and neither
+        # excuses the other: mkdssp can exit non-zero *after* writing a partial
+        # residue table, and an `and` here accepted that truncated table as a
+        # complete run -- `agreement()` then reported a "% concordant" over a short
+        # denominator with nothing to say it was short (#117).
+        if proc.returncode != 0 or not out_path.stat().st_size:
+            _fail(f"mkdssp failed (exit {proc.returncode}, "
+                  f"{out_path.stat().st_size} bytes written): "
+                  f"{proc.stderr.strip() or proc.stdout.strip()}")
         return _parse_dssp(out_path.read_text())
     finally:
         out_path.unlink(missing_ok=True)

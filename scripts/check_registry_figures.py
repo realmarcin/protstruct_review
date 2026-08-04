@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import statistics
 import sys
 from pathlib import Path
@@ -86,6 +87,30 @@ def _ratios(rows):
             for r in rows if r.get("d_fsc_model_pre") and r.get("resolution")]
 
 
+def _attempted(rows):
+    """Of the entries that entered the benchmark, those not skipped."""
+    return [r for r in _named(rows) if not r["status"].startswith("skipped")]
+
+
+def _with_delta(rows):
+    return [r for r in _named(rows) if r["cc_mask_delta"]]
+
+
+def _measured(rows):
+    return [r for r in _named(rows) if r["status"] == "measured"]
+
+
+def _attempted_incl_lost(rows):
+    """Refinement attempts over the whole file, i.e. including the 4 `LOST` rows.
+
+    This is the registry's 63. It does NOT nest under the 69 -- that was #115 -- so it
+    is stated against its own base and checked against its own derivation.
+    """
+    return [r for r in rows
+            if not r["status"].startswith("screened only")
+            and not r["status"].startswith("skipped")]
+
+
 def _resolution_rho(rows):
     pairs = [(float(r["resolution"]), abs(float(r["cc_mask_delta"])))
              for r in rows if r["cc_mask_delta"] and r["resolution"]]
@@ -97,6 +122,23 @@ CHECKS: list[tuple[str, str, Callable[[list[dict]], Any]]] = [
     ("EM entry count",
      "**69** entries that entered the refinement benchmark",
      lambda rows: f"**{len(_named(rows))}** entries that entered the refinement benchmark"),
+    # The nested denominators. #115 corrected the prose here; the check added with it
+    # compared these counts only to each other, so all four could drift together --
+    # or any one of them alone, as long as the ordering survived -- without a single
+    # check firing (#116). Each is now pinned to the data like every other figure.
+    ("refinement-attempt count",
+     "of which **59** reached a refinement attempt",
+     lambda rows: f"of which **{len(_attempted(rows))}** reached a refinement attempt"),
+    ("recorded-Δ count",
+     "**58** carry a recorded Δ",
+     lambda rows: f"**{len(_with_delta(rows))}** carry a recorded Δ"),
+    ("full pre/post count",
+     "**35** have full pre/post values",
+     lambda rows: f"**{len(_measured(rows))}** have full pre/post values"),
+    ("refinement attempts incl. LOST",
+     "(**63** entries reached a refinement attempt in total",
+     lambda rows: f"(**{len(_attempted_incl_lost(rows))}** entries reached a "
+                  f"refinement attempt in total"),
     ("CC_mask degradation count",
      "**17 degraded — a lower bound, not a count**",
      lambda rows: f"**{sum(1 for x in _cc_deltas(rows) if x < 0)} degraded "
@@ -125,23 +167,51 @@ CHECKS: list[tuple[str, str, Callable[[list[dict]], Any]]] = [
 ]
 
 
-def nesting_check(rows: list[dict]) -> dict[str, Any]:
-    """The nested denominators must actually nest.
+# The registry's nesting sentence, read as the registry states it rather than as the
+# data implies it. Anchored on the phrases, so a reworded claim goes MISSING (the same
+# contract as CHECKS) instead of quietly ceasing to be checked.
+_NESTING_SENTENCE = re.compile(
+    r"\*\*(?P<named>\d+)\*\* entries that entered the refinement benchmark.*?"
+    r"of which \*\*(?P<attempted>\d+)\*\* reached a refinement attempt, "
+    r"\*\*(?P<with_delta>\d+)\*\* carry a recorded Δ and "
+    r"\*\*(?P<measured>\d+)\*\* have full pre/post values",
+    re.DOTALL)
+
+
+def nesting_check(registry: str, rows: list[dict]) -> dict[str, Any]:
+    """The nested denominators must nest **as the registry states them**.
 
     #115: the registry read "69 ... of which 63 reached a refinement attempt", and 63
     was not a subset of 69 -- it counted the 4 LOST rows that 69 excludes. Every figure
-    was individually right against the data, which is why the per-figure checks above
-    all passed. Nothing compared them to each other.
+    was individually right against the data, so the per-figure checks all passed and
+    nothing compared them to each other.
+
+    The check written with that fix compared four counts it derived **itself** from the
+    TSV, and never read the registry at all. Those inclusions hold by construction --
+    `append_results` writes an empty `cc_mask_delta` for every `skipped:` row and a
+    value for every `measured` one -- so no run of the pipeline can produce a file that
+    fails them. It could fire only on a hand-edit, i.e. essentially never on the class
+    it was written for (#116).
+
+    So the relationship is now checked where the defect lives: in the sentence. The
+    numbers are parsed out of the registry's own prose and required to nest. The
+    data-side derivations are pinned separately, one literal per figure, in CHECKS.
     """
-    named = _named(rows)
-    attempted = [r for r in named if not r["status"].startswith("skipped")]
-    with_delta = [r for r in named if r["cc_mask_delta"]]
-    measured = [r for r in named if r["status"] == "measured"]
-    ok = len(named) >= len(attempted) >= len(with_delta) >= len(measured)
+    m = _NESTING_SENTENCE.search(registry)
+    if not m:
+        return {
+            "check": "stated counts nest", "status": "MISSING",
+            "detail": ("the registry's nested-denominator sentence no longer matches "
+                       "the expected phrasing — reworded or removed, so the "
+                       "relationship between 69/59/58/35 cannot be checked"),
+        }
+    named, attempted, with_delta, measured = (
+        int(m.group(k)) for k in ("named", "attempted", "with_delta", "measured"))
+    ok = named >= attempted >= with_delta >= measured
     return {
-        "check": "nested counts nest", "status": "OK" if ok else "BROKEN",
-        "detail": (f"named {len(named)} >= attempted {len(attempted)} >= with-delta "
-                   f"{len(with_delta)} >= measured {len(measured)}"
+        "check": "stated counts nest", "status": "OK" if ok else "BROKEN",
+        "detail": (f"registry states named {named} >= attempted {attempted} >= "
+                   f"with-delta {with_delta} >= measured {measured}"
                    + ("" if ok else "  <- not monotonically nested")),
     }
 
@@ -151,15 +221,21 @@ def run(registry: str, rows: list[dict]) -> list[dict[str, Any]]:
     for label, literal, derive in CHECKS:
         derived = derive(rows)
         if literal not in registry:
+            # Say "expected literal", not "no longer contains X ... the data gives X",
+            # which is what this read when the registry sentence was edited while the
+            # underlying figure was unchanged -- a self-contradicting message on the
+            # commonest failure mode.
             status, detail = "MISSING", (
-                f"the registry no longer contains {literal!r} — reworded or removed, "
-                f"so it cannot be checked; the data currently gives {derived!r}")
+                f"the registry does not contain the expected literal {literal!r} — the "
+                f"figure was edited or the claim reworded, so there is nothing to "
+                f"compare; the data currently gives {derived!r}. Find the sentence in "
+                f"the registry and re-check it by hand.")
         elif derived != literal:
             status, detail = "STALE", f"registry says {literal!r}; data gives {derived!r}"
         else:
             status, detail = "OK", derived
         results.append({"check": label, "status": status, "detail": detail})
-    results.append(nesting_check(rows))
+    results.append(nesting_check(registry, rows))
     return results
 
 

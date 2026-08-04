@@ -54,8 +54,16 @@ from typing import Any
 import yaml
 
 
+# Squared units are listed BEFORE their bare forms: the alternation is ordered, so a
+# leading `Å` would match the "Å" of "Å²" and leave "²" to fail the anchored tail,
+# dropping the cell to value_text. That is what happened before #126 -- and silently,
+# because a text measurement is a valid parse. It costs more than tidiness:
+# `qds_emit._strongest()` ranks numeric above text, so a real BSA (Å², emitted by
+# t16_interface_quality.py) or Wilson B (Å², t13_data_quality.py) entered via TSV lost
+# to a weaker text-only measurement from another tool.
 _NUMERIC_WITH_UNIT = re.compile(
-    r"^\s*(?P<sign>[+-]?)\s*(?P<num>\d+(?:\.\d+)?)\s*(?P<unit>%|°|Å|σ|deg|A)?\s*$"
+    r"^\s*(?P<sign>[+-]?)\s*(?P<num>\d+(?:\.\d+)?)\s*"
+    r"(?P<unit>Å\^2|Å²|Å|%|°|σ|deg|A)?\s*$"
 )
 
 

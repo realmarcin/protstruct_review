@@ -8,8 +8,11 @@ walks every YAML record under `ref/` and `data/examples/` and verifies:
   - every `metric_definition_ref` resolves in `ref/catalog.yaml::metric_definitions`
   - every `oracle_tool_ref` / `tool_ref` resolves in `ref/catalog.yaml::tools`
   - every `catalog_task_ref` / `catalog_tasks_applied[]` is a known T0NN id
-  - every `structure_ref` resolves either in `ref/catalog.yaml::structures` or
-    in the same record's structures[]
+  - every `structure_ref` resolves in `ref/catalog.yaml::structures` or the same
+    record's structures[] WHEN either exists; neither does today, so it falls back
+    to requiring every nested `structure_ref` to match its own record's. See
+    `check_structure_refs` — this bullet described a check that was never
+    implemented until #118.
 
 Exits non-zero with a per-violation report on the first miss. Wired into
 `scripts/validate.sh` so `linkml-validate` and the integrity check both
@@ -40,6 +43,10 @@ def load_catalog_indices() -> dict[str, set[str]]:
         "metric": {m["id"] for m in doc.get("metric_definitions", [])},
         "tool": {t["id"] for t in doc.get("tools", [])},
         "task": KNOWN_TASK_IDS,
+        # Empty today -- ref/catalog.yaml declares no `structures:` collection. The
+        # index is built anyway so `check_structure_refs` starts resolving against it
+        # the moment one is added, rather than needing to be remembered then.
+        "structure": {s["id"] for s in doc.get("structures", []) or []},
     }
 
 
@@ -109,6 +116,59 @@ def check_record(yaml_path: Path, indices: dict[str, set[str]]) -> list[str]:
                 check(v, f"{path}[{i}]")
 
     check(doc)
+    violations += check_structure_refs(doc, rel, indices["structure"] | local_structure_ids)
+    return violations
+
+
+# Top-level collections whose members each carry their own `structure_ref`, under which
+# every nested `structure_ref` must agree.
+RECORD_COLLECTIONS = ("evaluation_runs", "quality_data_sheets", "agent_artifacts")
+
+
+def check_structure_refs(doc: Any, rel: Path, declared: set[str]) -> list[str]:
+    """Check `structure_ref` — the one ref this script's docstring promised and skipped.
+
+    The promise was "resolves either in `ref/catalog.yaml::structures` or in the same
+    record's structures[]". Neither collection exists anywhere in the repo: the schema
+    declares `structure_ref: {range: Structure}` but nothing instantiates a `Structure`,
+    so the check as written had no index to resolve against and was silently never
+    implemented (#118) -- while `local_structure_ids` sat computed and unused above.
+
+    So it resolves against those collections WHEN they exist, and otherwise falls back
+    to the invariant that does hold today and catches the same typo: within one record
+    (one evaluation_run, one QDS), every nested `structure_ref` must equal that record's
+    own. An EVAL is about one structure; `ligands[].structure_ref` naming a different
+    one is a defect whether or not a `structures:` collection is ever added.
+    """
+    violations: list[str] = []
+    if not isinstance(doc, dict):
+        return violations
+
+    def nested_refs(node: Any, path: str) -> Iterable[tuple[str, str]]:
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if k == "structure_ref" and isinstance(v, str):
+                    yield f"{path}.{k}", v
+                else:
+                    yield from nested_refs(v, f"{path}.{k}")
+        elif isinstance(node, list):
+            for i, v in enumerate(node):
+                yield from nested_refs(v, f"{path}[{i}]")
+
+    for collection in RECORD_COLLECTIONS:
+        for i, record in enumerate(doc.get(collection) or []):
+            if not isinstance(record, dict):
+                continue
+            base = f"$.{collection}[{i}]"
+            own = record.get("structure_ref")
+            for path, value in nested_refs(record, base):
+                if declared and value not in declared:
+                    violations.append(
+                        f"{rel}: {path} = {value!r} not in known structure ids")
+                elif not declared and own and value != own:
+                    violations.append(
+                        f"{rel}: {path} = {value!r} does not match the record's own "
+                        f"structure_ref {own!r}")
     return violations
 
 
@@ -119,9 +179,11 @@ def main() -> int:
         REPO / "ref" / "tool_recommendations.yaml",
         REPO / "ref" / "tool_assumptions.yaml",
     ]
-    targets += sorted((REPO / "data" / "examples").rglob("*.yaml"))
-    targets += sorted((REPO / "data" / "coscientists").rglob("EVAL_*.yaml"))
-    targets += sorted((REPO / "data" / "coscientists").rglob("QDS_*.yaml"))
+    # Every provider, not just `coscientists`. Naming one provider here was the same
+    # defect as #123 in scripts/validate.sh, in its sibling -- records under any other
+    # provider resolved no references and said nothing about it.
+    targets += sorted((REPO / "data").rglob("*.yaml"))
+    targets = sorted({t for t in targets})
 
     failed = False
     for path in targets:
