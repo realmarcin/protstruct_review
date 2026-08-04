@@ -34,20 +34,34 @@ names most often, so the claim is stated at the size the evidence supports.
 The pre-registration said this outcome *"would argue against extending mechanical coverage further"*.
 It does, and the round follows its own instruction rather than building the thing it set out to build.
 
-## P2 — "underivable per-entry figures outnumber derivable ones": **confirmed**
+## P2 — "underivable per-entry figures outnumber derivable ones": **indeterminate**
 
-Of **29** claims pairing a real entry id with a number in the §4 map-model row, **9 are derivable and
-20 are not** — roughly two to one.
+**The verdict flips with the counting method, so it has none** (#182).
 
-The underivable ones are not oversights. They are quantities the TSV was never designed to hold:
-mtriage internals (`9VJD's curve dips to FSC 0.073 at 23.11 Å`), band values that happen to sit beside
-an id, resolution splits, and figures from `LOST` and `delta-only` rows whose per-entry values were
-never published — 9VAM's 6.10 Å among them, which #167 already established cannot be checked.
+A regex over the §4 map-model row gave **9 derivable against 20 underivable** — roughly two to one, and
+that is what this section originally claimed. It does not survive scrutiny, in **both** directions:
 
-**Both counts are approximate.** Extracting claims from prose by regex is crude: the first attempt
-counted `0311`, `9843` and `0115` — fragments of numbers like `−0.0311` — as entry ids and reported
-30 underivable. Filtering to ids that exist as entries gives 20. What is robust is the **direction**,
-not the digits.
+**It undercounted derivable.** It took only the first few numbers after each id and missed values the
+round's own criteria plainly cover — 9H7U's `4.06 → 2.59 Å` and ratio 1.372, 10BU's ratio 1.360 and
+its `4.35 Å` crossing, 10BU's `3.24×` above the next-largest and `30.6×` the median, 10ME's rank
+"29th of 36". All are direct lookups or one division on TSV columns, and the round already counted
+10EU's *computed* ratio as derivable, so the criterion was applied inconsistently. Derivable is **at
+least 15**, not 9 — and all fifteen verify correct, which strengthens P1.
+
+**It overcounted underivable.** It treated any number near an id as a claim *about* that entry. Most
+were not: band values (`0.05`, `0.06`, `0.15`), the 3.0 Å resolution split, round 19's `3.05–3.45`
+window. A hand classification of genuine per-entry assertions gives roughly **11** underivable —
+mtriage internals (`9VJD's curve dips to FSC 0.073 at 23.11 Å`), 27WR's and 21BQ's crossings and atom
+densities, 9VAM's 6.10 Å, and the `124 / 399 / 117` shell counts.
+
+So the two reasonable methods give **9 : 20** and **≈15 : 11** — opposite directions. **A prediction
+whose verdict flips with the counting method is indeterminate**, which is the call round 26 made for
+its own P4 and for the same reason. Recording it as confirmed was reading the method that agreed with
+the prediction.
+
+**The decision not to extend the check rests on P1 alone**, and is unaffected: every derivable
+per-entry figure already matches, so there is nothing further to find. P2 was supporting evidence for
+*"most of what remains cannot be checked"* — a claim now withdrawn.
 
 ## What was built, and what was deliberately not
 
@@ -58,8 +72,8 @@ and P2 says most of what remains cannot be checked at all.
 The gate now **states its own coverage** rather than implying completeness:
 
 ```
-all 19 checked registry figures match the data (5 per-entry; most per-entry figures
-the registry quotes are NOT derivable and are not checked — see round 29)
+all 19 checked registry figures match the data (5 per-entry; the registry quotes more
+per-entry figures than are gated here, some of them not derivable at all — see round 29)
 ```
 
 That line exists because of #116: a gate reporting *"all figures match"* while covering a third of
@@ -88,10 +102,11 @@ Exercised in both forms, since nothing in the committed data triggers either:
 
 ## Scope limits
 
-- **The five checks are a sample, not the derivable set.** Nine figures are derivable; five are
-  gated. The remaining four are pinned only by the aggregate checks that already existed.
-- **The 9/20 split is approximate**, for the extraction reason above, and is a lower bound on
-  underivable in the sense that a crude regex misses claim forms nobody anticipated.
+
+- **The derivable/underivable split has no reliable value.** 9:20 by regex, ≈15:11 by hand; the
+  answer depends entirely on what counts as a per-entry *claim*, and this round did not find a
+  principled way to delimit that. The count is reported as contested rather than resolved.
+- **At least 15 derivable figures exist and 5 are gated.** The other ten rest on the aggregate checks.
 - **§3's rows are out of scope.** They quote per-entry values from sets that are committed but not in
   this TSV.
 - **P1's falsification is about the registry only.** It says round 28's sweep was complete *there*;

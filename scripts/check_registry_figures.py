@@ -384,17 +384,18 @@ def main() -> int:
         print(f"\n{len(bad)} registry figure(s) no longer match the data.", file=sys.stderr)
         return 1
     # State the coverage, not just the verdict. The per-entry figures gated here are a
-    # MINORITY of those the registry quotes -- round 29 measured roughly 9 derivable
-    # against 20 that name a value never recorded per-entry (mtriage internals, band
-    # values, LOST and delta-only rows). A gate that prints "all figures match" while
-    # covering a third of them overstates what it verified, which is #116's shape.
+    # SUBSET: round 29 found at least 15 derivable and gates 5. It also found that the
+    # derivable/underivable split has no reliable value (9:20 by regex, ~15:11 by hand,
+    # #182), so this line claims coverage is partial without claiming how partial. A
+    # gate printing "all figures match" while covering a third overstates what it
+    # verified, which is #116's shape.
     # Tagged, not sniffed: "refinement attempts incl. LOST" contains a dot and was
     # counted as per-entry by a `"." in check` test -- a wrong coverage figure inside
     # the statement written to stop overstating coverage.
     n_entry = sum(1 for r in results if r.get("per_entry"))
     print(f"\nall {len(results)} checked registry figures match the data "
-          f"({n_entry} per-entry; most per-entry figures the registry quotes are NOT "
-          f"derivable and are not checked — see round 29)")
+          f"({n_entry} per-entry; the registry quotes more per-entry figures than are "
+          f"gated here, some of them not derivable at all — see round 29)")
     return 0
 
 

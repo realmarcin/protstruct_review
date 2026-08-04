@@ -127,9 +127,11 @@ technique deserves the same adversarial reading as the code it repairs.
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
 own predictions said not to.** P1 (a check finds something the hand sweep missed) was falsified: every
-derivable per-entry figure already matched. P2 (underivable outnumber derivable) was confirmed, about
-two to one. Together they say the remaining coverage is either unnecessary or impossible, so five
-checks ship and the rest does not. **A falsified prediction can cancel the work that motivated the
+derivable per-entry figure already matched. P2 (underivable outnumber derivable) was recorded as confirmed
+and is in fact **indeterminate** — 9:20 by one extraction, ~15:11 by another, opposite directions
+(#182), and the verdict was read off the method that agreed with the prediction. **The decision rests
+on P1 alone**: extending a check to figures already known correct adds assertions that are already
+true. **A falsified prediction can cancel the work that motivated the
 round** — which is only available as an outcome if the prediction is registered before the work, and
 is the second time in two rounds that pre-registration changed what got built rather than merely
 scoring it.
