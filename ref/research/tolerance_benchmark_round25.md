@@ -15,7 +15,7 @@ before it was filed, then fixed and pinned with a test.
 
 ## What was found
 
-Twelve defects, filed as #116–#127. Three high.
+Twelve defects, filed as #116–#127. Four high (#116, #117, #118, #127).
 
 | | defect | why it mattered |
 |---|---|---|

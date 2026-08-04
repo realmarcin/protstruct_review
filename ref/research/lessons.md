@@ -89,10 +89,11 @@ it compares against — if both come from the same place, it is a tautology with
 Its companion is why the defect survived twenty-four rounds: **review the code that makes the number,
 not only the number.** Every round re-read the registry adversarially and re-derived its figures; the
 scripts computing them were read once each, when written. The first systematic pass over `scripts/`
-found twelve defects, three of them high — a `structure_ref` check promised in a docstring and never
-written, a wwPDB parser fabricating `0.0` violations where the real value is 17.4, a truncated DSSP
-run accepted because a guard said `and` where it meant `or`. None of these is subtle; they were simply
-never looked for. Note also what the round did *not* earn: three of the six silent-failure paths fail
+found twelve defects, four of them high: the guard above, a `structure_ref` check promised in a
+docstring and never written, a truncated DSSP run accepted because a guard said `and` where it meant
+`or`, and a benchmark that dropped entries whenever a third-party API faltered and recorded nothing.
+A fifth, only medium, had a wwPDB parser fabricating `0.0` violations where the real figure is 17.4.
+None of these is subtle; they were simply never looked for. Note also what the round did *not* earn: three of the six silent-failure paths fail
 in the flattering direction, one in the alarming one, two neither — a tendency, not the rule it would
 have been satisfying to report.
 
