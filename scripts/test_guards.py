@@ -238,4 +238,30 @@ check("and every row carries a stated severity",
       [r["issue"] for r in FINDINGS if r["severity"] == "unstated"], [])
 
 
+# --- Round 26: a vocabulary believed schema-enforced, and enforced on one class ---
+# #142: two documents asserted `oracle_family` was a required schema enum -- issue #125
+# ("a required enum in the schema") and round 26's own pass-4 audit, which listed the
+# vocabulary as already closed and therefore never checked it. It was declared on
+# `Finding` only. `MeasurementValue` and `HeadlineFinding` carried it bare, and
+# `qds_emit` reads `measurements`, whose range is MeasurementValue -- so every value
+# feeding build_cross_tool_coverage() and _strongest() was unconstrained.
+#
+# Parsed from the schema text rather than run through linkml-validate, so this test
+# needs no linkml install and runs anywhere.
+
+import yaml as _yaml
+_schema = _yaml.safe_load((REPO / "schemas/protstruct_review.yaml").read_text())
+_families = {
+    f"{cls}.{slot}": attrs.get("range")
+    for cls, body in _schema.get("classes", {}).items()
+    for slot, attrs in (body.get("attributes") or {}).items()
+    if slot == "oracle_family"
+}
+check("every class declaring oracle_family constrains it to ToolFamily",
+      sorted(k for k, v in _families.items() if v != "ToolFamily"), [])
+check("and all three classes that declare it are covered", len(_families), 3)
+check("the enum itself still admits exactly the two families",
+      sorted(_schema["enums"]["ToolFamily"]["permissible_values"]), ["cctbx", "non_cctbx"])
+
+
 print(f"\nall guard unit tests passed ({PASSED} checks)")

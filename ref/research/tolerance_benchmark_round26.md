@@ -161,6 +161,53 @@ fence *without* updating either. Reported here rather than filed, so the judgeme
 Duplication in this repo is therefore enumerable, not systemic — which is what makes gating each
 instance a proportionate response rather than a refactor.
 
+## #142 — a vocabulary two documents believed was schema-enforced
+
+Raised by a reader asking whether the status-vocabulary work was "a schema-supported
+operation". It was not — `ref/research/data/*.tsv` sit outside LinkML's scope entirely, and
+`validate.sh` runs `linkml-validate` only against `ref/*.yaml` and `data/**/*.yaml`. The
+hand-rolled `STATUS_PREFIXES` check was the right outcome, but it was reached without
+checking whether the schema could express it.
+
+Checking then found something worse. **Two documents asserted a guarantee that did not hold:**
+
+- issue #125: *"The field is a required enum in the schema…"*
+- this round's pass-4 audit, which listed `oracle_family` as already closed,
+  *"schema-enforced via `linkml-validate`"*, and so never examined it.
+
+`oracle_family` was declared on three classes and constrained on one:
+
+| class | declaration | enforced |
+|---|---|---|
+| `Finding` | `range: ToolFamily`, `required: true` | yes |
+| `MeasurementValue` | bare | **no** |
+| `HeadlineFinding` | bare | **no** |
+
+`qds_emit` reads `eval_run["measurements"]`, whose slot range is `MeasurementValue`. Confirmed
+by running the gate's own validator on the committed example with a deliberately bogus value:
+
+```
+$ linkml-validate --schema schemas/protstruct_review.yaml EVAL_bogus.yaml
+No issues found            # oracle_family: totally_bogus_family
+```
+
+Two consequences beyond the missing constraint:
+
+1. **#125's fix was load-bearing, not belt-and-braces.** Its reasoning — *the schema requires
+   it, but this emitter runs on hand-edited drafts* — credited a guarantee that never existed.
+2. **`_strongest()` was never considered.** `fam_score = 0 if m.get("oracle_family") == "non_cctbx" else 1`
+   silently scores `non-cctbx` or `noncctbx` as cctbx, which can change which measurement is
+   selected — and cross-tool independence is what this repo grades on.
+
+Fixed by giving both bare slots `range: ToolFamily`. The committed corpus still validates, and
+`totally_bogus_family`, `non-cctbx` and `noncctbx` are now all rejected. `required: true` was
+**not** added: enforcing the range closes the vocabulary, and requiring the field is a separate
+decision about records that legitimately omit it.
+
+**The general lesson is about the audit, not the schema.** A pass-4 finding was dismissed on a
+false premise, so the vocabulary went unchecked precisely because it was believed safe. "Already
+covered by X" is a claim to verify, not a reason to stop.
+
 ## Scope limits
 
 - **The round-figure gate covers one document.** It is written against round 25's phrasings; rounds
@@ -173,6 +220,8 @@ instance a proportionate response rather than a refactor.
   programmatic reader at all, so there is no second copy to drift from. That is a survey, not a proof.
 - **P1 confirms depth is not exhausted; it cannot say where the bottom is.** A fifth pass with a fifth
   lens would be the same argument again. The honest statement stays "lower bound" at every depth.
+- **#142 constrains the range, not the presence.** A record omitting `oracle_family` entirely
+  still validates; `qds_emit`'s `unclassified` bucket (#125) remains the thing that catches it.
 - **#140 is gated, not eliminated.** Nine copies still exist; the gate only stops them disagreeing
   silently. It also cannot catch the case where all nine are updated together to a path that is
   wrong.
