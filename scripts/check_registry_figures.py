@@ -37,6 +37,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import statistics
@@ -45,6 +46,17 @@ from pathlib import Path
 from typing import Any, Callable
 
 from scipy import stats
+
+def _load_vocabulary():
+    """The declared status vocabulary, from the script that WRITES the file."""
+    spec = importlib.util.spec_from_file_location(
+        "bench_em_status", Path(__file__).resolve().parent / "bench_refinement_deltas_em.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.STATUS_PREFIXES, module.status_is_known
+
+
+_VOCAB, _IS_KNOWN = _load_vocabulary()
 
 REGISTRY = "ref/thresholds_and_standards.md"
 TSV = "ref/research/data/em_refinement_deltas.tsv"
@@ -58,6 +70,33 @@ def load(path: Path) -> list[dict[str, str]]:
 
 # --- the derivations, each one line of intent -------------------------------------
 
+def _status_is(row, token: str) -> bool:
+    """Does this row's status match the DECLARED token, delimiter included?
+
+    #152: `status_is_known` was tightened in #148 to match on each status's delimiter,
+    and these predicates were not — they kept the bare `startswith("skipped")` that #148
+    removed, so `skipped-early: ...` was excluded from `_attempted` as though it were a
+    real skip. Nothing escaped only because `vocabulary_check` rejects such a row
+    independently; the denominators were right because a separate check happened to fail
+    first, which is a backstop rather than correctness. One rule, one copy.
+    """
+    matches = [(d, rule) for d, (rule, _) in _VOCAB.items() if d.startswith(token)]
+    if not matches:
+        raise KeyError(f"{token!r} is not a declared status token")
+    if len(matches) > 1:
+        # An AMBIGUOUS token resolved silently by dict order, which is the same shape as
+        # the defects this function was written to fix (#153). No two declared statuses
+        # share a prefix today; the trigger is someone adding one, i.e. exactly what the
+        # vocabulary exists to support. Fail rather than pick.
+        raise KeyError(
+            f"{token!r} matches {len(matches)} declared statuses "
+            f"({[d for d, _ in matches]}) — the predicate cannot tell which is meant; "
+            f"use the full status token")
+    declared, rule = matches[0]
+    return row["status"] == declared if rule == "exact" else \
+        row["status"].startswith(declared)
+
+
 def _named(rows):
     """Entries that entered the refinement benchmark.
 
@@ -67,7 +106,7 @@ def _named(rows):
     """
     return [r for r in rows
             if not r["pdb_id"].startswith("UNKNOWN")
-            and not r["status"].startswith("screened only")]
+            and not _status_is(r, "screened only")]
 
 
 def _cc_deltas(rows):
@@ -89,7 +128,7 @@ def _ratios(rows):
 
 def _attempted(rows):
     """Of the entries that entered the benchmark, those not skipped."""
-    return [r for r in _named(rows) if not r["status"].startswith("skipped")]
+    return [r for r in _named(rows) if not _status_is(r, "skipped")]
 
 
 def _with_delta(rows):
@@ -97,7 +136,7 @@ def _with_delta(rows):
 
 
 def _measured(rows):
-    return [r for r in _named(rows) if r["status"] == "measured"]
+    return [r for r in _named(rows) if _status_is(r, "measured")]
 
 
 def _attempted_incl_lost(rows):
@@ -107,8 +146,7 @@ def _attempted_incl_lost(rows):
     is stated against its own base and checked against its own derivation.
     """
     return [r for r in rows
-            if not r["status"].startswith("screened only")
-            and not r["status"].startswith("skipped")]
+            if not _status_is(r, "screened only") and not _status_is(r, "skipped")]
 
 
 def _resolution_rho(rows):
@@ -216,6 +254,36 @@ def nesting_check(registry: str, rows: list[dict]) -> dict[str, Any]:
     }
 
 
+def _status_vocabulary():
+    """The declared `status` vocabulary, imported from the script that WRITES it.
+
+    Not re-declared here. Every predicate in this file keys on a status, and before
+    round 26 those keys were the only definition of the vocabulary that existed --
+    spread across four functions, in the reader, while the writer that produces the
+    values lived in another file. That is the shape of #136.
+    """
+    return _VOCAB, _IS_KNOWN
+
+
+def vocabulary_check(rows: list[dict]) -> dict[str, Any]:
+    """Every `status` in the file must match the declared vocabulary.
+
+    `attempted` is defined by subtraction (`not startswith("skipped")`), so a status
+    nobody declared does not raise -- it joins the attempted count silently and moves a
+    published denominator. This check is what stops that being invisible.
+    """
+    prefixes, is_known = _status_vocabulary()
+    unknown = sorted({r["status"] for r in rows if not is_known(r["status"])})
+    return {
+        "check": "status vocabulary",
+        "status": "OK" if not unknown else "UNDECLARED",
+        "detail": (f"all {len(rows)} rows carry one of {len(prefixes)} declared statuses"
+                   if not unknown else
+                   f"{len(unknown)} status value(s) match no declared prefix — they are "
+                   f"being counted as `attempted` by default: {unknown}"),
+    }
+
+
 def run(registry: str, rows: list[dict]) -> list[dict[str, Any]]:
     results = []
     for label, literal, derive in CHECKS:
@@ -236,6 +304,7 @@ def run(registry: str, rows: list[dict]) -> list[dict[str, Any]]:
             status, detail = "OK", derived
         results.append({"check": label, "status": status, "detail": detail})
     results.append(nesting_check(registry, rows))
+    results.append(vocabulary_check(rows))
     return results
 
 

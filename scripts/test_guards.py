@@ -144,4 +144,266 @@ for _p in _real:
           integrity.check_structure_refs(_doc, _p.relative_to(REPO), set()), [])
 
 
+# --- Round 26: the status vocabulary is declared, not inferred from predicates -----
+# Before #139 the vocabulary existed only as prefixes spread across four predicates in
+# the READER, while the WRITER that produces the values lived in another file -- the
+# shape of #136. 28 of the 97 rows matched none of those prefixes and were counted as
+# `attempted` by DEFAULT (`not startswith("skipped")`), which happened to be right for
+# them and would not be for the next status added.
+
+import copy
+
+check("every committed status matches the declared vocabulary",
+      figures.vocabulary_check(ROWS)["status"], "OK")
+
+_drifted = copy.deepcopy(ROWS)
+_drifted.append({**_drifted[0], "pdb_id": "9XXX", "cc_mask_delta": "",
+                 "status": "failed: real_space_refine timeout"})
+check("an undeclared status is reported, not absorbed",
+      figures.vocabulary_check(_drifted)["status"], "UNDECLARED")
+check("and it would otherwise have joined `attempted` silently",
+      len(figures._attempted(_drifted)) - len(figures._attempted(ROWS)), 1)
+
+# The case the guard really exists for: a typo in an EXISTING status. This moves a
+# published denominator by 10 entries.
+_typo = copy.deepcopy(ROWS)
+for _r in _typo:
+    _r["status"] = _r["status"].replace("skipped:", "skip:", 1)
+check("a typo in a known status is caught", figures.vocabulary_check(_typo)["status"],
+      "UNDECLARED")
+check("and it moves `attempted` by 10", len(figures._attempted(_typo)), 69)
+
+# Scope, stated rather than implied: the registry literals ALSO go STALE on that typo.
+# They are not redundant with each other -- the registry check blames the REGISTRY
+# ("registry says 59, data gives 69"), which invites correcting a figure that is right,
+# i.e. #113's failure mode. The vocabulary check names the cause. It also covers counts
+# the registry does not pin, where nothing else would fire at all.
+_reg_statuses = {r["check"]: r["status"] for r in figures.run(REGISTRY_TEXT, _typo)}
+check("the registry check fires too, but blames the registry",
+      _reg_statuses["refinement-attempt count"], "STALE")
+
+# The vocabulary is imported from the writer, never re-declared here.
+_prefixes, _is_known = figures._status_vocabulary()
+check("the vocabulary comes from the script that writes the file", sorted(_prefixes),
+      ["LOST: ", "d_FSC only (", "delta-only (", "measured", "screened only (", "skipped: "])
+
+# #148: a bare `startswith` absorbed anything sharing a prefix with a declared status,
+# so `measured-partially` passed as known and then joined `attempted` by default --
+# the very hazard this vocabulary exists to close. Matching now requires the delimiter
+# a payload-carrying status actually uses, and `measured` matches exactly.
+for _s in ["measured", "skipped: reason", "LOST: id never recorded",
+           "screened only (round 23): x", "delta-only (y)", "d_FSC only (z)"]:
+    check(f"  declared status accepted: {_s[:24]!r}", _is_known(_s), True)
+for _s in ["measured-partially", "measured_v2", "LOSTISH", "screened only later", ""]:
+    check(f"  undeclared look-alike rejected: {_s[:24]!r}", _is_known(_s), False)
+check("and a look-alike is reported by the vocabulary check, not absorbed",
+      figures.vocabulary_check(
+          [{**ROWS[0], "status": "measured-partially"}])["status"], "UNDECLARED")
+
+
+# --- Round 26: a round document's claims about its own findings ------------------
+# #130 ("three high" when four were) and #135 ("a 20-file audit round" that was 19)
+# were both caught by review, not by a check, and both flattered the round. The rule
+# -- every quoted figure comes from a committed, re-runnable script -- had never been
+# applied to a round document's claims about ITSELF.
+
+def _raises_keyerror(figures):
+    try:
+        figures._status_is({"status": "x"}, "nonsense")
+    except KeyError:
+        return True
+    return False
+
+
+roundfig = load("check_round_figures")
+FINDINGS = roundfig.load(roundfig.RECORD)
+ROUND25_DOC = Path(roundfig.ROUND25).read_text()
+
+def _round_statuses(doc):
+    return {r["check"]: r["status"] for r in roundfig.run(doc, FINDINGS)}
+
+check("round 25's document matches its findings record",
+      sorted({v for v in _round_statuses(ROUND25_DOC).values()}), ["OK"])
+
+# Each mutation must fire, or the check above passes for the wrong reason.
+check("the exact #130 miscount is caught",
+      _round_statuses(ROUND25_DOC.replace("Four high (#116, #117, #118, #127).",
+                                          "Three high (#116, #117, #118)."))
+      ["pass-1 high count"], "MISSING")
+check("a wrong per-issue severity is caught",
+      _round_statuses(ROUND25_DOC.replace("**#136 (high)", "**#136 (medium)"))
+      ["severity of #136"], "STALE")
+check("a citation of an issue that does not exist is caught",
+      _round_statuses(ROUND25_DOC.replace("**#130 (medium)", "**#999 (medium)"))
+      ["severity of #999"], "MISSING")
+check("and rewording a covered claim does not silently pass",
+      _round_statuses(ROUND25_DOC.replace("Twelve defects, filed as #116–#127.",
+                                          "A dozen defects were filed."))
+      ["pass-1 finding count"], "MISSING")
+
+# The severity parse is anchored to the start of a line. Unanchored it took the first
+# match anywhere, and #130's body OPENS by quoting the label it reports on -- so the
+# record read `high` for an issue declaring `medium`. That is #121's shape.
+check("a severity quoted mid-sentence is not mistaken for the declaration",
+      roundfig.severity_of(
+          "Four of the twelve are labelled `**Severity: high**`:\n\n"
+          "**Severity: medium** (a wrong published count)."), "medium")
+check("an issue with no severity line is recorded as unstated, not defaulted",
+      roundfig.severity_of("no severity here"), "unstated")
+
+# #149, three defects in this gate, each verified by running it.
+# 1. A FENCED block sits at column 0 too, so the line anchor alone did not stop an
+#    issue that quotes another issue's severity from reporting the quoted value.
+check("a severity inside a fenced block is not mistaken for the declaration",
+      roundfig.severity_of("quoting:\n\n```\n**Severity: high**\n```\n\n**Severity: low**\n"),
+      "low")
+# 2. A citation the regex did not anticipate produced NO result item -- unchecked and
+#    unmentioned. Anything claim-shaped is now reported.
+check("a mis-capitalised citation is checked, not dropped",
+      [r["status"] for r in roundfig.severity_claims("**#130 (High)** x", FINDINGS)],
+      ["STALE"])
+check("an unrecognised severity word is reported rather than ignored",
+      [r["status"] for r in roundfig.severity_claims("**#130 (bogus)** x", FINDINGS)],
+      ["UNRECOGNISED"])
+check("and UNRECOGNISED is a failure, unlike UNCHECKABLE",
+      roundfig.severity_claims("**#130 (bogus)** x", FINDINGS)[0]["status"]
+      not in ("OK", "UNCHECKABLE"), True)
+# 3. An empty pass-1 subset reported a traceback instead of a diagnostic.
+check("an empty record reports instead of raising",
+      "re-run --refresh" in roundfig.round25_checks([])[0][2], True)
+# A quoted counter-example is not a claim, whatever formatting it carries. #144 fixed
+# the un-bolded case by requiring bold; this round then quoted a BOLDED example inside
+# backticks and the gate reported it. Code formatting is the discriminator, not bold.
+check("a claim quoted inside backticks is not checked as a claim",
+      roundfig.severity_claims("the regex missed (`**#130 (High)**`) entirely", FINDINGS), [])
+check("nor one inside a fenced block",
+      roundfig.severity_claims("example:\n\n```\n**#130 (high)**\n```\n", FINDINGS), [])
+check("while a claim in running prose still is",
+      [r["status"] for r in roundfig.severity_claims("**#130 (medium)** — a real claim", FINDINGS)],
+      ["OK"])
+
+# The record must not contain pull requests. `gh issue view <n>` resolves a PR number
+# happily, so a numeric range pulled #128 and #129 in as `unstated`.
+check("no pull requests in the findings record",
+      [r["issue"] for r in FINDINGS if r["issue"] in {"128", "129"}], [])
+# The `**Severity:` convention starts at #116. The record now spans back to #87 so it
+# covers every issue the round documents cite, and those older ones legitimately have no
+# machine-readable severity -- reported as UNCHECKABLE rather than failed (#144's lesson:
+# a guard that fires on correct input gets ignored).
+check("every issue from #116 on carries a stated severity",
+      [r["issue"] for r in FINDINGS
+       if int(r["issue"]) >= 116 and r["severity"] == "unstated"], [])
+check("and the unstated ones are all older than the convention",
+      max(int(r["issue"]) for r in FINDINGS if r["severity"] == "unstated") < 116, True)
+check("a claim against a pre-convention issue is UNCHECKABLE, not a failure",
+      [r["status"] for r in roundfig.severity_claims("**#87 (medium)** something", FINDINGS)],
+      ["UNCHECKABLE"])
+# Not `assert True`: actually run the entrypoint and confirm it exits 0 while genuine
+# UNCHECKABLE rows are present, which is the behaviour the status exists for.
+import contextlib as _ctx, io as _io
+_buf, _err = _io.StringIO(), _io.StringIO()
+with _ctx.redirect_stdout(_buf), _ctx.redirect_stderr(_err):
+    _rc = roundfig.main()
+check("the gate exits 0 despite UNCHECKABLE rows", _rc, 0)
+check("and says how many it could not check",
+      "predate the severity convention" in _buf.getvalue(), True)
+check("with at least one genuinely present",
+      sum(1 for r in roundfig.run_all(roundfig.REPO, FINDINGS)
+          if r["status"] == "UNCHECKABLE") > 0, True)
+
+
+# --- Round 26: a vocabulary believed schema-enforced, and enforced on one class ---
+# #142: two documents asserted `oracle_family` was a required schema enum -- issue #125
+# ("a required enum in the schema") and round 26's own pass-4 audit, which listed the
+# vocabulary as already closed and therefore never checked it. It was declared on
+# `Finding` only. `MeasurementValue` and `HeadlineFinding` carried it bare, and
+# `qds_emit` reads `measurements`, whose range is MeasurementValue -- so every value
+# feeding build_cross_tool_coverage() and _strongest() was unconstrained.
+#
+# Parsed from the schema text rather than run through linkml-validate, so this test
+# needs no linkml install and runs anywhere.
+
+import yaml as _yaml
+_schema = _yaml.safe_load((REPO / "schemas/protstruct_review.yaml").read_text())
+_families = {
+    f"{cls}.{slot}": attrs.get("range")
+    for cls, body in _schema.get("classes", {}).items()
+    for slot, attrs in (body.get("attributes") or {}).items()
+    if slot == "oracle_family"
+}
+check("every class declaring oracle_family constrains it to ToolFamily",
+      sorted(k for k, v in _families.items() if v != "ToolFamily"), [])
+check("and all three classes that declare it are covered", len(_families), 3)
+check("the enum itself still admits exactly the two families",
+      sorted(_schema["enums"]["ToolFamily"]["permissible_values"]), ["cctbx", "non_cctbx"])
+
+
+# --- Round 26, pass 6: the partitions an input-space enumeration found -------------
+# #151/#152. Every prior fix here was tested against the construct that motivated it
+# and failed the next one -- inline backticks, then fenced blocks, then bold-inside-
+# backticks, then ~~~. So this block is a partition MAP, not a regression test for one
+# case, and the two false NEGATIVES matter most: a gate that declines to look is worse
+# than one that complains.
+
+_D = ROUND25_DOC  # a real document, for the cases that need one
+
+# False negatives -- the gate must still SEE these.
+check("a stray backtick does not delete a later real claim",
+      [r["status"] for r in roundfig.severity_claims(
+          "stray ` here. The claim **#136 (medium)** is WRONG, then `end`.", FINDINGS)],
+      ["STALE"])
+check("a quoted literal does not satisfy a check the prose contradicts",
+      [r["status"] for r in roundfig.run(
+          "Eleven defects, filed as #116-126.\n\n```\nTwelve defects, filed as #116–#127.\n```\n",
+          FINDINGS)][:1],
+      ["MISSING"])
+
+# Quotation, by every fence and span style these documents actually use.
+check("a ~~~ fenced severity is a quotation, not a declaration",
+      roundfig.severity_of("q:\n\n~~~\n**Severity: high**\n~~~\n\n**Severity: low**\n"), "low")
+check("an unclosed fence does not leak its contents",
+      roundfig.severity_of("q:\n\n```\n**Severity: high**\n"), "unstated")
+for _label, _doc in [
+        ("backtick-wrapped", "the regex missed (`**#130 (High)**`) entirely"),
+        ("fenced", "example:\n\n```\n**#130 (high)**\n```\n"),
+        ("indented", "shown as:\n\n    **#136 (medium)**\n\nnot a claim."),
+        ("blockquoted", "> **#136 (medium)** quoted from elsewhere")]:
+    check(f"  quotation ignored: {_label}", roundfig.severity_claims(_doc, FINDINGS), [])
+check("while a claim in running prose is still checked",
+      [r["status"] for r in roundfig.severity_claims("**#130 (medium)** — a real claim", FINDINGS)],
+      ["OK"])
+
+# #152: the denominators classify via the declared vocabulary, not their own prefixes.
+import copy as _copy
+_bad = _copy.deepcopy(ROWS)
+_bad.append({**_bad[0], "pdb_id": "9XXX", "status": "skipped-early: still counts",
+             "cc_mask_delta": ""})
+check("an undeclared look-alike is not absorbed as a real skip",
+      len(figures._attempted(_bad)) - len(figures._attempted(ROWS)), 1)
+check("and the published denominators are unchanged by the rewrite",
+      [len(f(ROWS)) for f in (figures._named, figures._attempted, figures._with_delta,
+                              figures._measured, figures._attempted_incl_lost)],
+      [69, 59, 58, 35, 63])
+check("the denominator predicates reject an undeclared token outright",
+      _raises_keyerror(figures), True)
+
+# #153: an AMBIGUOUS token used to resolve by dict order. No two declared statuses share
+# a prefix today, so this constructs the case a future round would create.
+_saved_vocab = figures._VOCAB
+try:
+    figures._VOCAB = dict(_saved_vocab)
+    figures._VOCAB["skipped-early: "] = ("prefix", "a future status")
+    _ambiguous = False
+    try:
+        figures._status_is({"status": "skipped-early: x"}, "skipped")
+    except KeyError as _e:
+        _ambiguous = "matches 2 declared statuses" in str(_e)
+    check("an ambiguous status token fails rather than picking one", _ambiguous, True)
+finally:
+    figures._VOCAB = _saved_vocab
+check("and the real vocabulary has no ambiguous token today",
+      [tok for tok in ("measured", "skipped", "screened only")
+       if len([d for d in figures._VOCAB if d.startswith(tok)]) != 1], [])
+
+
 print(f"\nall guard unit tests passed ({PASSED} checks)")

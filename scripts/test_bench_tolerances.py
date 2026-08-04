@@ -1331,4 +1331,84 @@ check("whereas the pre-fix hand-built path finds nothing",
       "map_correlations produced no log")
 
 
+# --- Round 26: the ordered-core cutoff has one definition, not two ----------------
+# #139: bench_t17_ordered_core claimed in its docstring to reuse the harness's metric,
+# imported the module for run_precision() only, reimplemented the ordered-core filter
+# inline, and indexed the result with the hardcoded string key "2.0". The two copies
+# also disagreed on rounding (sum/len at 3 dp vs fmean at 4) and on an empty core
+# (loud failure vs silent None). Moving the harness's cutoff left the benchmark
+# reporting the old bucket under a name that said otherwise.
+
+import statistics as _stats
+t17core = load("bench_t17_ordered_core")
+_t17 = t17core.load_t17()
+_RMSF = [0.5, 0.8, 1.0, 1.2, 1.5, 1.8, 2.2, 2.4, 3.5, 6.0]
+_whole = _stats.fmean(_RMSF)
+
+check("the harness's cutoff is not restated in the benchmark's sweep list",
+      t17core.SWEEP_CUTOFFS.count(_t17._ORDERED_CORE_RMSF_CUTOFF) <= 1, True)
+
+def _harness_gap(cutoff):
+    mean, n = _t17.ordered_core_precision(_RMSF, cutoff)
+    return round(_whole - mean, 4), n
+
+_orig_cutoff = _t17._ORDERED_CORE_RMSF_CUTOFF
+try:
+    check("the harness column tracks the harness cutoff", _harness_gap(2.0), (0.957, 6))
+    check("and moves when that cutoff moves", _harness_gap(2.5), (0.665, 8))
+finally:
+    _t17._ORDERED_CORE_RMSF_CUTOFF = _orig_cutoff
+
+# Non-vacuous: the pre-fix code always read the "2.0" bucket, so both rows above would
+# have been 0.957. Assert the two differ, or the test proves nothing.
+check("so the two cutoffs give different gaps (the old code gave one value for both)",
+      _harness_gap(2.0)[0] != _harness_gap(2.5)[0], True)
+
+# The cutoff must be passed explicitly: a default argument is bound at def time, so a
+# bare call would use the value the module held at import and ignore the caller.
+check("the benchmark passes the cutoff explicitly rather than relying on the default",
+      "ordered_core_precision(rmsf, harness_cutoff)" in
+      (REPO / "scripts" / "bench_t17_ordered_core.py").read_text(), True)
+
+
+# --- Round 26 self-review: collect() and summarize() must agree on the key ---------
+# #145: the #139 fix made the output key dynamic --
+# f"whole_chain_minus_{harness_cutoff}A_core" -- which did not remove the duplication,
+# it moved it. summarize() still read the old literal "whole_chain_minus_2A_core", and
+# since harness_cutoff is a float the writer emitted "...2.0A_core". The script raised
+# KeyError on every run that produced a row.
+#
+# No unit test on either function could see this: the defect lived in the SEAM. This
+# drives the real collect() with a stubbed run_precision (so no biotite is needed) and
+# feeds its output straight into the real summarize().
+
+class _StubT17:
+    _ORDERED_CORE_RMSF_CUTOFF = 2.0
+    @staticmethod
+    def run_precision(model):
+        return {"rmsf_values": [0.5, 0.8, 1.0, 1.2, 1.5, 1.8, 2.2, 2.4, 3.5, 6.0]}
+    @staticmethod
+    def ordered_core_precision(rmsf, cutoff=2.0):
+        core = [v for v in rmsf if v <= cutoff]
+        return round(sum(core) / len(core), 3), len(core)
+
+_real_loader = t17core.load_t17
+try:
+    t17core.load_t17 = lambda: _StubT17
+    _rows, _skipped = t17core.collect([Path("synthetic.pdb")])
+    _summary = t17core.summarize(_rows)          # <- this is what used to raise KeyError
+finally:
+    t17core.load_t17 = _real_loader
+
+check("collect produces one row", len(_rows), 1)
+check("and summarize consumes it without a KeyError", _summary["n_ensembles"], 1)
+check("and reports the gap it read from that key",
+      _summary["whole_chain_vs_ordered_core_gap"]["max"], 0.957)
+check("the harness gap is present and correct", _rows[0]["whole_chain_minus_harness_core"], 0.957)
+check("the key is fixed, not built from the cutoff",
+      [k for k in _rows[0] if k.startswith("whole_chain_minus")],
+      ["whole_chain_minus_harness_core"])
+check("and the cutoff travels as data instead", _rows[0]["harness_cutoff"], 2.0)
+
+
 print(f"\nall bench tolerance unit tests passed ({PASSED} checks)")

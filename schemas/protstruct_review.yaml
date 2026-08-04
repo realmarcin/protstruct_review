@@ -672,6 +672,7 @@ classes:
       metric_definition_ref:
       oracle_tool_ref:
       oracle_family:
+        range: ToolFamily
       agent_claim:
         range: TypedMeasurementValue
         description: Value reported by the agent.
@@ -771,6 +772,7 @@ classes:
       metric_definition_ref:
       oracle_tool_ref:
       oracle_family:
+        range: ToolFamily
       agent_claim:
         range: TypedMeasurementValue
       oracle_measure:
