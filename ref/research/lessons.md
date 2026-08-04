@@ -91,6 +91,12 @@ em-dash was expected and a sentence wrapped across lines. Nothing distinguishes 
 successful one except grepping afterwards for the value you meant to remove. Fix by sweep, verify by
 absence.
 
+But the same round showed the method's limit, and it is sharp: **verify-by-absence rewards deleting
+history.** The sweep also rewrote a round-12 lesson's figure to today's value, turning a sentence that
+was true of round 12 into one true of no moment — because "the old value must not appear anywhere"
+cannot distinguish a stale claim from a correctly-dated historical one. A sweep needs a human decision
+per occurrence: is this asserted as current, or as a snapshot?
+
 Round 28 swept ~326 numeric claims by hand instead of adding a third gate, and **two of its four
 predictions were falsified — the two that would have justified building one.** **Measure a defect
 class before mechanising it.** The plan was a contradiction-checker, on the reasoning that a figure
@@ -462,7 +468,8 @@ the kind of result a symmetric band would have flagged as a failure.
 
 Round 12 adds the counterpart to the headroom rule: **when a band keeps breaking as the set grows,
 check its shape before widening it again.** `d_FSC_model` was widened and re-widened as an absolute
-± 0.05 Å band and broke anyway at 3 of 21 entries — because the quantity ranges 2.06–4.35 Å over the recorded crossings and no
+± 0.05 Å band and broke anyway at 3 of 21 entries — because the quantity ranged 2.2–6.1 Å across round 12's 21 entries (2.06–4.35 Å over the 36
+recorded crossings today) and no
 absolute band serves both ends. As a **relative** 5 % band the same data has zero violations and a
 median of 0.31 %. Rounds 1 and 2 reached the identical conclusion for interface BSA and Wilson B;
 it took ten rounds to apply it here.

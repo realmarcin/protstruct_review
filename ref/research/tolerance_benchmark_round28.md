@@ -158,6 +158,32 @@ one that worked**, which is why five of these accumulated in the first place; on
 One occurrence of `2.2–6.1` remains by design: the "what was actually wrong" table quotes it as the
 value that *was* wrong.
 
+## #171 — the sweep's blind spot, found by the sweep's own verification step
+
+Checking the replacement text I had just written found that the #170 sweep changed **round 12's**
+lesson paragraph:
+
+> *"…broke anyway at 3 of 21 entries — because the quantity ranges ~~2.2–6.1 Å~~ **2.06–4.35 Å**…"*
+
+`2.06–4.35 Å` is the range over **today's 36 crossings**. Round 12 had 21 entries and could not have
+observed it. The edit replaced a correct historical statement with one that is **true of no moment at
+all** — worse than the staleness it replaced, which was at least true when written.
+
+**This is the convention this round proposes, violated inside this round, while fixing something
+else.** The document argues four sections above that a finished trail's figures are *snapshots* and
+should carry their denominator and date. I then treated one as a live quantity and "corrected" it.
+
+**It also marks a real limit of the sweep method #170 introduced.** "Grep for the superseded value and
+replace it everywhere" is right for a figure asserted as *current* and wrong for one asserted as
+*historical*, and the sweep cannot distinguish them. Worse, #170's verification step — *confirm the
+old value no longer appears anywhere* — **actively rewards** deleting legitimate historical
+occurrences. The check that made the sweep trustworthy is the same check that made this defect
+invisible.
+
+Restored as the convention would have it: *"the quantity ranged 2.2–6.1 Å across round 12's 21
+entries (2.06–4.35 Å over the 36 recorded crossings today)"* — the snapshot, its denominator, and the
+present value beside it.
+
 ## Scope limits
 
 - **One sweep, seven documents, by hand.** The same "lower bound, not a total" caveat that applies to
@@ -170,5 +196,8 @@ value that *was* wrong.
 - **The error rates compare unequal denominators.** The registry's 185 claims are concentrated in a
   few very long rows; the trails' 65 are spread across four documents. The ~5.7× ratio is a real
   signal, not a precise measurement.
+- **The sweep method cannot tell a stale figure from a historical one** (#171), and its
+  verify-by-absence step rewards removing the latter. Any future sweep needs the distinction made by a
+  human per occurrence; this round made it wrong once out of nine.
 - **`lessons.md`'s round-9 claim is left unfixed**, marked low-confidence by the sweep and not
   independently settled here. Recorded rather than silently corrected.
