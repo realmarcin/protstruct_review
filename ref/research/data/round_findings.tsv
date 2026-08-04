@@ -1,4 +1,28 @@
 issue	severity	state	title
+87	unstated	closed	Round 20's 'median starting clashscore' figures are not medians (2.49/11.27 should be 2.28/8.96)
+88	unstated	closed	Round 20 claims determinism 'across a PHENIX upgrade'; the benchmark has pinned the same binary since round 5
+89	unstated	closed	'Three of 16 entries trip the 5× gate' counts two entries that did not trip
+90	unstated	closed	NEXT_TASKS round-20 row is out of order, unlinked, and misdated
+91	unstated	closed	Clashscore clause headline still says 'while clashscore_pre ≲ 20' while its body now says bounded at both ends
+93	unstated	closed	Round 21 presents a subset re-run as independent corroboration — the 24 is almost certainly a subset of the historical 27
+94	unstated	closed	'Publication bias preserved the half that matters' presents already-published information as a finding, and calls a structural property luck
+95	unstated	closed	NEXT_TASKS round table: round 21 inserted before round 20
+96	unstated	closed	NEXT_TASKS says six rows carry the partial-record mark; the registry literally has seven
+97	unstated	closed	Round 21's P5 outcome switches denominator (0 of 24) from the result it reports seven lines earlier (0 of 15)
+98	unstated	closed	bench_t13_l_test comment implies the two sets are mostly disjoint; the evidence points the other way
+100	unstated	closed	Round 22's P0 gate uses a Tukey fence computed on 8 values, and nowhere says so
+101	unstated	closed	Round 22's ρ/p figures were computed from 4-dp rounded intermediates, not from the script it cites — the round-17 backfill artefact, repeated
+102	unstated	closed	Round 22's Mann–Whitney p = 0.010 is one-sided (undisclosed) and near-tautological given how the group was chosen
+103	unstated	closed	The n=2 hypothesis is stated flatly in NEXT_TASKS and in the registry's lead clause
+104	unstated	closed	outlier_fences() hinges branch does not implement Tukey's hinges for odd n, and its docstring says it does
+105	unstated	closed	fetch_em_entries.py writes entries.json and the attrition record only at the end — round 21's defect in the sibling script
+107	unstated	closed	The registry's CC_mask rate statistics are round-17 vintage (n=25); the data is now n=35
+108	unstated	closed	Round 23 miscounts the ratio distribution: '57 of 60' is 50, and '3 above the fence' is 4 — the fourth is already-refined evidence against the hypothesis
+109	unstated	closed	Round 23's 'fetch-interruption' test does not exercise the fix
+111	unstated	closed	goal_change_cycle.md's PR-rebuild recipe drops the dependent PR's first commit
+112	unstated	closed	goal_change_cycle.md labels 'git branch -D' as deleting the remote branch
+113	unstated	closed	§4's 'named entries' convention now yields 93, not the 69 it states — round 23's screening-only rows are not excluded
+115	unstated	closed	§4's nested counts don't nest: '69 … of which 63' — the 63 includes 4 LOST rows the 69 excludes
 116	high	closed	check_registry_figures: nesting_check never reads the registry, and 59/35/63 are pinned to no literal
 117	high	closed	t15_ss_agreement: truncated DSSP output is silently accepted (guard uses `and`, not `or`)
 118	high	closed	check_referential_integrity: the structure_ref check its docstring promises was never implemented
@@ -20,3 +44,8 @@ issue	severity	state	title
 136	high	closed	The #119 cache-key fix broke failure diagnosis: collect() looks for the pre-fix log filename
 137	low	closed	The #121 twin-operator fix inspects only the first header occurrence
 138	low	closed	The #137 rewrite left a comment describing a first-principles fallback it no longer has
+139	high	open	bench_t17_ordered_core hardcodes the ordered-core cutoff and reimplements the metric it claims to reuse
+140	medium	open	PHENIX_BIN and CCP4_SETUP are written independently in 5 and 4 files
+142	medium-high	open	oracle_family is schema-enforced on Finding only, not on the MeasurementValue that qds_emit actually reads
+143	medium-high	open	round_findings.tsv is stale on arrival: it omits #139, #140 and #142, the findings of the round that ships it
+144	medium	open	severity_claims() cannot distinguish a claim from a quoted counter-example, and its alternation order truncates medium-high

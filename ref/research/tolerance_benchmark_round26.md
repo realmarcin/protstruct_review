@@ -208,11 +208,57 @@ decision about records that legitimately omit it.
 false premise, so the vocabulary went unchecked precisely because it was believed safe. "Already
 covered by X" is a claim to verify, not a reason to stop.
 
+## Self-review: the gate was never aimed at the round that built it
+
+Reviewing this PR's own diff found three defects, and the pattern joining them is that the round
+**built a self-count gate and did not point it at itself**.
+
+**#143 (medium-high) — the findings record was stale on arrival.** It was refreshed early and covers
+#116–138. This round filed **#139, #140 and #142**; none were in it. Pointing the round's own gate at
+the round's own document reported exactly that:
+
+```
+MISSING  severity of #139   the document cites #139 but the record has no such issue
+MISSING  severity of #140   the document cites #140 but the record has no such issue
+```
+
+The scope limit as originally written — *"covers round N only if round N is written to it"* — read as
+a decision about phrasing. It was concealing that **not aiming the gate here is what kept the stale
+record invisible**, which is round 24's lesson verbatim.
+
+**#144 (medium) — the gate fired on correct prose.** `severity_claims()` matched every
+`#NNN (severity)` in a document, including the ones this round's P3 table *quotes as counter-examples*
+(`` `#136 (high)` → `#136 (medium)` ``) to demonstrate that the gate catches a wrong severity. It duly
+reported that demonstration as `STALE`. A guard that fails on valid input gets ignored, and it was
+also a live blocker: this false positive was one reason the gate could not be aimed at round 26.
+Fixed by matching only the **bolded** claim form, which every real claim already used.
+
+**I also filed half of #144 wrongly.** I asserted the alternation `high|medium|low|medium-high` would
+truncate `medium-high` to `medium`. It does not — the trailing paren forces backtracking. I asserted
+it from reading rather than running, which is the habit #130 and #135 were both about, and I have
+corrected the issue rather than quietly dropping it.
+
+**What extending the gate then exposed.** Aimed at every round document, it reported claims in rounds
+20–23 that cannot be checked at all: the `**Severity:` convention only starts at **#116**, so those
+issues carry no machine-readable severity. Failing on them would have repeated #144 immediately, so
+they report `UNCHECKABLE` — a coverage statement, not a pass. The gate now says so explicitly:
+
+```
+all 7 checkable round-document figures match the findings record;
+11 predate the severity convention and are NOT checked
+```
+
+That line is the honest summary of what this guard is worth: **7 checked, 11 not.**
+
 ## Scope limits
 
-- **The round-figure gate covers one document.** It is written against round 25's phrasings; rounds
-  1–24 have their own and are not checked. A gate covering one document is worth less than it looks,
-  and the honest statement is that it will cover round *N* only if round *N* is written to it.
+- **The round-figure gate now checks every round document, but only for severity claims.** The
+  per-document literal checks (counts, ranges) remain round-25-specific, because each round's
+  phrasings are its own. So of 18 severity claims across all round documents, **7 are checked and 11
+  are UNCHECKABLE** — their issues predate the `**Severity:` convention that starts at #116.
+- **The findings record is a snapshot, not a live view.** It must be refreshed (`--refresh`) at round
+  close or it goes stale exactly as it did here (#143). Nothing enforces that it was refreshed
+  *recently* — only that what the documents cite is present.
 - **It cannot check a claim nobody wrote down as a number.** "Four high" is checkable; "the audit was
   thorough" is not.
 - **The vocabulary guard protects one column of one file.** Pass 4 checked the others it could find —

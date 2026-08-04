@@ -163,19 +163,42 @@ def _word(n: int) -> str:
     return _WORDS.get(n, str(n))
 
 
-def severity_claims(doc: str, rows: list[dict]) -> list[dict[str, Any]]:
-    """Every "#NNN (severity)" the document asserts must match the record.
+# A severity CLAIM is bolded: `**#136 (high) — the #119 fix ...`. A severity quoted as
+# an EXAMPLE is not -- round 26's proof-of-failure table contains "`#136 (high)` →
+# `#136 (medium)`", which is the document demonstrating that the gate catches a wrong
+# severity. Matching both made the gate report STALE on correct prose describing what
+# the gate does (#144), and a guard that fires on correct input trains people to ignore
+# it. The bold marker is the convention every real claim already follows.
+_SEVERITY_CLAIM = re.compile(r"\*\*#(\d+) \((medium-high|low-medium|high|medium|low)\)")
 
-    Round 25's self-review section names its findings inline -- "#136 (high)",
-    "#130 (medium)", "#135 (low)". Those are exactly the figures that were wrong
+
+def severity_claims(doc: str, rows: list[dict]) -> list[dict[str, Any]]:
+    """Every bolded "**#NNN (severity)" the document asserts must match the record.
+
+    Round 25's self-review section names its findings inline -- "**#136 (high)",
+    "**#130 (medium)", "**#135 (low)". Those are exactly the figures that were wrong
     before, so they are checked individually rather than only in aggregate.
+
+    The alternation is longest-first. It does not need to be -- the trailing paren
+    forces backtracking, so `medium-high` captures correctly either way -- but it stops
+    depending on that, and an ordering that is right for a reason is cheaper than one
+    that is right by rescue.
     """
     by_issue = {r["issue"]: r for r in rows}
     results = []
-    for m in re.finditer(r"#(\d+) \((high|medium|low|medium-high|low-medium)\)", doc):
+    for m in re.finditer(_SEVERITY_CLAIM, doc):
         issue, claimed = m.group(1), m.group(2)
         actual = by_issue.get(issue, {}).get("severity")
-        if actual is None:
+        if actual == "unstated":
+            # The issue carries no `**Severity:` line. That convention starts at #116;
+            # rounds 20-23 assigned severities in their write-ups only, so there is no
+            # machine-readable source to compare against. Reported, not failed: the
+            # document may well be right, and failing on correct prose is exactly the
+            # defect #144 was (a guard that fires on valid input gets ignored).
+            status, detail = "UNCHECKABLE", (
+                f"#{issue} predates the `**Severity:` convention (starts at #116), so "
+                f"the document's {claimed!r} cannot be checked against the issue")
+        elif actual is None:
             status, detail = "MISSING", (
                 f"the document cites #{issue} but the record has no such issue — "
                 f"refresh with --refresh, or the citation is wrong")
@@ -186,6 +209,30 @@ def severity_claims(doc: str, rows: list[dict]) -> list[dict[str, Any]]:
             status, detail = "OK", f"#{issue} ({claimed})"
         results.append({"check": f"severity of #{issue}", "status": status,
                         "detail": detail})
+    return results
+
+
+ROUND_DOCS = "ref/research/tolerance_benchmark_round*.md"
+
+
+def run_all(repo: Path, rows: list[dict]) -> list[dict[str, Any]]:
+    """Check EVERY round document, not only the one the gate was written for.
+
+    #143: the record shipped omitting #139/#140/#142 -- this round's own findings -- and
+    that stayed invisible because the gate was only ever pointed at round 25. A guard
+    aimed away from the work that introduced it is the round-24 lesson repeating.
+
+    Per-document literal checks are still round-25-specific (its phrasings are its own).
+    The severity claims apply to any document, so every round is checked for those.
+    """
+    results = []
+    for path in sorted(repo.glob(ROUND_DOCS)):
+        doc = path.read_text()
+        name = path.name.replace("tolerance_benchmark_", "").replace(".md", "")
+        claims = severity_claims(doc, rows)
+        for r in claims:
+            r["check"] = f"{name}: {r['check']}"
+        results += claims
     return results
 
 
@@ -210,8 +257,10 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--refresh", action="store_true",
                     help="re-pull the findings from `gh` and rewrite the record")
-    ap.add_argument("--from-issue", type=int, default=116)
-    ap.add_argument("--to-issue", type=int, default=138)
+    # 87 is the lowest severity claim in any round document; the record must span
+    # every issue the documents cite or the gate reports MISSING on correct prose.
+    ap.add_argument("--from-issue", type=int, default=87)
+    ap.add_argument("--to-issue", type=int, default=200)
     ap.add_argument("--doc", default=str(ROUND25))
     ap.add_argument("--record", default=str(RECORD))
     args = ap.parse_args()
@@ -233,16 +282,26 @@ def main() -> int:
         print(f"wrote {len(rows)} findings to {shown}")
         return 0
 
-    results = run(Path(args.doc).read_text(), load(record))
-    bad = [r for r in results if r["status"] != "OK"]
+    rows = load(record)
+    results = run(Path(args.doc).read_text(), rows)
+    # Plus the severity claims of every OTHER round document (#143).
+    results += [r for r in run_all(REPO, rows)
+                if not r["check"].startswith(Path(args.doc).stem.replace(
+                    "tolerance_benchmark_", "") + ":")]
+    # UNCHECKABLE is a coverage statement, not a failure.
+    bad = [r for r in results if r["status"] not in ("OK", "UNCHECKABLE")]
     for r in results:
-        print(f"  {r['status']:<8} {r['check']:<24} {r['detail']}",
-              file=sys.stderr if r["status"] != "OK" else sys.stdout)
+        print(f"  {r['status']:<12} {r['check']:<26} {r['detail']}",
+              file=sys.stderr if r["status"] not in ("OK", "UNCHECKABLE") else sys.stdout)
     if bad:
         print(f"\n{len(bad)} round-document figure(s) do not match the findings record.",
               file=sys.stderr)
         return 1
-    print(f"\nall {len(results)} round-document figures match the findings record")
+    unchecked = [r for r in results if r["status"] == "UNCHECKABLE"]
+    print(f"\nall {len(results) - len(unchecked)} checkable round-document figures match "
+          f"the findings record"
+          + (f"; {len(unchecked)} predate the severity convention and are NOT checked"
+             if unchecked else ""))
     return 0
 
 

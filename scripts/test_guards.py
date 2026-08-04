@@ -234,8 +234,30 @@ check("an issue with no severity line is recorded as unstated, not defaulted",
 # happily, so a numeric range pulled #128 and #129 in as `unstated`.
 check("no pull requests in the findings record",
       [r["issue"] for r in FINDINGS if r["issue"] in {"128", "129"}], [])
-check("and every row carries a stated severity",
-      [r["issue"] for r in FINDINGS if r["severity"] == "unstated"], [])
+# The `**Severity:` convention starts at #116. The record now spans back to #87 so it
+# covers every issue the round documents cite, and those older ones legitimately have no
+# machine-readable severity -- reported as UNCHECKABLE rather than failed (#144's lesson:
+# a guard that fires on correct input gets ignored).
+check("every issue from #116 on carries a stated severity",
+      [r["issue"] for r in FINDINGS
+       if int(r["issue"]) >= 116 and r["severity"] == "unstated"], [])
+check("and the unstated ones are all older than the convention",
+      max(int(r["issue"]) for r in FINDINGS if r["severity"] == "unstated") < 116, True)
+check("a claim against a pre-convention issue is UNCHECKABLE, not a failure",
+      [r["status"] for r in roundfig.severity_claims("**#87 (medium)** something", FINDINGS)],
+      ["UNCHECKABLE"])
+# Not `assert True`: actually run the entrypoint and confirm it exits 0 while genuine
+# UNCHECKABLE rows are present, which is the behaviour the status exists for.
+import contextlib as _ctx, io as _io
+_buf, _err = _io.StringIO(), _io.StringIO()
+with _ctx.redirect_stdout(_buf), _ctx.redirect_stderr(_err):
+    _rc = roundfig.main()
+check("the gate exits 0 despite UNCHECKABLE rows", _rc, 0)
+check("and says how many it could not check",
+      "predate the severity convention" in _buf.getvalue(), True)
+check("with at least one genuinely present",
+      sum(1 for r in roundfig.run_all(roundfig.REPO, FINDINGS)
+          if r["status"] == "UNCHECKABLE") > 0, True)
 
 
 # --- Round 26: a vocabulary believed schema-enforced, and enforced on one class ---
