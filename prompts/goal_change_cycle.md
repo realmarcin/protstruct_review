@@ -118,8 +118,18 @@ When PR B is based on PR A's branch:
   1. Merge A first. There is no other order — B's diff is meaningless without A.
   2. Deleting A's branch CLOSES B. Either retarget B to main before deleting, or expect to rebuild.
   3. After A is squash-merged, B's branch still holds A's individual commits, which main no longer
-     has. Rebuilding B on main and re-applying only B's own changes is cleaner than merging. Take
-     the diff from B's FIRST COMMIT, not from the shared ancestor, or you replay A's work too.
+     has. Rebuilding B on main and re-applying only B's own changes is cleaner than merging:
+
+         git checkout -b <rebuilt> origin/main
+         git diff <B-first-commit>^..<B-head> > /tmp/b.patch     # NOTE the ^
+         git apply --3way /tmp/b.patch
+
+     The `^` is load-bearing. `git diff <first>..<head>` starts AFTER that commit and silently drops
+     it — on the round-19 rebuild this recipe came from, that would have lost the entire
+     pre-registration document, i.e. the commit proving predictions were made before the data.
+     Diff from the PARENT of B's first commit, and check the file count against `git show --stat` on
+     each of B's commits before trusting the patch. Do not diff from the shared ancestor either, or
+     you replay A's work too.
   4. Where both touched the same lines, resolve by KEEPING BOTH SIDES — a late fix in A and a change
      in B are usually both wanted. Afterwards, verify explicitly that none of A's fixes were dropped.
 
@@ -133,12 +143,14 @@ On approval, match the repo's existing merge style (squash; main's history is on
 titled "... (#NN)"):
 
   bash scripts/validate.sh                       # must exit 0
-  gh pr merge <N> --squash --delete-branch
+  gh pr merge <N> --squash --delete-branch       # merges, and deletes the REMOTE branch
   git checkout main && git pull
-  git branch -D <branch>                         # remote and local
+  git branch -D <branch>                         # LOCAL only; may already be gone, harmless if so
   gh issue close <fixed> --comment "Fixed in #<N>, merged to main as <sha>."
 
-Then confirm: PR merged, both branches gone, issues closed, gate green on main. Note that squash
+Then confirm each separately — PR merged, REMOTE branch gone (`git ls-remote --heads origin
+<branch>`), local branch gone, issues closed, gate green on main. Do not infer the remote from the
+local deletion; they are done by different commands. Note that squash
 merging collapses the pre-registration commit, so a write-up citing a bare hash will not resolve
 from main — cite the PR instead.
 </merge_and_cleanup>
