@@ -1,4 +1,4 @@
-# Lessons from twenty-eight rounds of tolerance benchmarking
+# Lessons from twenty-nine rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,7 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| A falsified prediction can cancel the work that motivated the round | 29 |
 | A spot fix that silently misses looks exactly like one that worked | 28 |
 | A counting rule has a domain; state which unit you are using | 28 |
 | A count of your own defects has no fixed value while review continues | 28 |
@@ -122,6 +123,16 @@ list survives untouched — a section header reading "the ninth miscount" seven 
 reading "Tenth", where "ninth" had been correct until its pair moved. Verify by **quantity, not by
 string**. Three distinct failure modes in one method in one round is itself the lesson: a repair
 technique deserves the same adversarial reading as the code it repairs.
+
+Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
+ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
+own predictions said not to.** P1 (a check finds something the hand sweep missed) was falsified: every
+derivable per-entry figure already matched. P2 (underivable outnumber derivable) was confirmed, about
+two to one. Together they say the remaining coverage is either unnecessary or impossible, so five
+checks ship and the rest does not. **A falsified prediction can cancel the work that motivated the
+round** — which is only available as an outcome if the prediction is registered before the work, and
+is the second time in two rounds that pre-registration changed what got built rather than merely
+scoring it.
 
 Round 28 swept ~326 numeric claims by hand instead of adding a third gate, and **two of its four
 predictions were falsified — the two that would have justified building one.** **Measure a defect

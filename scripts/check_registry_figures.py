@@ -216,6 +216,63 @@ _NESTING_SENTENCE = re.compile(
     re.DOTALL)
 
 
+# Per-entry figures the registry asserts for a named entry. These are quoted throughout
+# §4's map-model row and NONE were gated: all 12 CHECKS above are aggregate, and both
+# registry errors round 28 found (#167) were per-entry -- 10RI's delta stated as
+# +0.45 % against a recorded 0.4441, and a range endpoint taken from an entry that has
+# no recorded value at all (#180).
+#
+# (id, column, literal that must appear, how to render the TSV value)
+PER_ENTRY: list[tuple[str, str, str, Any]] = [
+    ("10RI", "cc_mask_delta", "10RI: CC_mask +0.0115", lambda v: f"10RI: CC_mask +{float(v):.4f}"),
+    ("10RI", "d_fsc_model_delta_pct", "`d_FSC_model` degraded +0.444 %",
+     lambda v: f"`d_FSC_model` degraded +{float(v):.3f} %"),
+    ("10BU", "d_fsc_model_delta_pct", "the largest *degradation* is **+4.786 %**",
+     lambda v: f"the largest *degradation* is **+{float(v):.3f} %**"),
+    ("10ME", "d_fsc_model_delta_pct", "worst **+1.476 %** (10ME)",
+     lambda v: f"worst **+{float(v):.3f} %** (10ME)"),
+    ("9H7U", "d_fsc_model_delta_pct", "a **36 % improvement** (9H7U",
+     lambda v: f"a **{abs(float(v)):.0f} % improvement** (9H7U"),
+]
+
+
+def per_entry_checks(registry: str, rows: list[dict]) -> list[dict[str, Any]]:
+    """Each per-entry figure the registry quotes, against that entry's TSV row.
+
+    Reports DERIVABLE and UNDERIVABLE separately and counts both. A figure naming an
+    entry whose value was never recorded -- a `LOST` row, a `delta-only` row, round 13's
+    unpublished values -- cannot be checked at all, and skipping those silently while
+    printing OK would overstate the coverage. That is #116's shape, and this check
+    states its denominator instead.
+    """
+    by_id = {r["pdb_id"]: r for r in rows}
+    results = []
+    for pdb_id, column, literal, render in PER_ENTRY:
+        row = by_id.get(pdb_id)
+        value = (row or {}).get(column, "")
+        if not value:
+            results.append({
+                "check": f"{pdb_id}.{column}", "status": "UNDERIVABLE", "per_entry": True,
+                "detail": (f"the registry asserts {literal!r} but {pdb_id} has no recorded "
+                           f"{column} — "
+                           + ("no such entry in the file" if row is None
+                              else f"status {row['status']!r}") +
+                           " — so the figure cannot be checked against anything")})
+            continue
+        derived = render(value)
+        if literal not in registry:
+            status, detail = "MISSING", (
+                f"the registry no longer contains {literal!r} — reworded or removed, so "
+                f"there is nothing to compare; the record gives {derived!r}")
+        elif derived != literal:
+            status, detail = "STALE", f"registry says {literal!r}; the record gives {derived!r}"
+        else:
+            status, detail = "OK", derived
+        results.append({"check": f"{pdb_id}.{column}", "status": status,
+                        "detail": detail, "per_entry": True})
+    return results
+
+
 def nesting_check(registry: str, rows: list[dict]) -> dict[str, Any]:
     """The nested denominators must nest **as the registry states them**.
 
@@ -305,6 +362,7 @@ def run(registry: str, rows: list[dict]) -> list[dict[str, Any]]:
         results.append({"check": label, "status": status, "detail": detail})
     results.append(nesting_check(registry, rows))
     results.append(vocabulary_check(rows))
+    results += per_entry_checks(registry, rows)
     return results
 
 
@@ -325,7 +383,18 @@ def main() -> int:
     if bad:
         print(f"\n{len(bad)} registry figure(s) no longer match the data.", file=sys.stderr)
         return 1
-    print(f"\nall {len(results)} dataset-dependent registry figures match the data")
+    # State the coverage, not just the verdict. The per-entry figures gated here are a
+    # MINORITY of those the registry quotes -- round 29 measured roughly 9 derivable
+    # against 20 that name a value never recorded per-entry (mtriage internals, band
+    # values, LOST and delta-only rows). A gate that prints "all figures match" while
+    # covering a third of them overstates what it verified, which is #116's shape.
+    # Tagged, not sniffed: "refinement attempts incl. LOST" contains a dot and was
+    # counted as per-entry by a `"." in check` test -- a wrong coverage figure inside
+    # the statement written to stop overstating coverage.
+    n_entry = sum(1 for r in results if r.get("per_entry"))
+    print(f"\nall {len(results)} checked registry figures match the data "
+          f"({n_entry} per-entry; most per-entry figures the registry quotes are NOT "
+          f"derivable and are not checked — see round 29)")
     return 0
 
 
