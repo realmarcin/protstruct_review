@@ -3,7 +3,7 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-04** (round 24). Rounds 17–18 merged as
+**Last reconciled: 2026-08-04** (round 26). Rounds 17–18 merged as
 [#69](https://github.com/realmarcin/protstruct_review/pull/69); rounds 19 and 20 followed in
 [#82](https://github.com/realmarcin/protstruct_review/pull/82) and its successor. **Check the issue
 tracker for open issues; this file does not mirror it in real time.** There is no CI in this
@@ -55,12 +55,14 @@ floors row.
 | 22 | (2026-08-03) | 10BU shown to be a genuine statistical outlier; a candidate mechanism supported but not established (n = 2), with the successor test specified; flip-set row shown **not** to be fixable by round 21's route |
 | 23 | (2026-08-03) | crossing-quality test **could not be run at the 1.3 cut** — 0 of 24 screened; at the data-driven 1.074 fence one already-refined near-miss (10EU) leans against it; estimator characterised over 60 crossings; the fetcher's all-or-nothing write fixed |
 | 24 | (2026-08-04) | staleness audit: the registry's `named entries` definition had drifted to yield 93 not 69; a gate now recomputes 8 dataset-dependent figures and fails on a stale value **or** a rewrite |
+| 25 | [#129](https://github.com/realmarcin/protstruct_review/pull/129) (2026-08-04) | first systematic audit of `scripts/` itself — 12 defects, 4 high, including a guard that **could not fail** (it compared four counts it derived itself and never read the registry) and a wwPDB parser fabricating `0.0` violations where the real value is 17.4. No tolerance changed |
+| 26 | [#141](https://github.com/realmarcin/protstruct_review/pull/141) (2026-08-04) | tested round 25's three parting claims: **P1 and P3 confirmed, P2 falsified, P4 indeterminate**. Declared the EM `status` vocabulary once beside its writer; gated a round document's claims about its own findings. Six review passes found 14 defects, several inside the round's own fixes. No tolerance changed |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-four rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-six rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -105,6 +107,24 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
 - **A relative gate needs bounds at both ends.** The 5× clashscore ratio was guarded above
   `pre ≈ 20` and not below; at `pre = 0` it is undefined and fires on a model well inside the
   absolute quality bar.
+- **A gate that only compares numbers is defeated by a rewrite.** The staleness gate therefore fails
+  in two ways: when the recomputed value differs, and when the quoted literal has *disappeared*. A
+  reworded claim cannot be silently correct, because nothing verified it.
+- **Review the code that makes the number, not only the number.** Twenty-four rounds re-read the
+  registry adversarially; the scripts computing it had been read once each, when written. The first
+  systematic pass found twelve defects, four high.
+- **A guard must assert against the artefact it polices.** Round 24's nesting check compared four
+  counts it derived *itself* from one file, and those inclusions hold by construction of the writer —
+  so no run of the pipeline could fail it. If a check's inputs and expectations come from the same
+  place, it is a tautology with a status field.
+- **A default bucket makes "unrecognised" and "miscounted" independent.** 28 of 97 status values
+  matched no declared predicate, and every denominator was still correct, because `attempted` is
+  defined by subtraction. Right by luck of the default, and only until a status arrives that does not
+  belong there.
+- **Register the consequence you will check, not one you assume follows** — and a prediction
+  resolvable only by a rule you invent afterwards was not a well-formed prediction. Round 26 wrote
+  "0 rows outside the vocabulary, and if violated a denominator is wrong today" as one claim; they
+  are two, and the second did not follow.
 
 ## Open
 
@@ -163,6 +183,16 @@ three controls has a best achievable p of 0.25 — an observation, not a test.
   that are identifiable and both clauses held, but the two maxima that actually size the bands come
   from the lost batch. Only a fresh low-resolution X-ray measurement would give them a checkable
   basis — a real project, not a round.
+- **The audit of `scripts/` is a lower bound, not a total.** Round 25 found 12 defects in the first
+  systematic pass; round 26 found 5 more with a *different lens*, and a sixth pass — enumerating each
+  guard's input space rather than reading — found 5 more in code the earlier passes had just
+  reviewed. Reading finds the defect you can imagine. Nothing establishes where the bottom is, and
+  the same argument applies to every further pass.
+- **Two of round 26's guards are heuristics with stated residual risk.** `check_round_figures.py`
+  decides "is this markdown a quotation" by inspecting a match's immediate context; it handles every
+  construct these documents currently use and may be wrong on one nobody has written yet. And its
+  findings record is a *snapshot* — any round that files an issue after refreshing it goes stale, as
+  round 26 did four times. Both are recorded in that round's scope limits rather than implied closed.
 - **`d_FSC_model` still rests on one verified extreme.** 10BU is an outlier by every criterion tried — **3.24×
   the next-largest degradation**, which needs no distributional assumption, and above the 1.5 × IQR
   fence under all three quartile conventions (3.017 / 2.370 / 1.724, on n = 8). It also reproduces

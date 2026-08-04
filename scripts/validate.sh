@@ -218,9 +218,11 @@ for row in re.findall(r"^\|.*\|\s*$", lessons, re.M):
     if len(cells) >= 2:
         covered.update(re.findall(r"\d+", cells[-1]))
 
+# De-duplicated: a round can have several files (round 26 has both its trail and its
+# pre-registration), and without this the failure message names it once per file.
 rounds = sorted(
-    (re.search(r"round(\d+)", p.name).group(1)
-     for p in (repo / "ref/research").glob("tolerance_benchmark_round*.md")),
+    {re.search(r"round(\d+)", p.name).group(1)
+     for p in (repo / "ref/research").glob("tolerance_benchmark_round*.md")},
     key=int)
 print(" ".join(r for r in rounds if r not in covered))
 ' "${REPO_ROOT}")"; then
@@ -231,6 +233,45 @@ if [[ -n "${missing_lessons// /}" ]]; then
 fi
 if [[ "${QUIET}" == "0" ]]; then
   echo "every benchmark round is represented in ref/research/lessons.md"
+fi
+
+# ...and in NEXT_TASKS.md, which is a different file and was not covered.
+#
+# The gate above was added by #68, whose title was "Reconcile NEXT_TASKS after round 16
+# -- and gate the gap that keeps recurring". It reconciled NEXT_TASKS BY HAND and gated
+# its NEIGHBOUR. Ten rounds later NEXT_TASKS was two rounds stale again, for the sixth
+# reconcile in this repo's history (#58, #64, #68, and two earlier). A guard aimed one
+# file to the left of the problem is the round-24/25 lesson: state a gate's scope as
+# carefully as its result, and check that it covers the thing it was named for.
+#
+# REPRESENTATION only, exactly like the lessons check: a round needs a row in the round
+# table, not a particular description. There is no ground truth for what a round's
+# summary should say, so a pass here does NOT mean the summary is accurate.
+if ! missing_tasks="$(python3 -c '
+import pathlib, re, sys
+
+repo = pathlib.Path(sys.argv[1])
+tasks = (repo / "NEXT_TASKS.md").read_text()
+
+# The round table rows open with "| <n> |". Matched on the leading cell rather than
+# anywhere in the line, so a round MENTIONED in prose does not satisfy the check.
+covered = set(re.findall(r"^\|\s*(\d+)\s*\|", tasks, re.M))
+
+# De-duplicated: a round can have several files (round 26 has both its trail and its
+# pre-registration), and without this the failure message names it once per file.
+rounds = sorted(
+    {re.search(r"round(\d+)", p.name).group(1)
+     for p in (repo / "ref/research").glob("tolerance_benchmark_round*.md")},
+    key=int)
+print(" ".join(r for r in rounds if r not in covered))
+' "${REPO_ROOT}")"; then
+  fail "could not check NEXT_TASKS round coverage"
+fi
+if [[ -n "${missing_tasks// /}" ]]; then
+  fail "NEXT_TASKS.md has no round-table row for round(s): ${missing_tasks}"
+fi
+if [[ "${QUIET}" == "0" ]]; then
+  echo "every benchmark round is represented in NEXT_TASKS.md"
 fi
 
 # Every bench_*.py must commit the entry set it ran on. The round-17 audit found that
