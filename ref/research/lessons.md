@@ -13,6 +13,7 @@ maxims.
 | Rule | Round |
 |---|---|
 | A spot fix that silently misses looks exactly like one that worked | 28 |
+| A counting rule has a domain; state which unit you are using | 28 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |

@@ -228,7 +228,8 @@ shape rather than this one.
 It understates by one, in the direction that makes the problem look smaller — the bias this repo says
 to check hardest — inside a sentence whose only job is counting instances of a defect class.
 
-**Ten issues were found in the round's own work across three review passes** (#164–#167, #169–#174),
+**Eleven issues were found in the round's own work** (#164–#167, #169–#174, #176) — three review
+passes before merge and one after,
 **every one in the prose and none in the measurement.** The unit is *issues*, which is exact and
 checkable; see below for why the statement-level rule is not used here. That split is the round's most durable result and is worth
 stating as such: the measurement (P1–P4, the sweep, the seven corrected figures) has not moved through
@@ -271,6 +272,28 @@ counting rule is not the same as following it.** This document defined the rule,
 to the measurement, and abandoned it two sections later when summarising itself — which is why the
 rule needs to be restated at each use rather than declared once.
 
+## #177 — four more, found after merge, none caught by three passes
+
+A post-merge review of `main` found four defects this round introduced, and the interesting property
+is that **three passes hunting exactly this class caught none of them**:
+
+| | defect | why nothing caught it |
+|---|---|---|
+| `NEXT_TASKS` round table read 24, 25, 26, **28, 27** | `fa89a2a` inserted round 28's row before round 27's | `next_tasks_coverage` checks each round *has a row*, never that rows are **ordered** — the representation-vs-content limit, demonstrated rather than asserted |
+| *"Ten issues"* excluded **#176** | it was found in this round's own work and fixed by the same PR as #174 | the recursive-miscount shape, inside the sentence written to close it |
+| the third *"nine"* was never enumerated | #174 named three senses; two were fixed and this one left | an unverified count inside the round about unverified counts |
+| the counting-rule lesson had no Index row | `lessons.md` had four round-28 paragraphs and three rows | `validate.sh` checks every **round** is represented, not every **lesson** — round 16's own comment says it verifies *"REPRESENTATION, not completeness"*, and this is the first time that gap has bitten |
+
+Two of the four are gates behaving exactly as documented and still missing a real defect. That is not
+a gate failure; it is the cost of representation checks, now paid rather than predicted.
+
+The third *"nine"* was in fact derivable all along — the #170 sweep searched nine superseded values and
+misjudged one of their matches — so the fix is to say what it counts rather than to soften it.
+
+**Eleven issues in this round's own work, one after merge.** The measurement (P1–P4, the sweep, the
+corrected figures) has still not moved through any of the four passes. Every defect has been in the
+prose about it, and the last six have been counts.
+
 ## Scope limits
 
 - **One sweep, seven documents, by hand.** The same "lower bound, not a total" caveat that applies to
@@ -285,6 +308,10 @@ rule needs to be restated at each use rather than declared once.
   signal, not a precise measurement.
 - **The sweep method cannot tell a stale figure from a historical one** (#171), and its
   verify-by-absence step rewards removing the latter. Any future sweep needs the distinction made by a
-  human per occurrence; this round judged nine occurrences and got one of them wrong (#171).
+  human per occurrence. The #170 sweep searched **nine superseded values** (`2.2–6.1`,
+  `Eight miscounts`, `8 miscounts`, `~299`, `eight wrong`, `~4× ratio`, `**six** figures`,
+  `a quarter`, `at ~4.6 %`) and judged one of their matches wrongly — the round-12 historical
+  occurrence (#171). That is the third of the three "nine"s #174 identified; the other two were
+  fixed then and this one was left unenumerated until #177.
 - **`lessons.md`'s round-9 claim is left unfixed**, marked low-confidence by the sweep and not
   independently settled here. Recorded rather than silently corrected.
