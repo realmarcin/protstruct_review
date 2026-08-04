@@ -24,9 +24,12 @@ Every per-entry figure derivable from `em_refinement_deltas.tsv` already matches
 | 21AO recovered | 2.8125 Å | 2.8125 |
 | 9O9K breach | −0.0311 | −0.0311 |
 
-Round 28's hand sweep recorded itself as *"a lower bound, not a total"*. **Over the registry's
-derivable per-entry figures it was in fact complete**, which is a stronger statement than that round
-was willing to make about itself and could only be established by checking.
+Round 28's hand sweep recorded itself as *"a lower bound, not a total"*. **Over the nine derivable
+per-entry figures checked here, it missed none** — which is what P1 actually tests. It is *not* a
+claim that the sweep was complete over the registry: nine figures is what could be derived and
+checked, and the other twenty per-entry claims remain unverifiable by any means (P2). Saying "the
+sweep was complete" would be the stronger version of a true result, which is the failure this repo
+names most often, so the claim is stated at the size the evidence supports.
 
 The pre-registration said this outcome *"would argue against extending mechanical coverage further"*.
 It does, and the round follows its own instruction rather than building the thing it set out to build.
@@ -67,6 +70,21 @@ what it does not reach.
 `"." in check`, which matches `refinement attempts incl. LOST` — a wrong coverage number inside the
 statement written to stop overstating coverage. Fixed by tagging the results explicitly rather than
 sniffing their names.
+
+## What `UNDERIVABLE` means, stated rather than left implicit
+
+An `UNDERIVABLE` result **fails the gate**, and that is deliberate. It is not the same as round 26's
+`UNCHECKABLE`, which reports that no source exists *by convention* and passes. `UNDERIVABLE` means the
+registry cites a per-entry value that the record **no longer holds** — a column emptied, or an entry
+removed. A registry figure whose backing has disappeared is a real problem, not a coverage note.
+
+Exercised in both forms, since nothing in the committed data triggers either:
+
+| case | result |
+|---|---|
+| entry present, column emptied | `UNDERIVABLE`, naming the entry's status |
+| entry removed from the file entirely | `UNDERIVABLE`, saying no such entry |
+| value changed | `STALE`, showing registry against record |
 
 ## Scope limits
 
