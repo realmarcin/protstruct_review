@@ -124,6 +124,27 @@ The shape is the round's own recurring one, a third time: **code sized to the ra
 occupies is a fixture pretending to be a function.** `EXPECTED_DEFECT_CLAIMS` is the same instinct
 (and is disclosed below), and both test fixtures had already been corrected for it in this round.
 
+## #161 — three more, and the same shape a fourth time
+
+A review enumerating the input space found three defects in the new script. One is a **false pass**:
+
+| | defect | direction |
+|---|---|---|
+| **1** | a range claimed twice took the **last** value, so a wrong round-table figure passed whenever a later sentence restated it correctly | **false pass** |
+| **2** | the `\|---\|` separator was assumed rather than checked, so a malformed table lost its first data row | false MISSING (loud) |
+| **3** | *any* digit in the lessons Round cell credited that round — an issue reference such as `26, cf. issue #27` covered round 27 with no entry behind it | false OK |
+
+The first matters most, and it is the exact failure this check exists to prevent: these documents
+restate figures constantly, so a correct restatement three paragraphs later would have silently
+excused a wrong round-table row. A range claimed with two different numbers is now a `CONFLICT`;
+claimed twice with the *same* number it stays `OK`.
+
+**This is the fourth naming of one shape in this round.** Each of the three was written against the
+input these files happen to contain today: every range claimed exactly once, every table well-formed,
+every Round cell holding only round numbers. The hardcoded test fixtures, `spell()`'s lookup table
+and now the parsing itself — all the same instinct, and only enumeration found them. Reading found
+none of the four.
+
 ## Scope limits
 
 - **Coverage is representation, counts are derivation, and only four figures are derived.** Every

@@ -49,6 +49,9 @@ ROUND_GLOB = "ref/research/tolerance_benchmark_round*.md"
 # documentation example that satisfies a coverage check is #157.
 _FENCED = re.compile(r"^(```|~~~).*?(^\1|\Z)", re.MULTILINE | re.DOTALL)
 
+# A markdown table separator: pipes, dashes, colons and space, nothing else.
+_SEPARATOR = re.compile(r"^\s*\|[\s:|-]+\|\s*$")
+
 
 def prose(text: str) -> str:
     return _FENCED.sub("", text)
@@ -67,6 +70,11 @@ def table_rows(text: str, header_cells: list[str]) -> list[list[str]]:
     for i, line in enumerate(lines):
         cells = [c.strip().lower() for c in line.strip().strip("|").split("|")]
         if cells != want:
+            continue
+        # The separator is CHECKED, not assumed. Skipping `i+1` unconditionally meant a
+        # table whose separator row was missing lost its first data row, and the round
+        # in that row was reported missing when it was present (#161).
+        if i + 1 >= len(lines) or not _SEPARATOR.match(lines[i + 1]):
             continue
         rows = []
         for row in lines[i + 2:]:            # +2 skips the |---|---| separator
@@ -108,6 +116,23 @@ def next_tasks_coverage(tasks: str, rounds: list[str]) -> dict[str, Any]:
     }
 
 
+def round_tokens(cell: str) -> set[str]:
+    """Round numbers named in a lessons index cell.
+
+    The cell is prose as often as not -- "11, back-tested 13" -- so rounds are matched
+    as tokens rather than as the whole cell. But NOT every digit: an issue or PR
+    reference inside the cell used to credit that round with no entry behind it, so
+    `#NNN` is removed first (#161). A `N-M` range is expanded, since "1-5" names five
+    rounds rather than two.
+    """
+    cell = re.sub(r"#\d+", "", cell)
+    covered: set[str] = set()
+    for lo, hi in re.findall(r"(\d+)\s*[–-]\s*(\d+)", cell):
+        covered.update(str(n) for n in range(int(lo), int(hi) + 1))
+    covered.update(re.findall(r"\d+", re.sub(r"\d+\s*[–-]\s*\d+", "", cell)))
+    return covered
+
+
 def lessons_coverage(lessons: str, rounds: list[str]) -> dict[str, Any]:
     """Every round needs an index entry in lessons.md (round(s) in the LAST cell).
 
@@ -117,7 +142,7 @@ def lessons_coverage(lessons: str, rounds: list[str]) -> dict[str, Any]:
     covered: set[str] = set()
     for row in table_rows(lessons, ["Rule", "Round"]):
         if row:
-            covered.update(re.findall(r"\d+", row[-1]))
+            covered.update(round_tokens(row[-1]))
     missing = [r for r in rounds if r not in covered]
     return {
         "check": "lessons.md round coverage",
@@ -149,12 +174,24 @@ def defect_counts(tasks: str, findings: list[dict]) -> list[dict[str, Any]]:
     number sits inside the range and was counted as a finding. The record contains
     issues only, so deriving from it cannot make that mistake.
     """
-    found = {(int(m.group(2)), int(m.group(3))): int(m.group(1))
-             for m in _DEFECT_CLAIM.finditer(prose(tasks))}
+    # EVERY occurrence per range, not the last one. A dict comprehension keyed by range
+    # let a later restatement overwrite an earlier wrong claim silently -- so a wrong
+    # round-table figure passed because a correct sentence appeared further down, which
+    # is a style these documents use constantly (#161).
+    found: dict[tuple[int, int], list[int]] = {}
+    for m in _DEFECT_CLAIM.finditer(prose(tasks)):
+        found.setdefault((int(m.group(2)), int(m.group(3))), []).append(int(m.group(1)))
     results = []
     for lo, hi in EXPECTED_DEFECT_CLAIMS:
         actual = sum(1 for f in findings if lo <= int(f["issue"]) <= hi)
-        claimed = found.get((lo, hi))
+        claims = found.get((lo, hi), [])
+        if len(set(claims)) > 1:
+            results.append({
+                "check": f"defect count #{lo}-#{hi}", "status": "CONFLICT",
+                "detail": (f"the file claims #{lo}–#{hi} holds {sorted(set(claims))} in "
+                           f"different places; the record holds {actual}")})
+            continue
+        claimed = claims[0] if claims else None
         if claimed is None:
             status, detail = "MISSING", (
                 f"no '**N defects** (#{lo}–#{hi})' claim in the file — reworded or "

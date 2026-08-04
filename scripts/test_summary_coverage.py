@@ -148,6 +148,42 @@ check("a removed round count goes MISSING",
                             ROUNDS)["status"], "MISSING")
 
 
+# --- #161: three partitions the first draft got wrong ------------------------------
+
+# A duplicate range claim used to take the LAST value, so a wrong round-table figure
+# passed whenever a later sentence restated it correctly -- a false pass, and these
+# documents restate figures constantly.
+check("a range claimed twice with different numbers is a CONFLICT",
+      [r["status"] for r in cov.defect_counts(
+          "| 25 | x | **99 defects** (#116–#127) |\n"
+          "| 26 | y | **14 defects** (#139–#153) |\n\n"
+          "Later: the total was **12 defects** (#116–#127).\n", FINDINGS)],
+      ["CONFLICT", "OK"])
+check("but the same number stated twice is not a conflict",
+      [r["status"] for r in cov.defect_counts(
+          "**12 defects** (#116–#127) and again **12 defects** (#116–#127)\n"
+          "**14 defects** (#139–#153)\n", FINDINGS)], ["OK", "OK"])
+
+# The separator row is checked rather than assumed; skipping it blindly ate the first
+# data row of a malformed table.
+check("a table with no separator row is not parsed as a table",
+      cov.table_rows("| Round | PR | Settled |\n| 27 | [#200](x) | note |\n",
+                     ["Round", "PR", "Settled"]), [])
+check("and an alignment separator is still accepted",
+      len(cov.table_rows("| Round | PR | Settled |\n|---|:--:|---|\n| 27 | a | b |\n",
+                         ["Round", "PR", "Settled"])), 1)
+
+# Any digit in the lessons Round cell used to credit that round.
+check("an issue reference in the Round cell does not credit a round",
+      cov.lessons_coverage("| Rule | Round |\n|---|---|\n| r | 26, cf. issue #27 |\n",
+                           [ABSENT_ROUND, "27"])["status"], "MISSING")
+check("but a real round token in prose still counts",
+      cov.lessons_coverage("| Rule | Round |\n|---|---|\n| r | 26, back-tested 27 |\n",
+                           ["27"])["status"], "OK")
+check("and a range names every round in it, not just its ends",
+      sorted(cov.round_tokens("1–5"), key=int), ["1", "2", "3", "4", "5"])
+
+
 # --- table scoping ------------------------------------------------------------------
 
 check("a table is located by its header, and its rows end at the first non-row",
