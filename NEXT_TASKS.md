@@ -53,7 +53,7 @@ floors row.
 | 20 | [#86](https://github.com/realmarcin/protstruct_review/pull/86) (2026-08-02) | the two §4 clauses untested since round 7 re-measured: both hold, both worst cases reproduce exactly; the clashscore ratio gate found undefined at `pre = 0` and given a low-end guard; `phenix.refine` shown deterministic 8/8 |
 | 21 | [#92](https://github.com/realmarcin/protstruct_review/pull/92) (2026-08-03) | L-test made re-derivable on a committed 24-dataset set instead of being retired — a subset re-run, so reproducible rather than corroborating; EM benchmark now writes per-entry results as it goes |
 | 22 | (2026-08-03) | 10BU shown to be a genuine statistical outlier; a candidate mechanism supported but not established (n = 2), with the successor test specified; flip-set row shown **not** to be fixable by round 21's route |
-| 23 | (2026-08-03) | crossing-quality test **could not be run** — 0 of 24 screened entries cleared the ratio cut; estimator shown stable over 60 crossings (median 0.9843); the fetcher's all-or-nothing write fixed |
+| 23 | (2026-08-03) | crossing-quality test **could not be run at the 1.3 cut** — 0 of 24 screened; at the data-driven 1.074 fence one already-refined near-miss (10EU) leans against it; estimator characterised over 60 crossings; the fetcher's all-or-nothing write fixed |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
@@ -140,9 +140,13 @@ minutes of `mtriage`. **That is a project, not a round**, and it should not be p
 were cheap.
 
 Round 23 also found the 1.3 cut, inherited from n = 2, is **too conservative**: the Tukey fence on the
-combined 60 sits at **1.074**, which would have admitted one candidate (6PMJ, 1.094) from that batch.
-A future attempt should use the data-driven cut. It was not refined here because one candidate
-against three controls has a best achievable p of 0.25 — an observation, not a test.
+combined 60 sits at **1.074**, and **4 of 60** clear it — including **10EU, already refined in round 16**,
+whose Δ of −1.084 % just fails the hypothesis's own 10× bar (1.102 %). So the hypothesis has one
+near-miss on existing data, leaning mildly against it.
+
+A future attempt should use the data-driven cut, where the base rate is **4 of 60 = 6.7 %** and two
+members (10EU, 6PMJ) are already identified. 6PMJ was not refined here because one candidate against
+three controls has a best achievable p of 0.25 — an observation, not a test.
 
 ### Standing risk, not tasks
 

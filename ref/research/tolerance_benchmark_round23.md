@@ -134,29 +134,49 @@ tighter than the 1.3 cut assumed:
 | round 23 | 24 | 0.9736 | 1.0937 |
 | **combined** | **60** | **0.9843** | — |
 
-**The sustained-crossing estimator tracks the map's own stated resolution almost exactly for the
-overwhelming majority of entries** — 57 of 60 sit between 0.73 and 1.01. That is a new
-characterisation of the estimator round 9 introduced, and it is reassuring about the estimator
-independently of this round's hypothesis.
+**The sustained-crossing estimator tracks the map's own stated resolution closely for most entries** —
+**50 of 60** sit between 0.73 and 1.01, i.e. **83 %**, with a median of 0.9843. That is a new
+characterisation of the estimator round 9 introduced. The ten outside the band are 36QD (0.674),
+6O1M (0.676), 10EH (1.016), 10EP (1.033), 10EQ (1.044), 10ET (1.060), 10EU (1.076), 6PMJ (1.094),
+10BU (1.360) and 9H7U (1.372) — a right-skewed tail rather than a symmetric spread.
 
 It also reframes the threshold. A Tukey fence on the **combined** ratio distribution sits at
-**1.074**, not 1.3 — and by that criterion all three of the top ratios are outliers, including this
-round's highest, **6PMJ at 1.094**:
+**1.074**, not 1.3 — and **four** entries clear it, not the three this round first reported:
 
-```
-1.094 (6PMJ, round 23)   1.360 (10BU)   1.372 (9H7U)      fence 1.074
-```
+| entry | ratio | Δ |
+|---|---:|---|
+| **10EU** | **1.0762** | **−1.084 %** — *already refined, round 16* |
+| 6PMJ | 1.0937 | never refined |
+| 10BU | 1.3598 | +4.786 % |
+| 9H7U | 1.3718 | −36.150 % |
 
-So the post-hoc 1.3 cut inherited from n = 2 was **too conservative**, and a data-driven cut would
-have admitted one candidate from this batch.
+So the post-hoc 1.3 cut inherited from n = 2 was **too conservative**.
+
+### The corrected fence puts existing evidence in play, and it leans against the hypothesis
+
+**10EU was refined in round 16 and its Δ is on record.** Applying this round's own P2 criterion at the
+corrected fence — |Δ| ≥ 10× the control median, i.e. ≥ **1.102 %** — 10EU's **1.084 %** *just fails
+it*.
+
+That is weak evidence, and it is evidence: at the data-driven threshold there is one already-measured
+candidate, and it does not behave the way the hypothesis predicts. **The round's first draft said
+"screening found no candidates; it did not examine any" — that was wrong**, and wrong in the direction
+that flattered the hypothesis. It found no candidates *above 1.3*; at the threshold the data itself
+suggests, one candidate was already in hand.
+
+So the honest verdict is not "untested". It is: **untested at 1.3, and one near-miss at 1.074.**
 
 ### Why 6PMJ was not refined
 
 It would not have been a test. One high-ratio entry against three controls gives a best achievable
 one-sided p of **1/4 = 0.25** — the power table registered before this round shows a single candidate
 cannot reach significance against any control group affordable here. Refining it would have added an
-*observation* to an n = 2 hypothesis, not a *test* of it, and this series has spent four rounds
-learning to tell those apart.
+*observation*, not a *test*, and this series has spent four rounds learning to tell those apart.
+
+That reasoning is unchanged by the correction above, but the corrected picture makes 6PMJ **more**
+worth doing in a future round: with 10EU and 6PMJ both at ~1.08–1.09, a targeted set at the 1.074
+fence has a base rate of **4 of 60 = 6.7 %** rather than 3.3 %, and two of its members are already
+identified.
 
 ## What it would actually take
 
@@ -165,7 +185,7 @@ The cost is now known rather than guessed:
 | | |
 |---|---|
 | combined base rate at ratio > 1.3 | **2 of 60 = 3.3 %** |
-| at the data-driven fence 1.074 | **3 of 60 = 5.0 %** |
+| at the data-driven fence 1.074 | **4 of 60 = 6.7 %** |
 | entries to screen for **3** candidates | **~60–90** |
 | cost per screened entry | one map download (100–250 MB) + `mtriage` (~2–5 min) |
 
@@ -175,12 +195,13 @@ cheap.
 
 ## Applied
 
-> **No band changed and no tolerance moved.** The crossing-quality hypothesis remains **untested**;
-> it is neither supported nor refuted by this round.
+> **No band changed and no tolerance moved.** The crossing-quality hypothesis is **untested at the
+> 1.3 cut**. At the data-driven fence of **1.074** it has one already-measured near-miss — 10EU,
+> Δ −1.084 % against a 10× bar of 1.102 % — which leans mildly against it.
 >
 > **New, and worth keeping:** the crossing/resolution ratio over **60** entries has median **0.9843**
-> with 57 of 60 in 0.73–1.01, so the sustained-crossing estimator tracks stated resolution closely in
-> the ordinary case. The outlier fence is **1.074**, not the 1.3 inherited from n = 2.
+> with **50 of 60 (83 %)** in 0.73–1.01 and a right-skewed tail. The outlier fence is **1.074**, not
+> the 1.3 inherited from n = 2, and **4 of 60** clear it.
 
 ## Self-review finding: a stale statistic, re-derived and confirmed
 
@@ -206,9 +227,32 @@ a stronger result than round 17 could claim. The figures are updated and labelle
 This is round 18's rule applied to statistics rather than clauses, and the second instance after #72.
 A quoted statistic ages the moment the set grows, and nothing in the pipeline notices.
 
+## Second self-review pass
+
+An adversarial read of this PR found two more
+([#108](https://github.com/realmarcin/protstruct_review/issues/108),
+[#109](https://github.com/realmarcin/protstruct_review/issues/109)), both fixed above.
+
+- **#108 (high)** — two miscounts. "57 of 60 within 0.73–1.01" is **50**; "3 of 60 above the 1.074
+  fence" is **4**. The missing fourth is **10EU at 1.076, already refined in round 16**, whose Δ of
+  −1.084 % *just fails* this round's own 10× bar. The error was visible in the round's own diagram,
+  which printed `fence 1.074` and jumped to `1.094`. It mattered: the round had concluded "screening
+  found no candidates; it did not examine any", which was wrong **in the direction that flattered the
+  hypothesis**. Corrected to "untested at 1.3, one near-miss at 1.074".
+- **#109 (medium)** — the fetch-interruption test did not test the fix. It exercised
+  `append_fetch_record`'s dedup — unchanged code — and would have passed even if `flush()` had never
+  been wired into the loop. Rewritten to drive `main()` and interrupt it, and **negative-tested**:
+  removing the per-candidate `flush()` now fails the suite.
+
+**Both are the same failure as rounds 20–22**: the arithmetic was fine and the claim built on it was
+not. Here it went one step further — a miscount produced a conclusion more favourable to the
+hypothesis under test than the data supported, which is the direction that matters most.
+
 ## Scope limits
 
-- **The hypothesis is untested, not weakened.** Screening found no candidates; it did not examine any.
+- **The hypothesis is untested at the 1.3 cut, and has one near-miss at the corrected 1.074 fence.**
+  10EU (ratio 1.076, Δ −1.084 %) just fails the round's own 10× bar. One entry is not a refutation,
+  but it is not nothing, and the round's first draft wrongly claimed no candidate had been examined.
 - **P0's falsification is an artefact of how it was written.** 0/24 is consistent with the prior rate
   (p = 0.512); the interval was on the wrong quantity.
 - **The 1.074 fence is computed on the combined 60** and includes the two entries that motivated the
