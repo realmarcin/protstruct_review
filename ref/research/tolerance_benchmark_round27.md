@@ -193,7 +193,7 @@ measured two commits after it was written rather than asserted.
 
 - **Coverage is representation, counts are derivation, and only three figures are derived**
   (the round count and two defect counts; the two coverage checks are representation, not derivation). Every
-  other number in `NEXT_TASKS.md` is unchecked. Eight miscounts shipped; this catches the two shapes
+  other number in `NEXT_TASKS.md` is unchecked. Nine miscounts shipped; this catches the two shapes
   that recurred, not the class.
 - **The expected-claims list is itself a hand-maintained figure.** `EXPECTED_DEFECT_CLAIMS` must be
   extended when a round adds a count, and nothing enforces that — the same snapshot problem round 26

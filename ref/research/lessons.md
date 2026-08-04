@@ -12,6 +12,7 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| A spot fix that silently misses looks exactly like one that worked | 28 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -81,18 +82,27 @@ mechanism inferred from two data points is a hypothesis.** Round 7 explained a d
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
 
+Round 28's own review added a third: **a spot fix that silently misses looks exactly like one that
+worked.** Five fixes in that round each corrected the first occurrence and left the rest — one of them
+creating a fresh self-contradiction in the registry, in the file being corrected, falsifying two of the
+round's published conclusions. Switching to a sweep then exposed the mechanism: **two of five
+`str.replace` calls matched nothing and returned successfully**, because a colon stood where an
+em-dash was expected and a sentence wrapped across lines. Nothing distinguishes a no-op edit from a
+successful one except grepping afterwards for the value you meant to remove. Fix by sweep, verify by
+absence.
+
 Round 28 swept ~326 numeric claims by hand instead of adding a third gate, and **two of its four
 predictions were falsified — the two that would have justified building one.** **Measure a defect
 class before mechanising it.** The plan was a contradiction-checker, on the reasoning that a figure
 stated twice can be checked without knowing which statement is right. The sweep found **two** live
-self-contradictions and **six** figures simply wrong against their source, with nothing to contradict
+self-contradictions and **five** figures simply wrong against their source, with nothing to contradict
 them; the registry had **zero** contradictions in 227 claims. The cheap general guard would have
-addressed a quarter of the problem. This series has now mechanised four classes and measured one, and
+addressed two of seven — under a third of the problem. This series has now mechanised four classes and measured one, and
 the one measurement overturned the plan — which is an argument about the other four, not just this one.
 
 Its companion is why the errors sit where they do: **a write-once document rots; a re-read one does
 not.** The registry carries ~185 verifiable figures at a ~1.1 % error rate; the round trails carry ~65
-at ~4.6 %, and the trails have no gate while the registry has fourteen checks. But the causal story is
+at ~6.2 %, and the trails have no gate while the registry has fourteen checks. But the causal story is
 not the gate. Every round opens the registry and nobody ever reopens a finished trail, so its figures
 are correct on the day and rot unobserved. Round 26's "12 checked, 11 not" was true when written and
 reads as a present-tense claim two rounds later. The implication is a convention rather than a check —
@@ -452,7 +462,7 @@ the kind of result a symmetric band would have flagged as a failure.
 
 Round 12 adds the counterpart to the headroom rule: **when a band keeps breaking as the set grows,
 check its shape before widening it again.** `d_FSC_model` was widened and re-widened as an absolute
-± 0.05 Å band and broke anyway at 3 of 21 entries — because the quantity ranges 2.2–6.1 Å and no
+± 0.05 Å band and broke anyway at 3 of 21 entries — because the quantity ranges 2.06–4.35 Å over the recorded crossings and no
 absolute band serves both ends. As a **relative** 5 % band the same data has zero violations and a
 median of 0.31 %. Rounds 1 and 2 reached the identical conclusion for interface BSA and Wilson B;
 it took ten rounds to apply it here.

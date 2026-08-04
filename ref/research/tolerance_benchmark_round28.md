@@ -94,7 +94,8 @@ it.
 | #164 | the miscount tally, "nine" | ten, counting distinct wrong numbers |
 | #165 | `NEXT_TASKS` opens *"**Twenty-four** rounds"* while line 66 said twenty-seven | both now twenty-eight |
 | #166 | round 27: *"only **four** figures are derived"* | three |
-| #166 | round 26: *"**12** checked"* and *"**10** of 21"* | 15 |
+| #166 | round 26: *"**12** checked, 11 not"* | 15 |
+| #166 | round 26 scope limits: *"**10** are checked ... of **21**"* | 13 |
 | #167 | registry: 10RI degraded *"+0.45 %"* | **0.4441 %** — the TSV's own column says so |
 | #167 | registry: *"the quantity ranges **2.2–6.1 Å**"* | 2.06–4.35 Å over the 36 benchmark crossings |
 | #167 | that range's 6.1 Å ceiling, attributed to 9VAM | **unverifiable** — 9VAM is a `delta-only` row with no recorded `d_fsc_model_pre` |
@@ -127,6 +128,36 @@ wrong; nothing about it announced that it would age.
 what to build on the measurement is the next one's job, and doing both would repeat exactly the
 mistake the pre-registration caught.
 
+## #170 — every fix in this round corrected the headline and left the body
+
+Review found **five live defects**, and they are one behaviour:
+
+| | what was left behind |
+|---|---|
+| **#167's fix created a NEW registry self-contradiction** | the cell's later *"Caveat: the 2.2–6.1 Å range…"* was untouched, so the file now disagreed with itself where on `main` it had agreed — **and the surviving sentence asserts 9VAM = 6.10 Å, which this round established is unverifiable** |
+| #164's fix | round 27 stated its tally three ways: "Nine" (line 3), "Tenth" (179), **"Eight miscounts shipped"** (196) — plus `NEXT_TASKS` echoing the stale 8 |
+| #169's fix | round 28's *own* scope limits still read ~299 / "eight wrong" / "~4×" after the headline moved to ~297 / seven / ~5.7× |
+| the "what was wrong" table | merged round 26's **two** figures under one truth value — **#150's exact shape**, in this round's report about #150's shape |
+| `lessons.md` | its round-28 paragraph never updated: "six", "a quarter", "~4.6 %" |
+
+The first is the serious one. **It falsifies two of this round's own published claims** — *"the registry
+sweep found zero live self-contradictions"* and P2's *"self-contradiction is the minority shape"* —
+because the round created one in the file it was correcting.
+
+### The fix had to change method, and the verification is what mattered
+
+Spot-fixing had failed five times, so the repair was a **sweep**: enumerate every superseded value and
+grep all seven documents until none survives.
+
+**Two of the five replacements then silently did nothing** — the registry caveat uses a colon where I
+had written an em-dash, and round 27's sentence wraps across lines. Both `str.replace` calls matched
+zero characters and returned successfully. **A spot fix that silently misses is indistinguishable from
+one that worked**, which is why five of these accumulated in the first place; only grepping for the
+*old* value afterwards tells the two apart. That verification, not the edit, is the transferable part.
+
+One occurrence of `2.2–6.1` remains by design: the "what was actually wrong" table quotes it as the
+value that *was* wrong.
+
 ## Scope limits
 
 - **One sweep, seven documents, by hand.** The same "lower bound, not a total" caveat that applies to
@@ -134,10 +165,10 @@ mistake the pre-registration caught.
 - **PR bodies are excluded** because they are not files in the repo — and #147 and #150 both lived
   there, so the sweep structurally cannot see that shape. Two of the historical ten are invisible to
   the method that measured them.
-- **The ~326 / ~307 / ~299 figures are approximate** where the two sweeps overlapped. The eight wrong
-  ones are exact.
+- **The ~326 / ~307 / ~297 figures are approximate to ±2.** The seven wrong ones are exact, under
+  the counting rule stated above.
 - **The error rates compare unequal denominators.** The registry's 185 claims are concentrated in a
-  few very long rows; the trails' 65 are spread across four documents. The ~4× ratio is a real
+  few very long rows; the trails' 65 are spread across four documents. The ~5.7× ratio is a real
   signal, not a precise measurement.
 - **`lessons.md`'s round-9 claim is left unfixed**, marked low-confidence by the sweep and not
   independently settled here. Recorded rather than silently corrected.
