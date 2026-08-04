@@ -290,11 +290,11 @@ issues carry no machine-readable severity. Failing on them would have repeated #
 they report `UNCHECKABLE` — a coverage statement, not a pass. The gate now says so explicitly:
 
 ```
-all 12 checkable round-document figures match the findings record;
+all 15 checkable round-document figures match the findings record;
 11 predate the severity convention and are NOT checked
 ```
 
-That line is the honest summary of what this guard is worth: **12 checked, 11 not** — and it moved
+That line is the honest summary of what this guard is worth: **15 checked, 11 not** — and it moved
 from 7 to 12 during this round as the fixes added citations, which is itself the point. It was quoted
 as 7 until review caught it (#150), the **fourth** self-referential miscount in this round after #130,
 #135 and #147.
@@ -425,7 +425,7 @@ after refreshing the record reproduces it. The scope limits below say so.
 
 - **The round-figure gate now checks every round document, but only for severity claims.** The
   per-document literal checks (counts, ranges) remain round-25-specific, because each round's
-  phrasings are its own. So of **21** severity claims across all round documents, **10 are checked and
+  phrasings are its own. So of the severity claims across all round documents, **13 are checked and
   11 are UNCHECKABLE** — their issues predate the `**Severity:` convention that starts at #116.
   (This sentence carried the stale 7/18 after #150 corrected the quoted block six paragraphs above:
   the headline was fixed and the body was not, which is #91's shape and is why that finding is

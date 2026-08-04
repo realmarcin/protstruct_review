@@ -1,4 +1,4 @@
-# Lessons from twenty-seven rounds of tolerance benchmarking
+# Lessons from twenty-eight rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,9 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| A spot fix that silently misses looks exactly like one that worked | 28 |
+| Measure a defect class before mechanising it | 28 |
+| A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
 | "Same as the one we already trust" is a claim to verify | 27 |
 | A default bucket makes "unrecognised" and "miscounted" independent | 26 |
@@ -78,6 +81,47 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 28's own review added a third: **a spot fix that silently misses looks exactly like one that
+worked.** Five fixes in that round each corrected the first occurrence and left the rest — one of them
+creating a fresh self-contradiction in the registry, in the file being corrected, falsifying two of the
+round's published conclusions. Switching to a sweep then exposed the mechanism: **two of five
+`str.replace` calls matched nothing and returned successfully**, because a colon stood where an
+em-dash was expected and a sentence wrapped across lines. Nothing distinguishes a no-op edit from a
+successful one except grepping afterwards for the value you meant to remove. Fix by sweep, verify by
+absence.
+
+But the same round showed the method's limit, and it is sharp: **verify-by-absence rewards deleting
+history.** The sweep also rewrote a round-12 lesson's figure to today's value, turning a sentence that
+was true of round 12 into one true of no moment — because "the old value must not appear anywhere"
+cannot distinguish a stale claim from a correctly-dated historical one. A sweep needs a human decision
+per occurrence: is this asserted as current, or as a snapshot?
+
+And a third failure mode, found in the same round: **a sweep is blind to synonyms.** It hunts the
+value you changed *from*, so a sibling stating the same quantity in words that were never on your
+list survives untouched — a section header reading "the ninth miscount" seven lines above a body
+reading "Tenth", where "ninth" had been correct until its pair moved. Verify by **quantity, not by
+string**. Three distinct failure modes in one method in one round is itself the lesson: a repair
+technique deserves the same adversarial reading as the code it repairs.
+
+Round 28 swept ~326 numeric claims by hand instead of adding a third gate, and **two of its four
+predictions were falsified — the two that would have justified building one.** **Measure a defect
+class before mechanising it.** The plan was a contradiction-checker, on the reasoning that a figure
+stated twice can be checked without knowing which statement is right. The sweep found **two** live
+self-contradictions and **five** figures simply wrong against their source, with nothing to contradict
+them; the registry had **zero** contradictions in 227 claims. The cheap general guard would have
+addressed two of seven — under a third of the problem. This series has now mechanised four classes and measured one, and
+the one measurement overturned the plan — which is an argument about the other four, not just this one.
+
+Its companion is why the errors sit where they do: **a write-once document rots; a re-read one does
+not.** The registry carries ~185 verifiable figures at a ~1.1 % error rate; the round trails carry ~65
+at ~6.2 %, and the trails have no gate while the registry has fourteen checks. But the causal story is
+not the gate. Every round opens the registry and nobody ever reopens a finished trail, so its figures
+are correct on the day and rot unobserved. Round 26's "12 checked, 11 not" was true when written and
+reads as a present-tense claim two rounds later. The implication is a convention rather than a check —
+state a finished document's figures as snapshots, with their denominator and their date — and it is
+deliberately **not** implemented in the round that measured it, because building on a measurement in
+the round that produced it is the mistake the pre-registration existed to prevent.
 
 Round 27 gated the counts these summary files quote, after eight of them had shipped wrong across
 three rounds. Two lessons came out of it, and both are about the guard rather than the counts.
@@ -431,7 +475,8 @@ the kind of result a symmetric band would have flagged as a failure.
 
 Round 12 adds the counterpart to the headroom rule: **when a band keeps breaking as the set grows,
 check its shape before widening it again.** `d_FSC_model` was widened and re-widened as an absolute
-± 0.05 Å band and broke anyway at 3 of 21 entries — because the quantity ranges 2.2–6.1 Å and no
+± 0.05 Å band and broke anyway at 3 of 21 entries — because the quantity ranged 2.2–6.1 Å across round 12's 21 entries (2.06–4.35 Å over the 36
+recorded crossings today) and no
 absolute band serves both ends. As a **relative** 5 % band the same data has zero violations and a
 median of 0.31 %. Rounds 1 and 2 reached the identical conclusion for interface BSA and Wilson B;
 it took ten rounds to apply it here.
