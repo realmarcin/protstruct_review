@@ -184,6 +184,38 @@ Restored as the convention would have it: *"the quantity ranged 2.2–6.1 Å acr
 entries (2.06–4.35 Å over the 36 recorded crossings today)"* — the snapshot, its denominator, and the
 present value beside it.
 
+## #172 — the sweep's third failure mode: blind to synonyms
+
+A third review pass found one more, and it is the fourth instance of the headline-vs-body shape in
+this round:
+
+```
+round27.md:172 (header)  ## #163 — the ninth miscount, and what the gate does not reach
+round27.md:179 (body)    ... Tenth of the class, under that rule.
+```
+
+`fa89a2a` bumped the body to "Tenth" — correctly, per P4 — and left the header seven lines above.
+
+**#170's sweep read the "Tenth" and never looked up.** Its commit message states it enumerated round
+27's tally as *"stated three ways (Nine / Tenth / 'Eight miscounts shipped')"* and fixed the "Eight",
+treating "Tenth" as the correct target. The header was not in the list because **`ninth` was never a
+value I had changed** — it had been correct until `fa89a2a` moved its pair.
+
+> **A sweep hunts the value you changed *from*. It is blind to a sibling asserting the same quantity
+> in words that were never on your list.** Verify-by-absence confirms the old string is gone; it says
+> nothing about whether a different form of the same claim now disagrees.
+
+**That is the third distinct failure mode found in this one method, inside one round:** it no-ops
+silently (#170), it deletes correctly-dated history (#171), and it cannot see synonyms of the quantity
+it is fixing (#172). The repair is to verify by **quantity, not by string** — grep every statement of
+the ordinal regardless of wording, which is how this fix was checked.
+
+The rest of the pass was clean: every surviving occurrence of a superseded value is a legitimate
+historical quotation, the new registry caveat verifies against the TSV (9VAM has no
+`d_fsc_model_pre`; 10BU's 4.3513 is the largest recorded crossing), both tables balance exactly, round
+26's 15-vs-13 split is a genuine two-denominator distinction rather than an error, and all four gates
+exit 0.
+
 ## Scope limits
 
 - **One sweep, seven documents, by hand.** The same "lower bound, not a total" caveat that applies to

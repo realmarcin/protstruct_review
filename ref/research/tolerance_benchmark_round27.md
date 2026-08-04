@@ -169,7 +169,7 @@ digit, and nothing from the new table leaks in.
 That is not a hypothetical partition being defended; it is the first ordinary edit after the fix
 landing on the case the fix was for.
 
-## #163 — the ninth miscount, and what the gate does not reach
+## #163 — the tenth miscount, and what the gate does not reach
 
 Reviewing the candidate table added at the end of this round found two wrong counts.
 

@@ -97,6 +97,13 @@ was true of round 12 into one true of no moment — because "the old value must 
 cannot distinguish a stale claim from a correctly-dated historical one. A sweep needs a human decision
 per occurrence: is this asserted as current, or as a snapshot?
 
+And a third failure mode, found in the same round: **a sweep is blind to synonyms.** It hunts the
+value you changed *from*, so a sibling stating the same quantity in words that were never on your
+list survives untouched — a section header reading "the ninth miscount" seven lines above a body
+reading "Tenth", where "ninth" had been correct until its pair moved. Verify by **quantity, not by
+string**. Three distinct failure modes in one method in one round is itself the lesson: a repair
+technique deserves the same adversarial reading as the code it repairs.
+
 Round 28 swept ~326 numeric claims by hand instead of adding a third gate, and **two of its four
 predictions were falsified — the two that would have justified building one.** **Measure a defect
 class before mechanising it.** The plan was a contradiction-checker, on the reasoning that a figure
