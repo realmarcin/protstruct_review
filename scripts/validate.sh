@@ -265,3 +265,19 @@ fi
 if [[ "${QUIET}" == "0" ]]; then
   echo "every bench_*.py commits its entry set"
 fi
+
+# The registry quotes figures computed from ref/research/data/em_refinement_deltas.tsv,
+# and that file grows every round -- so those figures age silently. Three instances were
+# caught (#72, #107, #113), all three by accident during reviews of unrelated work.
+# Catching a class three times by luck is not a process.
+#
+# This recomputes each one and fails if the registry's text no longer matches. It also
+# fails if the quoted literal has been REWORDED, because a gate that only compares
+# numbers is defeated by a rewrite -- which is exactly how a figure escapes notice.
+if ! python3 "${REPO_ROOT}/scripts/check_registry_figures.py" > /dev/null 2>&1; then
+  python3 "${REPO_ROOT}/scripts/check_registry_figures.py" >&2 || true
+  fail "registry figures no longer match ref/research/data/em_refinement_deltas.tsv"
+fi
+if [[ "${QUIET}" == "0" ]]; then
+  echo "registry figures match the per-entry data"
+fi
