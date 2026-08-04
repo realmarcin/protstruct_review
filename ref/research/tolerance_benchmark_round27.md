@@ -169,6 +169,26 @@ digit, and nothing from the new table leaks in.
 That is not a hypothetical partition being defended; it is the first ordinary edit after the fix
 landing on the case the fix was for.
 
+## #163 — the ninth miscount, and what the gate does not reach
+
+Reviewing the candidate table added at the end of this round found two wrong counts.
+
+**Mine, and new.** The table said the `scripts/` audit had *"found defects every time — 12, then 5,
+then 5"*. Forty lines below, the same file says **12, then 2, then 5**. I wrote pass 6's figure for
+pass 4 — the identical mistake #158 corrected three commits earlier — in a table whose subject is how
+reliably audits find defects. Ninth of the class.
+
+**Pre-existing.** The 1.074 fence base rate was stated as *"3 of 60"* in one place and *"4 of 60 =
+6.7 %"* in another. Derived from the data: 4 of 60 above 1.074, 2 of 60 above 1.3. So 4 is right, the
+registry already said so, and `NEXT_TASKS` was contradicting both the registry and itself. My new
+table happened to quote 6.7 % — the correct side of a contradiction I had not noticed, which is luck
+rather than checking.
+
+**Neither would have been caught by this round's gate.** `check_summary_coverage.py` derives only
+`**N defects** (#A–#B)` claims and the spelled-out round count; neither of these matches that form.
+The scope limits below already said only four figures are derived. This is what that limitation costs,
+measured two commits after it was written rather than asserted.
+
 ## Scope limits
 
 - **Coverage is representation, counts are derivation, and only four figures are derived.** Every

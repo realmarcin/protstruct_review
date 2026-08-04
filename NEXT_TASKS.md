@@ -157,7 +157,7 @@ menu, not a second copy of it.
 |---|---|---|
 | **Crossing-quality hypothesis** (below) | ~60–90 screened entries, each a 100–250 MB map download plus `mtriage` | base rate 3.3 % at the 1.3 cut, 6.7 % at the data-driven 1.074 fence; three candidates is the minimum for a powered comparison. **Multi-round.** |
 | **Fresh low-resolution X-ray measurement** (*Standing risk*, below) | a new refinement set below 2.5 Å | the only way to give the §4 band widths a checkable basis; the two maxima that size them come from ~11 entries named nowhere and cannot be recounted. **Multi-round.** |
-| **Another `scripts/` audit pass with a new lens** (*Standing risk*, below) | one round | has found defects **every time** — 12, then 5, then 5 — but the lens must differ each pass, and there is **no defined endpoint**. Cheap per pass, unbounded in total. |
+| **Another `scripts/` audit pass with a new lens** (*Standing risk*, below) | one round | has found defects **every time** — 12, then 2, then 5 — but the lens must differ each pass, and there is **no defined endpoint**. Cheap per pass, unbounded in total. |
 
 The asymmetry is the point. The first two are expensive and *bounded* — you can say in advance what
 would settle them. The third is cheap and *unbounded* — it has never come back empty, which is a
@@ -175,7 +175,7 @@ evidence against it (Fisher p = 0.512; a 25 % chance of seeing none), so the hyp
 supported nor refuted**.
 
 **The cost is now measured rather than guessed.** Combined base rate is **2 of 60 = 3.3 %** at the
-1.3 cut, or 3 of 60 at the data-driven fence of 1.074. Three candidates — the minimum for a powered
+1.3 cut, or **4 of 60 = 6.7 %** at the data-driven fence of 1.074. Three candidates — the minimum for a powered
 comparison — needs **~60–90 screened entries**, each costing a 100–250 MB map download and a few
 minutes of `mtriage`. **That is a project, not a round**, and it should not be picked up as though it
 were cheap.
