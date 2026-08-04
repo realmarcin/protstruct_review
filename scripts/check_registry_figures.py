@@ -47,6 +47,17 @@ from typing import Any, Callable
 
 from scipy import stats
 
+def _load_vocabulary():
+    """The declared status vocabulary, from the script that WRITES the file."""
+    spec = importlib.util.spec_from_file_location(
+        "bench_em_status", Path(__file__).resolve().parent / "bench_refinement_deltas_em.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.STATUS_PREFIXES, module.status_is_known
+
+
+_VOCAB, _IS_KNOWN = _load_vocabulary()
+
 REGISTRY = "ref/thresholds_and_standards.md"
 TSV = "ref/research/data/em_refinement_deltas.tsv"
 
@@ -59,6 +70,23 @@ def load(path: Path) -> list[dict[str, str]]:
 
 # --- the derivations, each one line of intent -------------------------------------
 
+def _status_is(row, token: str) -> bool:
+    """Does this row's status match the DECLARED token, delimiter included?
+
+    #152: `status_is_known` was tightened in #148 to match on each status's delimiter,
+    and these predicates were not — they kept the bare `startswith("skipped")` that #148
+    removed, so `skipped-early: ...` was excluded from `_attempted` as though it were a
+    real skip. Nothing escaped only because `vocabulary_check` rejects such a row
+    independently; the denominators were right because a separate check happened to fail
+    first, which is a backstop rather than correctness. One rule, one copy.
+    """
+    for declared, (rule, _) in _VOCAB.items():
+        if declared.startswith(token):
+            return row["status"] == declared if rule == "exact" else \
+                row["status"].startswith(declared)
+    raise KeyError(f"{token!r} is not a declared status token")
+
+
 def _named(rows):
     """Entries that entered the refinement benchmark.
 
@@ -68,7 +96,7 @@ def _named(rows):
     """
     return [r for r in rows
             if not r["pdb_id"].startswith("UNKNOWN")
-            and not r["status"].startswith("screened only")]
+            and not _status_is(r, "screened only")]
 
 
 def _cc_deltas(rows):
@@ -90,7 +118,7 @@ def _ratios(rows):
 
 def _attempted(rows):
     """Of the entries that entered the benchmark, those not skipped."""
-    return [r for r in _named(rows) if not r["status"].startswith("skipped")]
+    return [r for r in _named(rows) if not _status_is(r, "skipped")]
 
 
 def _with_delta(rows):
@@ -98,7 +126,7 @@ def _with_delta(rows):
 
 
 def _measured(rows):
-    return [r for r in _named(rows) if r["status"] == "measured"]
+    return [r for r in _named(rows) if _status_is(r, "measured")]
 
 
 def _attempted_incl_lost(rows):
@@ -108,8 +136,7 @@ def _attempted_incl_lost(rows):
     is stated against its own base and checked against its own derivation.
     """
     return [r for r in rows
-            if not r["status"].startswith("screened only")
-            and not r["status"].startswith("skipped")]
+            if not _status_is(r, "screened only") and not _status_is(r, "skipped")]
 
 
 def _resolution_rho(rows):
@@ -220,16 +247,12 @@ def nesting_check(registry: str, rows: list[dict]) -> dict[str, Any]:
 def _status_vocabulary():
     """The declared `status` vocabulary, imported from the script that WRITES it.
 
-    Not re-declared here. Every predicate in this file keys on a status prefix, and
-    before round 26 those prefixes were the only definition of the vocabulary that
-    existed -- spread across four functions, in the reader, while the writer that
-    produces the values lived in another file. That is the shape of #136.
+    Not re-declared here. Every predicate in this file keys on a status, and before
+    round 26 those keys were the only definition of the vocabulary that existed --
+    spread across four functions, in the reader, while the writer that produces the
+    values lived in another file. That is the shape of #136.
     """
-    spec = importlib.util.spec_from_file_location(
-        "bench_em_status", Path(__file__).resolve().parent / "bench_refinement_deltas_em.py")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module.STATUS_PREFIXES, module.status_is_known
+    return _VOCAB, _IS_KNOWN
 
 
 def vocabulary_check(rows: list[dict]) -> dict[str, Any]:

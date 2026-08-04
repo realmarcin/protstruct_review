@@ -351,6 +351,48 @@ before the commit rather than after. That is the design working as intended and 
 snapshot record plus a document that cites issues filed during the round means every issue-filing
 commit needs a refresh. It is structural, not forgetfulness.
 
+### Pass 6: enumerating the input space instead of hunting bugs
+
+Five passes had each found a defect by reading. The sixth took a different method — for each guard,
+partition the space of inputs it must classify and construct one input per partition — and it found
+**four more**, two of them silent false negatives, plus a fifth that #148's own fix had left behind.
+
+**#151 (high) — quotation detection failed on four further markdown constructs.**
+
+| construct | before |
+|---|---|
+| quoted literal inside a fence, prose says something else | check reports `OK` |
+| one stray backtick earlier in the paragraph | a real wrong claim **vanishes** from the output |
+| `~~~` fence, and unclosed fences | quoted severity read as the declaration |
+| indented block, newline-spanning span | false `STALE` on correct prose |
+
+The second is the one that matters: **a false negative on a real defect is worse than a false
+positive**, and it needed nothing more exotic than one unmatched backtick. `round26.md` alone contains
+352 backticks.
+
+**#152 (medium) — #148's fix never visited the sibling functions.** `status_is_known` was tightened to
+match on each status's delimiter; `_named`, `_attempted` and `_attempted_incl_lost` kept the bare
+`startswith("skipped")` that #148 removed, so `skipped-early: …` was excluded from `attempted` as
+though it were a real skip. Nothing escaped — but only because `vocabulary_check` rejects such a row
+independently. **The denominators were right because a separate check happened to fail first**, which
+is a backstop, not correctness. They now classify through the declared vocabulary.
+
+**The method change is the finding.** Five passes of reading found five defects; one pass of
+partitioning found five more in the code those passes had just reviewed. Reading finds the defect you
+can imagine; enumerating finds the region you never thought about.
+
+**And the repair changed shape.** The first four fixes each *stripped* the document of one more
+construct and were tested against that construct. Stripping is destructive, which is why an unbalanced
+backtick could delete a claim. The gate now **classifies each match in place** — a stray backtick can
+mis-classify the match it touches and can no longer erase a different one. That is a structural answer
+rather than a fifth patch, and it is what should have been done at #144.
+
+**What is still not closed.** This remains a heuristic for "is this markdown text a quotation", and
+markdown has more constructs than are enumerated here. The honest position is that the gate now
+handles every construct these documents actually use, has a partition map in `test_guards.py` rather
+than one regression test per incident, and **may still be wrong on a construct nobody has written
+yet.**
+
 ### The record went stale again, one commit later — and the guard caught it
 
 Immediately after fixing #143, the same defect recurred: filing #145, #146 and #147 and citing them in
@@ -377,8 +419,11 @@ after refreshing the record reproduces it. The scope limits below say so.
 
 - **The round-figure gate now checks every round document, but only for severity claims.** The
   per-document literal checks (counts, ranges) remain round-25-specific, because each round's
-  phrasings are its own. So of 18 severity claims across all round documents, **7 are checked and 11
-  are UNCHECKABLE** — their issues predate the `**Severity:` convention that starts at #116.
+  phrasings are its own. So of **21** severity claims across all round documents, **10 are checked and
+  11 are UNCHECKABLE** — their issues predate the `**Severity:` convention that starts at #116.
+  (This sentence carried the stale 7/18 after #150 corrected the quoted block six paragraphs above:
+  the headline was fixed and the body was not, which is #91's shape and is why that finding is
+  counted as recurring rather than closed.)
 - **The gate cannot check a figure quoted from its own output** (circular: the summary counts the
   results), nor anything outside the repo — a PR body is not a file, and its guard-check count went
   stale twice in this PR. Both are refreshed by hand, and both have already been wrong once.

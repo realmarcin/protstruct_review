@@ -207,6 +207,14 @@ check("and a look-alike is reported by the vocabulary check, not absorbed",
 # -- every quoted figure comes from a committed, re-runnable script -- had never been
 # applied to a round document's claims about ITSELF.
 
+def _raises_keyerror(figures):
+    try:
+        figures._status_is({"status": "x"}, "nonsense")
+    except KeyError:
+        return True
+    return False
+
+
 roundfig = load("check_round_figures")
 FINDINGS = roundfig.load(roundfig.RECORD)
 ROUND25_DOC = Path(roundfig.ROUND25).read_text()
@@ -328,6 +336,56 @@ check("every class declaring oracle_family constrains it to ToolFamily",
 check("and all three classes that declare it are covered", len(_families), 3)
 check("the enum itself still admits exactly the two families",
       sorted(_schema["enums"]["ToolFamily"]["permissible_values"]), ["cctbx", "non_cctbx"])
+
+
+# --- Round 26, pass 6: the partitions an input-space enumeration found -------------
+# #151/#152. Every prior fix here was tested against the construct that motivated it
+# and failed the next one -- inline backticks, then fenced blocks, then bold-inside-
+# backticks, then ~~~. So this block is a partition MAP, not a regression test for one
+# case, and the two false NEGATIVES matter most: a gate that declines to look is worse
+# than one that complains.
+
+_D = ROUND25_DOC  # a real document, for the cases that need one
+
+# False negatives -- the gate must still SEE these.
+check("a stray backtick does not delete a later real claim",
+      [r["status"] for r in roundfig.severity_claims(
+          "stray ` here. The claim **#136 (medium)** is WRONG, then `end`.", FINDINGS)],
+      ["STALE"])
+check("a quoted literal does not satisfy a check the prose contradicts",
+      [r["status"] for r in roundfig.run(
+          "Eleven defects, filed as #116-126.\n\n```\nTwelve defects, filed as #116–#127.\n```\n",
+          FINDINGS)][:1],
+      ["MISSING"])
+
+# Quotation, by every fence and span style these documents actually use.
+check("a ~~~ fenced severity is a quotation, not a declaration",
+      roundfig.severity_of("q:\n\n~~~\n**Severity: high**\n~~~\n\n**Severity: low**\n"), "low")
+check("an unclosed fence does not leak its contents",
+      roundfig.severity_of("q:\n\n```\n**Severity: high**\n"), "unstated")
+for _label, _doc in [
+        ("backtick-wrapped", "the regex missed (`**#130 (High)**`) entirely"),
+        ("fenced", "example:\n\n```\n**#130 (high)**\n```\n"),
+        ("indented", "shown as:\n\n    **#136 (medium)**\n\nnot a claim."),
+        ("blockquoted", "> **#136 (medium)** quoted from elsewhere")]:
+    check(f"  quotation ignored: {_label}", roundfig.severity_claims(_doc, FINDINGS), [])
+check("while a claim in running prose is still checked",
+      [r["status"] for r in roundfig.severity_claims("**#130 (medium)** — a real claim", FINDINGS)],
+      ["OK"])
+
+# #152: the denominators classify via the declared vocabulary, not their own prefixes.
+import copy as _copy
+_bad = _copy.deepcopy(ROWS)
+_bad.append({**_bad[0], "pdb_id": "9XXX", "status": "skipped-early: still counts",
+             "cc_mask_delta": ""})
+check("an undeclared look-alike is not absorbed as a real skip",
+      len(figures._attempted(_bad)) - len(figures._attempted(ROWS)), 1)
+check("and the published denominators are unchanged by the rewrite",
+      [len(f(ROWS)) for f in (figures._named, figures._attempted, figures._with_delta,
+                              figures._measured, figures._attempted_incl_lost)],
+      [69, 59, 58, 35, 63])
+check("the denominator predicates reject an undeclared token outright",
+      _raises_keyerror(figures), True)
 
 
 print(f"\nall guard unit tests passed ({PASSED} checks)")

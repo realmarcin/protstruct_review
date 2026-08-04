@@ -53,7 +53,45 @@ HEADER = "issue\tseverity\tstate\ttitle\n"
 _SEVERITY = re.compile(r"^\*\*Severity:\s*([a-z-]+)", re.MULTILINE)
 
 
-_FENCED = re.compile(r"^```.*?^```", re.MULTILINE | re.DOTALL)
+# Any GFM fence, ``` or ~~~, and an UNCLOSED fence runs to end of document. `~~~` is
+# what an author reaches for when the quoted text itself contains backticks -- exactly
+# this repo's situation -- and an unclosed fence is a routine copy-paste artefact. Both
+# previously bypassed stripping and reproduced #121's shape a fourth time (#151).
+_FENCED = re.compile(r"^(```|~~~).*?(^\1|\Z)", re.MULTILINE | re.DOTALL)
+
+
+def _fenced_spans(doc: str) -> list[tuple[int, int]]:
+    return [(m.start(), m.end()) for m in _FENCED.finditer(doc)]
+
+
+def _is_quoted(doc: str, start: int, end: int, spans: list[tuple[int, int]]) -> bool:
+    """Is the match at [start, end) a quotation rather than a claim?
+
+    Classifies the match IN PLACE instead of stripping the document first. Destructive
+    stripping meant one unbalanced backtick earlier in a paragraph swallowed everything
+    to the next one -- including a genuinely wrong severity claim, which then vanished
+    from the gate's output entirely (#151). A false negative on a real defect is worse
+    than the false positives this stripping was introduced to fix, so the rule is now
+    local: a stray backtick can mis-classify the match it touches, never delete another.
+
+    Quotation means any of: inside a fence; wrapped in backticks on its own line; on an
+    indented (4-space) or blockquoted line.
+    """
+    if any(s <= start < e for s, e in spans):
+        return True
+    line_start = doc.rfind("\n", 0, start) + 1
+    line_end = doc.find("\n", end)
+    line_end = len(doc) if line_end == -1 else line_end
+    line = doc[line_start:line_end]
+    if line[:4] == "    " or line.lstrip().startswith(">"):
+        return True
+    # Backticks immediately around the match, on this line only. The claim pattern does
+    # not consume the closing `**`, so skip it before looking for the backtick --
+    # otherwise `` `**#130 (High)**` `` reads as unquoted because the character after the
+    # match is `*`.
+    before = doc[line_start:start]
+    after = doc[end:line_end].lstrip("*")
+    return before.rstrip().endswith("`") and after.lstrip().startswith("`")
 
 
 def severity_of(body: str) -> str:
@@ -216,7 +254,10 @@ def severity_claims(doc: str, rows: list[dict]) -> list[dict[str, Any]]:
     """
     by_issue = {r["issue"]: r for r in rows}
     results = []
-    for m in re.finditer(_SEVERITY_CLAIM, _prose_only(doc)):
+    spans = _fenced_spans(doc)
+    for m in re.finditer(_SEVERITY_CLAIM, doc):
+        if _is_quoted(doc, m.start(), m.end(), spans):
+            continue
         issue, claimed = m.group(1), m.group(2)
         if claimed.lower() not in _KNOWN_SEVERITIES:
             results.append({
@@ -276,8 +317,13 @@ def run_all(repo: Path, rows: list[dict]) -> list[dict[str, Any]]:
 
 def run(doc: str, rows: list[dict]) -> list[dict[str, Any]]:
     results = []
+    # Literal checks read the document with fences removed, for the same reason the
+    # claim checks do: a document that QUOTES the canonical phrasing while its prose
+    # states something else satisfied this check (#151), and this is the gate's default
+    # target.
+    prose = _FENCED.sub("", doc)
     for label, literal, derived in round25_checks(rows):
-        if literal not in doc:
+        if literal not in prose:
             status, detail = "MISSING", (
                 f"the document does not contain the expected literal {literal!r} — the "
                 f"figure was edited or the claim reworded, so there is nothing to "

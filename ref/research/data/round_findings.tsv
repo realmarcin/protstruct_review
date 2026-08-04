@@ -55,3 +55,5 @@ issue	severity	state	title
 148	medium-high	open	status_is_known absorbs an undeclared status that shares a prefix with a declared one
 149	medium	open	check_round_figures: fenced-block severities, silently-dropped citations, and a ValueError on an empty record
 150	medium	open	Round 26 quotes a stale count of the gate's own output (7, now 12), and the PR body's guard-check count is stale again
+151	high	open	check_round_figures' quotation detection fails on four more markdown constructs, two as silent false negatives
+152	medium	open	_named/_attempted still use the bare startswith that #148 removed from status_is_known
