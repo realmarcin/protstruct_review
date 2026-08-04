@@ -74,7 +74,7 @@ on the branch" stops being true. Immediately before `git add`:
 
 and read the staged list back before committing. Confirm it is the work you mean and NOTHING ELSE.
 An intervening `git checkout` — to read a file, to check another PR — leaves you somewhere else with
-no warning, and `git add -A` does not care. This has happened here: a 20-file audit round landed on
+no warning, and `git add -A` does not care. This has happened here: a 19-file audit round landed on
 an unrelated docs branch and had to be cherry-picked back onto main. It was recoverable only because
 it had not been pushed yet.
 
