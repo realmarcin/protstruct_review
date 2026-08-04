@@ -82,6 +82,16 @@ mechanism inferred from two data points is a hypothesis.** Round 7 explained a d
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
 
+Round 28 also showed, after merge, that **stating a counting rule is not the same as following it**:
+the document defined "one distinct numeric statement", applied it to its measurement, and two sections
+later summarised its own defects by counting *issues* instead, in the flattering direction (#174). A rule declared once and not restated at each use is a rule that
+lapses exactly where nobody is looking. The first correction then asserted a precise figure under that
+rule and was wrong again (#176) — and chasing the right one showed the rule **does not decompose** for
+the quantity it was being applied to: a two-row table that fails to balance is one defect or two,
+five defects called "one behaviour" are five or one, and nothing in the rule decides. **A counting
+rule has a domain.** Outside it, pick a unit that is exact — issues, files, commits — and say which,
+rather than manufacturing precision the rule cannot support.
+
 Round 28's own review added a third: **a spot fix that silently misses looks exactly like one that
 worked.** Five fixes in that round each corrected the first occurrence and left the rest — one of them
 creating a fresh self-contradiction in the registry, in the file being corrected, falsifying two of the

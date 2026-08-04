@@ -228,11 +228,48 @@ shape rather than this one.
 It understates by one, in the direction that makes the problem look smaller — the bias this repo says
 to check hardest — inside a sentence whose only job is counting instances of a defect class.
 
-**Nine of the round's own defects have now been found across three review passes, every one in the
-prose and none in the measurement.** That split is the round's most durable result and is worth
+**Ten issues were found in the round's own work across three review passes** (#164–#167, #169–#174),
+**every one in the prose and none in the measurement.** The unit is *issues*, which is exact and
+checkable; see below for why the statement-level rule is not used here. That split is the round's most durable result and is worth
 stating as such: the measurement (P1–P4, the sweep, the seven corrected figures) has not moved through
 any pass. What keeps failing is the writing *about* it — and each failure has been a count, in a round
 whose subject is that counts fail.
+
+## #174 — three quantities, one word, and a rule the summary did not follow
+
+A post-merge review found `nine` doing three jobs in this document: round 27's historical tally
+(corrected here to ten), the count of **issues** filed during round 28, and the count of **occurrences**
+the #170 sweep judged. Each was individually right; nothing said they counted different things.
+
+The substantive half is that the summary counted **issues** while this document's own rule, stated at
+the top of the measurement section, counts **statements**:
+
+> a *wrong figure* is one distinct numeric statement that was wrong
+
+**That is #164 exactly**, whose diagnosis was *"the list counted issues while calling them
+miscounts"*, recurring in this round's own summary of that defect — and in the flattering direction
+again, since a smaller number reads better.
+
+**The first attempt to fix it asserted "fifteen" and that was also wrong** (#176): the breakdown gave
+`#166:2` where the document's own table shows three rows for #166, making the sum sixteen. Chasing the
+right number is what exposed the real problem — **the rule does not decompose for this quantity at
+all**:
+
+- **#169** was a two-row table that failed to balance. One wrong statement, or two? One edit fixed both.
+- **#170** was five defects the issue itself calls *"one behaviour"*. Five, or one?
+- **#167**'s range floor and ceiling are two table rows but one sentence, which is why the table's
+  eight rows collapse to seven.
+
+The rule was built to count **figures in prose**, where a numeric statement is a well-defined unit.
+Applied to **defects**, 15 versus 16 is an artefact of where the line is drawn, not a fact. So this
+document counts *issues* for its own defects — exact and checkable — and reserves the statement-level
+rule for the swept figures, where it means something. **Asserting "sixteen" would have claimed a
+precision the rule cannot deliver**, which is the same overreach as the original "nine".
+
+Both figures now carry their unit. The wider point is unflattering and worth keeping: **stating a
+counting rule is not the same as following it.** This document defined the rule, applied it correctly
+to the measurement, and abandoned it two sections later when summarising itself — which is why the
+rule needs to be restated at each use rather than declared once.
 
 ## Scope limits
 
@@ -248,6 +285,6 @@ whose subject is that counts fail.
   signal, not a precise measurement.
 - **The sweep method cannot tell a stale figure from a historical one** (#171), and its
   verify-by-absence step rewards removing the latter. Any future sweep needs the distinction made by a
-  human per occurrence; this round made it wrong once out of nine.
+  human per occurrence; this round judged nine occurrences and got one of them wrong (#171).
 - **`lessons.md`'s round-9 claim is left unfixed**, marked low-confidence by the sweep and not
   independently settled here. Recorded rather than silently corrected.
