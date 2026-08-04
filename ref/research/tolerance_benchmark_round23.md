@@ -90,3 +90,104 @@ directly.
 
 **If P1 fails the round reports a base rate and nothing else**, and says so rather than reaching for
 whatever the screened set happens to show.
+
+
+## Results — the test could not be run, which was a registered possible outcome
+
+**24 entries screened, 0 with `ratio > 1.3`.** No refinements were run, because there was nothing to
+refine.
+
+| # | Prediction | Outcome |
+|---|---|---|
+| **P0** | base rate 3–15 % | ❌ **falsified — 0.0 %** (but see below) |
+| **P1** | ≥ 1 high-ratio entry in 24 | ❌ **falsified — zero** |
+| P2 | high-ratio \|Δ\| ≥ 10× the control median | **unevaluable** — no high-ratio entries |
+| P3 | control median \|Δ\| in [0.02, 0.5] % | **unevaluable** — no refinements run |
+| P4 | at least one high-ratio entry improves | **unevaluable** |
+
+Registered in advance: *"If P1 fails the round reports a base rate and nothing else."* That is what
+this is.
+
+### P0 was falsified as written, and the inference is the opposite of what that sounds like
+
+I registered P0 as an interval on the **observed** rate. 0 % falls outside [3 %, 15 %], so it is
+falsified — but **0/24 is entirely consistent with the 5.6 % prior rate**:
+
+- Fisher's exact on 0/24 against the prior 2/36: **p = 0.512**.
+- 95 % CI for the rate given 0/24: **[0 %, 14.2 %]**, which contains 5.6 %.
+- P(seeing zero in 24 | true rate 5.6 %) = 0.944²⁴ = **25 %** — a one-in-four outcome.
+
+So the honest reading is *"consistent with the prior rate; this batch happened to contain none"*, not
+*"the rate is lower than thought"*. **P0 was the wrong shape of prediction** — an interval on a point
+estimate rather than a test of consistency — which is round 17's lesson (*registering a prediction
+does not protect you from registering a bad test*) recurring in a new form. P1, registered as a
+straightforward count at 75 %, was well calibrated and failed honestly.
+
+### The useful finding is the shape of the distribution
+
+Combining this round's 24 with the 36 on record gives **60 measured crossings**, and the ratio is far
+tighter than the 1.3 cut assumed:
+
+| | n | median ratio | max |
+|---|---:|---:|---:|
+| prior | 36 | 0.9862 | 1.3718 |
+| round 23 | 24 | 0.9736 | 1.0937 |
+| **combined** | **60** | **0.9843** | — |
+
+**The sustained-crossing estimator tracks the map's own stated resolution almost exactly for the
+overwhelming majority of entries** — 57 of 60 sit between 0.73 and 1.01. That is a new
+characterisation of the estimator round 9 introduced, and it is reassuring about the estimator
+independently of this round's hypothesis.
+
+It also reframes the threshold. A Tukey fence on the **combined** ratio distribution sits at
+**1.074**, not 1.3 — and by that criterion all three of the top ratios are outliers, including this
+round's highest, **6PMJ at 1.094**:
+
+```
+1.094 (6PMJ, round 23)   1.360 (10BU)   1.372 (9H7U)      fence 1.074
+```
+
+So the post-hoc 1.3 cut inherited from n = 2 was **too conservative**, and a data-driven cut would
+have admitted one candidate from this batch.
+
+### Why 6PMJ was not refined
+
+It would not have been a test. One high-ratio entry against three controls gives a best achievable
+one-sided p of **1/4 = 0.25** — the power table registered before this round shows a single candidate
+cannot reach significance against any control group affordable here. Refining it would have added an
+*observation* to an n = 2 hypothesis, not a *test* of it, and this series has spent four rounds
+learning to tell those apart.
+
+## What it would actually take
+
+The cost is now known rather than guessed:
+
+| | |
+|---|---|
+| combined base rate at ratio > 1.3 | **2 of 60 = 3.3 %** |
+| at the data-driven fence 1.074 | **3 of 60 = 5.0 %** |
+| entries to screen for **3** candidates | **~60–90** |
+| cost per screened entry | one map download (100–250 MB) + `mtriage` (~2–5 min) |
+
+**That is a project, not a round** — roughly 60–90 map downloads and several hours of screening before
+a single refinement. The successor item is re-scoped accordingly rather than left as though it were
+cheap.
+
+## Applied
+
+> **No band changed and no tolerance moved.** The crossing-quality hypothesis remains **untested**;
+> it is neither supported nor refuted by this round.
+>
+> **New, and worth keeping:** the crossing/resolution ratio over **60** entries has median **0.9843**
+> with 57 of 60 in 0.73–1.01, so the sustained-crossing estimator tracks stated resolution closely in
+> the ordinary case. The outlier fence is **1.074**, not the 1.3 inherited from n = 2.
+
+## Scope limits
+
+- **The hypothesis is untested, not weakened.** Screening found no candidates; it did not examine any.
+- **P0's falsification is an artefact of how it was written.** 0/24 is consistent with the prior rate
+  (p = 0.512); the interval was on the wrong quantity.
+- **The 1.074 fence is computed on the combined 60** and includes the two entries that motivated the
+  hypothesis, so it is not independent of them.
+- All 24 screened entries are recorded in `em_refinement_deltas.tsv` with a `screened only` status,
+  carrying their pre-refinement crossing but no Δ — they are denominator, not evidence.

@@ -1,4 +1,4 @@
-# Lessons from twenty-two rounds of tolerance benchmarking
+# Lessons from twenty-three rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,8 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| Price the sampling before promising the test | 23 |
+| An interval on an observed rate is not a test of that rate | 23 |
 | Whether a subset re-run helps depends on which members were lost | 22 |
 | A failed mechanism hunt can still leave a testable successor | 22 |
 | A lost set can sometimes be replaced instead of recovered | 21 |
@@ -68,6 +70,24 @@ measured in.** Round 8 adds the fourth, and it is about explanations rather than
 mechanism inferred from two data points is a hypothesis.** Round 7 explained a degenerate
 `d_FSC_model` as a coverage problem on n = 2; round 8 refuted it with four more entries. The number
 (1 of 6 entries fails) survived; the story did not.
+
+Round 23 adds the cost half of round 17's power lesson: **price the sampling before promising the
+test.** Round 22 specified a successor test and called it cheap because the selector was measurable
+before refinement — which was true and beside the point. The candidates it needs occur at a **3.3 %**
+base rate, and screening **24** entries (24 map downloads, hours of `mtriage`) found **none**, which
+is a one-in-four outcome at that rate and tells you nothing you did not already know. Getting three
+candidates needs ~60–90 screened entries. Round 17 taught this series to check the *statistical* power
+before hunting a mechanism; round 23 adds that the *sampling* cost deserves the same arithmetic, and
+that "the selector is cheap to measure" is not the same as "the experiment is cheap to run".
+
+Its companion is a smaller methodological point that cost this round its gate: **an interval on an
+observed rate is not a test of that rate.** P0 predicted the base rate would land in 3–15 %; it came
+out at 0 %, so P0 was falsified — and 0/24 is *entirely consistent* with the 5.6 % prior (Fisher
+p = 0.512, 95 % CI [0 %, 14.2 %], and a 25 % chance of seeing zero). The prediction was falsified while
+the thing it was meant to detect was not. That is round 17's "registering a prediction does not
+protect you from registering a bad test", recurring in a new shape: predict the *comparison* you
+care about, not an interval around a point estimate whose sampling variance you have not accounted
+for.
 
 Round 22 qualifies round 21's route with the question that decides whether it works: **whether a
 subset re-run helps depends on *which* members were lost, not how many.** The L-test's missing
