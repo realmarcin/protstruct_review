@@ -32,8 +32,9 @@ they are not `LOST`, so the stated exclusion does not remove them.
 
 **The number was right and the definition was wrong**, which is the inverse of #84 and arguably worse:
 a reader checking the count against the file gets 93, concludes the registry is 24 behind, and
-"corrects" a figure that was correct. The other three counts (63 / 58 / 35) are unaffected — screened
-rows have no Δ and no post value.
+"corrects" a figure that was correct. Screened rows have no Δ and no post value, so 58 and 35 are
+unaffected — but the 63 turned out to have a separate problem of its own, found later in this same
+round (#115, below).
 
 Fixed by stating the exclusion: *entries that entered the refinement benchmark*, excluding both the
 `LOST` rows and the `screened only` ones.
@@ -43,7 +44,7 @@ Fixed by stating the exclusion: *entries that entered the refinement benchmark*,
 `scripts/check_registry_figures.py`, wired into `scripts/validate.sh`. It pairs each dataset-dependent
 figure in the registry with a function that recomputes it from the TSV, and fails if they diverge.
 
-Eight figures are covered: the entry count, the CC_mask degradation count, the `d_FSC_model`
+Eight figures are covered (a ninth check was added later in the round — see #115 below): the entry count, the CC_mask degradation count, the `d_FSC_model`
 degradation count and median, the worst degradation, the resolution correlation, and round 23's
 crossing-ratio median and band count.
 
@@ -58,7 +59,7 @@ Verified in both directions:
 |---|---|
 | append a row to the TSV (figures age) | **3 checks go STALE**, with the old and new values printed |
 | reword one claim, leaving the number right | **1 check goes MISSING**, naming the literal it lost |
-| restored | gate passes, 8/8 |
+| restored | gate passes |
 
 **Not covered, deliberately:** the §3 rows. Their sets are fixed and committed (round 18), so those
 figures cannot age without someone editing a `DEFAULT_SET` — which `validate.sh` already gates
