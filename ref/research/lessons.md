@@ -127,9 +127,9 @@ technique deserves the same adversarial reading as the code it repairs.
 
 Round 30 classified every figure found wrong across rounds 24–29 and found the intervention round 28
 proposed addresses **one failure in five**: 6 stale against 24 wrong-at-write. **The gap is adherence,
-not invention.** Of the 24, 62 % were counts restated from memory when the source was one command
+not invention.** Of the 27, 56 % were counts restated from memory when the source was one command
 away — against a rule this repo already states, *every figure a document quotes must come from a
-committed, re-runnable script* — and 38 % were incomplete edits, against a remedy round 28 had already
+committed, re-runnable script* — and 44 % were incomplete edits, against a remedy round 28 had already
 produced. Adding a third convention to a set already not followed would have been motion rather than
 progress, so nothing was written. Two consecutive rounds have now declined the work that motivated
 them after measuring it.
@@ -140,7 +140,8 @@ Review showed all four "unclassifiable" figures were recoverable — three from 
 ("round 25's ~20 intermediate commits are gone") was off by more than 3× and checkable with one
 `gh pr view`. The rule is withdrawn. What replaces it is smaller and worse: **the round asserted
 evidence was unrecoverable without running the command that recovers it**, in the same document that
-measured "counts restated from memory when the source was one command away" at 62 % of all defects.
+measured "counts restated from memory when the source was one command away" at 56 % of the
+wrong-at-write defects.
 A preregistered method saying *use the committed record, not recollection* does not enforce itself.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry

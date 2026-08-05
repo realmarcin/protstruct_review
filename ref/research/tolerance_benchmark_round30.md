@@ -45,8 +45,15 @@ Of the 24 wrong-at-write figures:
 
 | cause | count | share |
 |---|---:|---:|
-| a count restated from memory when the source was one command away | **15** | **62 %** |
-| an incomplete edit — headline changed, body left | 9 | 38 % |
+| a count restated from memory when the source was one command away | **15** | **56 %** |
+| an incomplete edit — headline changed, body left | 12 | 44 % |
+
+**These moved after #187** and the first version did not move with them: the correction pushed three
+figures into wrong-at-write and left the split reading 15 + 9 = 24 against a population of 27 (#191).
+That is a fix moving a headline and leaving its body — the third time in this round's history, after
+#170 and #172, and this time inside the section reporting that cause. **The cause now lives in
+`classify_wrong_figures.py` as a column**, so the percentages are derived rather than restated; leaving
+it in prose was the reason it went stale.
 
 ## P3 — "more than two undecidable": **FALSIFIED**
 
@@ -68,7 +75,7 @@ hash the issues cite. Nothing was lost; the round simply did not look.
 
 The round claimed *"round 25's ~20 intermediate commits are gone"*. `gh pr view 129 --json commits`
 returns **6** — off by more than 3× — and they are retrievable both as dangling objects and from
-GitHub. **That is the 62 % cause reproduced inside the section diagnosing it**: a count restated from
+GitHub. **That is the memory cause reproduced inside the section diagnosing it**: a count restated from
 memory when one command would have settled it.
 
 The `lessons.md` rule *"squash-merging makes staleness unauditable"* rested entirely on this and is
@@ -90,10 +97,10 @@ per-entry gate, this one on the snapshot convention.
 
 The uncomfortable part is what the 82 % points at:
 
-- **62 % — counts restated from memory.** The remedy already exists and is *already a stated rule of
+- **56 % — counts restated from memory.** The remedy already exists and is *already a stated rule of
   this repo*: **every figure a document quotes must come from a committed, re-runnable script**. It
   was not followed, fifteen times.
-- **38 % — incomplete edits.** The remedy also already exists: round 28's **sweep, verified by
+- **44 % — incomplete edits.** The remedy also already exists: round 28's **sweep, verified by
   absence and by quantity rather than by string** (#170, #172).
 
 **Both dominant causes have known remedies that were simply not applied.** The gap is adherence, not
