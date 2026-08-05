@@ -164,7 +164,7 @@ menu, not a second copy of it.
 | candidate | cost | the constraint |
 |---|---|---|
 | **Crossing-quality hypothesis** (below) | ~60–90 screened entries, each a 100–250 MB map download plus `mtriage` | base rate 3.3 % at the 1.3 cut, 6.7 % at the data-driven 1.074 fence; three candidates is the minimum for a powered comparison. **Multi-round.** |
-| **Fresh low-resolution X-ray measurement** (*Standing risk*, below) | a new refinement set below 2.5 Å | the only way to give the §4 band widths a checkable basis; the two maxima that size them come from ~11 entries named nowhere and cannot be recounted. **Multi-round.** |
+| **Fresh low-resolution X-ray measurement** (*Standing risk*, below) | a new refinement set at **`d_min ≥ 2.5 Å`** | the only way to give the §4 band widths a checkable basis; the two maxima that size them come from ~11 entries named nowhere and cannot be recounted. **Multi-round.** (This read *"below 2.5 Å"* until #237 — the opposite branch. Both lost maxima, 0.285 Å and 5.26 pp, belong to `d_min ≥ 2.5 Å`; the `< 2.5 Å` branch's sizing case 43SK is named and was re-measured by round 20.) |
 | **Another `scripts/` audit pass with a new lens** (*Standing risk*, below) | one round | has found defects **every time** — 12, then 2, then 5 — but the lens must differ each pass, and there is **no defined endpoint**. Cheap per pass, unbounded in total. |
 
 The asymmetry is the point. The first two are expensive and *bounded* — you can say in advance what
