@@ -70,7 +70,9 @@ recollection instead of `git fsck`:
 | `#177c` third "nine" | issue #177's own body | the derivation was recorded, and nine was **right** — not a wrong figure at all |
 
 `git fsck --unreachable --no-reflog` reports **142 dangling commits present locally**, including every
-hash the issues cite. The round simply did not look — though *"nothing was lost"* would overstate it: three of the four recoveries are **dangling** commits, which survive only until `git gc` prunes them (#192).
+hash the issues cite. The round simply did not look — though *"nothing was lost"* would overstate it: **two of the four** recoveries are **dangling** commits, which survive only until `git gc` prunes
+them (#192). The first version said *three* and then enumerated two in its next clause — a sentence
+carrying its own refutation (#195).
 
 ### The narrative built on P3 was wrong on both facts
 
@@ -119,7 +121,7 @@ classification table did not fix what the table was drawn from:
 | **the registry** | *"9VAM … carries no `d_fsc_model_pre`, so the figure cannot be checked"* — while `round12.md:58` records `6.1020 → 6.3629` in full. **I wrote that caveat in #167, disproved it in #187, and never returned to the sentence #187 cites as its own evidence.** |
 | this document | the scope limits still said *"four are marked undecidable"* against a corrected table reading **0**, forty lines apart |
 | `#167c` vs `#177c` | opposite verdicts — dropped-from-population versus STALE — on parallel evidence, with no stated reason |
-| *"nothing was lost"* | three of the four recoveries came from **dangling commits**, which survive only until `git gc`. `#167c`'s evidence is on `main` and `#177c`'s is in an issue body; `#147`'s and `#167a`'s are not durable. |
+| *"nothing was lost"* | **half** the recoveries came from **dangling commits**, which survive only until `git gc`. `#167c`'s evidence is on `main` and `#177c`'s is in an issue body; `#147`'s and `#167a`'s are not durable. |
 
 The first is the one that matters: **a false claim live in the registry, created by one fix and
 disproved by another, with no gate covering it** — `check_registry_figures.py` reads only the TSV, so a
