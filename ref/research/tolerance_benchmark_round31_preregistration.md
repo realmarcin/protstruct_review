@@ -43,9 +43,20 @@ absorbed into a subject beginning `Round NN:`. The correct enumerator walks the 
 #193, whose branch is gone and whose three `Fix #` commits still resolve. That yields **39** commits
 across the merged PRs, a population worth measuring rather than the 3 the naive command reports.
 
-Recording this here rather than in the results is deliberate: round 30's finding was that evidence
-gets called unrecoverable without running the command that recovers it, and a method that silently
-sampled 3 of 39 would have produced a confident, meaningless rate.
+**The primary population is the 33 from round 24 onward** (PRs #114 … #193), because the comparison
+arm — round 28's ~2.3 % — was swept over rounds 24–27 documents, and a numerator drawn from a wider
+window than its denominator is not a rate. The other **6** (PRs #22, #86, #99, #106; rounds 7–23)
+are measured and reported **separately**, not pooled.
+
+That split is #208, found reviewing this document before it merged: it first stated the population as
+all 39 against a rounds-24-27 denominator. **A scope error in a count, inside the pre-registration
+that nominates scope errors as the dominant class** — and the fifth in the series after #164, #174,
+#176 and #194. It is left recorded here rather than quietly corrected, because a prediction is worth
+less if the document making it has already demonstrated the failure and hidden it.
+
+Recording the enumerator here rather than in the results is deliberate for the same reason: round 30's
+finding was that evidence gets called unrecoverable without running the command that recovers it, and
+a method that silently sampled 3 of 39 would have produced a confident, meaningless rate.
 
 **Unit.** A *numeric claim introduced or modified by that commit* — a count, a rate, an n, a range
 endpoint — in the commit's diff to `.md` files. Not: tolerance values, resolutions, PDB ids, issue
