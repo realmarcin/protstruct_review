@@ -1,5 +1,5 @@
 body	claim	verdict	evidence
-184	"15 | 62 %" wrong-at-write cause table	correct-at-write	body created 2026-08-05T23:44:42Z-ish, before 0ba2b62 landed 00:26:17Z; 62 % was the live figure
+184	"15 | 62 %" wrong-at-write cause table	correct-at-write	created 2026-08-04T23:44:42Z, before 0ba2b62 landed 2026-08-05T00:26:17Z; 62 % was the live figure
 185	"15 of 24 wrong-at-write figures (62 %)"	correct-at-write	created 00:13:49Z, 12 min before the correction landed
 185	"retyped ... got 16; deriving gives 15"	correct	classify_wrong_figures.py gives 15 memory-cause rows
 187	"the 62 % cause reproduced in the round that diagnoses it"	correct-at-write	created 00:23:44Z, 2m33s before the correction landed
