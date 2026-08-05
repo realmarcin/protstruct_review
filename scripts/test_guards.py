@@ -406,4 +406,28 @@ check("and the real vocabulary has no ambiguous token today",
        if len([d for d in figures._VOCAB if d.startswith(tok)]) != 1], [])
 
 
+# --- #189: round_figures must not count a pull request as an issue ------------------
+# scripts/round_figures.py is a helper, not a gate, so it is not run by validate.sh --
+# but the RULE it depends on is shared with check_round_figures.issue_numbers, and that
+# sharing is what this pins. Writing the fallback without reusing that rule made the
+# tool report 3 issues for a range holding 2, counting its own PR: the exact defect
+# (#155) the --issues flag exists to prevent, laundered as derived output.
+
+rf = load("round_figures")
+check("round_figures reuses the sibling's issue rule rather than copying it",
+      "_real_issue_numbers" in (REPO / "scripts" / "round_figures.py").read_text(), True)
+check("and that rule is check_round_figures.issue_numbers",
+      "check_round_figures.py" in (REPO / "scripts" / "round_figures.py").read_text(), True)
+
+# The rule itself, exercised offline: the findings record -- which issue_numbers is the
+# live counterpart of -- contains no pull-request number. #128/#129/#141 are PRs whose
+# numbers sit inside the record's range, so their absence is the property that matters.
+_record_ids = {r["issue"] for r in FINDINGS}
+_prs_in_range = {"128", "129", "141", "154", "159", "168", "175", "178", "181"}
+check("no pull-request number appears in the findings record",
+      sorted(_record_ids & _prs_in_range), [])
+check("while issues bracketing them do", 
+      {"127", "130"} <= _record_ids, True)
+
+
 print(f"\nall guard unit tests passed ({PASSED} checks)")
