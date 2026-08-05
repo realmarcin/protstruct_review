@@ -1,0 +1,44 @@
+body	claim	verdict	evidence
+184	"15 | 62 %" wrong-at-write cause table	correct-at-write	created 2026-08-04T23:44:42Z, before 0ba2b62 landed 2026-08-05T00:26:17Z; 62 % was the live figure
+185	"15 of 24 wrong-at-write figures (62 %)"	correct-at-write	created 00:13:49Z, 12 min before the correction landed
+185	"retyped ... got 16; deriving gives 15"	correct	classify_wrong_figures.py gives 15 memory-cause rows
+187	"the 62 % cause reproduced in the round that diagnoses it"	correct-at-write	created 00:23:44Z, 2m33s before the correction landed
+188	"15 of 24 wrong-at-write figures (62 %)"	WRONG	created 00:27:53Z, 96 s AFTER 0ba2b62; population was 27 and rate 56 %. Filed as #209
+191	"a count restated from memory ... 15  62 %"	correct	quotes the broken split it reports, not an assertion
+209	"WRONG-AT-WRITE 27, restated from memory 15 (56 %)"	correct	python3 scripts/classify_wrong_figures.py
+209	"24 and 62 % are the pre-#187 figures"	correct	0ba2b62 moved 24->27 and 62->56
+214	"15 of 24 ... (62 %)" quoted as the defect	correct	quotation of #209
+218	"62 % is the pre-correction rate ... making it 56 %"	correct	classify_wrong_figures.py
+169	"8/307 = 2.61 %"	correct	8/307 = 2.606 %
+169	"2/185 = 1.08 %"	correct	2/185 = 1.081 %
+169	"3/65 = 4.62 %"	correct	3/65 = 4.615 %
+169	"ratio 4.27x"	correct	4.615 / 1.081 = 4.27
+113	"applying that definition to the file today gives 93, not 69"	correct	69 + 24 screened-only rows = 93
+113	"round 23 appended 24 screened" rows	correct	em_refinement_deltas.tsv: 24 rows status "screened only"
+114	"the named entries definition yielded 93, not the 69"	correct	same derivation
+115	"63 is not a subset of 69"	correct	63 = 59 attempted + 4 LOST; 69 excludes LOST
+115	"state 59 (attempted within the 69)"	correct	measured 35 + delta-only 23 + d_FSC-only 1 = 59
+120	"em_refinement_deltas.tsv carries 10 skipped: rows today"	correct	grep -c "skipped:" = 10
+129	"the 10 skipped: rows"	correct	same
+129	"the real 2N54 value is 17.4"	correct	verified in round 25's audit; wwPDB report
+129	"12 defects (#116-#127), 4 high"	correct	round_findings.tsv: 12 rows, 4 severity=high
+132	"a 20-file audit round was branched"	WRONG	gh pr view 129 --json files = 19. Filed as #135
+135	"It is 19"	correct	same
+128	"the branch carries 17 files of unrelated in-flight work"	contested	#134 says the round as committed touches 19; the two quantities differ in scope
+147	"42 guard checks -- it is 50"	correct	round 30 re-ran 8bdad88 and got 42; later commits added assertions
+147	"42 was correct at 8bdad88"	correct	commit reachable; re-run gives "42 checks"
+150	"the gate now says 12 checkable, not 7"	correct	check_round_figures.py output moved as citations were added
+154	"237 tolerance checks"	correct	validate.sh reports 237 today
+154	"84 guard checks"	correct-at-write	88 today; the suite grew after
+154	"16 record-tool checks"	correct	16 today
+155	"Six review passes found 15 defects" -> "It is 14"	correct	#139-#153 holds 14 ISSUES; #141 is the round's own PR
+155	"round 25's 12 defects, 4 high is correct"	correct	round_findings.tsv
+159	"NEXT_TASKS said 5 defects; round 26's trail says two"	correct	round26.md pass 4 = two
+159	"20 is the trail-file count, 26 the highest round"	correct	20 trail files at the time; rounds 1-5 and 9 have none
+160	"at round 40 check_summary_coverage.py dies with a traceback"	correct	_WORDS held {20,30}; spell(40) raised KeyError
+161	"the round-table claim is wrong by 87"	correct	99 - 12 = 87
+163	"the sequence is 12, 2, 5"	correct	round26.md pass 4 = 2, pass 6 = 5
+163	"3/60 is 5 %, 4/60 is 6.7 %"	correct	3/60 = 5.0 %, 4/60 = 6.67 %
+163	"4 of 60 is correct and line 178's 3 of 60 is wrong"	correct	4 rows above the 1.074 fence
+141	"231 tolerance checks, 42 guard checks, 16 record-tool"	correct-at-write	all three have since grown
+114	"209 unit checks pass"	correct-at-write	suite has since grown
