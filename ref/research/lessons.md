@@ -18,6 +18,7 @@ maxims.
 | A counting rule has a domain; state which unit you are using | 28 |
 | A count of your own defects has no fixed value while review continues | 28 |
 | A test too small to fail its own null has not been run | 31 |
+| Exhausting a population is an answer about the population, not the question | 32 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -167,6 +168,16 @@ So the claim was not a gap in the record; it was a contradiction of it, written 
 tooling in the same session that measured memory as the dominant defect cause. **Nothing new was
 written in response** — a third statement of a rule already stated twice is motion, not
 progress, which is round 30's finding applied to its own successor (#213).
+
+Round 32 exhausted that inventory and found the answer is about the **population**, not the question:
+155 claim-bearing lines yield **58** verifiable numeric claims, and the test needs **130**. Two were
+wrong — 3.45 % against round 28's 2.28 %, the direction predicted, with `P(≥2) = 0.382`, which is a
+coin landing the way you guessed. **Exhausting a population is an answer about the population, not
+the question it was chosen to settle.** Verifying the same lines harder cannot close a gap of 72
+claims that do not exist, so the next round widens the population or drops the question. Both wrong
+claims were introduced by `Fix #` commits, and both attached a correct figure to the wrong population
+— which `round_figures.py` cannot catch, because deriving a count tells you the number and not which
+set the sentence means.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its

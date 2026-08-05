@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Thirty-one rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Thirty-two rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -62,12 +62,13 @@ floors row.
 | 29 | (2026-08-04) | set out to gate the registry's **per-entry** figures (12 aggregate, 0 per-entry, and both of round 28's registry errors were per-entry) and **did not**: P1 falsified — every derivable per-entry figure already matched — and **P2 indeterminate**, the derivable/underivable split flipping with the counting method (#182). Five checks ship, on P1 alone; the gate now states its own coverage |
 | 30 | (2026-08-04) | classified every figure found wrong in rounds 24–29: **27 wrong-at-write, 6 stale, 0 undecidable** (corrected in #187 — P3 was reported confirmed and is falsified). Round 28's proposed snapshot convention addresses **1 in 5**, so it was **not written**. 56 % of the rest are counts restated from memory, against a rule the repo already has — **the gap is adherence, not invention** |
 | 31 | (2026-08-05) | asked whether **corrections are more defective than the text they correct**. **Indeterminate — underpowered**: 0 of 35 verified claims wrong across 33 `Fix #` commits, but P(0) = 0.446 at round 28's 2.3 % base rate, and 130 verified claims are needed before zero is surprising. Three stale-by-nature counts, no wrong-at-write. Three copies of one pre-#187 figure outlived the correction that fixed the fourth — two live on `main` (#210), one in the tool built to prevent it (#209): **review is not a sweep** |
+| 32 | (2026-08-05) | exhausted round 31's inventory under a stopping rule fixed in advance: **58 verifiable claims, 2 wrong (3.45 %)** against round 28's 2.28 % — the predicted direction, and `P(≥2) = 0.382`, indistinguishable from chance. **P5 confirmed**: the inventory yields 58, the test needs 130, so **this population cannot answer the question**. Both wrong claims were introduced by `Fix #` commits and both involve **scope**, which `round_figures.py` would not have caught |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — thirty-one rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — thirty-two rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
