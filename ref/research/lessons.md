@@ -21,6 +21,7 @@ maxims.
 | Exhausting a population is an answer about the population, not the question | 32 |
 | An effect smaller than your measurement floor is not a finding to chase | 33 |
 | A batch's ceiling is usually the query, not the budget | 34 |
+| A selection criterion can be satisfied by the thing it was meant to exclude | 35 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -204,6 +205,18 @@ And the canary earned its cost several times over: **four of six defects were fo
 batch entry was downloaded**, including a screen that could not express the cut the project required
 and a fetch that **overwrote** `entries.json`, erasing a paid-for entry from the screen's own
 denominator — in a script whose docstring promises that denominator cannot go missing.
+
+Round 35 widened the query and it worked — 50 entries where round 34 got 14 — and the screen finally
+produced a candidate. Inspecting it produced the round's real finding: **a selection criterion can be
+satisfied by the thing it was meant to exclude.** 7DZX clears the ratio fence at 1.210 and has a
+`cc_mask_pre` of **0.2083**, a worse model-map fit than any of the 59 entries on record. A model that
+barely correlates with its map has an FSC crossing far past the map's resolution *as arithmetic*, not
+as evidence. Two of the five entries ever found above the fence are that second kind, while the two
+that motivated the hypothesis fit normally at ~0.75 — so the criterion has been selecting two
+populations and calling them one. The base rate falls from 6.7 % to 4.5 %, or **2.7 %** counting only
+genuine candidates, which roughly doubles the screening a powered test needs. The general form is
+worth keeping: **when a proxy is cheap enough to screen on, check what else satisfies it before
+spending the budget it unlocks.**
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its

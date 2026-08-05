@@ -1,0 +1,425 @@
+{
+  "rows": [
+    {
+      "pdb_id": "22BJ",
+      "resolution": 2.4,
+      "d_fsc_model_pre": 2.3922721571290286,
+      "ratio": 0.9968,
+      "cc_mask_pre": 0.6875,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6Z8D",
+      "resolution": 2.63,
+      "d_fsc_model_pre": 2.57439929655466,
+      "ratio": 0.9789,
+      "cc_mask_pre": 0.8442,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6MRC",
+      "resolution": 3.08,
+      "d_fsc_model_pre": 3.0554300164234864,
+      "ratio": 0.992,
+      "cc_mask_pre": 0.8308,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7EJE",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 3.858136610066247,
+      "ratio": 0.9694,
+      "cc_mask_pre": 0.7293,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "24SV",
+      "resolution": 2.4,
+      "d_fsc_model_pre": 2.1510862446688472,
+      "ratio": 0.8963,
+      "cc_mask_pre": 0.7726,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6X2L",
+      "resolution": 2.85,
+      "d_fsc_model_pre": 2.7927740590656853,
+      "ratio": 0.9799,
+      "cc_mask_pre": 0.8849,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "11WO",
+      "resolution": 3.3,
+      "d_fsc_model_pre": 3.156803652457182,
+      "ratio": 0.9566,
+      "cc_mask_pre": 0.8945,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7AR8",
+      "resolution": 3.53,
+      "d_fsc_model_pre": 3.475265384210102,
+      "ratio": 0.9845,
+      "cc_mask_pre": 0.8295,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "5OYB",
+      "resolution": 3.75,
+      "d_fsc_model_pre": 3.67317963535141,
+      "ratio": 0.9795,
+      "cc_mask_pre": 0.838,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7KY5",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 4.249989445151213,
+      "ratio": 1.0678,
+      "cc_mask_pre": 0.7505,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "28PQ",
+      "resolution": 2.4,
+      "d_fsc_model_pre": 2.335054325190654,
+      "ratio": 0.9729,
+      "cc_mask_pre": 0.8914,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7EBF",
+      "resolution": 2.63,
+      "d_fsc_model_pre": 2.26714599211347,
+      "ratio": 0.862,
+      "cc_mask_pre": 0.7764,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6Y7S",
+      "resolution": 2.85,
+      "d_fsc_model_pre": 2.4747335397478882,
+      "ratio": 0.8683,
+      "cc_mask_pre": 0.9044,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7DXI",
+      "resolution": 3.53,
+      "d_fsc_model_pre": 3.4210153479132583,
+      "ratio": 0.9691,
+      "cc_mask_pre": 0.8149,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "5WPT",
+      "resolution": 3.75,
+      "d_fsc_model_pre": 3.7146147516764625,
+      "ratio": 0.9906,
+      "cc_mask_pre": 0.8194,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "28PR",
+      "resolution": 2.4,
+      "d_fsc_model_pre": 2.350539235090437,
+      "ratio": 0.9794,
+      "cc_mask_pre": 0.8885,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6UWF",
+      "resolution": 3.08,
+      "d_fsc_model_pre": 2.9921120565593435,
+      "ratio": 0.9715,
+      "cc_mask_pre": 0.8546,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7DZX",
+      "resolution": 3.53,
+      "d_fsc_model_pre": 4.27175887664019,
+      "ratio": 1.2101,
+      "cc_mask_pre": 0.2083,
+      "high_ratio": true
+    },
+    {
+      "pdb_id": "7Q5B",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 3.202659867949273,
+      "ratio": 0.8047,
+      "cc_mask_pre": 0.604,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "31ES",
+      "resolution": 2.4,
+      "d_fsc_model_pre": 2.2848453498883416,
+      "ratio": 0.952,
+      "cc_mask_pre": 0.8342,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6ZB5",
+      "resolution": 2.85,
+      "d_fsc_model_pre": 2.7912476332906646,
+      "ratio": 0.9794,
+      "cc_mask_pre": 0.8466,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6UZA",
+      "resolution": 3.08,
+      "d_fsc_model_pre": 3.043902013056288,
+      "ratio": 0.9883,
+      "cc_mask_pre": 0.8727,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "13JV",
+      "resolution": 3.3,
+      "d_fsc_model_pre": 3.0594267612654065,
+      "ratio": 0.9271,
+      "cc_mask_pre": 0.8681,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6CSA",
+      "resolution": 3.75,
+      "d_fsc_model_pre": 3.64506541487247,
+      "ratio": 0.972,
+      "cc_mask_pre": 0.8317,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7VFI",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 4.119277265224347,
+      "ratio": 1.035,
+      "cc_mask_pre": 0.8487,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "5FTK",
+      "resolution": 2.4,
+      "d_fsc_model_pre": 2.36076685753026,
+      "ratio": 0.9837,
+      "cc_mask_pre": 0.6616,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7KHB",
+      "resolution": 3.53,
+      "d_fsc_model_pre": 3.4853219256980807,
+      "ratio": 0.9873,
+      "cc_mask_pre": 0.845,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7VFJ",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 3.7130829374515475,
+      "ratio": 0.9329,
+      "cc_mask_pre": 0.7739,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7OPX",
+      "resolution": 2.63,
+      "d_fsc_model_pre": 2.406535654127652,
+      "ratio": 0.915,
+      "cc_mask_pre": 0.8787,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6YXU",
+      "resolution": 3.08,
+      "d_fsc_model_pre": 2.6746474866768186,
+      "ratio": 0.8684,
+      "cc_mask_pre": 0.793,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7QBC",
+      "resolution": 3.53,
+      "d_fsc_model_pre": 3.522557799669496,
+      "ratio": 0.9979,
+      "cc_mask_pre": 0.7367,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7VGJ",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 3.4686631209367884,
+      "ratio": 0.8715,
+      "cc_mask_pre": 0.783,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6M54",
+      "resolution": 2.4,
+      "d_fsc_model_pre": 2.421867338574041,
+      "ratio": 1.0091,
+      "cc_mask_pre": 0.8462,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6YYS",
+      "resolution": 3.08,
+      "d_fsc_model_pre": 2.7073418133884846,
+      "ratio": 0.879,
+      "cc_mask_pre": 0.7675,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7RHQ",
+      "resolution": 3.53,
+      "d_fsc_model_pre": 3.195604443531439,
+      "ratio": 0.9053,
+      "cc_mask_pre": 0.8461,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7YDI",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 3.563066499737001,
+      "ratio": 0.8952,
+      "cc_mask_pre": 0.6152,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6NZ0",
+      "resolution": 2.4,
+      "d_fsc_model_pre": 2.324807958773604,
+      "ratio": 0.9687,
+      "cc_mask_pre": 0.8699,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7VFE",
+      "resolution": 2.63,
+      "d_fsc_model_pre": 2.5736876301579787,
+      "ratio": 0.9786,
+      "cc_mask_pre": 0.8896,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7A7A",
+      "resolution": 3.08,
+      "d_fsc_model_pre": 3.049373246917226,
+      "ratio": 0.9901,
+      "cc_mask_pre": 0.874,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "21VL",
+      "resolution": 3.3,
+      "d_fsc_model_pre": 3.2451379793240385,
+      "ratio": 0.9834,
+      "cc_mask_pre": 0.7684,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7TOY",
+      "resolution": 3.53,
+      "d_fsc_model_pre": 3.4739279691040514,
+      "ratio": 0.9841,
+      "cc_mask_pre": 0.8445,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7YR0",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 3.902279065212484,
+      "ratio": 0.9805,
+      "cc_mask_pre": 0.7694,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6QSU",
+      "resolution": 2.4,
+      "d_fsc_model_pre": 2.5342930846544394,
+      "ratio": 1.056,
+      "cc_mask_pre": 0.8721,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7VY3",
+      "resolution": 2.63,
+      "d_fsc_model_pre": 2.2693505719133347,
+      "ratio": 0.8629,
+      "cc_mask_pre": 0.8548,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7EKP",
+      "resolution": 2.85,
+      "d_fsc_model_pre": 2.840004041325751,
+      "ratio": 0.9965,
+      "cc_mask_pre": 0.8146,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "22AX",
+      "resolution": 3.3,
+      "d_fsc_model_pre": 3.277294030607527,
+      "ratio": 0.9931,
+      "cc_mask_pre": 0.8504,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7U0F",
+      "resolution": 3.53,
+      "d_fsc_model_pre": 2.416324308146184,
+      "ratio": 0.6845,
+      "cc_mask_pre": 0.5928,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6XKT",
+      "resolution": 3.75,
+      "d_fsc_model_pre": 3.6447737862037655,
+      "ratio": 0.9719,
+      "cc_mask_pre": 0.7919,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7Z23",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 3.6326228010317463,
+      "ratio": 0.9127,
+      "cc_mask_pre": 0.7842,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6UUS",
+      "resolution": 2.4,
+      "d_fsc_model_pre": 2.029409656805823,
+      "ratio": 0.8456,
+      "cc_mask_pre": 0.7255,
+      "high_ratio": false
+    }
+  ],
+  "skipped": [
+    {
+      "pdb_id": "6QI8",
+      "reason": "crossing 11.03 A implausible for a 3.75 A map"
+    }
+  ],
+  "summary": {
+    "n_screened": 50,
+    "n_high_ratio": 1,
+    "base_rate_pct": 2.0,
+    "high_ratio_ids": [
+      "7DZX"
+    ],
+    "ratio_median": 0.9758,
+    "ratio_min": 0.6845,
+    "ratio_max": 1.2101,
+    "cut": 1.074,
+    "prior_base_rate_pct": 6.7,
+    "prior_hits": 4,
+    "prior_n": 60
+  }
+}
