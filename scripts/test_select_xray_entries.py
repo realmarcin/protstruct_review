@@ -193,6 +193,29 @@ finally:
     sx.search = _saved_search
 
 
+# --- #247: a flag must not silently undo the fix -----------------------------------
+
+import argparse as _argparse
+for _bad in ("1", "0", "-3"):
+    _msg = ""
+    try:
+        sx._chunks_value(_bad)
+    except _argparse.ArgumentTypeError as _e:
+        _msg = str(_e)
+    check(f"--chunks {_bad} is refused by name", "disables the spread" in _msg, True)
+check("--chunks 2 is accepted", sx._chunks_value("2"), 2)
+
+_calls2: list[int] = []
+_saved_search = sx.search
+try:
+    sx.search = lambda lo, hi, rows, start=0: (
+        _calls2.append(start), (1000, [f"e{start + i:04d}" for i in range(rows)]))[1]
+    sx.sample_stratum(2.5, 2.7, want=3, chunks=5)
+    check("chunks are clamped to want, so no request is wasted", len(_calls2), 3)
+finally:
+    sx.search = _saved_search
+
+
 # --- #241: the query excludes entries with no protein ------------------------------
 _src = (REPO / "scripts" / "select_xray_entries.py").read_text()
 check("the query filters on protein entity count",

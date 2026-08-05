@@ -120,6 +120,23 @@ def search(min_res: float, max_res: float, rows: int,
             [hit["identifier"].upper() for hit in payload.get("result_set", [])])
 
 
+def _chunks_value(text: str) -> int:
+    """`--chunks 1` is one offset, which is "take the head of the stratum" -- the exact
+    defect #243 fixed, reachable by a flag and invisible in the output (#247). Refused
+    by name, the way #230 refused a `--cut` that silently produced a meaningless rate.
+    """
+    import argparse as _ap
+    try:
+        value = int(text)
+    except ValueError:
+        raise _ap.ArgumentTypeError(f"{text!r} is not an integer")
+    if value < 2:
+        raise _ap.ArgumentTypeError(
+            f"{value} disables the spread: one offset is the head of the stratum, "
+            f"which is the #243 defect this flag exists to avoid. Use 2 or more")
+    return value
+
+
 def sample_stratum(lo: float, hi: float, want: int, chunks: int = 5) -> list[str]:
     """`want` ids spread across the WHOLE stratum, by paginating to even offsets.
 
@@ -137,6 +154,8 @@ def sample_stratum(lo: float, hi: float, want: int, chunks: int = 5) -> list[str
     Deterministic: same query, same offsets, same set. A sampled set a later round
     cannot reproduce would defeat the purpose of selecting by query at all.
     """
+    # More chunks than entries wanted spends a live request per unusable slot (#247).
+    chunks = max(1, min(chunks, want))
     total, first = search(lo, hi, max(1, want // chunks), 0)
     if total == 0:
         return []
@@ -217,9 +236,9 @@ def main() -> int:
     ap.add_argument("--max-res", type=float, default=3.2)
     ap.add_argument("--strata", type=int, default=4)
     ap.add_argument("--per-stratum", type=int, default=25)
-    ap.add_argument("--chunks", type=int, default=5,
+    ap.add_argument("--chunks", type=_chunks_value, default=5,
                     help="offsets sampled per stratum, spreading across deposition "
-                         "era rather than taking the oldest N (#243)")
+                         "era rather than taking the oldest N (#243); minimum 2")
     ap.add_argument("--limit", type=int, default=20)
     ap.add_argument("--exclude", default="", help="extra ids, comma-separated")
     ap.add_argument("--json", dest="json_out")
