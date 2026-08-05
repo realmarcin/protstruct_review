@@ -2,9 +2,15 @@
 """Print the figures a round can honestly claim, so nobody has to remember them.
 
 Round 30 classified every figure found wrong across rounds 24-29 and found the dominant
-cause exactly: **15 of 24 wrong-at-write figures (62 %) were counts restated from memory
+cause exactly: **15 of 27 wrong-at-write figures (56 %) were counts restated from memory
 when the source was one command away** (#185). Round 30 declined to add a third
 convention -- the gap is adherence, not invention -- so this does not add one either.
+
+Those figures are derived, not quoted: `python3 scripts/classify_wrong_figures.py`.
+This docstring first said "15 of 24 (62 %)", the population from BEFORE #187 moved four
+undecidable figures into wrong-at-write and #191 fixed the split that still read
+15 + 9 = 24 against 27 -- both merged before this file existed. A tool for not restating
+counts from memory, opening with a count restated from memory (#209).
 
 It is not a gate. It enforces nothing, is not wired into `validate.sh`, and has nothing
 to keep in sync. It exists to remove the reason the existing rule gets broken: that
