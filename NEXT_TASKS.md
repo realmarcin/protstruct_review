@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Twenty-nine rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Thirty rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -60,12 +60,13 @@ floors row.
 | 27 | (2026-08-04) | gated the counts the summary files quote, after **9 miscounts** shipped across rounds 24–26; found the round-coverage gate merged one PR earlier had **two false passes** (an unrelated table, and a fenced example row) because it lived in shell and could not be tested |
 | 28 | (2026-08-04) | **measured** the miscount class instead of gating it again: ~326 numeric claims swept by hand, ~307 verifiable, **7 wrong** (~2.3 %) + 3 contested. Two of four predictions falsified — self-contradiction does *not* dominate (2 of 7), and the gate-covered files are *not* where the errors are. The registry is **~5.7× cleaner** than the round trails, which have no gate at all |
 | 29 | (2026-08-04) | set out to gate the registry's **per-entry** figures (12 aggregate, 0 per-entry, and both of round 28's registry errors were per-entry) and **did not**: P1 falsified — every derivable per-entry figure already matched — and **P2 indeterminate**, the derivable/underivable split flipping with the counting method (#182). Five checks ship, on P1 alone; the gate now states its own coverage |
+| 30 | (2026-08-04) | classified every figure found wrong in rounds 24–29: **27 wrong-at-write, 6 stale, 0 undecidable** (corrected in #187 — P3 was reported confirmed and is falsified). Round 28's proposed snapshot convention addresses **1 in 5**, so it was **not written**. 56 % of the rest are counts restated from memory, against a rule the repo already has — **the gap is adherence, not invention** |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — twenty-nine rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — thirty rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 

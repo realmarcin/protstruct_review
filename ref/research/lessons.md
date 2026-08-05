@@ -1,4 +1,4 @@
-# Lessons from twenty-nine rounds of tolerance benchmarking
+# Lessons from thirty rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
@@ -12,6 +12,7 @@ maxims.
 
 | Rule | Round |
 |---|---|
+| The gap is adherence, not invention | 30 |
 | A falsified prediction can cancel the work that motivated the round | 29 |
 | A spot fix that silently misses looks exactly like one that worked | 28 |
 | A counting rule has a domain; state which unit you are using | 28 |
@@ -123,6 +124,25 @@ list survives untouched — a section header reading "the ninth miscount" seven 
 reading "Tenth", where "ninth" had been correct until its pair moved. Verify by **quantity, not by
 string**. Three distinct failure modes in one method in one round is itself the lesson: a repair
 technique deserves the same adversarial reading as the code it repairs.
+
+Round 30 classified every figure found wrong across rounds 24–29 and found the intervention round 28
+proposed addresses **one failure in five**: 6 stale against 24 wrong-at-write. **The gap is adherence,
+not invention.** Of the 27, 56 % were counts restated from memory when the source was one command
+away — against a rule this repo already states, *every figure a document quotes must come from a
+committed, re-runnable script* — and 44 % were incomplete edits, against a remedy round 28 had already
+produced. Adding a third convention to a set already not followed would have been motion rather than
+progress, so nothing was written. Two consecutive rounds have now declined the work that motivated
+them after measuring it.
+
+Its companion was a claim that **squash-merging makes staleness unauditable**, and it was **wrong**.
+Review showed all four "unclassifiable" figures were recoverable — three from dangling commits that
+`git fsck` lists 142 of, one from a file on `main` — and that the round's supporting figure
+("round 25's ~20 intermediate commits are gone") was off by more than 3× and checkable with one
+`gh pr view`. The rule is withdrawn. What replaces it is smaller and worse: **the round asserted
+evidence was unrecoverable without running the command that recovers it**, in the same document that
+measured "counts restated from memory when the source was one command away" at 56 % of the
+wrong-at-write defects.
+A preregistered method saying *use the committed record, not recollection* does not enforce itself.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
