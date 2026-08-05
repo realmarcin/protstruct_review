@@ -86,13 +86,24 @@ def table_rows(text: str, header_cells: list[str]) -> list[list[str]]:
 
 
 def rounds_on_disk(repo: Path) -> list[str]:
-    """Round numbers that have an audit trail, de-duplicated.
+    """Round numbers that have an audit TRAIL, de-duplicated.
 
     A round can have several files -- round 26 has its trail and its pre-registration --
     and without the set the failure message names it once per file.
+
+    Pre-registrations are excluded (#206). A pre-registration is defined as a commit
+    containing NO results; the round table and the lessons entry are summaries OF
+    results. Counting one as an audit trail made the gate demand the conclusion before
+    the measurement, so landing round 31's pre-registration alone turned validate.sh red
+    -- two of this repo's own rules in direct conflict, with the gate insisting on the
+    one that says write the answer first.
+
+    Excluding them is strictly STRICTER: a round whose trail is missing can no longer be
+    covered by its pre-registration standing in for it.
     """
     return sorted({re.search(r"round(\d+)", p.name).group(1)
-                   for p in repo.glob(ROUND_GLOB)}, key=int)
+                   for p in repo.glob(ROUND_GLOB)
+                   if not p.name.endswith("_preregistration.md")}, key=int)
 
 
 def load_findings(path: Path) -> list[dict[str, str]]:

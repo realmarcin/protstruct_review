@@ -202,5 +202,26 @@ check("a missing table yields no rows rather than raising",
 check("round numbers are de-duplicated across a round's several files",
       len(ROUNDS), len(set(ROUNDS)))
 
+# #206: a pre-registration is a commit containing NO results, so treating it as an audit
+# trail made the gate demand a summary row for a round that had not been measured -- the
+# gate insisting the conclusion be written first. Tested in both directions, because the
+# exclusion must not also drop a round whose trail exists alongside its pre-registration.
+_PREREG = "tolerance_benchmark_round999_preregistration.md"
+_scratch = REPO / "ref/research" / _PREREG
+_scratch.write_text("# Round 999 — pre-registration\n")
+try:
+    check("a pre-registration alone does not make a round due for a summary row",
+          ABSENT_ROUND in cov.rounds_on_disk(REPO), False)
+    _trail = REPO / "ref/research/tolerance_benchmark_round999.md"
+    _trail.write_text("# Round 999\n")
+    try:
+        check("  but its trail does", ABSENT_ROUND in cov.rounds_on_disk(REPO), True)
+    finally:
+        _trail.unlink()
+finally:
+    _scratch.unlink()
+check("and every round with a trail is still counted",
+      cov.rounds_on_disk(REPO), ROUNDS)
+
 
 print(f"\nall summary-coverage unit tests passed ({PASSED} checks)")
