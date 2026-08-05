@@ -86,3 +86,84 @@ pdb_id	round	resolution	emdb	outcome	charges	unparameterised	publication
 11GJ	34	3.3	EMD-75678	kept			10.1038/s41594-026-01840-5
 6UI6	34			rejected: map 301 MB exceeds --max-map-mb 250			
 7B00	34	3.98	EMD-11952	kept			10.1073/pnas.2113573118
+22BJ	35	2.4	EMD-68152	kept			Structural basis for the assembly and modulation of human M-channels
+6Z8D	35	2.63	EMD-11115	kept			10.1128/JVI.01542-20
+6UUW	35			rejected: formal charges absent from the electron scattering table: O1-×480	N1+×448, O1-×480		
+6MRC	35	3.08	EMD-9195	kept			10.1038/s41467-020-15698-8
+11MN	35			rejected: map 430 MB exceeds --max-map-mb 250			
+7AFI	35			rejected: unparameterised ligand: 72 atoms with no monomer-library restraints (G7M×24, MA6×48)		G7M×24, MA6×48	
+5MRE	35			rejected: model 23 MB exceeds --max-model-mb 8			
+7EJE	35	3.98	EMD-31160	kept			10.1093/nar/gkab1141
+24SV	35	2.4	EMD-69801	kept			10.1126/sciadv.aeh4305
+7CUW	35			rejected: unparameterised ligand: 59 atoms with no monomer-library restraints (HEO×59)		HEO×59	
+6X2L	35	2.85	EMD-22011	kept			10.1126/sciadv.abf5814
+6RD8	35			rejected: map 414 MB exceeds --max-map-mb 250			
+11WO	35	3.3	EMD-76137	kept			Ligand-Dependent Interdomain Rearrangements Drive Catalysis by Acetyl-CoA Synthetases
+7AR8	35	3.53	EMD-11876	kept			10.1093/plcell/koab092
+5OYB	35	3.75	EMD-3860	kept			10.1038/nature24652
+7KY5	35	3.98	EMD-23068	kept			10.7554/eLife.62163
+28PQ	35	2.4	EMD-56721	kept			10.1021/acsbiomedchemau.5c00245
+7EBF	35	2.63	EMD-31053	kept			10.1016/j.jsb.2021.107748
+6Y7S	35	2.85	EMD-10721	kept			10.1038/s41467-024-47212-9
+6TNY	35			rejected: formal charges absent from the electron scattering table: O1-×343	N1+×244, O1-×343		
+12OZ	35			rejected: map 314 MB exceeds --max-map-mb 250			
+7DXI	35	3.53	EMD-30910	kept			10.1016/j.jbc.2022.101702
+5WPT	35	3.75	EMD-8882	kept			10.1038/nature24035
+7M6L	35			rejected: model 16 MB exceeds --max-model-mb 8			
+28PR	35	2.4	EMD-56722	kept			10.1021/acsbiomedchemau.5c00245
+7L2H	35			rejected: unparameterised ligand: 160 atoms with no monomer-library restraints (XJ7×160)		XJ7×160	
+6YW5	35			rejected: model 20 MB exceeds --max-model-mb 8			
+6UWF	35	3.08	EMD-20922	kept			10.1038/s41589-020-0561-6
+13GM	35			rejected: unparameterised ligand: 53 atoms with no monomer-library restraints (PIO×53)		PIO×53	
+7DZX	35	3.53	EMD-30918	kept			10.1016/j.cell.2021.05.032
+5ZZ8	35			rejected: model 23 MB exceeds --max-model-mb 8			
+7Q5B	35	3.98	EMD-13831	kept			10.1038/s41467-021-27338-w
+31ES	35	2.4	EMD-58347	kept			10.1107/S2052252526005105
+7LG5	35			rejected: formal charges absent from the electron scattering table: O1-×460	N1+×344, O1-×460		
+6ZB5	35	2.85	EMD-11145	kept			10.1126/science.abd3255
+6UZA	35	3.08	EMD-20954	kept			10.7554/eLife.53311
+13JV	35	3.3	EMD-77099	kept			THE STRUCTURES OF MATURE AND IMMATURE ST. LOUIS ENCEPHALITIS VIRUS REVEALS KEY HISTIDINE RESIDUES FOR VIRUS FITNESS
+7E0I	35			rejected: unparameterised ligand: 948 atoms with no monomer-library restraints (CHL×948)		CHL×948	
+6CSA	35	3.75	EMD-7598	kept			10.1073/pnas.1803347115
+7VFI	35	3.98	EMD-31955	kept			10.1038/s41467-022-33593-2
+5FTK	35	2.4	EMD-3296	kept			10.1126/SCIENCE.AAD7974
+7LP9	35			rejected: formal charges absent from the electron scattering table: O1-×224	N1+×200, O1-×224		
+7AOZ	35			rejected: formal charges absent from the electron scattering table: O1-×512	N1+×473, O1-×512		
+6V12	35			rejected: model 25 MB exceeds --max-model-mb 8			
+21NP	35			rejected: unparameterised ligand: 25 atoms with no monomer-library restraints (A1EG7×25)		A1EG7×25	
+7KHB	35	3.53	EMD-21880	kept			10.1038/s41467-020-20776-y
+6DLU	35			rejected: formal charges absent from the electron scattering table: O1-×225	O1-×225		
+7VFJ	35	3.98	EMD-31956	kept			10.1038/s41467-022-34136-5
+6L4U	35			rejected: unparameterised ligand: 2495 atoms with no monomer-library restraints (CL0×65, KC1×2430)		CL0×65, KC1×2430	
+7OPX	35	2.63	EMD-13022	kept			10.1128/jvi.00604-22
+7B0J	35			rejected: unparameterised ligand: 176 atoms with no monomer-library restraints (LPP×176)		LPP×176	
+6YXU	35	3.08	EMD-10996	kept			10.1038/s41467-020-20158-4
+21NR	35			rejected: formal charges absent from the electron scattering table: O1-×44	N1+×28, O1-×44		
+7QBC	35	3.53	EMD-13886	kept			10.1038/s41586-022-04498-3
+6GSI	35			rejected: map 794 MB exceeds --max-map-mb 250			
+7VGJ	35	3.98	EMD-31971	kept			10.1073/pnas.2118656119
+6M54	35	2.4	EMD-30084	kept			10.1016/j.pbiomolbio.2020.07.009
+7QI5	35			rejected: model 39 MB exceeds --max-model-mb 8			
+7BES	35			rejected: unparameterised ligand: 58 atoms with no monomer-library restraints (UTP×58)		UTP×58	
+6YYS	35	3.08	EMD-11004	kept			10.1038/s41467-020-20158-4
+21NS	35			rejected: unparameterised ligand: 378 atoms with no monomer-library restraints (A1D9O×81, A1E3E×297)		A1D9O×81, A1E3E×297	
+7RHQ	35	3.53	EMD-24466	kept			10.1016/j.devcel.2022.02.008
+6KWX	35			rejected: unparameterised ligand: 44 atoms with no monomer-library restraints (K0W×44)		K0W×44	
+7YDI	35	3.98	EMD-33748	kept			10.1038/s41564-022-01235-4
+6NZ0	35	2.4	EMD-0553	kept			10.7554/eLife.44707
+7VFE	35	2.63	EMD-31950	kept			10.1038/s41467-022-29305-5
+7DRD	35			rejected: map 407 MB exceeds --max-map-mb 250			
+7A7A	35	3.08	EMD-11676	kept			10.1016/j.str.2020.12.008
+21VL	35	3.3	EMD-68036	kept			Cryo-EM structure of portal-adaptor of bacteriophage phi92
+7TOY	35	3.53	EMD-26041	kept			10.1016/j.molcel.2022.03.028
+6QI8	35	3.75	EMD-4552	kept			10.1126/sciadv.aaw1616
+7YR0	35	3.98	EMD-34041	kept			10.1016/j.chom.2022.09.018
+6QSU	35	2.4	EMD-4629	kept			10.1038/s41467-020-20485-6
+7VY3	35	2.63	EMD-32193	kept			10.1038/s41467-022-29453-8
+7EKP	35	2.85	EMD-31172	kept			10.1038/s41422-021-00509-6
+7AC7	35			rejected: model 19 MB exceeds --max-model-mb 8			
+22AX	35	3.3	EMD-68140	kept			10.1007/s11427-026-3373-3
+7U0F	35	3.53	EMD-26257	kept			10.1016/j.str.2023.07.009
+6XKT	35	3.75	EMD-22224	kept			10.1038/s41467-021-21051-4
+7Z23	35	3.98	EMD-14456	kept			10.7554/eLife.87616
+6UUS	35	2.4	EMD-20901	kept			10.1021/acsptsci.9b00080
