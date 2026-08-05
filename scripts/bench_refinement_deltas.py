@@ -127,6 +127,47 @@ def refine_prefix(model_stem: str, restraints: bool) -> str:
     return f"{'rr' if restraints else 'r'}{MACRO_CYCLES}_{model_stem}"
 
 
+# Causes worth naming rather than reporting as "phenix.refine failed". Round 37 lost 7
+# of 18 entries and the batch said only that (#242); the log said exactly what was
+# wrong. The first entry here is that case: older depositions frequently carry no
+# R-free flags phenix.refine will accept.
+#
+# NOTE what the R-free case does NOT do: it does not set r_free_flags.generate=True.
+# That would refine against NEWLY GENERATED flags, so R-free is no longer comparable
+# with the deposited value and the run is not the same null re-refinement every other
+# entry got. It is a methodological choice to register, not a default to reach for.
+_REFINE_FAILURES: list[tuple[str, str]] = [
+    ("r_free_flags.generate",
+     "no usable R-free flags in the deposited data (phenix suggests "
+     "r_free_flags.generate=True, which would refine against NEW flags -- a different "
+     "experiment, so it is not done here)"),
+    ("Unknown scattering type",
+     "an atom's scattering type is absent from the table phenix uses"),
+    ("Sorry: Crystal symmetry mismatch",
+     "crystal symmetry differs between the model and the data"),
+    ("No array of R-free flags found",
+     "the data file carries no R-free flag array at all"),
+]
+
+
+def refine_failure_reason(log: Path) -> str:
+    """Why `phenix.refine` produced no output, from its own log.
+
+    Falls back to the last non-empty lines rather than to a bare "failed": an
+    unrecognised cause that is quoted can be diagnosed by a reader, and one that is
+    discarded cannot. A 39 % failure rate reporting no reason is indistinguishable
+    from a broken pipeline (#242).
+    """
+    if not log.exists():
+        return "phenix.refine produced no output and no log"
+    text = log.read_text(errors="ignore")
+    for needle, reason in _REFINE_FAILURES:
+        if needle in text:
+            return reason
+    tail = [l.strip() for l in text.splitlines() if l.strip()][-3:]
+    return "phenix.refine failed: " + " / ".join(tail) if tail else "phenix.refine failed"
+
+
 def refine(model: Path, mtz: Path, work: Path,
            restraints: bool = False) -> tuple[Path | None, dict[str, Any]]:
     """Re-refine a deposited model against its own data; returns (refined model, R stats).
@@ -147,7 +188,7 @@ def refine(model: Path, mtz: Path, work: Path,
              f"--overwrite > {log} 2>&1"],
             capture_output=True, text=True, timeout=7200, env=dict(os.environ))
     if not out.exists():
-        return None, {}
+        return None, {"failure_reason": refine_failure_reason(log)}
     r_values = _R_WORK.findall(log.read_text(errors="ignore")) if log.exists() else []
     stats: dict[str, Any] = {}
     if r_values:
@@ -170,8 +211,9 @@ def collect(pairs: list[tuple[Path, Path]], work: Path,
             continue
         refined, r_stats = refine(model, mtz, work, restraints=restraints)
         if refined is None:
-            print("  ! phenix.refine failed", file=sys.stderr)
-            skipped.append({"pdb_id": name, "reason": "phenix.refine failed"})
+            why = r_stats.get("failure_reason", "phenix.refine failed")
+            print(f"  ! {why}", file=sys.stderr)
+            skipped.append({"pdb_id": name, "reason": why})
             continue
         post = measure(refined, work, "postr" if restraints else "post")
         if post["clashscore"] is None or post["rama_favored_pct"] is None:
