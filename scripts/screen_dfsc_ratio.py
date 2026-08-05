@@ -16,12 +16,15 @@ crossing, so the screen and the benchmark compute the identical quantity -- incl
 the sustained-crossing rule (20 consecutive shells below 0.143) that round 9 had to
 introduce because mtriage's own reported value is defeated by one anomalous shell.
 
-The base rate matters as much as the hits: 2 of 36 on record, ~5.6 %. Every screened
-entry is written out, hit or miss, so the denominator cannot go missing the way
-rounds 16-18 found it had elsewhere.
+The base rate matters as much as the hits, and it is DERIVED from the committed record
+at the cut in force rather than written here -- this docstring used to say "2 of 36 on
+record, ~5.6 %", which was true when written, and the set is now 60 (#227). Every
+screened entry is written out, hit or miss, so the denominator cannot go missing the
+way rounds 16-18 found it had elsewhere.
 
 Usage:
     python3 scripts/screen_dfsc_ratio.py --cache DIR --json screened.json
+    python3 scripts/screen_dfsc_ratio.py --cache DIR --cut 1.3     # round 22's cut
 """
 from __future__ import annotations
 
@@ -35,10 +38,52 @@ from typing import Any
 
 REPO = Path(__file__).resolve().parent.parent
 
-# The ratio above which round 22 saw both large excursions. It is a POST-HOC cut
-# from n = 2 -- chosen because the ratio distribution has a clean gap there
-# (1.372, 1.360, then 1.076) -- and this round tests it rather than assuming it.
-HIGH_RATIO = 1.3
+# Round 22's cut, from n = 2, chosen because the ratio distribution has a clean gap
+# there (1.372, 1.360, then 1.076). Round 23 SCREENED AT IT, found 0 of 24, could not
+# complete the test, and then showed the cut is too conservative: the Tukey fence on
+# the combined set sits at 1.074, where the base rate is double.
+#
+# It stayed hardcoded anyway (round 26 saw the line and declined), so the default is
+# now the data-driven fence and the post-hoc one is opt-in (#226). At 1.3 a screen
+# needs roughly twice the entries to reach three candidates -- ~90 against ~45, at
+# 100-250 MB and ~2.5 min each -- which is the difference between a project and an
+# impossible one.
+TUKEY_FENCE = 1.074
+POST_HOC_CUT = 1.3
+DEFAULT_CUT = TUKEY_FENCE
+
+# Where the prior base rate comes from. It used to be the literal 5.6, meaning "2 of 36
+# on record" -- true when written, and the set is now 60, so every run emitted a stale
+# figure into machine-readable output that round documents then quote (#227). A script
+# is the one place this repo insists figures must NOT be remembered.
+DELTAS_TSV = REPO / "ref/research/data/em_refinement_deltas.tsv"
+
+
+def prior_base_rate(cut: float) -> dict[str, Any]:
+    """The base rate above `cut` among entries already on record, derived not recalled.
+
+    Returns the numerator and denominator alongside the percentage, because a bare
+    rate with no denominator is what round 28 spent itself correcting.
+    """
+    import csv
+    if not DELTAS_TSV.exists():
+        return {"prior_base_rate_pct": None,
+                "prior_note": f"no record at {DELTAS_TSV.name}"}
+    ratios = []
+    with DELTAS_TSV.open() as fh:
+        for row in csv.DictReader(fh, delimiter="\t"):
+            try:
+                pre = float((row.get("d_fsc_model_pre") or "").strip())
+                res = float((row.get("resolution") or "").strip())
+            except ValueError:
+                continue
+            if res:
+                ratios.append(pre / res)
+    if not ratios:
+        return {"prior_base_rate_pct": None, "prior_note": "no computable ratios on record"}
+    hits = sum(1 for r in ratios if r > cut)
+    return {"prior_base_rate_pct": round(100.0 * hits / len(ratios), 1),
+            "prior_hits": hits, "prior_n": len(ratios)}
 
 
 def load_bench():
@@ -50,7 +95,8 @@ def load_bench():
     return module
 
 
-def screen(entries: list[dict], cache: Path) -> tuple[list[dict], list[dict]]:
+def screen(entries: list[dict], cache: Path,
+           cut: float = DEFAULT_CUT) -> tuple[list[dict], list[dict]]:
     """Measure the pre-refinement crossing for each entry. No refinement is run."""
     bench = load_bench()
     rows, skipped = [], []
@@ -75,14 +121,14 @@ def screen(entries: list[dict], cache: Path) -> tuple[list[dict], list[dict]]:
             "pdb_id": pdb_id.upper(), "resolution": resolution,
             "d_fsc_model_pre": crossing, "ratio": round(ratio, 4),
             "cc_mask_pre": pre["cc_mask"],
-            "high_ratio": bool(ratio > HIGH_RATIO),
+            "high_ratio": bool(ratio > cut),
         })
         print(f"  crossing {crossing:.3f} A / {resolution} A = ratio {ratio:.3f}"
-              f"{'   <-- HIGH' if ratio > HIGH_RATIO else ''}", file=sys.stderr)
+              f"{'   <-- HIGH' if ratio > cut else ''}", file=sys.stderr)
     return rows, skipped
 
 
-def summarize(rows: list[dict]) -> dict[str, Any]:
+def summarize(rows: list[dict], cut: float = DEFAULT_CUT) -> dict[str, Any]:
     if not rows:
         return {"n": 0}
     ratios = [r["ratio"] for r in rows]
@@ -94,9 +140,8 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
         "high_ratio_ids": [r["pdb_id"] for r in hits],
         "ratio_median": round(statistics.median(ratios), 4),
         "ratio_min": round(min(ratios), 4), "ratio_max": round(max(ratios), 4),
-        "cut": HIGH_RATIO,
-        # On record before this round: 2 of 36 = 5.6 %.
-        "prior_base_rate_pct": 5.6,
+        "cut": cut,
+        **prior_base_rate(cut),
     }
 
 
@@ -105,14 +150,18 @@ def main() -> int:
     ap.add_argument("--cache", required=True)
     ap.add_argument("--entries", help="JSON: [{pdb_id, resolution}, ...]; default <cache>/entries.json")
     ap.add_argument("--json", dest="json_out")
+    ap.add_argument("--cut", type=float, default=DEFAULT_CUT,
+                    help=f"ratio above which an entry is a candidate "
+                         f"(default {DEFAULT_CUT}, the Tukey fence; "
+                         f"round 22's post-hoc cut was {POST_HOC_CUT})")
     args = ap.parse_args()
 
     cache = Path(args.cache)
     entries_path = Path(args.entries) if args.entries else cache / "entries.json"
     entries = json.loads(entries_path.read_text())
 
-    rows, skipped = screen(entries, cache)
-    summary = summarize(rows)
+    rows, skipped = screen(entries, cache, args.cut)
+    summary = summarize(rows, args.cut)
     if args.json_out:
         Path(args.json_out).write_text(
             json.dumps({"rows": rows, "skipped": skipped, "summary": summary}, indent=2) + "\n")

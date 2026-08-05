@@ -60,3 +60,6 @@ pdb_id	round	resolution	emdb	outcome	charges	unparameterised	publication
 20ZH	23	2.4	EMD-67430	kept			10.1038/s41586-026-10228-w
 7RW6	23	2.55	EMD-24709	kept			10.1126/sciadv.abm2827
 13HR	23	2.7	EMD-77072	kept			10.64898/2026.05.09.724024
+10OP	34			rejected: formal charges absent from the electron scattering table: O1-×225	N1+×249, O1-×225		
+5LZW	34			rejected: model 26 MB exceeds --max-model-mb 8			
+21GF	34	3.75	EMD-67646	kept			Structure of the heptameric pore state of alpha-hemolysin in the presence of A549 cells at pH 5.5

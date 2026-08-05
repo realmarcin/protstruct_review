@@ -144,6 +144,23 @@ if ! python3 "${REPO_ROOT}/scripts/test_record_tools.py"; then
   fail "record tool unit tests"
 fi
 
+# 4i. Every remaining scripts/test_*.py, discovered rather than enumerated (#228).
+#     test_round_figures.py shipped in #188 with 18 checks and was never run here,
+#     because this file names each suite by hand and one was forgotten -- silently,
+#     as it always would be. A suite nothing executes is the repo's #2 class: a
+#     guard that does not guard. Discovery cannot go stale the same way; the suites
+#     above keep their named invocations so their failure messages stay specific.
+for _suite in "${REPO_ROOT}"/scripts/test_*.py; do
+  case "$(basename "${_suite}")" in
+    test_qds_emit.py|test_t15_ss_agreement.py|test_t16_interface_quality.py| \
+    test_t17_nmr_ensemble.py|test_t17_restraint_summary.py|test_bench_tolerances.py| \
+    test_guards.py|test_record_tools.py|test_summary_coverage.py) continue ;;
+  esac
+  if ! python3 "${_suite}"; then
+    fail "$(basename "${_suite}" .py)"
+  fi
+done
+
 # 5. Published-view drift. ref/tasks_and_evaluations.{tsv,md} are views of
 #    ref/catalog.yaml. Nothing else here compares them, so a task added to the
 #    catalog alone used to ship silently (T15-T17 did exactly that).
