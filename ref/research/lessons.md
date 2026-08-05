@@ -165,7 +165,7 @@ rebuilt. `prompts/backlog-loop-goal.md` had said so for eight rounds, in capital
 named for it — *"DELETING A BASE BRANCH DOES NOT RETARGET ITS DEPENDENT PRs — GITHUB CLOSES THEM"*.
 So the claim was not a gap in the record; it was a contradiction of it, written from memory about
 tooling in the same session that measured memory as the dominant defect cause. **Nothing new was
-written in response** — a fourth statement of a rule already stated three times is motion, not
+written in response** — a third statement of a rule already stated twice is motion, not
 progress, which is round 30's finding applied to its own successor (#213).
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry

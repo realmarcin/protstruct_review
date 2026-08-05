@@ -167,7 +167,8 @@ So this was not an unrecorded fact. It was a **contradiction of a written rule, 
 about tooling**, inside the round measuring how often figures are asserted from memory — and it cost
 a rebuilt PR rather than a wrong number, which is the same failure in a different currency.
 
-**Nothing was added in response.** A fourth copy of a rule already stated three times is the motion
+**Nothing was added in response.** A third copy of a rule already stated twice (`backlog-loop-goal.md`
+lines 126 and 131, derived rather than recalled after this section first said *"three times"*) is the motion
 round 30 declined to mistake for progress. What this instance is worth is as *data*: the rule was
 present, prominent, and recently read, and adherence still failed. That is the strongest single
 observation this series has for **the gap is adherence, not invention**, and it arrived unprompted
