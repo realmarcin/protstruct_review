@@ -344,14 +344,30 @@ def main() -> int:
     # 87 is the lowest severity claim in any round document; the record must span
     # every issue the documents cite or the gate reports MISSING on correct prose.
     ap.add_argument("--from-issue", type=int, default=87)
-    ap.add_argument("--to-issue", type=int, default=200)
+    # Derived, not hardcoded (#244). This was `default=200`, a snapshot of where the
+    # repo stood when the line was written, so once issue numbers passed 200 the gate
+    # reported MISSING on prose that was correct and --refresh could not fix it. That is
+    # round 27's spell() defect verbatim -- "code sized to the range the repo currently
+    # occupies is a fixture pretending to be a function" -- in the gate that polices
+    # figures. The lower bound stays fixed because 87 IS a fact about the documents: it
+    # is the lowest severity claim any of them make.
+    ap.add_argument("--to-issue", type=int, default=None,
+                    help="highest issue to pull (default: the highest that exists)")
     ap.add_argument("--doc", default=str(ROUND25))
     ap.add_argument("--record", default=str(RECORD))
     args = ap.parse_args()
 
     record = Path(args.record)
     if args.refresh:
-        rows = refresh(args.from_issue, args.to_issue)
+        to_issue = args.to_issue
+        if to_issue is None:
+            existing = issue_numbers(args.from_issue, 10**9)
+            if not existing:
+                raise SystemExit("check_round_figures: no issues found to refresh from")
+            to_issue = max(existing)
+            print(f"refreshing #{args.from_issue}-#{to_issue} (ceiling derived)",
+                  file=sys.stderr)
+        rows = refresh(args.from_issue, to_issue)
         if not rows:
             print("refresh produced no rows — is `gh` authenticated?", file=sys.stderr)
             return 1

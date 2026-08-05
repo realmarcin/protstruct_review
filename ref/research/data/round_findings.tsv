@@ -44,17 +44,82 @@ issue	severity	state	title
 136	high	closed	The #119 cache-key fix broke failure diagnosis: collect() looks for the pre-fix log filename
 137	low	closed	The #121 twin-operator fix inspects only the first header occurrence
 138	low	closed	The #137 rewrite left a comment describing a first-principles fallback it no longer has
-139	high	open	bench_t17_ordered_core hardcodes the ordered-core cutoff and reimplements the metric it claims to reuse
-140	medium	open	PHENIX_BIN and CCP4_SETUP are written independently in 5 and 4 files
-142	medium-high	open	oracle_family is schema-enforced on Finding only, not on the MeasurementValue that qds_emit actually reads
-143	medium-high	open	round_findings.tsv is stale on arrival: it omits #139, #140 and #142, the findings of the round that ships it
-144	medium	open	severity_claims() cannot distinguish a claim from a quoted counter-example, and its alternation order truncates medium-high
-145	high	open	The #139 fix made the output key dynamic and summarize() still reads the old literal — the script raises KeyError on every run
-146	medium-high	open	P4 and P2 verdict labels claim more than the pre-registration supports, both in the flattering direction
-147	medium	open	PR body says 42 guard checks (it is 50), and the HIGH_RATIO duplication is described inaccurately
-148	medium-high	open	status_is_known absorbs an undeclared status that shares a prefix with a declared one
-149	medium	open	check_round_figures: fenced-block severities, silently-dropped citations, and a ValueError on an empty record
-150	medium	open	Round 26 quotes a stale count of the gate's own output (7, now 12), and the PR body's guard-check count is stale again
-151	high	open	check_round_figures' quotation detection fails on four more markdown constructs, two as silent false negatives
-152	medium	open	_named/_attempted still use the bare startswith that #148 removed from status_is_known
-153	low-medium	open	_status_is resolves an ambiguous status token silently by dict order
+139	high	closed	bench_t17_ordered_core hardcodes the ordered-core cutoff and reimplements the metric it claims to reuse
+140	medium	closed	PHENIX_BIN and CCP4_SETUP are written independently in 5 and 4 files
+142	medium-high	closed	oracle_family is schema-enforced on Finding only, not on the MeasurementValue that qds_emit actually reads
+143	medium-high	closed	round_findings.tsv is stale on arrival: it omits #139, #140 and #142, the findings of the round that ships it
+144	medium	closed	severity_claims() cannot distinguish a claim from a quoted counter-example, and its alternation order truncates medium-high
+145	high	closed	The #139 fix made the output key dynamic and summarize() still reads the old literal — the script raises KeyError on every run
+146	medium-high	closed	P4 and P2 verdict labels claim more than the pre-registration supports, both in the flattering direction
+147	medium	closed	PR body says 42 guard checks (it is 50), and the HIGH_RATIO duplication is described inaccurately
+148	medium-high	closed	status_is_known absorbs an undeclared status that shares a prefix with a declared one
+149	medium	closed	check_round_figures: fenced-block severities, silently-dropped citations, and a ValueError on an empty record
+150	medium	closed	Round 26 quotes a stale count of the gate's own output (7, now 12), and the PR body's guard-check count is stale again
+151	high	closed	check_round_figures' quotation detection fails on four more markdown constructs, two as silent false negatives
+152	medium	closed	_named/_attempted still use the bare startswith that #148 removed from status_is_known
+153	low-medium	closed	_status_is resolves an ambiguous status token silently by dict order
+155	medium	closed	NEXT_TASKS' round-26 row says 15 defects; it is 14 (#141 is a PR, not an issue)
+156	low-medium	closed	#154 says "sixth reconcile (#58, #64, #68, and three earlier)" — that is seven; there are two earlier
+157	high	closed	The NEXT_TASKS coverage gate false-passes on any numeric-first-cell table and on fenced example rows
+158	medium	closed	NEXT_TASKS says the different-lens pass found 5 defects (it found 2), and "stale four times" where round 26 says twice in one place and three in another
+160	low	closed	spell() raises KeyError outside 20-39, so the summary gate crashes at round 40
+161	medium-high	closed	check_summary_coverage: a duplicate range claim silently wins, a missing separator drops a row, and any digit in the lessons Round cell credits a round
+162	low	closed	round_tokens: a descending range covers nothing, a regression against the digit scan #161 replaced
+163	medium	closed	NEXT_TASKS: audit-pass sequence says 12/5/5 (it is 12/2/5), and the 1.074 fence base rate is stated as both 3 of 60 and 4 of 60
+164	medium	closed	The tally of miscounts is itself miscounted: #150 carried two and was counted as one, so the class is 10, not 9
+165	medium-high	closed	NEXT_TASKS says both "Twenty-four rounds" and "twenty-seven rounds"; round_count_claim is case-sensitive and checks only the first match
+166	medium	closed	Round 27 says four figures are derived (it is three); round 26's two severity-coverage figures are both stale against the live gate
+167	medium	closed	Registry map-model row: 10RI's delta is 0.4441% not 0.45%, and the "2.2-6.1 Å" range has a wrong floor and an unverifiable ceiling
+169	medium-high	closed	Round 28's own measurement table does not balance: rows are off by +1 and -1, and cancel in the total
+170	high	closed	Round 28's five fixes each corrected the headline and left the body — including a new registry self-contradiction that falsifies the round's own P2 conclusion
+171	medium-high	closed	The #170 sweep rewrote a round-12 historical figure to today's value, making a true sentence false — the convention round 28 proposes, violated inside round 28
+172	medium	closed	round 27's #163 section header says "ninth miscount" while its body says "Tenth" — and the sweep read the body without looking at the header
+173	low	closed	Round 28 calls #172 the "fourth instance" of the headline-vs-body shape; #170's own table makes it the fifth
+174	medium	closed	Round 28 uses "nine" for three different quantities, and its summary counts issues while the document's own rule counts statements
+176	medium	closed	The #174 fix says fifteen (it is sixteen), and chasing that shows the counting rule does not decompose for the round's own defects
+177	medium	closed	Round 28 follow-ups: NEXT_TASKS round table out of order, "Ten issues" excludes #176, the third "nine" still unresolved, and a lesson with no index row
+179	medium	closed	"Eleven issues" excludes #177 — and the count has been wrong four times because a defects-in-own-work tally has no fixed value while review continues
+180	medium-high	closed	check_registry_figures gates 12 aggregate figures and zero per-entry ones — where both of round 28's registry errors were
+182	medium	closed	Round 29's P2 verdict does not survive a careful classification — 9:20 by regex, ~13:11 by hand, so it is indeterminate not confirmed
+183	medium	closed	Round 28 proposed a snapshot convention for write-once trails and deferred it — measure whether staleness actually dominates before implementing
+185	medium	closed	Make deriving cheaper than restating: one command for a round's own figures, targeting the measured 62 %
+186	low-medium	closed	Squash-merging makes staleness unauditable — round 30 could not classify 4 of 34 figures because of it
+187	high	closed	Round 30's P3 was confirmed only because git fsck was never run — all four "undecidable" figures are recoverable, and the squash-merge claim is wrong by 3×
+189	high	closed	round_figures --issues counts pull requests as issues — the exact defect (#155) it was built to prevent
+190	high	closed	round_figures: fenced-block severity reproduces #149, plus reversed ranges, crashes and misleading scope annotations
+191	medium	closed	The #187 correction left P2's cause split on a dead denominator — 15+9=24 against 27 wrong-at-write
+192	high	closed	Round 30's correction left four claims it disproved — including a live registry sentence saying a recoverable figure cannot be checked
+194	medium	closed	Round 30 counts the headline-moved-body-left shape "in this round's history" while citing instances from rounds 27 and 28
+195	medium	closed	Round 30 says three of four recoveries are dangling commits, then enumerates two — the sentence refutes itself
+196	high	closed	round_figures --issues silently reports 0 when the sibling module cannot be loaded
+197	high	closed	round_figures: SystemExit from the sibling aborts the whole tool instead of degrading
+198	low	closed	round_figures --commits with a malformed regex crashes with a raw traceback
+199	low	closed	round_figures over-claims the reason a number is not in the record
+200	low	closed	round_figures: int-vs-str comparison made the gh-missing path re-report resolved issues
+201	medium	closed	round30.md pairs #167c/#177c with each other's verdict, contradicting the script and the next paragraph
+202	medium	closed	lessons.md still carries the durability miscount #193 fixed in two other places
+204	low	closed	PR #203's body miscounted its own sweep: 7 hits claimed, 8 exist
+205	medium	closed	Round 31: measure whether corrections are more defective than the text they correct
+206	medium	closed	The coverage gate forces a round's summary row to exist before the round is measured
+208	medium	closed	Round 31's pre-registration states a population of 39 whose scope does not match its comparison arm
+209	medium	closed	round_figures.py's docstring carries the pre-#187 population: 15 of 24 (62 %), corrected to 15 of 27 (56 %)
+210	medium	closed	The 24-wrong-at-write population survives in two more places on main, contradicting the tables beneath them
+212	medium	closed	PRs #207 and #211 both target main and #211 contains all of #207 — squash-merging both would duplicate the pre-registration
+213	medium	closed	Deleting a base branch CLOSES the stacked PR — #212's resolution asserted auto-retargeting, which did not happen
+216	low	closed	PR #215 says the stacked-PR rule was 'already stated three times'; it is stated twice
+219	medium	closed	Round 32 called PR and issue bodies 'not diffable'; GitHub exposes full dated edit history via userContentEdits
+224	medium	open	Project: test the crossing-quality hypothesis at the data-driven 1.074 fence
+225	medium	open	Project: a fresh low-resolution X-ray set, to give the §4 band widths a checkable basis
+226	high	closed	screen_dfsc_ratio.py hardcodes the 1.3 cut, so the batch would repeat round 23's failure
+227	medium	closed	screen_dfsc_ratio.py emits a stale base rate (5.6 %) into its own JSON output
+228	medium	closed	test_round_figures.py is never run by validate.sh — a suite the gate does not execute
+230	medium	closed	screen_dfsc_ratio --cut accepts 0 and negatives, making every entry a candidate at a reported 100 % base rate
+231	high	closed	fetch_em_entries.py overwrites entries.json, silently dropping earlier entries from the screen's denominator
+232	low	closed	A model rejected after download leaves an orphan .cif in the cache
+234	high	open	The crossing-quality ratio is confounded with model-map fit: two of five entries above the fence barely fit their own maps
+237	high	closed	The X-ray backlog item names the wrong resolution branch: the lost evidence is d_min >= 2.5 A, not below it
+238	high	closed	resolution_combined is an array: an X-ray window query returns ~75 % out-of-window entries
+241	medium	open	select_xray_entries has no protein filter, so nucleic-acid entries are selected and yield 0 Ca
+242	high	open	phenix.refine fails on 7 of 18 entries for missing R-free flags, and the batch reports only 'phenix.refine failed'
+243	medium	open	The X-ray selector's ascending sort returns a systematically old, unrepresentative sample
+244	medium	open	check_round_figures --refresh has a hardcoded issue ceiling of 200, so the gate fails on correct prose

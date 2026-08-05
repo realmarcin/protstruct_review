@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Thirty-five rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Thirty-seven rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -66,12 +66,14 @@ floors row.
 | 33 | (2026-08-05) | exhausted the ungated arm — PR and issue prose, 109 bodies, 493 lines, **101 claims, 3 wrong (2.97 %)**. **P6 falsified in direction**: the ungated channel is *cleaner* than the gated one (3.45 %), so **the gating apparatus is not visible in the error rate**. P7 falsified (101 < 130), P2 falsified on pooled evidence (memory 3, scope 2). Pooled 5 of 159 = 3.14 % vs a 2.28 % base rate — a **0.86 pp** difference needing **~5,542 claims per arm**. **The question is closed as unanswerable here** |
 | 34 | (2026-08-05) | ran the crossing-quality screen at the **1.074 fence** round 23 established: **0 of 13** above it, `P(0) = 0.408` at the prior rate — an underpowered draw, **not a refutation**. The blocker is the **query**, not cost: `--per-stratum 6 × 8 strata` offers only 48 candidates, so 2.5 GB bought 14 entries. Six tooling defects found by the canary and the batch (#226–#228, #230–#232), including `entries.json` **overwriting** itself and dropping a paid-for entry from the screen's denominator |
 | 35 | (2026-08-05) | widened the query as round 34 said to — 160 candidates, **50 entries fetched** against round 34's 14 — and screened up the **first candidate** the project has ever produced, 7DZX at ratio 1.210. It does not survive inspection: `cc_mask_pre` **0.2083**, worse than every entry on record. **The fence is confounded with model-map fit** (#234) — 2 of the 5 entries ever above it barely fit their maps. Base rate revised **6.7 % → 4.5 %**, or **2.7 %** counting genuine candidates only |
+| 36 | (2026-08-05) | pre-registration only — fixed the fit-quality exclusion (`cc_mask_pre ≥ 0.6038`, the Tukey fence over the record) **before** it could be fitted to 7DZX. What it leaves is the finding: the eligible, **non-circular** candidate pool for #224 has **one** member, 10EU, which already fails the 10× bar. Three such candidates needs **~330 screened, ~220 more** |
+| 37 | (2026-08-05) | first **named** low-resolution X-ray set — 21 selected by query, **10 usable**. Bands hold; fresh maxima **0.1828 Å** and **2.61 pp** fall short of the lost 0.285 Å / 5.26 pp, which the registration said in advance is weak evidence. **P5 falsified**: the "not reproducible" clashscore 17.2 is ordinary — a fresh sample reaches **38.70**. 11 of 21 lost to three filed defects (#241–#243) |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — thirty-five rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — thirty-seven rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
