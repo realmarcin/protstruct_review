@@ -63,3 +63,26 @@ pdb_id	round	resolution	emdb	outcome	charges	unparameterised	publication
 10OP	34			rejected: formal charges absent from the electron scattering table: O1-×225	N1+×249, O1-×225		
 5LZW	34			rejected: model 26 MB exceeds --max-model-mb 8			
 21GF	34	3.75	EMD-67646	kept			Structure of the heptameric pore state of alpha-hemolysin in the presence of A549 cells at pH 5.5
+6GK3	34	3.975	EMD-0014	kept			10.1038/s41467-018-06761-6
+11IC	34	2.63	EMD-75710	kept			10.1093/nar/gkag607
+3JCT	34			rejected: model 18 MB exceeds --max-model-mb 8			
+6J3Q	34			rejected: map 320 MB exceeds --max-map-mb 250			
+8U83	34	3.975	EMD-42004	kept			10.1073/pnas.2315018121
+11LT	34			rejected: map 677 MB exceeds --max-map-mb 250			
+5XYM	34			rejected: model 10 MB exceeds --max-model-mb 8			
+6JB3	34	3.53	EMD-9788	kept			10.1016/j.celrep.2019.04.050
+6B0L	34	3.98	EMD-7028	kept			10.1038/s41467-018-04044-8
+28YN	34			rejected: map 507 MB exceeds --max-map-mb 250			
+6ADL	34	3.08	EMD-9607	kept			10.1073/pnas.1814309115
+6O8W	34			rejected: model 17 MB exceeds --max-model-mb 8			
+6PP5	34	3.98	EMD-20419	kept			10.7554/eLife.52774
+6E0C	34	2.63	EMD-8945	kept			10.1038/s41467-019-10247-4
+6HIZ	34			rejected: model 9 MB exceeds --max-model-mb 8			
+6PW4	34			rejected: unparameterised ligand: 346 atoms with no monomer-library restraints (PIK×252, PIO×94)		PIK×252, PIO×94	
+6U9G	34	3.98	EMD-20698	kept			10.1016/j.str.2019.10.007
+6L3V	34	2.63	EMD-0827	kept			10.1126/sciadv.aba4996
+6TRA	34			rejected: unparameterised ligand: 65 atoms with no monomer-library restraints (CL0×65)		CL0×65	
+6K7J	34	3.08	EMD-9935	kept			10.1126/science.aay3353
+11GJ	34	3.3	EMD-75678	kept			10.1038/s41594-026-01840-5
+6UI6	34			rejected: map 301 MB exceeds --max-map-mb 250			
+7B00	34	3.98	EMD-11952	kept			10.1073/pnas.2113573118

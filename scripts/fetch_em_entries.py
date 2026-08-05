@@ -358,6 +358,41 @@ def fetch_map(pdb_id: str, accession: str, cache: Path,
     return dest, None
 
 
+def write_entries(cache: Path, entries: list[dict]) -> list[dict]:
+    """Write `<cache>/entries.json`, MERGING with what is already there (#231).
+
+    Fetching incrementally into one cache is the normal way to build a set to a target
+    size -- it is exactly what the crossing-quality screen needs -- and this used to
+    OVERWRITE. The second run erased the first while its map sat on disk, paid for and
+    dropped from the denominator. `screen_dfsc_ratio.py` reads this file, so the result
+    was a base rate computed against the wrong n, which is the single most repeated
+    defect in this repo.
+
+    A prior entry is kept only if its map is still present: this file must describe the
+    CACHE, not the history of fetches into it. A corrupt file is replaced rather than
+    propagated.
+
+    Module-level, not a closure, so the tests can call the real function. The first
+    draft of those tests re-implemented the merge and would have passed against a
+    broken one -- a second copy of a rule, which is #153 and #190 in this repo.
+    """
+    merged: dict[str, dict] = {}
+    existing = cache / "entries.json"
+    if existing.exists():
+        try:
+            for prior in json.loads(existing.read_text()):
+                pid = prior.get("pdb_id")
+                if pid and (cache / f"{pid.lower()}.map").exists():
+                    merged[pid] = prior
+        except (json.JSONDecodeError, TypeError, AttributeError):
+            pass
+    for entry in entries:
+        merged[entry["pdb_id"]] = entry
+    out = list(merged.values())
+    existing.write_text(json.dumps(out, indent=2) + "\n")
+    return out
+
+
 def collect(pdb_ids: list[str], cache: Path, max_map_mb: float, max_model_mb: float,
             seen_pubs: set[str] | None = None,
             max_per_pub: int = 0) -> tuple[list[dict], list[dict]]:
@@ -422,6 +457,12 @@ def collect(pdb_ids: list[str], cache: Path, max_map_mb: float, max_model_mb: fl
         if map_file is None:
             skipped.append({"pdb_id": pdb_id, "reason": reason})
             print(f"  ! {reason}", file=sys.stderr)
+            # The charge and ligand paths above already did this; the map path did
+            # not, and left the model behind -- so the cache held 18 .cif against 14
+            # .map and anything counting models to size the set got 18 (#232). One
+            # instance of a class fixed and the others left, which is the pattern
+            # this file's own flush() comment cites (#105).
+            model.unlink(missing_ok=True)
             continue
         pub_counts[pub_key] = pub_counts.get(pub_key, 0) + 1
         entries.append({"pdb_id": pdb_id, "resolution": resolution,
@@ -566,7 +607,7 @@ def main() -> int:
     # did not check the sibling script, which is round 15's rule about fixing one
     # instance of a failure class and leaving the others (#105).
     def flush() -> None:
-        (cache / "entries.json").write_text(json.dumps(entries, indent=2) + "\n")
+        write_entries(cache, entries)
         if args.fetch_tsv:
             append_fetch_record(entries, skipped, Path(args.fetch_tsv), args.round)
 
