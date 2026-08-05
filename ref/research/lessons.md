@@ -157,6 +157,17 @@ sweep.** It reads the sentence in front of it, so a fix verified by review alone
 where review happened to look; the remedy is to enumerate every occurrence by quantity and read each,
 which is the same rule round 28 wrote and round 30 measured at 44 % of its defects.
 
+**Back-tested within the hour, against the round's own machinery.** Round 31's stacked-PR
+arrangement was defended with the claim *"GitHub retargets the dependent PR automatically when the
+parent merges"*. It does not: `gh pr merge --squash --delete-branch` deleted the base branch and
+GitHub **closed** the child, which then refused both `reopen` and a base change. The PR had to be
+rebuilt. `prompts/backlog-loop-goal.md` had said so for eight rounds, in capitals, in a section
+named for it — *"DELETING A BASE BRANCH DOES NOT RETARGET ITS DEPENDENT PRs — GITHUB CLOSES THEM"*.
+So the claim was not a gap in the record; it was a contradiction of it, written from memory about
+tooling in the same session that measured memory as the dominant defect cause. **Nothing new was
+written in response** — a fourth statement of a rule already stated three times is motion, not
+progress, which is round 30's finding applied to its own successor (#213).
+
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
 own predictions said not to.** P1 (a check finds something the hand sweep missed) was falsified: every

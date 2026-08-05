@@ -150,6 +150,34 @@ This round **cannot establish it**: no counterfactual, no measurement of pre-rev
 against a 2.3 % base rate. Stated as a hypothesis, in the round that lacked the power to test its
 predecessor.
 
+## Postscript — the class recurred before the round merged (#213)
+
+Round 31's own PR stack was protected by a claim that **GitHub auto-retargets a dependent PR when its
+base merges**. It does not. `--delete-branch` removed the base and GitHub **closed** #211, which then
+refused `gh pr reopen` (*"Could not open the pull request"*) and `gh pr edit --base`
+(*"Cannot change the base branch of a closed pull request"*). It was rebuilt as #214.
+
+`prompts/backlog-loop-goal.md` has carried the correct behaviour since `c3c2bcb` (#110, 2026-08-03),
+which sits between round 23's PR and round 24's — so **rounds 24–31, eight rounds** — in capitals,
+under a heading named for it:
+
+> DELETING A BASE BRANCH DOES NOT RETARGET ITS DEPENDENT PRs — GITHUB CLOSES THEM.
+
+So this was not an unrecorded fact. It was a **contradiction of a written rule, asserted from memory
+about tooling**, inside the round measuring how often figures are asserted from memory — and it cost
+a rebuilt PR rather than a wrong number, which is the same failure in a different currency.
+
+**Nothing was added in response.** A fourth copy of a rule already stated three times is the motion
+round 30 declined to mistake for progress. What this instance is worth is as *data*: the rule was
+present, prominent, and recently read, and adherence still failed. That is the strongest single
+observation this series has for **the gap is adherence, not invention**, and it arrived unprompted
+in the round that could not measure it.
+
+Both figures in this section were themselves derived rather than recalled, after the first draft said
+*"since round 19"* and *"eleven rounds"* — wrong, and caught by running `git log -S` before the commit
+rather than after the merge. The rule that fixed it is the one this whole round is about, applied at
+the only point where it is cheap.
+
 ## Scope limits
 
 - **The sweep is 35 of 155 claim-bearing lines — 23 %.** A lower bound, not a defect density. The
