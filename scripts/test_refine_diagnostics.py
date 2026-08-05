@@ -137,6 +137,26 @@ for _phrase in ("No array of R-free flags found\n",
           "different experiment" in _rr, True)
 
 
+# --- #250: the explainer must never itself fail ------------------------------------
+
+with tempfile.TemporaryDirectory() as d:
+    _dir = Path(d) / "a_directory"
+    _dir.mkdir()
+    _raised = None
+    try:
+        _got = b.refine_failure_reason(_dir)
+    except Exception as _e:                                    # noqa: BLE001
+        _raised = type(_e).__name__
+    check("an unreadable log path does not raise", _raised, None)
+    check("  and is reported as a missing readable log",
+          "no readable log" in _got, True)
+
+_binary = reason_for("\x00\x01\x02 garbage\n")
+check("control characters do not reach the committed record",
+      any(ord(c) < 32 for c in _binary), False)
+check("  while the printable part survives", "garbage" in _binary, True)
+
+
 # --- the reason reaches the caller, which is the whole point -----------------------
 # refine() returning None must carry the diagnosis, or collect() has nothing to record.
 

@@ -164,9 +164,19 @@ def refine_failure_reason(log: Path) -> str:
     discarded cannot. A 39 % failure rate reporting no reason is indistinguishable
     from a broken pipeline (#242).
     """
+    # Any unreadable path is treated as a missing log (#250). This function's contract
+    # is "never fail, always explain" -- it runs while the caller is recording a SKIP,
+    # so raising here turns one skipped entry into a dead batch. `log.exists()` alone
+    # is not enough: it is true for a directory, and read_text() then throws.
     if not log.exists():
         return "phenix.refine produced no output and no log"
-    text = log.read_text(errors="ignore")
+    try:
+        text = log.read_text(errors="ignore")
+    except OSError:
+        # Present but unreadable is a DIFFERENT fact from absent -- a directory where a
+        # log should be says something went wrong with the run's plumbing, not with the
+        # refinement. Collapsing the two would hide that.
+        return "phenix.refine produced no output and no readable log"
     # EARLIEST occurrence in the log, not first in this list (#249). phenix prints the
     # r_free_flags.generate suggestion from several unrelated failure paths, so it is
     # the needle most likely to co-occur with a real cause and mask it -- and a
@@ -181,7 +191,10 @@ def refine_failure_reason(log: Path) -> str:
         return "phenix.refine failed"
     # Bounded: this lands in a committed JSON record, and one malformed log should not
     # dominate the file (#249).
-    quoted = " / ".join(tail)
+    # Control characters out: a truncated or partially-written log otherwise puts NULs
+    # into a committed JSON record, where nothing downstream expects them (#250).
+    quoted = "".join(c if c.isprintable() or c == " " else "?"
+                     for c in " / ".join(tail))
     if len(quoted) > _MAX_QUOTED:
         quoted = quoted[:_MAX_QUOTED] + " …(truncated)"
     return "phenix.refine failed: " + quoted
