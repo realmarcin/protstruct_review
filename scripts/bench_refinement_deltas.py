@@ -137,17 +137,23 @@ def refine_prefix(model_stem: str, restraints: bool) -> str:
 # with the deposited value and the run is not the same null re-refinement every other
 # entry got. It is a methodological choice to register, not a default to reach for.
 _REFINE_FAILURES: list[tuple[str, str]] = [
-    ("r_free_flags.generate",
-     "no usable R-free flags in the deposited data (phenix suggests "
-     "r_free_flags.generate=True, which would refine against NEW flags -- a different "
-     "experiment, so it is not done here)"),
+    # Both R-free causes carry the SAME caveat. Splitting them and warning on only one
+    # meant the earliest-occurrence rule (#249) could report the more precise cause and
+    # silently drop the warning -- which is what happened to round 37's real logs the
+    # moment that rule landed.
+    ("No array of R-free flags found", _RFREE_CAVEAT := (
+        "no usable R-free flags in the deposited data (phenix suggests "
+        "r_free_flags.generate=True, which would refine against NEW flags -- a "
+        "different experiment, so it is not done here)")),
+    ("r_free_flags.generate", _RFREE_CAVEAT),
     ("Unknown scattering type",
      "an atom's scattering type is absent from the table phenix uses"),
     ("Sorry: Crystal symmetry mismatch",
      "crystal symmetry differs between the model and the data"),
-    ("No array of R-free flags found",
-     "the data file carries no R-free flag array at all"),
 ]
+
+
+_MAX_QUOTED = 300
 
 
 def refine_failure_reason(log: Path) -> str:
@@ -161,11 +167,24 @@ def refine_failure_reason(log: Path) -> str:
     if not log.exists():
         return "phenix.refine produced no output and no log"
     text = log.read_text(errors="ignore")
-    for needle, reason in _REFINE_FAILURES:
-        if needle in text:
-            return reason
+    # EARLIEST occurrence in the log, not first in this list (#249). phenix prints the
+    # r_free_flags.generate suggestion from several unrelated failure paths, so it is
+    # the needle most likely to co-occur with a real cause and mask it -- and a
+    # confidently wrong diagnosis is worse than the bare "failed" this replaces,
+    # because that at least asserted nothing.
+    hits = [(text.find(needle), reason) for needle, reason in _REFINE_FAILURES
+            if needle in text]
+    if hits:
+        return min(hits)[1]
     tail = [l.strip() for l in text.splitlines() if l.strip()][-3:]
-    return "phenix.refine failed: " + " / ".join(tail) if tail else "phenix.refine failed"
+    if not tail:
+        return "phenix.refine failed"
+    # Bounded: this lands in a committed JSON record, and one malformed log should not
+    # dominate the file (#249).
+    quoted = " / ".join(tail)
+    if len(quoted) > _MAX_QUOTED:
+        quoted = quoted[:_MAX_QUOTED] + " …(truncated)"
+    return "phenix.refine failed: " + quoted
 
 
 def refine(model: Path, mtz: Path, work: Path,

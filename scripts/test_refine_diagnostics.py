@@ -97,6 +97,46 @@ check("an empty log does not raise", reason_for(""), "phenix.refine failed")
 check("a whitespace-only log does not raise", reason_for("\n\n   \n"), "phenix.refine failed")
 
 
+# --- #249: ambiguity is resolved by the log, not by declaration order --------------
+# phenix prints the r_free_flags suggestion from several unrelated failure paths, so
+# it is the needle most likely to co-occur with a real cause and mask it.
+
+_MIXED = ("Sorry: Crystal symmetry mismatch between model and data\n"
+          "later unrelated noise\n"
+          "run again with xray_data.r_free_flags.generate=True\n")
+check("the cause that appears FIRST in the log wins",
+      "symmetry" in reason_for(_MIXED), True)
+check("  and the later generic hint does not mask it",
+      "R-free" in reason_for(_MIXED), False)
+# and the reverse order must flip the answer, or the test proves nothing
+_REVERSED = ("run again with xray_data.r_free_flags.generate=True\n"
+             "Sorry: Crystal symmetry mismatch between model and data\n")
+check("  reversing the log reverses the diagnosis",
+      "no usable R-free flags" in reason_for(_REVERSED), True)
+
+
+# --- #249: the quoted fallback is bounded ------------------------------------------
+# The reason is written into a committed JSON record; one malformed log should not
+# dominate the file it lands in.
+
+_long = reason_for("x" * 5000 + "\n")
+check("a huge log yields a bounded reason", len(_long) <= 340, True)
+check("  and says it was truncated", "truncated" in _long, True)
+check("  while a short log is quoted whole",
+      "truncated" in reason_for("short failure line\n"), False)
+
+
+# Both R-free phrasings must carry the caveat. The earliest-occurrence rule made this
+# a live regression: round 37's real logs contain "No array of R-free flags found"
+# BEFORE the generate suggestion, so splitting the two reasons dropped the warning
+# from exactly the entries it was written for.
+for _phrase in ("No array of R-free flags found\n",
+                "run again with xray_data.r_free_flags.generate=True\n"):
+    _rr = reason_for(_phrase)
+    check(f"the caveat survives whichever R-free phrasing appears ({_phrase[:22]}…)",
+          "different experiment" in _rr, True)
+
+
 # --- the reason reaches the caller, which is the whole point -----------------------
 # refine() returning None must carry the diagnosis, or collect() has nothing to record.
 
