@@ -120,7 +120,7 @@ classification table did not fix what the table was drawn from:
 |---|---|
 | **the registry** | *"9VAM … carries no `d_fsc_model_pre`, so the figure cannot be checked"* — while `round12.md:58` records `6.1020 → 6.3629` in full. **I wrote that caveat in #167, disproved it in #187, and never returned to the sentence #187 cites as its own evidence.** |
 | this document | the scope limits still said *"four are marked undecidable"* against a corrected table reading **0**, forty lines apart |
-| `#167c` vs `#177c` | opposite verdicts — dropped-from-population versus STALE — on parallel evidence, with no stated reason |
+| `#167c` vs `#177c` | opposite verdicts — STALE versus dropped-from-population — on parallel evidence, with no stated reason |
 | *"nothing was lost"* | **half** the recoveries came from **dangling commits**, which survive only until `git gc`. `#167c`'s evidence is on `main` and `#177c`'s is in an issue body; `#147`'s and `#167a`'s are not durable. |
 
 The first is the one that matters: **a false claim live in the registry, created by one fix and
