@@ -42,3 +42,62 @@ body	claim	verdict	evidence
 163	"4 of 60 is correct and line 178's 3 of 60 is wrong"	correct	4 rows above the 1.074 fence
 141	"231 tolerance checks, 42 guard checks, 16 record-tool"	correct-at-write	all three have since grown
 114	"209 unit checks pass"	correct-at-write	suite has since grown
+164	miscount tally 1+1+1+2+1+1+2 = 9 through #158	correct	sums to 9; #163 is therefore the tenth
+164	"#130 three high -> four"	correct	round_findings.tsv: #116-#127 has 4 high
+164	"#135 20-file -> 19"	correct	gh pr view 129 --json files = 19
+164	"#147 42 guard checks -> 50"	correct	round 30 re-ran 8bdad88
+164	"#150 7 checkable -> 12, and 50 -> 70"	correct	gate output moved as citations were added
+164	"#155 15 defects -> 14"	correct	#139-#153 holds 14 issues
+164	"#158 5 with a different lens -> 2"	correct	round26.md pass 4 = two
+167	10RI stated +0.45 %, record says 0.4441 %	correct	TSV d_fsc_model_delta_pct = 0.4441
+167	"check_registry_figures.py, whose 14 checks cover the aggregate"	correct-at-write	19 today after round 29 added 5
+168	table 227+99 = 326	correct	arithmetic
+168	table 223+84 = 307	correct	arithmetic
+168	table 221+78 = 299	correct	arithmetic
+168	"3 + 5 = 8 wrong"	correct	arithmetic
+168	"registry ~185, 2 wrong, ~1.1 %"	correct	2/185 = 1.081 %
+168	"trails ~65, 3 wrong, ~4.6 %"	correct	3/65 = 4.615 %
+168	"the registry is ~4x cleaner"	correct	4.615 / 1.081 = 4.27
+168	"#166 round 27: only four figures are derived -> three"	correct	round 27 derived three
+168	"#166 round 26: 12 checked, 10 of 21 -> 15"	correct	check_round_figures.py reported 15
+168	"#167 registry ranges 2.2-6.1 -> 2.06-4.35 over 36"	correct	36 rows with both pre and post
+169	"row 1: 221+3 = 224 does not equal the stated 223"	correct	arithmetic; over by 1
+169	"row 2: 78+5 = 83 does not equal the stated 84"	correct	arithmetic; under by 1
+169	"the total balances only because the row errors cancel"	correct	299+8 = 307
+169	"7 wrong figures established, 1 flagged"	correct	round 28's exact figure
+170	"12 checked, 11 not -> 15 and 10 are checked of 21 -> 13"	correct	two denominators, both real
+172	"Tenth is right"	correct	P4 establishes ten
+174	"231: issues filed during round 28 (#164-#167, #169-#173) = 9"	correct	nine issue numbers
+174	"under that rule the same set is 15, not 9"	correct	1+1+2+2+1+5+1+1+1 = 15
+181	"of 29 claims pairing an entry id with a number, 9 derivable, 20 not"	correct	9+20 = 29
+182	"roughly 13 : 11"	correct	approximate by construction; round 29 later refined to ~15:11
+184	"the convention addresses 6 of 30 classifiable figures - one in five"	correct-at-write	6/30 = 20 %; population later 33
+184	"WRONG-AT-WRITE 24 (80 %), STALE 6 (20 %), UNDECIDABLE 4"	correct-at-write	24+6 = 30; 24/30 = 80 %. Superseded by #187
+184	"memory 15 (62 %), incomplete edit 9 (38 %)"	correct-at-write	15+9 = 24; 15/24 = 62.5 %. Superseded by #187
+185	"what the 15 were counting: 7 + 4 + 1 each x 4"	correct	sums to 15
+186	"round 30 could not classify 4 of 34"	correct-at-write	24+6+4 = 34. Superseded by #187
+187	"gh pr view 129 returns 6, not ~20 - off by more than 3x"	correct	20/6 = 3.33
+187	"142 dangling commits still present locally"	correct-at-write	149 today; the count grows
+187	before/after: STALE 6->6, WRONG 24->27, UNDECIDABLE 4->0, 1 removed	correct	34 - 1 = 33
+187	"P1 confirmed (6 of 33, 18 %)"	correct	6/33 = 18.2 %
+188	"7 of the 15 were counting issues and severities"	correct	#185's breakdown
+188	"#135 - a 20-file audit round of a 19-file diff"	correct	PR 129 has 19 files
+189	"#188 is this tool's own pull request. The correct answer is 2."	correct	round_figures --issues 186-188 = 2
+189	"#155 - 15 defects (#139-#153), which was 14"	correct	round_findings.tsv
+191	"corrected split: memory 15 (56 %), incomplete edit 12 (44 %)"	correct	15+12 = 27; 15/27 = 56 %
+204	"the sweep read 7 hits" -> 8 exist	correct	grep -rn dangling returns 8 lines
+207	"git log main | grep '^Fix #' returns 3"	correct	squash-merging absorbs the rest
+208	"the 39 span #22 through #193; only 33 come from round 24 on"	correct	per-PR breakdown
+210	"#187 moved three undecidable into wrong-at-write and dropped one"	correct	4 -> 3 moved, #177c dropped
+210	"a table reading 15 + 12 = 27, shares 56 % and 44 %"	correct	arithmetic
+214	"33 Fix # commits, 155 lines, 35 claims, 0 wrong"	correct	round 31's ledger
+214	"P(0 | p = 0.0228, n = 35) = 0.446"	correct	recomputed
+214	"130 verified claims are needed"	correct	ceil(log .05 / log(1-p)) = 130
+215	"a fourth statement of something already stated three times"	WRONG	the rule is stated TWICE (backlog-loop-goal.md:126 and :131), so a new copy is the third. Filed as #216
+215	"the first draft said since round 19 and eleven rounds - both wrong"	correct	c3c2bcb sits between #106 and #114; eight rounds
+218	"35 + 23 = 58 claims, 2 wrong, 3.45 %"	correct	arithmetic
+218	"round 32 adds 2 of 23 = 8.7 %"	correct	arithmetic
+218	"P(>=2 | p = 0.0228, n = 58) = 0.382"	correct	recomputed
+218	"scope implicated in 2 of 2, memory in 1 of 2"	correct	round 32's two wrong claims
+218	"352 backticks"	correct-at-write	380 today
+219	"#203 returns totalCount 2 and both prior bodies in full"	correct	GraphQL userContentEdits
