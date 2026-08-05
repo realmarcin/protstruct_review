@@ -87,9 +87,17 @@ excluded. Registering this in advance is what makes it a result rather than an a
 > exist. **The next round either widens the population or drops the question.**
 
 Widening means PR bodies and issue text, which is where #204 and part of #187 lived — and which are
-**not in the repo**, so they are not diffable, not gated, and recoverable only through the API. That
-is a different measurement with different reliability, and it should be registered as one rather than
-folded silently into this series.
+**not in the repo**, so they are not gated by `validate.sh` and are reachable only through the API.
+That is a different measurement and should be registered as one rather than folded silently into this
+series.
+
+**Correction (#219): this paragraph first said they are "not diffable". They are.** GraphQL
+`userContentEdits` returns every prior version of a body with its `editedAt` timestamp — on #203 it
+returns the pre-correction text of #204 verbatim — and `totalCount: 0` means a body was never edited,
+so the current text *is* the original. Wrong-at-write is therefore directly determinable for that
+population. The claim was written into a **scope limit**, the section whose job is to be conservative
+and the place a reader is least likely to challenge it, and it is round 30's shape exactly: evidence
+asserted to be unrecoverable without running the command that recovers it.
 
 ## The four snapshot claims
 
