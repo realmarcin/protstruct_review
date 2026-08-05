@@ -50,8 +50,9 @@ Of the 24 wrong-at-write figures:
 
 **These moved after #187** and the first version did not move with them: the correction pushed three
 figures into wrong-at-write and left the split reading 15 + 9 = 24 against a population of 27 (#191).
-That is a fix moving a headline and leaving its body — the third time in this round's history, after
-#170 and #172, and this time inside the section reporting that cause. **The cause now lives in
+That is a fix moving a headline and leaving its body — the **third across this series** (after #170
+in round 28 and #172 in round 27) and the **first within round 30** (#194) — and this time inside
+the section reporting that cause. **The cause now lives in
 `classify_wrong_figures.py` as a column**, so the percentages are derived rather than restated; leaving
 it in prose was the reason it went stale.
 
@@ -69,7 +70,9 @@ recollection instead of `git fsck`:
 | `#177c` third "nine" | issue #177's own body | the derivation was recorded, and nine was **right** — not a wrong figure at all |
 
 `git fsck --unreachable --no-reflog` reports **142 dangling commits present locally**, including every
-hash the issues cite. Nothing was lost; the round simply did not look.
+hash the issues cite. The round simply did not look — though *"nothing was lost"* would overstate it: **two of the four** recoveries are **dangling** commits, which survive only until `git gc` prunes
+them (#192). The first version said *three* and then enumerated two in its next clause — a sentence
+carrying its own refutation (#195).
 
 ### The narrative built on P3 was wrong on both facts
 
@@ -108,12 +111,39 @@ invention — which is a less satisfying finding than a new convention and a con
 one. Adding a third rule to a set already not being followed would have been motion rather than
 progress.
 
+## #192 — the correction left four claims it had itself disproved
+
+A review of the correction commit, arriving after this round merged, found that fixing the
+classification table did not fix what the table was drawn from:
+
+| | what was left asserting the opposite |
+|---|---|
+| **the registry** | *"9VAM … carries no `d_fsc_model_pre`, so the figure cannot be checked"* — while `round12.md:58` records `6.1020 → 6.3629` in full. **I wrote that caveat in #167, disproved it in #187, and never returned to the sentence #187 cites as its own evidence.** |
+| this document | the scope limits still said *"four are marked undecidable"* against a corrected table reading **0**, forty lines apart |
+| `#167c` vs `#177c` | opposite verdicts — dropped-from-population versus STALE — on parallel evidence, with no stated reason |
+| *"nothing was lost"* | **half** the recoveries came from **dangling commits**, which survive only until `git gc`. `#167c`'s evidence is on `main` and `#177c`'s is in an issue body; `#147`'s and `#167a`'s are not durable. |
+
+The first is the one that matters: **a false claim live in the registry, created by one fix and
+disproved by another, with no gate covering it** — `check_registry_figures.py` reads only the TSV, so a
+per-entry aside citing a round trail is outside its reach by construction (round 29's coverage gap,
+now with a concrete cost).
+
+The distinction `#167c` vs `#177c` turns on *which artefact is audited*: `#177c`'s claim was a number
+in a document and the number was right, so it was never a wrong figure; `#167c`'s was the registry's
+**sentence about checkability**, which was wrong and has now been fixed. That is defensible and was
+simply never written down.
+
+**P3's falsification stands** — the evidence was available when the round ran, and not looking was the
+error. But *"nothing was lost"* is now qualified: unreachable objects are recoverable **until they are
+pruned**, which is a different guarantee from a file on `main`.
+
 ## Scope limits
 
 - **This classifies figures already known wrong.** It says nothing about the rate of undiscovered
   ones, which round 28 established is a lower bound regardless.
 - **The stale/wrong-at-write split relies on my own judgement per figure**, recorded with its evidence
-  but not independently adjudicated. Four are marked undecidable rather than forced.
+  but not independently adjudicated. **Nothing is marked undecidable** — the first version marked
+  four, and #187 showed all four were recoverable.
 - **It cannot show the convention would have worked** — only what fraction it *could* address. A
   reader still has to heed a dated snapshot.
 - **Rounds before 24 are out of scope**; the issue record starts at #130.
