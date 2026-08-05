@@ -41,7 +41,7 @@ pair**, not because any data changed. A dated snapshot would not have saved it.
 
 ## P2 — "the dominant cause is a count restated from memory": **confirmed**
 
-Of the 24 wrong-at-write figures:
+Of the 27 wrong-at-write figures:
 
 | cause | count | share |
 |---|---:|---:|
