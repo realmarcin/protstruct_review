@@ -50,8 +50,9 @@ Of the 24 wrong-at-write figures:
 
 **These moved after #187** and the first version did not move with them: the correction pushed three
 figures into wrong-at-write and left the split reading 15 + 9 = 24 against a population of 27 (#191).
-That is a fix moving a headline and leaving its body — the third time in this round's history, after
-#170 and #172, and this time inside the section reporting that cause. **The cause now lives in
+That is a fix moving a headline and leaving its body — the **third across this series** (after #170
+in round 28 and #172 in round 27) and the **first within round 30** (#194) — and this time inside
+the section reporting that cause. **The cause now lives in
 `classify_wrong_figures.py` as a column**, so the percentages are derived rather than restated; leaving
 it in prose was the reason it went stale.
 
