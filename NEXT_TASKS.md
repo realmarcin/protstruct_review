@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Thirty-three rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Thirty-four rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -64,12 +64,13 @@ floors row.
 | 31 | (2026-08-05) | asked whether **corrections are more defective than the text they correct**. **Indeterminate — underpowered**: 0 of 35 verified claims wrong across 33 `Fix #` commits, but P(0) = 0.446 at round 28's 2.3 % base rate, and 130 verified claims are needed before zero is surprising. Three stale-by-nature counts, no wrong-at-write. Three copies of one pre-#187 figure outlived the correction that fixed the fourth — two live on `main` (#210), one in the tool built to prevent it (#209): **review is not a sweep** |
 | 32 | (2026-08-05) | exhausted round 31's inventory under a stopping rule fixed in advance: **58 verifiable claims, 2 wrong (3.45 %)** against round 28's 2.28 % — the predicted direction, and `P(≥2) = 0.382`, indistinguishable from chance. **P5 confirmed**: the inventory yields 58, the test needs 130, so **this population cannot answer the question**. Both wrong claims were introduced by `Fix #` commits and both involve **scope**, which `round_figures.py` would not have caught |
 | 33 | (2026-08-05) | exhausted the ungated arm — PR and issue prose, 109 bodies, 493 lines, **101 claims, 3 wrong (2.97 %)**. **P6 falsified in direction**: the ungated channel is *cleaner* than the gated one (3.45 %), so **the gating apparatus is not visible in the error rate**. P7 falsified (101 < 130), P2 falsified on pooled evidence (memory 3, scope 2). Pooled 5 of 159 = 3.14 % vs a 2.28 % base rate — a **0.86 pp** difference needing **~5,542 claims per arm**. **The question is closed as unanswerable here** |
+| 34 | (2026-08-05) | ran the crossing-quality screen at the **1.074 fence** round 23 established: **0 of 13** above it, `P(0) = 0.408` at the prior rate — an underpowered draw, **not a refutation**. The blocker is the **query**, not cost: `--per-stratum 6 × 8 strata` offers only 48 candidates, so 2.5 GB bought 14 entries. Six tooling defects found by the canary and the batch (#226–#228, #230–#232), including `entries.json` **overwriting** itself and dropping a paid-for entry from the screen's denominator |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — thirty-three rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — thirty-four rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 

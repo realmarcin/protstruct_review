@@ -1,0 +1,127 @@
+{
+  "rows": [
+    {
+      "pdb_id": "6GK3",
+      "resolution": 3.975,
+      "d_fsc_model_pre": 4.074861115388018,
+      "ratio": 1.0251,
+      "cc_mask_pre": 0.617,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "11IC",
+      "resolution": 2.63,
+      "d_fsc_model_pre": 2.604665460102276,
+      "ratio": 0.9904,
+      "cc_mask_pre": 0.8265,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "8U83",
+      "resolution": 3.975,
+      "d_fsc_model_pre": 3.4357058228837025,
+      "ratio": 0.8643,
+      "cc_mask_pre": 0.7352,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6JB3",
+      "resolution": 3.53,
+      "d_fsc_model_pre": 3.4378849732849694,
+      "ratio": 0.9739,
+      "cc_mask_pre": 0.6684,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6B0L",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 3.8464565178996146,
+      "ratio": 0.9664,
+      "cc_mask_pre": 0.759,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6PP5",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 3.8880662129588894,
+      "ratio": 0.9769,
+      "cc_mask_pre": 0.8001,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6E0C",
+      "resolution": 2.63,
+      "d_fsc_model_pre": 2.5852453301517926,
+      "ratio": 0.983,
+      "cc_mask_pre": 0.87,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6U9G",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 3.83445232174305,
+      "ratio": 0.9634,
+      "cc_mask_pre": 0.8021,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6L3V",
+      "resolution": 2.63,
+      "d_fsc_model_pre": 2.5407877484759567,
+      "ratio": 0.9661,
+      "cc_mask_pre": 0.8511,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "6K7J",
+      "resolution": 3.08,
+      "d_fsc_model_pre": 2.9854396703873984,
+      "ratio": 0.9693,
+      "cc_mask_pre": 0.8249,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "11GJ",
+      "resolution": 3.3,
+      "d_fsc_model_pre": 3.144323815395969,
+      "ratio": 0.9528,
+      "cc_mask_pre": 0.8564,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "7B00",
+      "resolution": 3.98,
+      "d_fsc_model_pre": 3.399606358899782,
+      "ratio": 0.8542,
+      "cc_mask_pre": 0.7866,
+      "high_ratio": false
+    },
+    {
+      "pdb_id": "21GF",
+      "resolution": 3.75,
+      "d_fsc_model_pre": 3.6858671237751297,
+      "ratio": 0.9829,
+      "cc_mask_pre": 0.8283,
+      "high_ratio": false
+    }
+  ],
+  "skipped": [
+    {
+      "pdb_id": "6ADL",
+      "reason": "crossing 21.91 A implausible for a 3.08 A map"
+    }
+  ],
+  "summary": {
+    "n_screened": 13,
+    "n_high_ratio": 0,
+    "base_rate_pct": 0.0,
+    "high_ratio_ids": [],
+    "ratio_median": 0.9693,
+    "ratio_min": 0.8542,
+    "ratio_max": 1.0251,
+    "cut": 1.074,
+    "prior_base_rate_pct": 6.7,
+    "prior_hits": 4,
+    "prior_n": 60
+  }
+}

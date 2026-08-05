@@ -20,6 +20,7 @@ maxims.
 | A test too small to fail its own null has not been run | 31 |
 | Exhausting a population is an answer about the population, not the question | 32 |
 | An effect smaller than your measurement floor is not a finding to chase | 33 |
+| A batch's ceiling is usually the query, not the budget | 34 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -192,6 +193,17 @@ exhaustive hand-verification produced 159. **An effect smaller than your measure
 finding to chase** — the useful output was three independent estimates of the same base rate, ~2–3 %,
 by three different methods, and the recognition that no amount of further sweeping would settle what
 was asked.
+
+Round 34 ran the crossing-quality screen at the fence round 23 had established and found **0 of 13**
+above it — `P(0) = 0.408` at the prior base rate, so an underpowered draw rather than a refutation,
+which is round 23's outcome repeated with the cut corrected. The useful finding was about the
+apparatus: **a batch's ceiling is usually the query, not the budget.** `--strata 8 × --per-stratum 6`
+offers 48 candidates however large `--limit` is, so 2.5 GB of downloads bought 14 entries because
+only 26 unexcluded candidates existed to try. The project was never expensive; it was under-queried.
+And the canary earned its cost several times over: **four of six defects were found before a single
+batch entry was downloaded**, including a screen that could not express the cut the project required
+and a fetch that **overwrote** `entries.json`, erasing a paid-for entry from the screen's own
+denominator — in a script whose docstring promises that denominator cannot go missing.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
