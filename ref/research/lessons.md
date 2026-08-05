@@ -22,6 +22,8 @@ maxims.
 | An effect smaller than your measurement floor is not a finding to chase | 33 |
 | A batch's ceiling is usually the query, not the budget | 34 |
 | A selection criterion can be satisfied by the thing it was meant to exclude | 35 |
+| Choose the exclusion before you see which point it removes | 36 |
+| "Not reproducible" can mean rare, or merely unsampled | 37 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -217,6 +219,25 @@ populations and calling them one. The base rate falls from 6.7 % to 4.5 %, or **
 genuine candidates, which roughly doubles the screening a powered test needs. The general form is
 worth keeping: **when a proxy is cheap enough to screen on, check what else satisfies it before
 spending the budget it unlocks.**
+
+Round 36 registered the fit-quality exclusion (`cc_mask_pre >= 0.6038`, the Tukey fence over the
+record) **before** it could be fitted to the entry that motivated it — and the registration was where
+the real cost appeared: of the five entries ever above the ratio fence, two fail on fit and two *are*
+the observations the hypothesis was built on, leaving **one** non-circular candidate that already
+fails the 10× bar. **Choose the exclusion before you see which point it removes**, and price the
+circularity honestly: reasoning from the 2.7 % "eligible" rate silently counted the defining
+observations as evidence for the thing they define.
+
+Round 37 built the first **named** low-resolution X-ray set — 21 entries by query, 10 usable — and
+falsified a claim the registry had recorded as unanswerable. The starting clashscore of 17.2 was
+called *"not reproducible … can never be checked"*; a fresh sample of ten reaches **38.70**.
+**"Not reproducible" can mean rare, or merely unsampled**, and the recoverable set's 13.61 ceiling was
+an artefact of which entries survived rather than evidence about the population. The fresh Cα-shift
+and favored maxima fell well short of the lost ones, which the pre-registration had already said is
+the weak direction — a maximum can only rise with more data, so failing to reach one proves less than
+reaching it would. The round's other lesson is about attrition: **11 of 21 selected entries produced
+nothing**, for three compounding reasons that all trace to one sort order returning twenty 1990s
+depositions.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its

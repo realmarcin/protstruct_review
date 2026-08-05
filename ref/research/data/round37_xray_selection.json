@@ -1,0 +1,90 @@
+{
+  "selected": [
+    {
+      "pdb_id": "116D",
+      "d_min": 2.5
+    },
+    {
+      "pdb_id": "12OC",
+      "d_min": 2.68
+    },
+    {
+      "pdb_id": "1B9B",
+      "d_min": 2.85
+    },
+    {
+      "pdb_id": "12UN",
+      "d_min": 3.03
+    },
+    {
+      "pdb_id": "12CI",
+      "d_min": 2.5
+    },
+    {
+      "pdb_id": "13OY",
+      "d_min": 2.68
+    },
+    {
+      "pdb_id": "1BMF",
+      "d_min": 2.85
+    },
+    {
+      "pdb_id": "1OWJ",
+      "d_min": 3.03
+    },
+    {
+      "pdb_id": "14ZZ",
+      "d_min": 2.5
+    },
+    {
+      "pdb_id": "1BDJ",
+      "d_min": 2.68
+    },
+    {
+      "pdb_id": "1DZH",
+      "d_min": 2.85
+    },
+    {
+      "pdb_id": "1TIJ",
+      "d_min": 3.03
+    },
+    {
+      "pdb_id": "155C",
+      "d_min": 2.5
+    },
+    {
+      "pdb_id": "1DWU",
+      "d_min": 2.68
+    },
+    {
+      "pdb_id": "1DZQ",
+      "d_min": 2.85
+    },
+    {
+      "pdb_id": "1W1I",
+      "d_min": 3.03
+    },
+    {
+      "pdb_id": "15C8",
+      "d_min": 2.5
+    },
+    {
+      "pdb_id": "1ECZ",
+      "d_min": 2.68
+    },
+    {
+      "pdb_id": "1H1C",
+      "d_min": 2.85
+    },
+    {
+      "pdb_id": "1ZY2",
+      "d_min": 3.03
+    }
+  ],
+  "rejected": [],
+  "window": [
+    2.5,
+    3.2
+  ],
+  "attribute": "rcsb_entry_info.diffrn_resolution_high.value"
+}
