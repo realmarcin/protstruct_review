@@ -19,6 +19,7 @@ maxims.
 | A count of your own defects has no fixed value while review continues | 28 |
 | A test too small to fail its own null has not been run | 31 |
 | Exhausting a population is an answer about the population, not the question | 32 |
+| An effect smaller than your measurement floor is not a finding to chase | 33 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -178,6 +179,19 @@ claims that do not exist, so the next round widens the population or drops the q
 claims were introduced by `Fix #` commits, and both attached a correct figure to the wrong population
 — which `round_figures.py` cannot catch, because deriving a count tells you the number and not which
 set the sentence means.
+
+Round 33 exhausted the last available population — 109 PR and issue bodies, 493 lines, **101 claims,
+3 wrong (2.97 %)** — and closed the question. Three things fell out. **P6 was falsified in
+direction**: ungated prose is *cleaner* than the gated, reviewed, committed arm (3.45 %), so whatever
+`validate.sh` and the review pass buy, **it is not a measurable reduction in wrong figures**. **P2 was
+falsified**: all three body failures were counts restated from memory, none were scope, and round 32's
+"scope in 2 of 2" did not survive a sample of five — so `round_figures.py` does address the majority
+cause after all. And pooled at **5 of 159 = 3.14 %** against a **2.28 %** base rate, the difference is
+**0.86 percentage points**, which needs **~5,542 claims per arm** to detect. Three rounds of
+exhaustive hand-verification produced 159. **An effect smaller than your measurement floor is not a
+finding to chase** — the useful output was three independent estimates of the same base rate, ~2–3 %,
+by three different methods, and the recognition that no amount of further sweeping would settle what
+was asked.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
