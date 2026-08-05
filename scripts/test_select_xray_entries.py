@@ -112,19 +112,91 @@ finally:
     sx.urllib.request.urlopen = _saved
 
 
-# --- stratified() must interleave, or a truncated run is single-resolution ---------
+# --- stratified() must interleave across strata ------------------------------------
 
 _saved_search = sx.search
 try:
-    sx.search = lambda lo, hi, rows: [f"{int(lo*100)}_{i}" for i in range(rows)]
+    # search now returns (total, ids); a tiny total takes sample_stratum's whole-stratum
+    # path, which is the behaviour being pinned here.
+    sx.search = lambda lo, hi, rows, start=0: (2, [f"{int(lo*100)}_{i}" for i in range(rows)])
     got = sx.stratified(2.5, 3.2, strata=4, per=2)
-    # round-robin: first pick from every stratum, then the second from every stratum
     check("strata are interleaved rather than concatenated",
           [g.split("_")[1] for g in got], ["0", "0", "0", "0", "1", "1", "1", "1"])
-    check("  so truncating at --limit keeps the spread",
+    check("  so truncating at --limit keeps the resolution spread",
           len({g.split("_")[0] for g in got[:4]}), 4)
 finally:
     sx.search = _saved_search
+
+
+# --- #243: sampling must reach the WHOLE stratum, not just its oldest end ----------
+# Round 37 took the first N and got twenty 1990s ids. The offsets are the fix, and
+# INTERLEAVING them is what makes the fix survive a --limit, which the first attempt
+# did not: it fetched the offsets and then handed back the oldest chunk first.
+
+_calls: list[int] = []
+
+
+def _fake_search(lo, hi, rows, start=0):
+    _calls.append(start)
+    # 1000 entries, ids encoding their position so era is visible in the test
+    return 1000, [f"e{start + i:04d}" for i in range(rows)]
+
+
+_saved_search = sx.search
+try:
+    sx.search = _fake_search
+    got = sx.sample_stratum(2.5, 2.7, want=10, chunks=5)
+    check("sampling issues one request per chunk", len(_calls), 5)
+    check("  at evenly spaced offsets across the stratum",
+          _calls, [0, 200, 400, 600, 800])
+    check("  and returns what was asked for", len(got), 10)
+    # The decisive assertion: the first half of the result must not all come from the
+    # first offset, which is exactly what #243 was.
+    _early = [g for g in got[:5] if int(g[1:]) < 200]
+    check("the first picks are NOT all from the oldest offset", len(_early), 1)
+    check("  the spread reaches the far end of the stratum",
+          any(int(g[1:]) >= 800 for g in got[:5]), True)
+finally:
+    sx.search = _saved_search
+
+# A stratum smaller than the request is taken whole, in one call rather than five.
+_calls.clear()
+_saved_search = sx.search
+try:
+    sx.search = lambda lo, hi, rows, start=0: (_calls.append(start), (3, ["a", "b", "c"]))[1]
+    check("a stratum smaller than the request is taken whole",
+          sx.sample_stratum(2.5, 2.7, want=10, chunks=5), ["a", "b", "c"])
+finally:
+    sx.search = _saved_search
+
+
+# The defect that actually shipped was NOT in sample_stratum alone: it was the
+# interaction of a concatenated bucket with stratified()'s round-robin AND the caller's
+# --limit. The bucket handed back its oldest chunk first, round-robin took index 0 from
+# every stratum, and --limit 20 threw away everything after. The offsets were fetched
+# and discarded. So the assertion has to be made on the truncated end-to-end result.
+
+_saved_search = sx.search
+try:
+    sx.search = lambda lo, hi, rows, start=0: (
+        1000, [f"s{int(lo*100)}_{start + i:04d}" for i in range(rows)])
+    _all = sx.stratified(2.5, 3.2, strata=4, per=25, chunks=5)
+    _first20 = _all[:20]                       # what --limit 20 would keep
+    _offsets = {int(g.split("_")[1]) for g in _first20}
+    check("after --limit truncation the kept set still spans the stratum",
+          max(_offsets) >= 800, True)
+    check("  and is not drawn from the oldest offset alone",
+          len({o // 200 for o in _offsets}), 5)
+    check("  while still covering every resolution stratum",
+          len({g.split("_")[0] for g in _first20}), 4)
+finally:
+    sx.search = _saved_search
+
+
+# --- #241: the query excludes entries with no protein ------------------------------
+_src = (REPO / "scripts" / "select_xray_entries.py").read_text()
+check("the query filters on protein entity count",
+      "rcsb_entry_info.polymer_entity_count_protein" in _src, True)
 
 
 # --- the exclusion source is imported, not retyped ---------------------------------

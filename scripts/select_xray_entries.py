@@ -74,8 +74,13 @@ def known_ids() -> set[str]:
         return set()
 
 
-def search(min_res: float, max_res: float, rows: int) -> list[str]:
-    """X-ray entries with RELEASED structure factors in a d_min window."""
+def search(min_res: float, max_res: float, rows: int,
+           start: int = 0) -> tuple[int, list[str]]:
+    """X-ray entries with RELEASED structure factors in a d_min window.
+
+    Returns `(total_count, ids)`. The total is what makes spreading possible: without
+    it a caller can only take the first N, which is #243.
+    """
     query = {
         "query": {"type": "group", "logical_operator": "and", "nodes": [
             {"type": "terminal", "service": "text", "parameters": {
@@ -90,9 +95,17 @@ def search(min_res: float, max_res: float, rows: int) -> list[str]:
             {"type": "terminal", "service": "text", "parameters": {
                 "attribute": "rcsb_accession_info.has_released_experimental_data",
                 "operator": "exact_match", "value": "Y"}},
+            # The quantity is a Ca-SHIFT, so an entry with no protein measures nothing.
+            # Round 37 spent a full ten-minute refinement on 12CI and got n_ca = 0
+            # (#241). Removes 857 of 39,036 in the default window -- cheap, and the
+            # entries it removes are the ones that would have cost the most per unit of
+            # nothing.
+            {"type": "terminal", "service": "text", "parameters": {
+                "attribute": "rcsb_entry_info.polymer_entity_count_protein",
+                "operator": "range", "value": {"from": 1, "include_lower": True}}},
         ]},
         "return_type": "entry",
-        "request_options": {"paginate": {"start": 0, "rows": rows},
+        "request_options": {"paginate": {"start": start, "rows": rows},
                             "sort": [{"sort_by": RES_ATTR, "direction": "asc"}]},
     }
     req = urllib.request.Request(RCSB_SEARCH, data=json.dumps(query).encode(),
@@ -103,22 +116,66 @@ def search(min_res: float, max_res: float, rows: int) -> list[str]:
     except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError,
             json.JSONDecodeError) as exc:
         raise SystemExit(f"select_xray: RCSB search failed: {exc}")
-    return [hit["identifier"].upper() for hit in payload.get("result_set", [])]
+    return (payload.get("total_count", 0),
+            [hit["identifier"].upper() for hit in payload.get("result_set", [])])
 
 
-def stratified(min_res: float, max_res: float, strata: int, per: int) -> list[str]:
-    """Round-robin across equal d_min sub-bands, so a truncated run stays spread.
+def sample_stratum(lo: float, hi: float, want: int, chunks: int = 5) -> list[str]:
+    """`want` ids spread across the WHOLE stratum, by paginating to even offsets.
+
+    Round 37 took the first N of each stratum and got twenty 1990s identifiers (#243).
+    Within a stratum the search ties-break by identifier and identifier order is
+    deposition order, so "the first N" means "the oldest N" -- which are also the
+    entries missing R-free flags (#242) and the ones most likely to be nucleic acid
+    (#241). One sort order produced all three of round 37's failures.
+
+    Oversampling and spacing does NOT fix it: the oversampled pool is still the first
+    few hundred by deposition, so the spread happens inside the same era. Only offsets
+    into the full result set reach the rest -- verified on the 2.5-2.675 A stratum,
+    where offset 0 returns 14ZZ/155C/15C8 and offset 14603 returns 9U2X/9VDG/9VOY.
+
+    Deterministic: same query, same offsets, same set. A sampled set a later round
+    cannot reproduce would defeat the purpose of selecting by query at all.
+    """
+    total, first = search(lo, hi, max(1, want // chunks), 0)
+    if total == 0:
+        return []
+    if total <= want:                       # small stratum: take it whole, one call
+        return search(lo, hi, want, 0)[1]
+    per_chunk = max(1, want // chunks)
+    drawn: list[list[str]] = []
+    for c in range(chunks):
+        # Even offsets across the stratum, last chunk clamped so it cannot run past
+        # the end and silently return fewer than asked.
+        start = min(int(c * total / chunks), max(0, total - per_chunk))
+        drawn.append(first if c == 0 else search(lo, hi, per_chunk, start)[1])
+    # INTERLEAVE the chunks, do not concatenate them. The caller round-robins across
+    # strata by index and any --limit truncates the tail, so a concatenated bucket
+    # hands back its oldest chunk first and the limit throws the rest away -- which
+    # reproduced #243 exactly, with the offsets fetched and then discarded.
+    out: list[str] = []
+    for i in range(per_chunk):
+        for chunk in drawn:
+            if i < len(chunk) and chunk[i] not in out:
+                out.append(chunk[i])
+    return out[:want]
+
+
+def stratified(min_res: float, max_res: float, strata: int, per: int,
+               chunks: int = 5) -> list[str]:
+    """Round-robin across equal d_min sub-bands, spread within each.
 
     The ascending sort piles hits at the window's low edge -- at 2.5-3.2 A the first
-    twelve were all exactly 2.5 A. Without stratification a `--limit 20` set would be
-    twenty 2.5 A structures and would say nothing about 3 A.
+    twelve were all exactly 2.5 A -- so stratifying by resolution is still needed. What
+    `sample_stratum` adds is spread WITHIN a stratum, which is the deposition-era axis.
     """
     width = (max_res - min_res) / strata
     buckets: list[list[str]] = []
     for i in range(strata):
         lo, hi = min_res + i * width, min_res + (i + 1) * width
-        hits = search(lo, hi, per)
-        print(f"  {lo:.2f}-{hi:.2f} A: {len(hits)} candidates", file=sys.stderr)
+        hits = sample_stratum(lo, hi, per, chunks)
+        print(f"  {lo:.2f}-{hi:.2f} A: {len(hits)} sampled across the stratum",
+              file=sys.stderr)
         buckets.append(hits)
     out: list[str] = []
     for i in range(per):
@@ -160,6 +217,9 @@ def main() -> int:
     ap.add_argument("--max-res", type=float, default=3.2)
     ap.add_argument("--strata", type=int, default=4)
     ap.add_argument("--per-stratum", type=int, default=25)
+    ap.add_argument("--chunks", type=int, default=5,
+                    help="offsets sampled per stratum, spreading across deposition "
+                         "era rather than taking the oldest N (#243)")
     ap.add_argument("--limit", type=int, default=20)
     ap.add_argument("--exclude", default="", help="extra ids, comma-separated")
     ap.add_argument("--json", dest="json_out")
@@ -174,7 +234,8 @@ def main() -> int:
 
     selected: list[dict] = []
     rejected: list[dict] = []
-    for pdb_id in stratified(args.min_res, args.max_res, args.strata, args.per_stratum):
+    for pdb_id in stratified(args.min_res, args.max_res, args.strata,
+                             args.per_stratum, args.chunks):
         if len(selected) >= args.limit:
             break
         if pdb_id in excluded:
