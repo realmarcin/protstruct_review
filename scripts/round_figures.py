@@ -43,6 +43,25 @@ def _run(cmd: list[str]) -> str:
     return out.stdout
 
 
+def _real_issue_numbers(lo: int, hi: int) -> set[int]:
+    """Numbers in [lo, hi] that are ISSUES, via the same rule as check_round_figures.
+
+    Imported rather than reimplemented: one rule, one copy. If that module cannot be
+    loaded the fallback returns an empty set, so unknown numbers are reported as
+    unresolved rather than guessed at -- failing closed, since a wrong count is the
+    thing this tool exists to prevent.
+    """
+    try:
+        import importlib.util
+        spec_ = importlib.util.spec_from_file_location(
+            "crf", REPO / "scripts" / "check_round_figures.py")
+        mod = importlib.util.module_from_spec(spec_)
+        spec_.loader.exec_module(mod)
+        return set(mod.issue_numbers(lo, hi))
+    except Exception:
+        return set()
+
+
 def issues(spec: str) -> list[str]:
     """Issue count and severity split over a range, from the committed findings record.
 
@@ -65,8 +84,17 @@ def issues(spec: str) -> list[str]:
     # Safe here in a way it would not be in a gate: this is a helper, so a missing or
     # unauthenticated `gh` degrades to the record alone and says so.
     if missing:
-        live, failed = [], []
+        # REUSE the sibling's rule rather than writing a second copy of it. Round 26 hit
+        # this exact trap in check_round_figures.issue_numbers: `gh issue view <n>`
+        # resolves a PULL REQUEST number and returns it looking like an issue. Writing
+        # the fallback without applying that fix made this tool count its own PR and
+        # report 3 issues for a range holding 2 (#189) -- the very defect (#155) the
+        # --issues flag exists to prevent, laundered as derived output.
+        real, failed = _real_issue_numbers(min(missing), max(missing)), []
+        live = []
         for n in missing:
+            if n not in real:
+                failed.append(n); continue
             res = subprocess.run(["gh", "issue", "view", str(n), "--json",
                                   "number,title,body,state"], capture_output=True, text=True)
             if res.returncode:
