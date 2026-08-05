@@ -71,7 +71,7 @@ rate is at or below 3.45 % at an n that can distinguish them — which the power
 rather than assume.
 
 **P7 (new) — this population yields n ≥ 130**, and so can resolve P1 where the committed documents
-could not. 108 bodies against 155 lines, and bodies are far denser in figures than a diff line.
+could not. 109 bodies against 155 lines, and bodies are far denser in figures than a diff line.
 *Falsified* if n < 130, in which case **the question is dropped**, not widened a second time.
 
 **P2 (carried) — scope is the dominant cause among wrong claims.** Round 32 found scope in 2 of 2 on a
