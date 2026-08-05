@@ -21,7 +21,7 @@ Usage:
     python3 scripts/round_figures.py --diff main..HEAD      # files, insertions, deletions
     python3 scripts/round_figures.py --suite                # checks per test suite
     python3 scripts/round_figures.py --commits 'Reconcile NEXT_TASKS'
-    python3 scripts/round_figures.py --all --issues 183-186 --diff main..HEAD
+    python3 scripts/round_figures.py --issues 183-186 --diff main..HEAD --suite
 """
 from __future__ import annotations
 
@@ -43,6 +43,22 @@ def _run(cmd: list[str]) -> str:
     return out.stdout
 
 
+def _sibling():
+    """`check_round_figures`, loaded once, for the rules this tool must not re-copy.
+
+    Two defects in this file came from copying that module's parsing WITHOUT its
+    fixes: #189 (`gh issue view` resolves pull requests) and #190 (a fenced block
+    defeats the severity regex, which is #149). Both were already solved next door.
+    Importing is the only version of "one rule, one copy" that survives contact.
+    """
+    import importlib.util
+    spec_ = importlib.util.spec_from_file_location(
+        "crf", REPO / "scripts" / "check_round_figures.py")
+    mod = importlib.util.module_from_spec(spec_)
+    spec_.loader.exec_module(mod)
+    return mod
+
+
 def _real_issue_numbers(lo: int, hi: int) -> set[int]:
     """Numbers in [lo, hi] that are ISSUES, via the same rule as check_round_figures.
 
@@ -52,12 +68,7 @@ def _real_issue_numbers(lo: int, hi: int) -> set[int]:
     thing this tool exists to prevent.
     """
     try:
-        import importlib.util
-        spec_ = importlib.util.spec_from_file_location(
-            "crf", REPO / "scripts" / "check_round_figures.py")
-        mod = importlib.util.module_from_spec(spec_)
-        spec_.loader.exec_module(mod)
-        return set(mod.issue_numbers(lo, hi))
+        return set(_sibling().issue_numbers(lo, hi))
     except Exception:
         return set()
 
@@ -70,8 +81,20 @@ def issues(spec: str) -> list[str]:
     holds issues only, so a count derived here cannot repeat #155's mistake of counting
     a pull request.
     """
-    lo, _, hi = spec.partition("-")
-    lo, hi = int(lo), int(hi or lo)
+    lo_s, sep, hi_s = spec.partition("-")
+    if sep and not hi_s.strip():
+        raise SystemExit(f"round_figures: --issues {spec!r} has a trailing '-' with no "
+                         f"upper bound; write {lo_s.strip()!r} or {lo_s.strip()}-N")
+    try:
+        lo, hi = int(lo_s), int(hi_s or lo_s)
+    except ValueError:
+        raise SystemExit(f"round_figures: --issues {spec!r} is not a number or LO-HI range")
+    if lo > hi:
+        # A transposed range used to return 0 silently, which is indistinguishable from
+        # a legitimately empty result -- in a tool whose whole purpose is not printing
+        # wrong counts (#190).
+        raise SystemExit(f"round_figures: --issues {spec!r} is reversed (lo > hi); "
+                         f"did you mean {hi}-{lo}?")
     if not FINDINGS.exists():
         return [f"issues {spec}: no findings record at {FINDINGS.relative_to(REPO)}"]
     lines = FINDINGS.read_text().splitlines()
@@ -95,14 +118,26 @@ def issues(spec: str) -> list[str]:
         for n in missing:
             if n not in real:
                 failed.append(n); continue
-            res = subprocess.run(["gh", "issue", "view", str(n), "--json",
-                                  "number,title,body,state"], capture_output=True, text=True)
+            try:
+                res = subprocess.run(["gh", "issue", "view", str(n), "--json",
+                                      "number,title,body,state"],
+                                     capture_output=True, text=True)
+            except FileNotFoundError:
+                # The docstring promises degrading "to the record alone and says so".
+                # That held for an unauthenticated `gh` and not for a missing one (#190).
+                failed.extend(m for m in missing if m not in [x["issue"] for x in live])
+                break
             if res.returncode:
                 failed.append(n); continue
             import json as _json
             d = _json.loads(res.stdout)
-            m = re.search(r"^\*\*Severity:\s*([a-z-]+)", d.get("body") or "", re.MULTILINE)
-            live.append({"issue": str(d["number"]), "severity": m.group(1) if m else "unstated"})
+            # The sibling's parser, not a second regex: it strips fenced blocks first,
+            # which #149 established a bare MULTILINE anchor does not (#190).
+            try:
+                sev = _sibling().severity_of(d.get("body") or "")
+            except Exception:
+                sev = "unresolved"
+            live.append({"issue": str(d["number"]), "severity": sev})
         hit += live
         missing = failed
     sev = Counter(r["severity"] for r in hit)
@@ -133,7 +168,8 @@ def diff(spec: str) -> list[str]:
     out = [f"diff {spec}", f"  files changed    : {len(names)}",
            f"  shortstat        : {stat or '(no changes)'}"]
     if untracked:
-        out.append(f"  UNTRACKED        : {len(untracked)} not in the range yet "
+        out.append(f"  UNTRACKED        : {len(untracked)} untracked in the WORKING TREE "
+                   f"(repo-wide, not scoped to {spec}) "
                    f"({', '.join(untracked[:4])}{' …' if len(untracked) > 4 else ''})"
                    f" — `git add` them before quoting a file count")
     return out
@@ -162,7 +198,11 @@ def commits(pattern: str) -> list[str]:
     """
     subs = _run(["git", "log", "--format=%s"]).splitlines()
     hit = [s for s in subs if re.search(pattern, s)]
-    return [f"commits matching {pattern!r}: {len(hit)}"] + [f"  {s[:76]}" for s in hit[:8]]
+    # Both scopes stated: this walks the WHOLE branch history and the pattern is a
+    # REGEX. `--commits "round 1."` matched round 19/16/15/13 via `.` as a wildcard and
+    # said nothing about either (#190).
+    return [f"commits matching regex {pattern!r} over all {len(subs)} commits on this "
+            f"branch: {len(hit)}"] + [f"  {s[:76]}" for s in hit[:8]]
 
 
 def main() -> int:
