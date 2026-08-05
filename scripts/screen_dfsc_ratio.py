@@ -86,6 +86,27 @@ def prior_base_rate(cut: float) -> dict[str, Any]:
             "prior_hits": hits, "prior_n": len(ratios)}
 
 
+# The ratio is d_FSC_model_pre / d_min, and the 60 on record run 0.73-1.372. A cut
+# outside this band selects everything or nothing, and `--cut 0` did it SILENTLY --
+# reporting a 100 % base rate in well-formed JSON that a round document could quote
+# (#230). Same class as #190 on round_figures: nonsense in, confident output.
+CUT_MIN, CUT_MAX = 0.5, 3.0
+
+
+def _cut_value(text: str) -> float:
+    import argparse as _ap
+    try:
+        value = float(text)
+    except ValueError:
+        raise _ap.ArgumentTypeError(f"{text!r} is not a number")
+    if not CUT_MIN <= value <= CUT_MAX:
+        raise _ap.ArgumentTypeError(
+            f"{value} is outside the plausible range {CUT_MIN}-{CUT_MAX}; the ratios on "
+            f"record run 0.73-1.372, so this selects everything or nothing. The Tukey "
+            f"fence is {TUKEY_FENCE} and round 22's post-hoc cut was {POST_HOC_CUT}")
+    return value
+
+
 def load_bench():
     """Import the EM benchmark so the screen measures the identical quantity."""
     spec = importlib.util.spec_from_file_location(
@@ -150,7 +171,7 @@ def main() -> int:
     ap.add_argument("--cache", required=True)
     ap.add_argument("--entries", help="JSON: [{pdb_id, resolution}, ...]; default <cache>/entries.json")
     ap.add_argument("--json", dest="json_out")
-    ap.add_argument("--cut", type=float, default=DEFAULT_CUT,
+    ap.add_argument("--cut", type=_cut_value, default=DEFAULT_CUT,
                     help=f"ratio above which an entry is a candidate "
                          f"(default {DEFAULT_CUT}, the Tukey fence; "
                          f"round 22's post-hoc cut was {POST_HOC_CUT})")

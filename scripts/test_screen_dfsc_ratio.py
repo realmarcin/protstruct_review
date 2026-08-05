@@ -103,4 +103,34 @@ check("the denominator is exactly the record's computable-ratio rows",
       _at_fence["prior_n"], _n)
 
 
+# --- #230: a cut outside the plausible band is a typo, not an intention -----------
+# `--cut 0` used to run and report a 100 % base rate in well-formed JSON. The screen
+# selects which entries get downloaded, so nonsense here is paid in gigabytes.
+
+import argparse
+
+for _bad in ("0", "-1", "5", "0.4"):
+    _raised = ""
+    try:
+        sc._cut_value(_bad)
+    except argparse.ArgumentTypeError as _e:
+        _raised = str(_e)
+    check(f"--cut {_bad} is refused by name", "outside the plausible range" in _raised, True)
+
+_msg = ""
+try:
+    sc._cut_value("abc")
+except argparse.ArgumentTypeError as _e:
+    _msg = str(_e)
+check("--cut abc is refused as not-a-number, not as a ValueError",
+      "not a number" in _msg, True)
+
+for _ok in (sc.TUKEY_FENCE, sc.POST_HOC_CUT):
+    check(f"--cut {_ok} is accepted", sc._cut_value(str(_ok)), _ok)
+
+# The refusal names both real cuts, so somebody who typo'd learns what to type.
+check("the refusal names the fence and the post-hoc cut",
+      all(t in _raised for t in ("1.074", "1.3")), True)
+
+
 print(f"\nall screen-dfsc unit tests passed ({PASSED} checks)")
