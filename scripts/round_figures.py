@@ -59,18 +59,23 @@ def _sibling():
     return mod
 
 
-def _real_issue_numbers(lo: int, hi: int) -> set[int]:
+def _real_issue_numbers(lo: int, hi: int) -> set[int] | None:
     """Numbers in [lo, hi] that are ISSUES, via the same rule as check_round_figures.
 
-    Imported rather than reimplemented: one rule, one copy. If that module cannot be
-    loaded the fallback returns an empty set, so unknown numbers are reported as
-    unresolved rather than guessed at -- failing closed, since a wrong count is the
-    thing this tool exists to prevent.
+    Imported rather than reimplemented: one rule, one copy. Returns **None** — not an
+    empty set — when the rule could not be applied at all, because the two are opposite
+    facts and conflating them was #196: an empty set means "none of these are issues",
+    which sent every real issue into the not-in-the-record line and printed `: 0` with
+    exit 0. The one number this tool must never print is a confident wrong one.
+
+    `SystemExit` is caught alongside `Exception` (#197): the sibling raises it when
+    `gh issue list` fails, and it subclasses BaseException, so `except Exception` let a
+    401 abort the whole run -- suppressing even the part already in the local record.
     """
     try:
         return set(_sibling().issue_numbers(lo, hi))
-    except Exception:
-        return set()
+    except (Exception, SystemExit):
+        return None
 
 
 def issues(spec: str) -> list[str]:
@@ -102,6 +107,7 @@ def issues(spec: str) -> list[str]:
     rows = [dict(zip(header, l.split("\t"))) for l in lines[1:] if l.strip()]
     hit = [r for r in rows if lo <= int(r["issue"]) <= hi]
     missing = sorted({n for n in range(lo, hi + 1)} - {int(r["issue"]) for r in hit})
+    unresolved: list[int] = []
     # The record is a SNAPSHOT, so the issues of the round being written are never in
     # it -- which is precisely when this tool is wanted. Fall back to `gh` for the gap.
     # Safe here in a way it would not be in a gate: this is a helper, so a missing or
@@ -113,9 +119,9 @@ def issues(spec: str) -> list[str]:
         # the fallback without applying that fix made this tool count its own PR and
         # report 3 issues for a range holding 2 (#189) -- the very defect (#155) the
         # --issues flag exists to prevent, laundered as derived output.
-        real, failed = _real_issue_numbers(min(missing), max(missing)), []
+        real, failed, unresolved = _real_issue_numbers(min(missing), max(missing)), [], []
         live = []
-        for n in missing:
+        for n in (() if real is None else missing):
             if n not in real:
                 failed.append(n); continue
             try:
@@ -125,7 +131,9 @@ def issues(spec: str) -> list[str]:
             except FileNotFoundError:
                 # The docstring promises degrading "to the record alone and says so".
                 # That held for an unauthenticated `gh` and not for a missing one (#190).
-                failed.extend(m for m in missing if m not in [x["issue"] for x in live])
+                # int vs str: `m not in [x["issue"] ...]` never matched, so numbers
+                # already resolved were re-reported as missing (#200).
+                failed.extend(m for m in missing if m not in {int(x["issue"]) for x in live})
                 break
             if res.returncode:
                 failed.append(n); continue
@@ -135,20 +143,33 @@ def issues(spec: str) -> list[str]:
             # which #149 established a bare MULTILINE anchor does not (#190).
             try:
                 sev = _sibling().severity_of(d.get("body") or "")
-            except Exception:
+            except (Exception, SystemExit):
                 sev = "unresolved"
             live.append({"issue": str(d["number"]), "severity": sev})
         hit += live
-        missing = failed
+        if real is None:
+            unresolved, missing = missing, []
+        else:
+            missing = failed
     sev = Counter(r["severity"] for r in hit)
-    out = [f"issues #{lo}-#{hi}      : {len(hit)}   ({', '.join('#'+r['issue'] for r in hit)})",
+    total = f"{len(hit)}" + ("   (LOWER BOUND -- see below)" if unresolved else "")
+    out = [f"issues #{lo}-#{hi}      : {total}   ({', '.join('#'+r['issue'] for r in hit)})",
            "  by severity      : " + (", ".join(f"{k} {v}" for k, v in sorted(sev.items()))
                                       or "none stated")]
     if missing:
         # Not silently ignored: a gap is usually a PR number, which is exactly the
-        # confusion that produced #155, so it is named rather than dropped.
+        # confusion that produced #155, so it is named rather than dropped. The wording
+        # states only what was checked (#199): the sibling's rule says these are not
+        # issues, which covers PR numbers AND numbers never issued -- it does not say
+        # which, and the earlier text asserted one of them.
         out.append(f"  not in the record: {', '.join('#'+str(n) for n in missing)}"
-                   f"  (PRs, or issues filed since the last --refresh)")
+                   f"  (checked: not issues -- PR numbers, or never issued)")
+    if unresolved:
+        # #196: this line is the whole fix. Reporting these as "not in the record" made
+        # a failure of the classifier look like a fact about the numbers.
+        out.append(f"  !! UNRESOLVED     : {', '.join('#'+str(n) for n in unresolved)}"
+                   f"  -- could not determine whether these are issues; the count above"
+                   f" excludes them and is NOT the answer. Do not paste it.")
     return out
 
 
@@ -196,8 +217,14 @@ def commits(pattern: str) -> list[str]:
 
     #156 said "and three earlier" where `git log` showed two.
     """
+    try:
+        rx = re.compile(pattern)
+    except re.error as e:
+        # Every other user-input error in this file exits with a diagnosis; this one
+        # printed a raw traceback (#198).
+        raise SystemExit(f"round_figures: --commits {pattern!r} is not a valid regex: {e}")
     subs = _run(["git", "log", "--format=%s"]).splitlines()
-    hit = [s for s in subs if re.search(pattern, s)]
+    hit = [s for s in subs if rx.search(s)]
     # Both scopes stated: this walks the WHOLE branch history and the pattern is a
     # REGEX. `--commits "round 1."` matched round 19/16/15/13 via `.` as a wildcard and
     # said nothing about either (#190).
@@ -226,10 +253,14 @@ def main() -> int:
     if not blocks:
         ap.print_help()
         return 2
+    degraded = False
     for b in blocks:
         print("\n".join(b))
         print()
-    return 0
+        degraded |= any(l.lstrip().startswith("!!") for l in b)
+    # Not a gate, but a number that could not be derived must not exit 0 next to one
+    # that could -- that equivalence is what made #196 paste-ready (#196).
+    return 1 if degraded else 0
 
 
 if __name__ == "__main__":
