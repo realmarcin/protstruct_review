@@ -15,16 +15,20 @@ in a commit containing no results.
 Every figure found wrong across rounds 24–29, classified against the **committed record** — the
 introducing document, the data file as it stood, `git log` — with the evidence named per figure.
 
-| | count | share of decidable |
+| | count | share |
 |---|---:|---:|
-| **WRONG-AT-WRITE** — never correct | **24** | **80 %** |
-| **STALE** — correct when written, rotted | 6 | 20 % |
-| **UNDECIDABLE** | 4 | — |
-| total | 34 | |
+| **WRONG-AT-WRITE** — never correct | **27** | **82 %** |
+| **STALE** — correct when written, rotted | 6 | 18 % |
+| **UNDECIDABLE** | **0** | — |
+| total | 33 | |
+
+**These are the corrected figures (#187).** The first version reported 24 / 6 / 4 and called P3
+confirmed; review showed all four "undecidable" figures were recoverable and three "stale" ones were
+mislabelled. See the correction section below — the mistake is more instructive than the table.
 
 ## P1 — "stale does not reach a majority": **confirmed**
 
-Six of thirty. The four errors round 28 found split two-two, which is what motivated predicting no
+Six of thirty-three — 18 %. The four errors round 28 found split two-two, which is what motivated predicting no
 majority; the wider population is far more lopsided than that sample suggested.
 
 The six stale ones are worth naming, because they are a coherent kind: `Twenty-four rounds` as rounds
@@ -44,16 +48,39 @@ Of the 24 wrong-at-write figures:
 | a count restated from memory when the source was one command away | **15** | **62 %** |
 | an incomplete edit — headline changed, body left | 9 | 38 % |
 
-## P3 — "more than two undecidable": **confirmed**
+## P3 — "more than two undecidable": **FALSIFIED**
 
-Four, and the reason matters: **squash-merging destroyed the evidence.** Each round lands as one
-commit — round 25's ~20 intermediate commits are gone, and every round branch is deleted on merge. So
-for a figure written mid-round, the state it was written against cannot be recovered.
+The round declared four undecidable and reported P3 confirmed. **All four are recoverable**, and the
+round's own registered method said to use the committed record *"not recollection"* — then reached for
+recollection instead of `git fsck`:
 
-Two of the four are unanswerable for that reason (`42 guard checks`, which lived in a **PR body** —
-not a file in the repo at all — and 10RI's `+0.45 %`, whose round-15 source state is unretrievable).
-**The repo's own merge convention makes staleness unauditable**, which is a cost of squash-merging
-nobody had priced, and it applies to every future round equally.
+| figure | recovered from | value |
+|---|---|---|
+| `#147` "42 guard checks" | dangling commit `8bdad88`, checked out and re-run | `all guard unit tests passed (42 checks)` |
+| `#167a` 10RI "+0.45 %" | dangling commit `3d6e5453`, round 15's own trail | `\| 10RI \| 3.60 Å \| +0.0115 \| +0.45 % \|` |
+| `#167c` 9VAM "6.10 Å" | `tolerance_benchmark_round12.md`, on `main` | 6.1020 |
+| `#177c` third "nine" | issue #177's own body | the derivation was recorded, and nine was **right** — not a wrong figure at all |
+
+`git fsck --unreachable --no-reflog` reports **142 dangling commits present locally**, including every
+hash the issues cite. Nothing was lost; the round simply did not look.
+
+### The narrative built on P3 was wrong on both facts
+
+The round claimed *"round 25's ~20 intermediate commits are gone"*. `gh pr view 129 --json commits`
+returns **6** — off by more than 3× — and they are retrievable both as dangling objects and from
+GitHub. **That is the 62 % cause reproduced inside the section diagnosing it**: a count restated from
+memory when one command would have settled it.
+
+The `lessons.md` rule *"squash-merging makes staleness unauditable"* rested entirely on this and is
+**withdrawn**, as is issue #186, filed on the same false premise.
+
+### Three misclassifications, on the round's own internal logic
+
+`#150`, `#166b` and `#177b` were labelled STALE because the source "moved later". In each the drift
+happened **within the round's own development** — the gate already printed 15 at round 26's own squash
+commit, and `#177b`'s excluded issue was fixed in the *same commit* that wrote the count. The
+classification labels that identical mechanism **WRONG-AT-WRITE** for `#170a–e`. Same defect, opposite
+label, in the same table.
 
 ## What this means for the proposal
 
@@ -61,7 +88,7 @@ nobody had priced, and it applies to every future round equally.
 second consecutive round to decline the work that motivated it after measuring — round 29 on the
 per-entry gate, this one on the snapshot convention.
 
-The uncomfortable part is what the 80 % points at:
+The uncomfortable part is what the 82 % points at:
 
 - **62 % — counts restated from memory.** The remedy already exists and is *already a stated rule of
   this repo*: **every figure a document quotes must come from a committed, re-runnable script**. It

@@ -13,7 +13,6 @@ maxims.
 | Rule | Round |
 |---|---|
 | The gap is adherence, not invention | 30 |
-| Squash-merging makes staleness unauditable | 30 |
 | A falsified prediction can cancel the work that motivated the round | 29 |
 | A spot fix that silently misses looks exactly like one that worked | 28 |
 | A counting rule has a domain; state which unit you are using | 28 |
@@ -135,11 +134,14 @@ produced. Adding a third convention to a set already not followed would have bee
 progress, so nothing was written. Two consecutive rounds have now declined the work that motivated
 them after measuring it.
 
-Its companion is a cost nobody had priced: **squash-merging makes staleness unauditable.** Each round
-lands as one commit and its branch is deleted, so for a figure written mid-round the state it was
-written against cannot be recovered. Four figures could not be classified at all for that reason —
-including one that lived only in a PR body, which is not a file in the repo. Whatever else squash
-merges buy, they cost the ability to ask *was this true when it was written?*
+Its companion was a claim that **squash-merging makes staleness unauditable**, and it was **wrong**.
+Review showed all four "unclassifiable" figures were recoverable — three from dangling commits that
+`git fsck` lists 142 of, one from a file on `main` — and that the round's supporting figure
+("round 25's ~20 intermediate commits are gone") was off by more than 3× and checkable with one
+`gh pr view`. The rule is withdrawn. What replaces it is smaller and worse: **the round asserted
+evidence was unrecoverable without running the command that recovers it**, in the same document that
+measured "counts restated from memory when the source was one command away" at 62 % of all defects.
+A preregistered method saying *use the committed record, not recollection* does not enforce itself.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
