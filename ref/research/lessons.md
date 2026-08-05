@@ -17,6 +17,7 @@ maxims.
 | A spot fix that silently misses looks exactly like one that worked | 28 |
 | A counting rule has a domain; state which unit you are using | 28 |
 | A count of your own defects has no fixed value while review continues | 28 |
+| A test too small to fail its own null has not been run | 31 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -126,7 +127,7 @@ string**. Three distinct failure modes in one method in one round is itself the 
 technique deserves the same adversarial reading as the code it repairs.
 
 Round 30 classified every figure found wrong across rounds 24–29 and found the intervention round 28
-proposed addresses **one failure in five**: 6 stale against 24 wrong-at-write. **The gap is adherence,
+proposed addresses **one failure in five**: 6 stale against 27 wrong-at-write. **The gap is adherence,
 not invention.** Of the 27, 56 % were counts restated from memory when the source was one command
 away — against a rule this repo already states, *every figure a document quotes must come from a
 committed, re-runnable script* — and 44 % were incomplete edits, against a remedy round 28 had already
@@ -144,6 +145,17 @@ evidence was unrecoverable without running the command that recovers it**, in th
 measured "counts restated from memory when the source was one command away" at 56 % of the
 wrong-at-write defects.
 A preregistered method saying *use the committed record, not recollection* does not enforce itself.
+
+Round 31 asked whether corrections are more defective than the text they correct, and **could not
+answer at this sample size**: 0 of 35 verified claims across 33 `Fix #` commits, where round 28's
+2.3 % base rate predicts 0.8 and P(0) = **0.446**. Zero is the most likely outcome under the null,
+and 130 verified claims are needed before it is surprising. **A test too small to fail its own null
+has not been run** — round 23's lesson, arriving in a second domain. What the sweep did find was
+`24` — the pre-#187 wrong-at-write population — alive in **three** places after #191 corrected it in
+one: two on `main` and one in the tool built to prevent exactly this restatement. **Review is not a
+sweep.** It reads the sentence in front of it, so a fix verified by review alone is verified only
+where review happened to look; the remedy is to enumerate every occurrence by quantity and read each,
+which is the same rule round 28 wrote and round 30 measured at 44 % of its defects.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
