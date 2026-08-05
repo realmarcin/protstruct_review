@@ -29,9 +29,16 @@ committed documents — an inversion of what round 32 assumed.
 
 ## Population, fixed in advance
 
-**All 108 bodies from #110 onward**: 20 merged pull requests and 88 issues. #110 is the boundary
-because it is the first PR of the rounds-24+ window round 28 swept, which keeps this arm comparable
-with both prior ones.
+**All bodies numbered #110–#219 inclusive**: 20 merged pull requests and 89 issues, **109** bodies.
+
+Both bounds are stated because the population moved while this file was being written: the first
+count gave 88 issues, and filing #219 — the correction that made this round's method sound — made it
+89. A population defined as *"from #110 onward"* is not a population; it is a query whose answer
+changes every time the work touches it. **#219 is the upper bound and is included**, since it was
+filed before any measurement began.
+
+#110 is the lower bound because it is the first PR of the rounds-24+ window round 28 swept, which
+keeps this arm comparable with both prior ones.
 
 - **Original text** is `userContentEdits` oldest node when `totalCount > 0`, else the current body.
 - Bodies I edited during rounds 31–32 are the interesting cases and are **not** excluded; excluding
