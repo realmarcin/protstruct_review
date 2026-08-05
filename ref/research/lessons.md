@@ -136,7 +136,8 @@ them after measuring it.
 
 Its companion was a claim that **squash-merging makes staleness unauditable**, and it was **wrong**.
 Review showed all four "unclassifiable" figures were recoverable — two from dangling commits that
-`git fsck` lists 142 of, one from a file on `main`, one from an issue body — and that the round's supporting figure
+`git fsck` lists 142 of, one from a file on `main`, one from an issue body — and that the round's
+supporting figure
 ("round 25's ~20 intermediate commits are gone") was off by more than 3× and checkable with one
 `gh pr view`. The rule is withdrawn. What replaces it is smaller and worse: **the round asserted
 evidence was unrecoverable without running the command that recovers it**, in the same document that
