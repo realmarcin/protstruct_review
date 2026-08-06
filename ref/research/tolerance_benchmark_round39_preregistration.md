@@ -45,9 +45,9 @@ restrained favored drop against the unrestrained one from round 38.
 Select a **new** low-resolution X-ray set at `d_min ≥ 2.5 Å`, refine **unrestrained** (identical to
 round 38), and measure the favored-drop maximum. **The selection MUST exclude every round-37 and
 round-38 selected id** — `known_ids()` excludes only `DEFAULT_SET`, so without an explicit
-`--exclude` of the **36** distinct ids across
-`round37_xray_selection.json` and `round38_xray_selection.json` (20 + 20, 4 shared) the deterministic
-selector redraws round 38's exact 20. Enough offsets to yield ≥ 15 usable entries after that exclusion; the round is
+`--exclude` of the **37** distinct ids across
+`round37_xray_selection.json` and `round38_xray_selection.json` (21 + 20, 4 shared — round 37 is 21
+since #255 restored 1A0C) the deterministic selector redraws round 38's exact 20. Enough offsets to yield ≥ 15 usable entries after that exclusion; the round is
 underpowered and says so if it yields fewer.
 
 ## Predictions
