@@ -370,3 +370,21 @@ fi
 if [[ "${QUIET}" == "0" ]]; then
   echo "round-document figures match the findings record"
 fi
+
+# Every id a round refined must appear in its committed selection record. #255 was a
+# refined, usable entry (1A0C) present in round37_xray_deltas.json but dropped from
+# round37_xray_selection.json, so the write-up's "21 selected" could not be checked
+# against its own artefact -- and nothing reconciled the two files, so the gate passed
+# for the whole life of round 37 (#261). The check is one-directional: selection may
+# hold MORE ids than the deltas (fetch rejects), never fewer.
+if ! python3 "${REPO_ROOT}/scripts/test_selection_deltas.py" > /dev/null; then
+  python3 "${REPO_ROOT}/scripts/test_selection_deltas.py" >&2 || true
+  fail "selection/deltas guard unit tests"
+fi
+if ! python3 "${REPO_ROOT}/scripts/check_selection_deltas.py" > /dev/null 2>&1; then
+  python3 "${REPO_ROOT}/scripts/check_selection_deltas.py" >&2 || true
+  fail "a round refined an entry its selection record does not list"
+fi
+if [[ "${QUIET}" == "0" ]]; then
+  echo "selection records account for every refined entry"
+fi
