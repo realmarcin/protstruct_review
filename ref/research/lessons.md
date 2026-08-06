@@ -241,9 +241,10 @@ nothing**, for three compounding reasons that all trace to one sort order return
 depositions.
 
 Round 38 re-ran round 37 with the selector fixed and got two answers, not one. The fix worked on what
-it was built for — **attrition**: R-free refinement failures fell from 7 of 18 to 1 of 17, usable n
-rose from 10 of 21 to 14 of 17, and nothing was lost to nucleic acid. So the selector defect *was* the
-whole problem for loss. But a sample spread evenly across deposition era — instead of twenty 1990s
+it was built for — the *excess* **attrition** it had caused: R-free refinement failures fell from 7 of
+18 to 1 of 17, usable n rose from 10 of 21 to 14 of 17, and nothing was lost to nucleic acid. (Baseline
+attrition remains — 6 of 20 still fall to fetch rejects and non-R-free refinement faults no selector
+touches.) But a sample spread evenly across deposition era — instead of twenty 1990s
 entries — did something round 37's biased set never could: it **breached the −6 pp favored band**, at
 6LE5, which drops 6.28 pp under a null re-refinement that improves R-work, R-free and rotamers. The
 biased sample had not been hiding a *smaller* version of the maximum; it had been failing to sample the

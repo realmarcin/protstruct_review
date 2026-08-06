@@ -78,10 +78,15 @@ are unrelated crystallographic faults the era spread simply exposes more of:
 The R-free failure rate fell from **7/18 to 1/17**. Per the registration, that settles **#242**'s
 methodological half: whether to generate R-free flags is now moot, because the flags are no longer the
 dominant loss. **Zero entries were lost at the measure stage** — the protein filter (#241) held, where
-round 37 lost 12CI as nucleic acid. So the selector defect *was* the whole problem for attrition:
-20 selected → 3 fetch rejects → 17 pairs → 3 refine failures → **14 usable**, against round 37's 10.
+round 37 lost 12CI as nucleic acid. So the selector defect was the whole problem for the *excess*
+attrition it caused — the R-free failure class (7/18 → 1/17) and the nucleic-acid loss (→ 0). It was
+**not** the whole of attrition: 20 selected → 3 fetch rejects → 17 pairs → 3 refine failures → **14
+usable** still loses **6 of 20 (30 %)**, against round 37's 10 of 21. The 6 that remain are baseline
+crystallographic attrition no selector fix touches — 3 fetch rejects (no amplitudes/FREE column) and 2
+non-R-free refine failures (3VDD improper rotation matrix, 4UDM incompatible Friedel-mate flags) — the
+kind any unbiased low-resolution sample carries.
 
-But it was **not** the whole problem for the bands. A representative sample is exactly what let the
+And it was **not** the whole problem for the bands. A representative sample is exactly what let the
 favored band be breached — round 37's all-pre-2000 set never reached an entry like 6LE5.
 
 ## P5 replicates on an era-spread sample
