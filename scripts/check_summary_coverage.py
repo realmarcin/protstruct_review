@@ -255,7 +255,11 @@ def round_count_claim(tasks: str, rounds: list[str]) -> dict[str, Any]:
     It read "twenty-four rounds of rules" for two rounds after the fact (#154).
     """
     expected = f"{spell(int(rounds[-1]))} rounds of"
-    found = re.search(r"(twenty|thirty)(-\w+)? rounds of", prose(tasks))
+    # Alternation derived from _TENS, not hardcoded: this regex was `(twenty|thirty)` and
+    # went MISSING at round 40 -- spell() was fixed for 40 (#160) but this sibling search
+    # was not, so the gate could not find "forty rounds of" and failed the round that
+    # crossed 40. Deriving it from the same table spell() uses keeps them in step (#244).
+    found = re.search(rf"({'|'.join(_TENS.values())})(-\w+)? rounds of", prose(tasks))
     if not found:
         return {"check": "round count", "status": "MISSING",
                 "detail": f"no spelled-out round count found; expected {expected!r}"}

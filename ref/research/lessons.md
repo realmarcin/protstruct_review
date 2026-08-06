@@ -26,6 +26,7 @@ maxims.
 | "Not reproducible" can mean rare, or merely unsampled | 37 |
 | Fixing a biased sample can expose the finding the bias was hiding | 38 |
 | A band breached under the wrong protocol is not a band that needs widening | 39 |
+| A real mechanism measured badly looks like no mechanism at all | 40 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -268,6 +269,23 @@ that needs widening**, and the lesson beneath it is procedural: when a decision 
 can settle it and an expensive arm that cannot settle it alone, run the cheap one first and let it
 decide — the round-38 cache was already on disk, so P1 cost zero downloads and closed #253 that a
 ~50-entry fresh screen (arm 2) could only have sharpened.
+
+Round 40 answered #224, the crossing-quality caveat that had been a two-point hypothesis since round 22
+and had defeated a ~50 GB screen (#258). The screen kept failing for one reason: it **selected on the
+ratio** `d_FSC_model_pre / d_min`, and the ratio is a poor, extreme-dependent proxy for the thing the
+caveat is about — over 19 entries its rank correlation with the excursion collapses from +0.319 to
+**+0.049** the moment the two entries it rests on are removed. The redesign stopped selecting and
+**measured the mechanism directly**: how far a fixed coordinate perturbation moves the sustained
+crossing. That predictor correlates with the excursion at ρ **+0.792** with the same two extremes
+removed — leave-one-out 0.75–0.85, and partial +0.818 controlling for fit — where the ratio had nothing
+left. The mechanism was real all along; the ratio was measuring it badly, and a bad measure of a real
+effect is indistinguishable from no effect until you measure it a better way. **A real mechanism measured
+badly looks like no mechanism at all** — and the fix was not more data (the screen's instinct) but a
+better-conditioned measurement on the data already in hand: 19 entries with existing labels, ~5 GB,
+against the 330-entry/~50 GB screen the ratio framing implied. The second half of the reframe was wrong
+and that matters too: a controlled perturbation moved the crossing 8–2900× *less* than refinement did,
+so the large excursions are genuine model movement, not the estimator jitter the redesign guessed —
+crossing quality predicts *which* entries move most without explaining the movement away.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
