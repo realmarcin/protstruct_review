@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Thirty-seven rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Thirty-eight rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -68,12 +68,13 @@ floors row.
 | 35 | (2026-08-05) | widened the query as round 34 said to — 160 candidates, **50 entries fetched** against round 34's 14 — and screened up the **first candidate** the project has ever produced, 7DZX at ratio 1.210. It does not survive inspection: `cc_mask_pre` **0.2083**, worse than every entry on record. **The fence is confounded with model-map fit** (#234) — 2 of the 5 entries ever above it barely fit their maps. Base rate revised **6.7 % → 4.5 %**, or **2.7 %** counting genuine candidates only |
 | 36 | (2026-08-05) | pre-registration only — fixed the fit-quality exclusion (`cc_mask_pre ≥ 0.6038`, the Tukey fence over the record) **before** it could be fitted to 7DZX. What it leaves is the finding: the eligible, **non-circular** candidate pool for #224 has **one** member, 10EU, which already fails the 10× bar. Three such candidates needs **~330 screened, ~220 more** |
 | 37 | (2026-08-05) | first **named** low-resolution X-ray set — 21 selected by query, **10 usable**. Bands hold; fresh maxima **0.1828 Å** and **2.61 pp** fall short of the lost 0.285 Å / 5.26 pp, which the registration said in advance is weak evidence. **P5 falsified**: the "not reproducible" clashscore 17.2 is ordinary — a fresh sample reaches **38.70**. 11 of 21 lost to three filed defects (#241–#243) |
+| 38 | (2026-08-05) | round 37 with the selector fixed. The fix stopped the **attrition** — R-free refinement failures fell **7/18 → 1/17**, **14 of 17 usable** against 10 of 21, 0 lost to nucleic acid — so it *was* the whole problem for loss. But an era-spread sample **breached the −6 pp favored band** for the first time: **6LE5 drops 6.28 pp** under a well-behaved null re-refinement, past the lost 5.26 pp. **P3 falsified** (the strong direction); P2 holds weakly (Cα max 0.2004 < 0.285, up from 0.1828); P5 falsified again (max 27.71). Band **not re-fitted** — widening deferred to a registered decision |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — thirty-seven rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — thirty-eight rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 

@@ -24,6 +24,7 @@ maxims.
 | A selection criterion can be satisfied by the thing it was meant to exclude | 35 |
 | Choose the exclusion before you see which point it removes | 36 |
 | "Not reproducible" can mean rare, or merely unsampled | 37 |
+| Fixing a biased sample can expose the finding the bias was hiding | 38 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -238,6 +239,20 @@ the weak direction — a maximum can only rise with more data, so failing to rea
 reaching it would. The round's other lesson is about attrition: **11 of 21 selected entries produced
 nothing**, for three compounding reasons that all trace to one sort order returning twenty 1990s
 depositions.
+
+Round 38 re-ran round 37 with the selector fixed and got two answers, not one. The fix worked on what
+it was built for — **attrition**: R-free refinement failures fell from 7 of 18 to 1 of 17, usable n
+rose from 10 of 21 to 14 of 17, and nothing was lost to nucleic acid. So the selector defect *was* the
+whole problem for loss. But a sample spread evenly across deposition era — instead of twenty 1990s
+entries — did something round 37's biased set never could: it **breached the −6 pp favored band**, at
+6LE5, which drops 6.28 pp under a null re-refinement that improves R-work, R-free and rotamers. The
+biased sample had not been hiding a *smaller* version of the maximum; it had been failing to sample the
+population where the maximum lives. **Fixing a biased sample can expose the finding the bias was
+hiding** — and the finding here is the strong direction the pre-registration named in advance: a
+maximum can only rise with more data, so P3 *failing* proves the band is too tight, where P3 holding
+would have proved little. The band was **not** re-fitted in the round that first saw the breach; that
+decision was registered separately, because a band set to clear a single worst case is the base case
+this file already warns to expect to break again.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
