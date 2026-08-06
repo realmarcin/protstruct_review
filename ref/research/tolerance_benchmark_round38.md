@@ -81,7 +81,8 @@ dominant loss. **Zero entries were lost at the measure stage** — the protein f
 round 37 lost 12CI as nucleic acid. So the selector defect was the whole problem for the *excess*
 attrition it caused — the R-free failure class (7/18 → 1/17) and the nucleic-acid loss (→ 0). It was
 **not** the whole of attrition: 20 selected → 3 fetch rejects → 17 pairs → 3 refine failures → **14
-usable** still loses **6 of 20 (30 %)**, against round 37's 10 of 21. The 6 that remain are baseline
+usable** still loses **6 of 20 (30 %)** — round 38 keeps **14 of 17** refinement attempts against
+round 37's 10 of 18. The 6 that remain are baseline
 crystallographic attrition no selector fix touches — 3 fetch rejects (no amplitudes/FREE column) and 2
 non-R-free refine failures (3VDD improper rotation matrix, 4UDM incompatible Friedel-mate flags) — the
 kind any unbiased low-resolution sample carries.
