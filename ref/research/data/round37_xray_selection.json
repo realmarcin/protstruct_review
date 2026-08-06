@@ -79,6 +79,10 @@
     {
       "pdb_id": "1ZY2",
       "d_min": 3.03
+    },
+    {
+      "pdb_id": "1A0C",
+      "d_min": 2.5
     }
   ],
   "rejected": [],
