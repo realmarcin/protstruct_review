@@ -25,6 +25,7 @@ maxims.
 | Choose the exclusion before you see which point it removes | 36 |
 | "Not reproducible" can mean rare, or merely unsampled | 37 |
 | Fixing a biased sample can expose the finding the bias was hiding | 38 |
+| A band breached under the wrong protocol is not a band that needs widening | 39 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -255,6 +256,18 @@ maximum can only rise with more data, so P3 *failing* proves the band is too tig
 would have proved little. The band was **not** re-fitted in the round that first saw the breach; that
 decision was registered separately, because a band set to clear a single worst case is the base case
 this file already warns to expect to break again.
+
+Round 39 took that registered decision and answered it the cheap way first. The §4 favored band is
+quoted for **unrestrained** refinement, so before asking whether it should widen to clear 6LE5's
+6.28 pp breach, the round asked whether the breach even survives the restraints a crystallographer
+applies at 3 Å. It does not: re-refining the round-38 set with NCS + secondary-structure restraints
+took 6LE5 from −6.28 to **−2.21 pp**, moved 11 of 14 entries the right way, and left **no entry
+breaching** the band. So the band was **kept** — widening it would have re-fitted the number to a
+protocol no low-resolution refinement uses. **A band breached under the wrong protocol is not a band
+that needs widening**, and the lesson beneath it is procedural: when a decision has a cheap arm that
+can settle it and an expensive arm that cannot settle it alone, run the cheap one first and let it
+decide — the round-38 cache was already on disk, so P1 cost zero downloads and closed #253 that a
+~50-entry fresh screen (arm 2) could only have sharpened.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
