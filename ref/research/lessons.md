@@ -277,13 +277,13 @@ caveat is about — over 19 entries its rank correlation with the excursion coll
 **+0.049** the moment the two entries it rests on are removed. The redesign stopped selecting and
 **measured the mechanism directly**: how far a fixed coordinate perturbation moves the sustained
 crossing. That predictor correlates with the excursion at ρ **+0.792** with the same two extremes
-removed — leave-one-out 0.75–0.85, and partial +0.818 controlling for fit — where the ratio had nothing
+removed — leave-one-out 0.75–0.85, and partial +0.773 controlling for fit — where the ratio had nothing
 left. The mechanism was real all along; the ratio was measuring it badly, and a bad measure of a real
 effect is indistinguishable from no effect until you measure it a better way. **A real mechanism measured
 badly looks like no mechanism at all** — and the fix was not more data (the screen's instinct) but a
 better-conditioned measurement on the data already in hand: 19 entries with existing labels, ~5 GB,
 against the 330-entry/~50 GB screen the ratio framing implied. The second half of the reframe was wrong
-and that matters too: a controlled perturbation moved the crossing 8–2900× *less* than refinement did,
+and that matters too: a controlled perturbation moved the crossing 2–2900× *less* than refinement did,
 so the large excursions are genuine model movement, not the estimator jitter the redesign guessed —
 crossing quality predicts *which* entries move most without explaining the movement away.
 

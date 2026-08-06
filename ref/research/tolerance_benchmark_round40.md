@@ -13,15 +13,17 @@ The pre-registration is
 [`tolerance_benchmark_round40_preregistration.md`](tolerance_benchmark_round40_preregistration.md); the
 set, both determinacy measures and the committed excursion labels are in
 [`ref/research/data/round40_dfsc_determinacy.json`](data/round40_dfsc_determinacy.json), produced by
-`scripts/bench_dfsc_determinacy.py`.
+`scripts/bench_dfsc_determinacy.py`. Every ρ below is re-derivable from that record by
+`scripts/analyze_dfsc_determinacy.py` (hand-rolled Spearman validated against `scipy`, partial
+correlation by the standard formula — #266, #267).
 
 ## Result
 
 | prediction | verdict |
 |---|---|
 | **P1** — D_perturb predicts \|excursion\| and survives dropping the two extremes (ρ ≥ 0.4) | **confirmed** — ρ = **0.792** without 9H7U + 10BU (0.505 with) |
-| **P2** — the excursion is mostly jitter (\|excursion\| within ~2× of D_perturb) | **FALSIFIED** — excursion is **8–2900×** the perturbation shift |
-| **P3** — the relationship survives controlling for fit (partial ρ ≥ 0.3) | **confirmed** — partial ρ = **0.818** |
+| **P2** — the excursion is mostly jitter (\|excursion\| within ~2× of D_perturb) | **FALSIFIED** — excursion is **2–2900×** the perturbation shift (10EH the lone near-exception at 2×) |
+| **P3** — the relationship survives controlling for fit (partial ρ ≥ 0.3) | **confirmed** — partial ρ = **0.773** |
 
 ## The decisive contrast
 
@@ -47,14 +49,15 @@ quality genuinely predicts the excursion — the ratio was just a poor, extreme-
 #234 warned the ratio selects on model-map fit. Round 40 measures the mechanism instead of selecting on
 it, and controls for fit directly. Fit alone predicts the excursion only weakly (ρ(cc_mask_pre,
 \|excursion\|) = −0.41), and partialling it out barely dents D_perturb's correlation (0.792 → partial
-**0.818**). The determinacy signal is not the fit confound wearing a different hat.
+**0.773**). The determinacy signal is not the fit confound wearing a different hat.
 
 ## P2 falsified: the excursion is real movement, not estimator jitter
 
 The reframe's second half — that a poorly-determined crossing's excursion is mostly shell-quantisation
 jitter — is **false**. A controlled 0.1–0.3 Å perturbation moves the crossing far *less* than refinement
-did: for the high-ratio entries \|excursion\| runs **8× to 2900×** the perturbation shift (9H7U: 36.15 %
-excursion vs a 0.012 % perturbation shift at σ = 0.2 Å; 10EU: 7.8×; 10EQ: 24×). So the large excursions are **genuine
+did: for the high-ratio entries \|excursion\| runs **2× to 2900×** the perturbation shift at σ = 0.2 Å —
+only 10EH is within the ~2× P2 allowed, and the rest far exceed it (9H7U: 36.15 % excursion vs a 0.012 %
+shift = 2900×; 10EQ: 24×; 10EU: 8×). So the large excursions are **genuine
 model movement**, consistent with round 17's byte-identical reproduction of 10BU. D_perturb *ranks* the
 entries by excursion well (P1) without *reproducing* the excursion magnitude (P2) — crossing quality
 predicts which entries move most, it does not explain the movement away as noise.
