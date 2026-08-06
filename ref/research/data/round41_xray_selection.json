@@ -1,0 +1,110 @@
+{
+  "selected": [
+    {
+      "pdb_id": "3GRT",
+      "d_min": 2.5
+    },
+    {
+      "pdb_id": "3A01",
+      "d_min": 2.7
+    },
+    {
+      "pdb_id": "4EL1",
+      "d_min": 2.88
+    },
+    {
+      "pdb_id": "5DZK",
+      "d_min": 3.07
+    },
+    {
+      "pdb_id": "5T9A",
+      "d_min": 2.5
+    },
+    {
+      "pdb_id": "5URQ",
+      "d_min": 2.7
+    },
+    {
+      "pdb_id": "3G7M",
+      "d_min": 2.9
+    },
+    {
+      "pdb_id": "3EUJ",
+      "d_min": 3.1
+    },
+    {
+      "pdb_id": "6QGY",
+      "d_min": 2.51
+    },
+    {
+      "pdb_id": "4FN9",
+      "d_min": 2.73
+    },
+    {
+      "pdb_id": "6CSM",
+      "d_min": 2.9
+    },
+    {
+      "pdb_id": "5X6C",
+      "d_min": 3.1
+    },
+    {
+      "pdb_id": "2QIZ",
+      "d_min": 2.56
+    },
+    {
+      "pdb_id": "2IY0",
+      "d_min": 2.77
+    },
+    {
+      "pdb_id": "3ZM5",
+      "d_min": 2.94
+    },
+    {
+      "pdb_id": "4Q9R",
+      "d_min": 3.12
+    },
+    {
+      "pdb_id": "2IEF",
+      "d_min": 2.6
+    },
+    {
+      "pdb_id": "2I4M",
+      "d_min": 2.8
+    },
+    {
+      "pdb_id": "7LMC",
+      "d_min": 2.98
+    },
+    {
+      "pdb_id": "7D6N",
+      "d_min": 3.16
+    },
+    {
+      "pdb_id": "5MAC",
+      "d_min": 2.6
+    },
+    {
+      "pdb_id": "4W7P",
+      "d_min": 2.8
+    },
+    {
+      "pdb_id": "3D45",
+      "d_min": 3.0
+    },
+    {
+      "pdb_id": "2YOL",
+      "d_min": 3.2
+    },
+    {
+      "pdb_id": "3MIU",
+      "d_min": 2.63
+    }
+  ],
+  "rejected": [],
+  "window": [
+    2.5,
+    3.2
+  ],
+  "attribute": "rcsb_entry_info.diffrn_resolution_high.value"
+}

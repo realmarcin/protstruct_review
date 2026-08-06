@@ -27,6 +27,7 @@ maxims.
 | Fixing a biased sample can expose the finding the bias was hiding | 38 |
 | A band breached under the wrong protocol is not a band that needs widening | 39 |
 | A real mechanism measured badly looks like no mechanism at all | 40 |
+| One breach in a large fresh set locates the breach, it does not indict the band | 41 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -286,6 +287,20 @@ against the 330-entry/~50 GB screen the ratio framing implied. The second half o
 and that matters too: a controlled perturbation moved the crossing 2–2900× *less* than refinement did,
 so the large excursions are genuine model movement, not the estimator jitter the redesign guessed —
 crossing quality predicts *which* entries move most without explaining the movement away.
+
+Round 41 built the largest fresh low-resolution X-ray set the project has (#225) — 20 usable of 25,
+era-spread, excluding all 37 round-37/38 ids — to give the §4 band widths a checkable basis. Its
+registered prediction was falsified in the weak direction: a maximum can only rise with more data, so
+*reaching* round 38's 6.28 pp favored breach would have been meaningful while *failing* to is weaker.
+It failed by a mile — the worst fresh drop was **−1.85 pp** — and that distance is the finding. Round 39
+had already shown 6LE5's 6.28 pp is an unrestrained artefact restraints tame to 2.21 pp; round 41 adds
+that it is also the **only** breach in **44** fresh unrestrained entries across three named sets. **One
+breach in a large fresh set locates the breach, it does not indict the band** — the honest move when a
+single entry crosses a band is not to widen (round 39) and not to panic, but to keep sampling until the
+fresh distribution says whether that entry was the edge or the outlier; here 44 entries later it is
+clearly the outlier. The lost maxima (0.285 Å, 5.26 pp) are still unreproduced, so the band *widths*
+rest on numbers no fresh set has matched — but the bands themselves now hold on 44 named entries, which
+is a different and firmer thing than holding on a batch whose ids were never written down.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
