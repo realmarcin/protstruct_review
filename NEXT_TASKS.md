@@ -3,7 +3,7 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-04** (round 26). Rounds 17–18 merged as
+**Last reconciled: 2026-08-06** (round 42; the "Open" section below was reconciled against rounds 37–42 and the Codex review). Rounds 17–18 merged as
 [#69](https://github.com/realmarcin/protstruct_review/pull/69); rounds 19 and 20 followed in
 [#82](https://github.com/realmarcin/protstruct_review/pull/82) and its successor. **Check the issue
 tracker for open issues; this file does not mirror it in real time.** There is no CI in this
@@ -101,8 +101,8 @@ Record new ones there. The operative few, for anyone about to add a tolerance or
 - **Confirm a suspected gap by running, not by reading.** Round 17 marked the DockQ row partial from
   a `limit=8` in the code; re-running showed the cap was never reached and the record was complete.
 - **When the set grows, re-test every clause it backs.** Rounds 8/10/11 grew the §4 X-ray set
-  19 → 37 while re-testing only two of its four clauses; the other two have been untested since
-  round 7.
+  19 → 37 while re-testing only two of its four clauses; the other two went untested from round 7
+  until round 20 re-measured them (both held, both worst cases reproduced exactly).
 - **A reproduced extreme is binding, not disposable.** 10BU sits 3.24× above every other
   `d_FSC_model` degradation, and round 17 proved it reproduces byte-identically — so the band stays
   where it is, precisely located rather than defended.
@@ -163,58 +163,55 @@ the completed entries with it. Tested by simulating a crash at entry 3 of 5.
 
 ### Open
 
-**Nothing here is round-sized.** That is the state as of round 27, and it is worth saying plainly
-rather than leaving someone to discover it: the one item carrying a checkbox is priced as a project,
-and the two other candidates are the same. Detail for each lives where it already lives — this is the
-menu, not a second copy of it.
+**The two bounded measurement projects that dominated this section since round 22 are now done.** What
+was "state as of round 27" — a menu of three candidates — has resolved into rounds 40–42:
 
-| candidate | cost | the constraint |
-|---|---|---|
-| **Crossing-quality hypothesis** (below) | ~60–90 screened entries, each a 100–250 MB map download plus `mtriage` | base rate 3.3 % at the 1.3 cut, 6.7 % at the data-driven 1.074 fence; three candidates is the minimum for a powered comparison. **Multi-round.** |
-| **Fresh low-resolution X-ray measurement** (*Standing risk*, below) | a new refinement set at **`d_min ≥ 2.5 Å`** | the only way to give the §4 band widths a checkable basis; the two maxima that size them come from ~11 entries named nowhere and cannot be recounted. **Multi-round.** (This read *"below 2.5 Å"* until #237 — the opposite branch. Both lost maxima, 0.285 Å and 5.26 pp, belong to `d_min ≥ 2.5 Å`; the `< 2.5 Å` branch's sizing case 43SK is named and was re-measured by round 20.) |
-| **Another `scripts/` audit pass with a new lens** (*Standing risk*, below) | one round | has found defects **every time** — 12, then 2, then 5 — but the lens must differ each pass, and there is **no defined endpoint**. Cheap per pass, unbounded in total. |
+- **Crossing-quality hypothesis (#224)** — **answered by round 40's determinacy redesign.** The ratio
+  screen was 2-point leverage (Spearman ρ with |excursion| collapses to **+0.049** without the two
+  extremes); a perturbation-recross *determinacy* measure predicts the excursion robustly (ρ **+0.792**
+  extremes-removed, LOO 0.75–0.85) and independent of fit (partial **+0.773**). Resolved on 19 existing
+  labels — no 50 GB screen. **#224 closed**, #234/#258 superseded, the §4 caveat re-based.
+- **Fresh low-resolution X-ray measurement (#225)** — **done across rounds 37/38/41/42.** Rounds
+  37/38/41 built **44 fresh named entries**; round 42 (#269) re-based the §4 `d_min ≥ 2.5 Å` X-ray band
+  widths off their lost maxima onto **coverage bounds** over those 44 (Cα **0.35 → 0.25 Å**; favored kept
+  at −6 pp, re-justified as ~98 % coverage), resolving the "most expensive partial record." **#225/#269
+  closed.**
 
-The asymmetry is the point. The first two are expensive and *bounded* — you can say in advance what
-would settle them. The third is cheap and *unbounded* — it has never come back empty, which is a
-reason to keep doing it and not a reason to expect it to finish. Picking it repeatedly is a choice to
-spend rounds on assurance rather than on measurement, and that trade should be made deliberately.
+**What is open now** is the Codex conceptual-review action plan
+([`ref/research/codex_review_action_plan.md`](ref/research/codex_review_action_plan.md)): **P1** — the
+registry→consumer drift gate — shipped (#271); **P2** is this reconciliation; **P3** is a preregistered
+**cross-version reproducibility round** (pinned `phenix-2.0-5936` vs a newer build), a **triage of the
+remaining `⚠ partial record` rows**, and **shoring up the small-n load-bearing fits** (round 42's n = 44
+lognormal, round 40's 19 labels); **P4** is explicit stopping/consolidation criteria for the round
+cadence and its gate machinery.
 
-Round 22 turned one of the three standing risks into a scoped, registerable task and closed another
-as unfixable-in-principle.
+The one **unbounded** option that persists from the old menu: **another `scripts/` audit pass with a
+new lens** — it has found defects every time (12, then 2, then 5), the lens must differ each pass, and
+there is no defined endpoint. Cheap per pass, unbounded in total; picking it is a deliberate choice to
+spend a round on assurance rather than on measurement.
 
-#### [ ] Crossing-quality hypothesis — untested, and now priced
+#### [x] Crossing-quality hypothesis — answered (round 40, #224)
 
-Round 23 ran the test as specified and **could not complete it**: 24 entries screened on the
-pre-refinement ratio, **zero** above 1.3. That is consistent with the 5.6 % base rate rather than
-evidence against it (Fisher p = 0.512; a 25 % chance of seeing none), so the hypothesis is **neither
-supported nor refuted**.
-
-**The cost is now measured rather than guessed.** Combined base rate is **2 of 60 = 3.3 %** at the
-1.3 cut, or **4 of 60 = 6.7 %** at the data-driven fence of 1.074. Three candidates — the minimum for a powered
-comparison — needs **~60–90 screened entries**, each costing a 100–250 MB map download and a few
-minutes of `mtriage`. **That is a project, not a round**, and it should not be picked up as though it
-were cheap.
-
-Round 23 also found the 1.3 cut, inherited from n = 2, is **too conservative**: the Tukey fence on the
-combined 60 sits at **1.074**, and **4 of 60** clear it — including **10EU, already refined in round 16**,
-whose Δ of −1.084 % just fails the hypothesis's own 10× bar (1.102 %). So the hypothesis has one
-near-miss on existing data, leaning mildly against it.
-
-A future attempt should use the data-driven cut, where the base rate is **4 of 60 = 6.7 %** and two
-members (10EU, 6PMJ) are already identified. 6PMJ was not refined here because one candidate against
-three controls has a best achievable p of 0.25 — an observation, not a test.
+Rounds 23–36 priced and screened this at the 1.074 fence and could not power it (0–1 candidate per
+batch, ~50 GB for three). Round 40 stopped screening for the rare event and **measured the mechanism
+directly** instead: crossing determinacy (perturbation-recross) predicts the excursion where the ratio
+was 2-point leverage, so the §4 caveat is re-based and #224 is closed without the expensive screen. The
+detail lives in `ref/research/tolerance_benchmark_round40.md` and the memo #258.
 
 ### Standing risk, not tasks
 
-- **Seven rows carry `⚠ partial record`.** Round 21 showed one route out (re-measure on a committed
-  subset) and round 22 showed its limit: **it works only when the lost members were unremarkable.**
-  For the flip-set row it is now established *not* to work — the five missing models are the
-  zero-disagreement ones, so a 12-model re-run would report a higher rate than the published 7.5 %
-  purely because the denominator shrank. Ask what the lost members contributed before trying it.
-- **The §4 X-ray band widths still rest on ~11 entries named nowhere.** Round 20 re-measured the 16
-  that are identifiable and both clauses held, but the two maxima that actually size the bands come
-  from the lost batch. Only a fresh low-resolution X-ray measurement would give them a checkable
-  basis — a real project, not a round.
+- **Six rows carry `⚠ partial record`** (round 42 resolved one — the ΔRMSD row, re-based on 44 named
+  entries). Round 21 showed one route out (re-measure on a committed subset) and round 22 showed its
+  limit: **it works only when the lost members were unremarkable.** For the flip-set row it is
+  established *not* to work — the five missing models are the zero-disagreement ones, so a 12-model
+  re-run would report a higher rate than the published 7.5 % purely because the denominator shrank.
+  Round 42 showed a *third* route for a band width: retire the lost maximum as the wrong estimator and
+  re-base on a coverage bound over named data. P3 of the Codex plan triages which of the remaining six
+  takes which route. Ask what the lost members contributed before trying to re-measure.
+- **The §4 X-ray band widths no longer rest on lost entries** (was a standing risk through round 41).
+  Round 42 re-based both `d_min ≥ 2.5 Å` widths onto coverage bounds over the 44 fresh named entries
+  (rounds 37/38/41), so the widths are now fully-backed, re-runnable figures. The two lost maxima
+  (0.285 Å, 5.26 pp) are retired as the wrong target, not mourned as lost data.
 - **The audit of `scripts/` is a lower bound, not a total.** Round 25 found 12 defects in the first
   systematic pass; round 26 found 2 more with a *different lens*, and a sixth pass — enumerating each
   guard's input space rather than reading — found 5 more in code the earlier passes had just
@@ -228,7 +225,10 @@ three controls has a best achievable p of 0.25 — an observation, not a test.
 - **`d_FSC_model` still rests on one verified extreme.** 10BU is an outlier by every criterion tried — **3.24×
   the next-largest degradation**, which needs no distributional assumption, and above the 1.5 × IQR
   fence under all three quartile conventions (3.017 / 2.370 / 1.724, on n = 8). It also reproduces
-  byte-identically. The item above is the cheapest way to find out whether that is explicable.
+  byte-identically. Round 40 answered whether it is explicable: the excursion is **real model
+  movement, not estimator jitter** (a controlled perturbation moves the crossing 2–2900× less than
+  refinement did), and crossing determinacy predicts excursion magnitude — so 10BU's outlier status is
+  genuine, and the band stays where it is.
 
 ## Not actionable in this repo (listed so the gaps are explained, not recommended)
 
