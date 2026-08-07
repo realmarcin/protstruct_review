@@ -104,6 +104,25 @@ def main() -> int:
     print(f"  band 6 pp covers {covered}/{n} = {covered/n*100:.1f}% of null re-refinements")
     print(f"  worst drop {max(drop):.2f} pp (6LE5), the single exceedance; p95 "
           f"{dsort[min(n-1, round(0.95*(n-1)))]:.2f}")
+
+    # clashscore: re-base the geometry row's null-ratio figures on named data (round 44).
+    # The gate is ratio post/pre >= 5x, valid only while 1 <= pre <= 20; the starting
+    # ceiling is what the upper bound guards.
+    pre_post = []
+    for rnd in ROUNDS:
+        d = json.loads((REPO / f"ref/research/data/{rnd}_xray_deltas.json").read_text())
+        for r in d["rows"]:
+            pre, post = r.get("clashscore_pre"), r.get("clashscore_post")
+            if pre is not None and post is not None:
+                pre_post.append((pre, post))
+    gated = [post / pre for pre, post in pre_post if 1 <= pre <= 20]
+    starts = [pre for pre, _ in pre_post]
+    over5 = [round(x, 2) for x in gated if x >= 5]
+    print("\nclashscore null RATIO (round 44; gate is >= 5x while 1 <= pre <= 20)")
+    print(f"  max ratio over {len(gated)} gate-valid entries: {max(gated):.3f}x  "
+          f"(>= 5x: {over5 or 'none'}; was 4.26x on the lost 19)")
+    print(f"  starting clashscore ceiling: {max(starts):.2f} over {len(starts)} entries, "
+          f"{sum(1 for s in starts if s > 20)} above pre = 20  (was 17.2 on the lost set)")
     return 0
 
 

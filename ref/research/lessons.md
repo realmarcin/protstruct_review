@@ -29,6 +29,7 @@ maxims.
 | A real mechanism measured badly looks like no mechanism at all | 40 |
 | One breach in a large fresh set locates the breach, it does not indict the band | 41 |
 | A band sized on a lost maximum was mis-based, not merely under-documented | 42 |
+| Finish resolving the row, not just the sub-figure you started with | 44 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -321,6 +322,19 @@ for eleven rounds, ask whether the thing you cannot recover was ever the right q
 recover it. (The clashscore figures in the same geometry row still come from the lost set, so that row
 stays marked — resolving one sub-figure is not resolving the row, which is the miscount this round had to
 avoid.)
+
+Round 44 came back and finished it. Round 42 had re-based the geometry row's *favored* figure and,
+carefully, left the row marked because its *clashscore* figures still came from the lost set. That was
+the honest call at the time, but it left a half-resolved row that a later pass could easily forget. Round
+44 re-based the clashscore figures the same way: over the 45 fresh named entries the max null ratio is
+**4.25×** — all but identical to the lost set's 4.26× — so the figure that set the 5× gate reproduces on
+named data, and the lost "17.2 starting clashscore, not reproducible" is *exceeded* at 38.70. The row is
+now fully backed (14 → 15), and the count of marked rows finally moves (6 → 5). **Finish resolving the
+row, not just the sub-figure you started with** — a partial record marked "now only for X" is a promise
+to come back for X, and the value of round 42's careful sub-figure accounting was only realised once
+round 44 spent it. The near-identity of the re-based ratio (4.25× vs 4.26×) is itself the reassurance the
+partial-record programme was after: the numbers that set the gates were never wrong, only unverifiable —
+and every one that has been re-based on named data has landed where the lost set said it would.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
