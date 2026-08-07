@@ -4,7 +4,9 @@ Round 42 established a *third* route out of a `⚠ partial record` — beyond ro
 committed subset" (works only when the lost members were unremarkable) and round 22's "closed as
 unfixable" — namely **retire the lost estimator and re-base the figure on a coverage/distribution bound
 over named data.** This document triages the **6 remaining** marked rows (round 42 resolved the ΔRMSD
-row) into one of three routes:
+row) into one of three routes. **Status: round 44 resolved #1 (geometry/clashscore, #275) and item #2
+was verified and reclassified REPLACE → RETAIN (see below) — so 5 rows remain marked, of which two are
+now RETAIN.**
 
 - **REPLACE** — re-base on named data now (a round-42-style move); resolves the mark, changes the
   registry, so needs pre-registration + approval.
@@ -18,8 +20,8 @@ Every figure below was checked against the committed data before classifying.
 
 | # | row | what is partial | route | resolvable now? |
 |---|---|---|---|---|
-| 1 | Geometry Δ clause — **clashscore** | the 4.26× null ratio and 17.2 starting clashscore come from the lost ~11 entries | **REPLACE** | **yes** — verified |
-| 2 | **L-test** ⟨\|L\|⟩ | only 5 of 27 datasets named; set uncommitted | **REPLACE (cite round 21)** | likely |
+| 1 | Geometry Δ clause — **clashscore** | the 4.26× null ratio and 17.2 starting clashscore come from the lost ~11 entries | **REPLACE — DONE (round 44, #275)** | resolved |
+| 2 | **L-test** ⟨\|L\|⟩ | only 5 of 27 datasets named; set uncommitted | **RETAIN** (was REPLACE; verified — see below) | already stated |
 | 3 | Ramachandran/rotamer **favored %** | aggregate median/p90/max sound, but no per-entry value recorded | REMEASURE | small round |
 | 4 | Ramachandran/rotamer **outlier %** | only the nonzero entries named; input set uncommitted | REMEASURE | small round |
 | 5 | **H-placement** agreement | "worst 16.4 %" from an uncommitted 17-model set; 0 % members unnamed | REMEASURE | small round |
@@ -27,20 +29,42 @@ Every figure below was checked against the committed data before classifying.
 
 ## Detail and evidence
 
-**#1 clashscore — REPLACE, verified resolvable now.** The geometry row's last partial figures are the
+**#1 clashscore — REPLACE, DONE (round 44, #275).** The geometry row's last partial figures were the
 clashscore null ratio (4.26×) and the "starting clashscore up to 17.2", both from the lost set. Over the
-**45 fresh named entries** (rounds 37/38/41, `clashscore_pre ≥ 1`) the max null ratio is **4.25×** —
-essentially the same value, now on named data, and still under the 5× degradation gate; the fresh
-starting clashscore reaches **38.70**, so the named basis is *more* comprehensive than the lost "17.2".
-Re-basing exactly as round 42 did the favored figure would **fully resolve the geometry row** (backed
-14 → 15, marked 6 → 5). **This is the strongest candidate for a round 44** — a registry change, so
-pre-registered and approved like round 42.
+**44 fresh named entries** (rounds 37/38/41, Cα-matched, 37 gate-valid at `1 ≤ clashscore_pre ≤ 20`) the
+max null ratio is **4.25×** — essentially the same value, now on named data, still under the 5× gate;
+the fresh starting clashscore reaches **38.70**, so the named basis is *more* comprehensive than the lost
+"17.2". Round 44 re-based both figures exactly as round 42 did the favored figure, **fully resolving the
+geometry row** (backed 14 → 15, marked 6 → 5). Pre-registered and approved like round 42.
 
-**#2 L-test — REPLACE by citing round 21.** The mark records that only 5 of the old 27 datasets were
-named. But **round 21 already re-derived the L-test on a committed 24-dataset set** (the row itself
-notes this). The partial mark is about the *old* uncommitted 27-set; the live tolerance can be stated as
-resting on round 21's committed set instead, which likely resolves the mark without new measurement.
-Verify the round-21 set fully backs the quoted figure before flipping it.
+**#2 L-test — RETAIN (verified; was tentatively REPLACE).** This entry was classified REPLACE-by-citation
+on the assumption that the mark records a *lost-denominator* defect a citation could erase. On inspection
+that is not what it records. **Round 21 already re-derived the L-test on a committed, re-runnable
+24-dataset set** (`bench_t13_wilson_b.py`'s `DEFAULT_SET`, then `bench_t13_l_test.py` over the same
+cache) — and the registry row **already cites it**. So there is nothing left to flip: the live tolerance
+(⟨|L|⟩ within ±0.02, same twin/no-twin call) already rests on committed data, and the quoted numbers are
+already regenerable from a clean checkout.
+
+What the mark still records is *not* resolvable by citation, and round 21 said so deliberately:
+
+> "The `⚠ partial record` mark stays on the row: the historical 27 is still unreconstructable, and the
+> new 24 inherits rather than replaces that limitation." — `tolerance_benchmark_round21.md`
+
+Three things the 24-set citation cannot fix:
+- **The historical *rate* (2 in 27) can't be checked** against the new 2-in-24 — three-plus datasets of
+  the original 27 remain unidentifiable, so the denominator the row quotes is still partly lost.
+- **The 24 is a *subset re-run*, not corroboration.** Round 21's own self-review (#93) caught and
+  corrected exactly this over-claim — the agreement is largely guaranteed because it is the same
+  structures through the same two deterministic programs, so the 24 makes the figures *reproducible*, a
+  more modest claim than *independently confirmed*.
+- **The two oracles share the Padilla–Yeates method**, so even a full re-run checks consistent
+  computation, not method-independence — already disclosed in the row as a scope caveat.
+
+None of these is a lost-figure that named data would recover; they are honest, disclosed limits of what
+this cross-check *can* establish — the same kind of mark as #6 (EM map-model), not the same kind as #1.
+So #2 is **RETAIN**, and the registry row — which already carries this reasoning — needs no change. The
+"verify the round-21 set before flipping" caveat did its job: verification showed the flip is not
+warranted.
 
 **#3 favored % / #4 outlier % / #5 H-placement — REMEASURE.** Each has a *sound aggregate* but an
 *uncommitted input set* whose unremarkable members (the zeros / the un-tabulated majority) were never
@@ -57,11 +81,18 @@ disclosed limit. Lowest priority; retain unless a fresh EM round is being run fo
 
 ## Recommended order
 
-1. **#1 clashscore (round 44)** — verified resolvable, extends round 42, one registry change. Highest
-   value, lowest cost. Needs a pre-registration + approval.
-2. **#2 L-test** — likely a documentation flip onto round 21's committed set; verify first.
-3. **#3/#4/#5** — three small remeasure rounds, bundleable if a fresh X-ray/validation set is run.
+1. ~~**#1 clashscore (round 44)**~~ — **DONE (#275).** Re-based on 44 named entries; geometry row fully
+   backed, marked 6 → 5.
+2. ~~**#2 L-test**~~ — **verified → RETAIN.** The row already cites round 21's committed 24-set; the
+   residual mark (unverifiable historical rate, subset re-run, shared method) is not citation-resolvable.
+   No registry change. This is a documentation correction only.
+3. **#3/#4/#5** — three small remeasure rounds, bundleable if a fresh X-ray/validation set is run. **Now
+   the highest-value remaining work** (each records per-entry values the lost sets never named, and their
+   lost members are unremarkable zeros/near-zeros, so re-measurement genuinely resolves the mark).
 4. **#6** — retain; revisit only alongside a fresh EM round.
+
+**After this document: 5 rows remain marked — #2 and #6 are RETAIN (honest, disclosed limits), #3/#4/#5
+are the remaining resolvable REMEASURE work.**
 
 No registry value is changed by this document; it is the plan. Executing #1 (or any REPLACE) changes a
 `[benchmark]` row and requires the round-42 discipline: pre-register the method, compute from a committed
