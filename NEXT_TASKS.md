@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Forty-one rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Forty-two rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -19,7 +19,7 @@ resolution range and breached by null re-refinement once low-resolution entries 
 **Where the registry stands.** Round 17 audited every `[benchmark]` row and found **7 quote a figure
 from a set that can no longer be reconstructed**; they are marked `⚠ partial record`. Round 18 fixed
 the cause — **every `bench_*.py` now commits the set it ran on**, and `scripts/validate.sh` fails if
-one does not. **13 rows are fully backed.**
+one does not. **14 rows are fully backed** (round 42 re-based the §4 X-ray band widths off their lost maxima onto a coverage bound over 44 named entries, fully backing the ΔRMSD row).
 
 **The counts, reconciled (round 18) — there are two different 21s and both are right.** §3 and §4
 hold **21 rows**, of which **20 carry `[benchmark]`**; the exception is §4's *absolute geometry
@@ -72,12 +72,13 @@ floors row.
 | 39 | (2026-08-06) | **arm 1 only.** Settled #253: the favored-band breach is an **unrestrained artefact**. Re-refined the round-38 set **with restraints** (no downloads): **6LE5's drop fell 6.28 → 2.21 pp** (P1), 11 of 14 entries improved and **no restrained entry breached** −6 pp (P2), median favored Δ +0.035 → +1.505. **Band kept at −6 pp** — the breach is specific to unrestrained refinement, not the low-resolution restrained protocol; §4 caveat strengthened. Arm 2 (fresh unrestrained set, P3) left registered and unrun; subsumed by #225 |
 | 40 | (2026-08-06) | **answered #224** — the redesign. The crossing-quality mechanism is real, but the *ratio* was the wrong measure: over 19 entries its Spearman ρ with \|excursion\| collapses +0.319 → **+0.049** without the two extremes (2-point leverage), while **crossing determinacy (perturbation-recross) predicts robustly** — ρ **+0.792** extremes-removed (LOO 0.75–0.85), partial **+0.773** controlling for fit (P1, P3 confirmed, so not the #234 confound). **P2 falsified**: the excursion is real movement, 2–2900× the perturbation shift, not jitter. §4 caveat retired the n=2 ratio hypothesis; band unchanged. Resolved on existing labels, ~5 GB, no 50 GB screen. #224 closed, #234/#258 superseded |
 | 41 | (2026-08-06) | **#225** — largest fresh X-ray set (round 39 arm 2): **20 usable of 25**, era-spread, excluding all 37 round-37/38 ids. **P3 falsified** (weak direction): worst favored drop **−1.85 pp**, nowhere near round 38's 6.28 — so **6LE5 is an isolated outlier**, 1 of **44** pooled fresh entries to breach −6 pp, and the one arm 1 showed restraints tame. Cα max **0.1849 Å** (< 0.2004 < lost 0.285). Both §4 X-ray bands hold; nothing re-fitted. Lost maxima still unreproduced — the *widths* rest on them, but the bands now have 44 fresh entries under them |
+| 42 | (2026-08-06) | **#269** — re-based the §4 `d_min ≥ 2.5 Å` X-ray band *widths* off their lost maxima onto **coverage bounds over the 44 named entries** (research from #225: a lone observed max is a biased, least-robust, low-confidence basis; structural biology uses percentiles). **Cα band 0.35 → 0.25 Å** (99/95 lognormal UTL 0.2514, flags 0 of 44, better detection power); **favored kept at −6 pp** (round 39), re-justified as ~98% coverage. **Resolved the "most expensive partial record"** — 13→**14 backed rows**; the geometry row stays marked only for its clashscore figures. Re-runnable via `analyze_xray_band_coverage.py` |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — forty-one rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — forty-two rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
