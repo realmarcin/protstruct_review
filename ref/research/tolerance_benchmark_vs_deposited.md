@@ -15,8 +15,8 @@ tiebreaker:
 
 | Quantity | Local | Reference |
 |---|---|---|
-| Ramachandran outlier % | `phenix.ramalyze` | `key_validation_stats` → `protein_ramachandran` |
-| Rotamer outlier % | `phenix.rotalyze` | `key_validation_stats` → `protein_sidechains` |
+| Ramachandran outlier % | `phenix.ramalyze` | validation XML → per-residue `rama="OUTLIER"` verdicts |
+| Rotamer outlier % | `phenix.rotalyze` | validation XML → per-residue `rota="OUTLIER"` verdicts |
 | R-free | `phenix.model_vs_data` | validation XML → `PDB-Rfree` (deposited) **and** `DCC_Rfree` (wwPDB-recomputed) |
 | Completeness | `phenix.model_vs_data` | validation XML → `DataCompleteness` |
 
@@ -38,10 +38,21 @@ completeness are available for the 9 that also have a `model_vs_data` run.
 
 ## Results
 
+> **Round 45 update (corrected instrument, #282).** The two *outlier %* rows below were measured in the
+> round-17 era against `key_validation_stats`' `protein_ramachandran` / `protein_sidechains` — and the
+> sidechain field is a broader metric inconsistent with the report's per-residue `rota=OUTLIER` verdicts
+> (#281). On the corrected instrument (outlier % counted from the per-residue XML verdicts) over the
+> **42 committed named entries** (`round45_ids.json`, 41 protein), Ramachandran outlier reproduces to
+> **≤ 0.11 pp** (median 0.000) and rotamer outlier reproduces **exactly on 39/41**, with **14ZZ (1.52 pp)
+> and 2YOL (0.57 pp)** breaching ±0.5 pp for an altloc denominator reason (rotamer *names* agree
+> exactly). The **rotamer "max 0.34 pp" below is superseded** by that named measurement; the ±0.5 band's
+> semantics are open in **#284**. See `tolerance_benchmark_round45.md`. The favored, R-free, and
+> completeness rows are unaffected (favored was always counted from the XML; see Finding 1b).
+
 | Tolerance | n | median \|Δ\| | p90 | max | current band |
 |---|---:|---:|---:|---:|---|
-| Ramachandran outlier % | 17 | **0.00 pp** | 0.00 | **0.00 pp** | ± 0.5 pp |
-| Rotamer outlier % | 17 | 0.00 pp | 0.00 | **0.34 pp** | ± 0.5 pp |
+| Ramachandran outlier % | 17 | **0.00 pp** | 0.00 | **0.00 pp** *(→ ≤0.11 pp, round 45 named 41)* | ± 0.5 pp |
+| Rotamer outlier % | 17 | 0.00 pp | 0.00 | **0.34 pp** *(superseded → 1.52 pp, round 45; #284)* | ± 0.5 pp |
 | R-free vs **deposited** | 9 | 0.0020 | 0.0097 | **0.0128** | ≤ 0.02 |
 | R-free vs **wwPDB-recomputed** | 9 | **0.0000** | 0.0033 | 0.0067 | — |
 | Completeness | 9 | 0.05 pp | 0.10 | **0.11 pp** | ± 1 pp |

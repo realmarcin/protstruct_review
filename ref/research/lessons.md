@@ -30,6 +30,7 @@ maxims.
 | One breach in a large fresh set locates the breach, it does not indict the band | 41 |
 | A band sized on a lost maximum was mis-based, not merely under-documented | 42 |
 | Finish resolving the row, not just the sub-figure you started with | 44 |
+| Re-measuring can resolve the record yet fail the band — and the instrument may be the bug | 45 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -342,6 +343,24 @@ on the lost value. So the lesson is not "the lost numbers were always right"; it
 re-basing outcome depends on what kind of figure it is** — a reproducible gate threshold lands where the
 lost set said, a sample maximum does not, and telling the two apart is the whole point of the
 partial-record triage.
+
+Round 45 tried the same move on the two vs-deposited geometry-% rows and learned two things the clean
+rounds before it hadn't. First, **the instrument itself was the bug.** Re-running `bench_vs_deposited`
+over the 42 named entries produced an alarming rotamer-outlier signal — a band that looked breached on
+30 of 41 entries — and the disciplined response was to verify it by hand before writing it up. That
+check found the script had been comparing `phenix.rotalyze` against the wrong wwPDB endpoint
+(`key_validation_stats`' `protein_sidechains`, a broader sidechain metric) instead of the report's own
+per-residue `rota=OUTLIER` verdicts, which `rotalyze` reproduces exactly (#281). **A dramatic result
+owes an adversarial check first; here it was the oracle, not the tool under test, that was miscalibrated
+— and a shared oracle's bug had been latent for many rounds.** Fixed and tested (#282), then re-run.
+Second, even on the corrected instrument the favored row re-based cleanly (median |Δ| 0.000, mark
+resolved) but the rotamer-outlier row did not: two **altloc** entries (14ZZ 1.52 pp, 2YOL 0.57 pp) breach
+the ±0.5 pp band because wwPDB evaluates altloc sidechains `rotalyze` does not — a *denominator*
+difference, not a classification one, since every shared residue's rotamer name agrees exactly. So
+**re-measuring can resolve the record (name the set, commit the per-entry values) and still fail the
+band** — the two are separate claims. The record half was done; the band question (#284) was not, so the
+mark stayed. Resolving a partial record is necessary but not sufficient: a named, committed basis on
+which the band *doesn't* hold is a finding about the band, not a resolution.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
