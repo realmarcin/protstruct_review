@@ -4,7 +4,8 @@
 Settles two `[template]` tolerances in `ref/thresholds_and_standards.md` that share a
 tool pair and a precondition:
 
-  - CA RMSD               |Δ| ≤ 0.10 Å **on the same residue selection**
+  - CA RMSD               |Δ| ≤ 0.03 Å **on the same residue selection** (measured here; the
+                          pre-benchmark template was 0.10 Å)
   - Aligned-residue count ± 2 residues **within one aligner class**
 
 Both tolerances already carry the warning that different aligners align different

@@ -65,12 +65,12 @@ Each bullet is a pass/fail check. All must pass for the task to be marked green.
 
 1. **Tool invocations in correct order.** superpose → refine → superpose → validate → model_vs_data. Agent logs must show this sequence (simple grep on the conversation / tool-call trace).
 2. **All expected output artefacts present.** `candidate_sup.pdb`, `candidate_rsr_*.pdb`, `*_real_space_refined.log`, validation report, model_vs_data report.
-3. **Cross-tool RMSD agreement.** PHENIX `superpose_models` CA RMSD vs ChimeraX `matchmaker` CA RMSD on the same aligned atoms: |Δ| ≤ 0.10 Å.
-4. **ΔRMSD sane.** RMSD_post ≤ RMSD_pre + 0.05 Å. (Refinement must not substantially *worsen* agreement with reference. Equality is OK; large improvements are bonus.)
-5. **Geometry did not degrade.** clashscore_post ≤ max(clashscore_pre, 4); Ramachandran favored_post ≥ min(favored_pre, 97%); rotamer outliers_post ≤ max(outliers_pre, 2%).
-6. **Map-model fit did not degrade.** CC_mask_post ≥ CC_mask_pre − 0.01; d_FSC_model_post ≤ d_FSC_model_pre + 0.05 Å.
-7. **MolProbity ≈ PHENIX.** MolProbity clashscore and PHENIX-reported clashscore agree within ±1.0 on the refined model. (Non-agreement indicates a reporting / parameterisation bug on the agent side.)
-8. **Deposition-header sanity (T06).** Reported `d_FSC_model` on the *reference* (un-perturbed) model is within 0.10 Å of the EMDB-header resolution (sanity check that the metric pipeline itself is calibrated).
+3. **Cross-tool RMSD agreement.** PHENIX `superpose_models` CA RMSD vs ChimeraX `matchmaker` CA RMSD on the same aligned atoms, **only when both report the same aligned-residue count**: |Δ| ≤ **0.03 Å**. `[registry §3 — CA RMSD]`
+4. **ΔRMSD sane.** RMSD_post ≤ RMSD_pre + the resolution-conditional §4 band: **+0.12 Å** (`d_min < 2.5 Å`) or **+0.25 Å** (`d_min ≥ 2.5 Å`). (Refinement must not substantially *worsen* agreement; equality is OK, improvements are bonus.) `[registry §4 — ΔRMSD]`
+5. **Geometry did not degrade.** Apply the §4 **Δ clause** — favored_post ≥ favored_pre − **6 pp** (`d_min ≥ 2.5 Å`; − **0.5 pp** below); clashscore ratio_post/pre < **5×** while `1 ≲ clashscore_pre ≲ 20`; rotamer outliers_post ≤ outliers_pre + **4 pp** — **and** the separate §4 **absolute floors** (clashscore ≤ **4**, favored ≥ **97 %**, rotamer outliers ≤ **2 %**), which are quality bars, not degradation checks. `[registry §4 — geometry Δ + floors]`
+6. **Map-model fit did not degrade.** CC_mask_post ≥ CC_mask_pre − the §4 band: **−0.04** (`d_min < 3.0 Å`) or **−0.06** (`d_min ≥ 3.0 Å`); d_FSC_model_post ≤ d_FSC_model_pre **× 1.05** (relative, one-sided). `[registry §4 — map-model]`
+7. **MolProbity ≈ PHENIX.** MolProbity clashscore and PHENIX-reported clashscore agree within **±1.0** (or 20 % of the mean, whichever is larger), with a matched H-build convention. (Non-agreement indicates a reporting / parameterisation bug on the agent side.) `[registry §3 — clashscore]`
+8. **Deposition-header sanity (T06).** Reported `d_FSC_model` on the *reference* (un-perturbed) model is within **0.10 Å** of the EMDB-header resolution (a calibration check that the metric pipeline itself is sound). `[registry §5 — resolution calibration]`
 
 Any failure → task scored red. Log which check failed, with the numeric delta that tripped it.
 

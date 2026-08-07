@@ -46,8 +46,8 @@ with CCP4 `ctruncate` (and `aimless` when unmerged intensities exist) and checks
 Each bullet is pass/fail; all must pass for green.
 
 1. **Wilson B agreement.** `xtriage` (ML) and `ctruncate` (classic straight-line Wilson plot) Wilson B
-   agree within **±5 Å²** on the same reflections — *provisional*, no literature benchmark; prefer a
-   like-method comparison. `[template — Wilson B]`
+   agree within **±5 Å² → max(25 %, 2.5 Å²)**, whichever is larger, and the comparison is **void under
+   strong anisotropy** (the two estimators diverge by method, not error). `[registry §3 — Wilson B]`
 2. **L-test twinning agreement.** Both tools' ⟨|L|⟩ agree within **±0.02**, and both make the same
    twin/no-twin call. (Untwinned ⟨|L|⟩ ≈ 0.5; perfect-twin ≈ 0.375 — Padilla & Yeates,
    *Acta Cryst.* D 2003.) `[literature]`

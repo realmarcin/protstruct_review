@@ -4,10 +4,13 @@
 `ref/thresholds_and_standards.md` §4 governs the compare→refine flow and asserts how
 far a refinement may move a quantity before it counts as degradation:
 
-  - ΔRMSD sanity            RMSD_post ≤ RMSD_pre + 0.05 Å
-  - Geometry did not degrade  clashscore_post ≤ max(clashscore_pre, 4);
-                              favored_post ≥ min(favored_pre, 97 %);
-                              rotamer outliers_post ≤ max(outliers_pre, 2 %)
+  - ΔRMSD sanity            RMSD_post ≤ RMSD_pre + 0.12 Å (d_min < 2.5 A) / + 0.25 A (>= 2.5, round 42)
+  - Geometry did not degrade  the resolution-conditional §4 Δ clause (favored − 0.5/− 6 pp;
+                              clashscore ratio < 5x; rotamer + 4 pp) AND the separate absolute
+                              floors (clashscore <= 4; favored >= 97 %; rotamer <= 2 %)
+
+  (The flat + 0.05 A ΔRMSD and the max()/min() forms above were round 5's; this benchmark is what
+  made them resolution-conditional across rounds 7-42. The live values are in §4.)
 
 These are **not** cross-tool agreement tolerances, so none of the rounds 1-4 machinery
 applies: the question is not "do two tools agree" but "how much does a refinement that

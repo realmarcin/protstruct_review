@@ -33,8 +33,9 @@ real space and report map-model fit (CC_mask, d_FSC_model) and post-refinement g
 
 Each bullet is pass/fail; all must pass for green.
 
-1. **Map-model fit did not degrade.** CC_mask_post ≥ CC_mask_pre − **0.01**; d_FSC_model_post ≤
-   d_FSC_model_pre + **0.05 Å**. `[template — registry §4 map-model]`
+1. **Map-model fit did not degrade.** CC_mask_post ≥ CC_mask_pre − **0.04** (`d_min < 3.0 Å`) or
+   **0.06** (`d_min ≥ 3.0 Å`); d_FSC_model_post ≤ d_FSC_model_pre **× 1.05** (relative, one-sided).
+   `[registry §4 — map-model]`
 2. **Cross-tool CC agreement.** PHENIX CC_mask and Servalcat CC on the same refined model agree within
    **± 0.02** (both correlate model against the same map; a larger gap means different masking).
    `[template]`
