@@ -12,9 +12,13 @@ already names as the tiebreaker. Two endpoints are used per entry:
 
   - `https://www.ebi.ac.uk/pdbe/entry-files/download/<id>_validation.xml`
     → `DataCompleteness`, `PDB-Rfree` (deposited), `DCC_Rfree` (wwPDB-recomputed),
-      `clashscore`
+      `clashscore`, and the **per-residue `rama=`/`rota=` verdicts** from which the
+      Ramachandran/rotamer favored and OUTLIER percentages are counted
   - `https://www.ebi.ac.uk/pdbe/api/validation/key_validation_stats/entry/<id>`
-    → `protein_ramachandran` and `protein_sidechains` outlier percentages
+    → `protein_ramachandran` / `protein_sidechains` percentages, retained only as
+      `*_api_pct` cross-checks. These are NOT the outlier reference: `protein_sidechains`
+      is a broader sidechain metric inconsistent with the per-residue rotamer verdicts
+      (#281), so the outlier % is counted from the XML verdicts, consistent with favored %.
 
 This is a **pipeline** comparison, not a method-independent one: wwPDB's geometry
 percentages are MolProbity-derived, as are PHENIX's. What it tests is whether a local
@@ -56,10 +60,15 @@ _MVD_RFREE = re.compile(r"^\s*r_free:\s*([\d.]+)\s*$", re.M)
 _MVD_COMPLETENESS = re.compile(r"Completeness in resolution range:\s*([\d.]+)")
 # Per-residue verdicts in the validation report. There is no entry-level "favored %"
 # attribute — only outlier counts — so the Ramachandran favored fraction is counted
-# from `rama="Favored|Allowed|OUTLIER"`. NOTE the rotamer attribute is NOT a verdict:
-# `rota="m-10"`, `rota="mp"` etc. name the rotamer the residue adopts, with no
-# favored/allowed classification and no OUTLIER value present, so the rotamer favored %
-# cannot be obtained this way and is left unmeasured.
+# from `rama="Favored|Allowed|OUTLIER"`. The rotamer attribute is a HYBRID: for a
+# non-outlier residue it names the rotamer (`rota="m-10"`, `rota="mp"`), but for a
+# rotamer outlier it carries the literal verdict `rota="OUTLIER"`. So the rotamer
+# *favored* % is unobtainable (no Favored/Allowed classification exists), but the
+# rotamer *outlier* % IS — count `rota="OUTLIER"` over all rota residues. This is the
+# report's own per-residue verdict, and it is what `phenix.rotalyze` reproduces. It is
+# NOT the same as `key_validation_stats`' `protein_sidechains.percent_outliers`, which
+# is a broader sidechain metric (see #281): on 6LE5 the per-residue XML marks 9/1763
+# rotamer outliers (0.51 %, matching rotalyze) where the API reports 59 (3.35 %).
 _RES_RAMA = re.compile(r'\brama="([^"]+)"')
 _RES_ROTA = re.compile(r'\brota="([^"]+)"')
 # Per-residue rotamer assignment from the report, with enough identity to match it
@@ -121,6 +130,30 @@ def favored_pct(xml: str, pattern: re.Pattern) -> float | None:
         return None
     favored = sum(1 for v in verdicts if v.lower() == "favored")
     return round(100.0 * favored / len(verdicts), 2)
+
+
+def outlier_pct(xml: str, pattern: re.Pattern) -> float | None:
+    """Percentage of residues the report calls "OUTLIER", counted per residue.
+
+    The wwPDB reference for the outlier tolerances (Ramachandran and rotamer). Counted
+    from the report's own per-residue `rama=`/`rota=` verdicts — the same source as
+    `favored_pct` — NOT from `key_validation_stats`' `percent_outliers`, whose
+    `protein_sidechains` figure is a broader sidechain metric inconsistent with the
+    per-residue rotamer verdicts (see #281). Verified against `phenix.rotalyze` on 6LE5:
+    9 `rota="OUTLIER"` of 1763 residues = 0.51 %, exactly the SUMMARY line, where the API
+    reports 3.35 %.
+    """
+    verdicts = pattern.findall(xml)
+    if not verdicts:
+        return None
+    # Unlike favored_pct, no favored/allowed-vocabulary guard: "OUTLIER" is an
+    # unambiguous literal (rotamer names like "m-10" are never "OUTLIER"), so counting it
+    # is safe even on rota=, where non-outlier residues carry names. A zero-outlier entry
+    # has only names — the correct answer is then 0.0 %, not "unmeasured", so the guard
+    # must NOT trip on the absence of the "outlier" token. Denominator is every residue
+    # with the attribute; numerator is the OUTLIER count.
+    outliers = sum(1 for v in verdicts if v.lower() == "outlier")
+    return round(100.0 * outliers / len(verdicts), 2)
 
 
 def report_rotamers(xml: str) -> dict[tuple[str, int, str], str]:
@@ -381,9 +414,15 @@ def collect(pdb_ids: list[str], cache: Path, mvd_cache: Path | None) -> tuple[li
         row: dict[str, Any] = {
             "pdb_id": pdb_id,
             "phenix_rama_outlier_pct": float(rama_out.group(1)),
-            "wwpdb_rama_outlier_pct": dep_pct("protein_ramachandran"),
+            # Reference = the report's own per-residue verdicts, consistent with
+            # favored_pct and the rotamer-name agreement (#281). The API percent_outliers
+            # is retained below as *_api_pct: for Ramachandran it agrees with the XML, for
+            # sidechains it does not (it is a broader metric), which is the bug's evidence.
+            "wwpdb_rama_outlier_pct": outlier_pct(xml, _RES_RAMA),
             "phenix_rota_outlier_pct": float(rota_out.group(1)),
-            "wwpdb_rota_outlier_pct": dep_pct("protein_sidechains"),
+            "wwpdb_rota_outlier_pct": outlier_pct(xml, _RES_ROTA),
+            "wwpdb_rama_outlier_api_pct": dep_pct("protein_ramachandran"),
+            "wwpdb_rota_sidechain_api_pct": dep_pct("protein_sidechains"),
             "wwpdb_completeness": entry_attribute(xml, "DataCompleteness"),
             "deposited_r_free": entry_attribute(xml, "PDB-Rfree"),
             "wwpdb_dcc_r_free": entry_attribute(xml, "DCC_Rfree"),
