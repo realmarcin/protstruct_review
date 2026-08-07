@@ -44,11 +44,12 @@ and checks agreement.
 Each bullet is pass/fail; all must pass for green.
 
 1. **Cross-tool CA RMSD agreement.** PHENIX `superpose_models` CA RMSD vs TM-align (or ChimeraX
-   `matchmaker`) CA RMSD on the same aligned atoms: **|Δ| ≤ 0.10 Å**. `[catalog gold_standard]`
-   `[template check 3]`
+   `matchmaker`) CA RMSD on the same aligned atoms: **|Δ| ≤ 0.03 Å**. `[registry §3 — CA RMSD]`
+   `[template check 3]` (the catalog's *gold_standard* of ~0.1 Å is a looser result-quality expectation,
+   a different quantity from this cross-tool agreement tolerance)
 2. **Aligned-residue-count agreement.** The number of aligned residues from the two tools agrees
    within **±2 residues** (larger divergence means the tools aligned different cores, so the RMSDs
-   are not comparable and the ≤0.10 Å check above is meaningless). `[template — comparability guard]`
+   are not comparable and the ≤0.03 Å check above is meaningless). `[template — comparability guard]`
 3. **TM-score fold call.** For the fold-level case, TM-score **> 0.5** confirms the two models share
    the same fold; **< 0.17** would indicate unrelated structures. (Xu & Zhang, *Bioinformatics*
    2010 — TM-score > 0.5 ≈ same fold, < 0.17 ≈ random.) `[literature]`

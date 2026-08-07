@@ -388,3 +388,21 @@ fi
 if [[ "${QUIET}" == "0" ]]; then
   echo "selection records account for every refined entry"
 fi
+
+# The driving examples and benchmark docstrings must not restate a retired registry value
+# as a live threshold. A Codex review found CA RMSD graded at 0.10 A (§3 says 0.03), and
+# ΔRMSD/CC_mask/d_FSC_model at their round-5 values, in driving_example*.md and several
+# bench_*.py docstrings, with nothing reconciling the registry against its consumers. The
+# check re-derives each value from the registry (so a future §-change fails here too) and
+# flags retired literals stated as current.
+if ! python3 "${REPO_ROOT}/scripts/test_driver_thresholds.py" > /dev/null; then
+  python3 "${REPO_ROOT}/scripts/test_driver_thresholds.py" >&2 || true
+  fail "driver-threshold guard unit tests"
+fi
+if ! python3 "${REPO_ROOT}/scripts/check_driver_thresholds.py" > /dev/null 2>&1; then
+  python3 "${REPO_ROOT}/scripts/check_driver_thresholds.py" >&2 || true
+  fail "a driving example or benchmark docstring restates a retired registry threshold"
+fi
+if [[ "${QUIET}" == "0" ]]; then
+  echo "driver/docstring thresholds match the registry"
+fi

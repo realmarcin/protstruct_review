@@ -3,8 +3,10 @@
 
 `ref/thresholds_and_standards.md` §4 asserts:
 
-  - Map-model fit did not degrade   CC_mask_post ≥ CC_mask_pre − 0.01;
-                                    d_FSC_model_post ≤ d_FSC_model_pre + 0.05 Å
+  - Map-model fit did not degrade   CC_mask_post ≥ CC_mask_pre − 0.04 (d_min < 3.0 A) / − 0.06
+                                    (d_min >= 3.0 A);  d_FSC_model_post ≤ d_FSC_model_pre × 1.05
+                                    (the − 0.01 / + 0.05 A shown here originally were the round-5
+                                    values this benchmark then made resolution-conditional/relative)
 
 Neither quantity exists for X-ray data — `phenix.refine` reports no CC_mask, and
 `d_FSC_model` is a map-model FSC measure — so this row cannot be covered by
