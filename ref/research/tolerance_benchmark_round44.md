@@ -2,7 +2,7 @@
 
 **No band value changes.** Round 44 finishes what round 42 began: it re-bases the §4 geometry row's last
 `⚠ partial record` figures — the clashscore null-ratio maximum and the starting-clashscore ceiling,
-both from the lost ~11 low-resolution entries — onto the **45 fresh named entries** (rounds 37/38/41).
+both from the lost ~11 low-resolution entries — onto the **44 fresh named entries** (rounds 37/38/41).
 With that, the geometry row is **fully backed** and the registry moves to **15 backed / 5 marked**.
 
 Pre-registered in [`tolerance_benchmark_round44_preregistration.md`](tolerance_benchmark_round44_preregistration.md)
@@ -14,7 +14,7 @@ before the figures were re-based; re-derivable by
 
 | prediction | verdict |
 |---|---|
-| **P1** — the fresh named max null ratio stays below 5× | **confirmed** — **4.25×** over 38 gate-valid entries (none ≥ 5×) |
+| **P1** — the fresh named max null ratio stays below 5× | **confirmed** — **4.25×** over 37 gate-valid entries (none ≥ 5×) |
 | **P2** — the fresh starting clashscore exceeds the lost 17.2 | **confirmed** — **38.70**, with 7 entries above pre = 20 |
 
 ## What was re-based
@@ -25,7 +25,7 @@ moved from the lost set to named entries:
 
 | figure | was (lost set) | now (named) |
 |---|---|---|
-| max null clashscore ratio (gate-valid, `1 ≤ pre ≤ 20`) | 4.26× over 19 | **4.25× over 38** |
+| max null clashscore ratio (gate-valid, `1 ≤ pre ≤ 20`) | 4.26× over 19 | **4.25× over 37** |
 | starting-clashscore ceiling | "17.2, not reproducible" | **38.70** (7 entries > pre 20) |
 
 The near-identity of the ratio maximum (4.25× vs 4.26×) is the point: the figure that established the
@@ -48,8 +48,8 @@ RETAIN).
 - **No tolerance changed** — the 5× gate, its `1 ≲ pre ≲ 20` bounds, and the absolute-bar fallback are
   all unchanged; this is a record-integrity re-basing of the evidence, not a re-fit.
 - **Same-binary** — `phenix-2.0-5936` pinned; round 43 registers the cross-version test.
-- **The ratio is only defined for `pre ≥ 1`**, and the gate only valid to `pre ≈ 20`; the 45-entry
-  figure uses the 38 entries in that range, and the 7 above pre = 20 are why the absolute-bar fallback
+- **The ratio is only defined for `pre ≥ 1`**, and the gate only valid to `pre ≈ 20`; the 44-entry
+  figure uses the 37 entries in that range, and the 7 above pre = 20 are why the absolute-bar fallback
   exists.
 - **The clashscore *difference* is still unbanded** — it moves both ways on a null re-refinement; only
   the ratio maximum and the starting ceiling were partial, and only they were re-based.

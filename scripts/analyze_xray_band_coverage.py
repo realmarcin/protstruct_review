@@ -108,12 +108,15 @@ def main() -> int:
     # clashscore: re-base the geometry row's null-ratio figures on named data (round 44).
     # The gate is ratio post/pre >= 5x, valid only while 1 <= pre <= 20; the starting
     # ceiling is what the upper bound guards.
+    # Same 44 protein entries as the Ca/favored basis (Ca-matched), not 45 -- 12CI is
+    # nucleic acid with a clashscore but null Ca, and mixing it in would make the
+    # clashscore denominator differ from round 42's, the same-word-different-count trap.
     pre_post = []
     for rnd in ROUNDS:
         d = json.loads((REPO / f"ref/research/data/{rnd}_xray_deltas.json").read_text())
         for r in d["rows"]:
             pre, post = r.get("clashscore_pre"), r.get("clashscore_post")
-            if pre is not None and post is not None:
+            if pre is not None and post is not None and r.get("ca_shift_rmsd") is not None:
                 pre_post.append((pre, post))
     gated = [post / pre for pre, post in pre_post if 1 <= pre <= 20]
     starts = [pre for pre, _ in pre_post]
