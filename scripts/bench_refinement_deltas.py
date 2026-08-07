@@ -390,16 +390,19 @@ def find_pairs(cache: Path, ids: list[str] | None) -> list[tuple[Path, Path]]:
 
 # INCOMPLETE: 16 of the 37 entries, committed in round 18 as the most recoverable.
 #
-# **This is the most expensive partial record in the repo.** Both §4 X-ray band widths
-# are set just above a null maximum that this set cannot reproduce:
+# **This WAS the most expensive partial record in the repo, resolved in round 42.** Both
+# §4 X-ray band widths were once set just above a null maximum this set cannot reproduce:
 #
 #   ΔRMSD, d_min >= 2.5 A   band +0.35 A   set just above a null max of 0.285 A
 #   favored, d_min >= 2.5 A band -6 pp     set just above a null max of 5.26 pp
 #
-# Both maxima come from the ~11 low-resolution entries round 7 added, and rounds 7 and 8
-# publish only that bin's median and max -- no entry is named. They are not in the list
-# below and cannot be. Re-running this set reproduces the HIGH-resolution end of the
-# benchmark and neither of the two numbers that actually size the bands.
+# Both maxima came from the ~11 low-resolution entries round 7 added, named nowhere. Round
+# 42 re-based both widths onto a 99/95 coverage bound over the 44 fresh NAMED entries
+# (rounds 37/38/41, scripts/analyze_xray_band_coverage.py): the Ca band became +0.25 A and
+# the favored band is kept at -6 pp but now backed as ~98% coverage. So the widths no
+# longer depend on this lost set at all -- #225's research showed a lone observed maximum
+# was a biased, low-confidence basis to begin with. This set still reproduces only the
+# HIGH-resolution end of the OLD benchmark, which is why it stays marked INCOMPLETE.
 #
 # Recovered from three places, none of them a record of the set:
 #   - the original 8, from the per-entry table in

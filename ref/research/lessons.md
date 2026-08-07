@@ -28,6 +28,7 @@ maxims.
 | A band breached under the wrong protocol is not a band that needs widening | 39 |
 | A real mechanism measured badly looks like no mechanism at all | 40 |
 | One breach in a large fresh set locates the breach, it does not indict the band | 41 |
+| A band sized on a lost maximum was mis-based, not merely under-documented | 42 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -301,6 +302,25 @@ fresh distribution says whether that entry was the edge or the outlier; here 44 
 clearly the outlier. The lost maxima (0.285 Å, 5.26 pp) are still unreproduced, so the band *widths*
 rest on numbers no fresh set has matched — but the bands themselves now hold on 44 named entries, which
 is a different and firmer thing than holding on a batch whose ids were never written down.
+
+Round 42 closed that loop by fixing the *basis* rather than mourning the lost data. For eleven rounds
+the §4 X-ray band widths were treated as a `⚠ partial record` — "the most expensive instance in the
+file" — because the maxima that sized them came from a batch named nowhere, and the standing assumption
+was that the record was merely *incomplete*: recover the entries and the band would be re-derivable. A
+deep-research pass (#225, JCGM/MolProbity/wwPDB/National-Academies sources, adversarially verified)
+overturned the assumption: **a band sized on one observed maximum was mis-based to begin with** — the
+sample maximum is a downward-biased, breakdown-point-0, low-confidence estimator that rises with more
+data, and no field that validates structures sizes tolerances that way; they use distribution
+percentiles. So the fix was not to find the lost entries but to change the estimator: the Cα band became
+the 99/95 lognormal upper tolerance limit over the 44 fresh named entries (0.35 → 0.25 Å, flagging none
+of them and catching a 0.28 Å degradation the old band missed), and the favored band, kept at −6 pp, was
+re-justified as ~98 % coverage. **A band sized on a lost maximum was mis-based, not merely
+under-documented** — and once the basis is a coverage bound over named entries, the "partial record"
+dissolves rather than being waited out. The discipline that matters: when a figure has been un-recoverable
+for eleven rounds, ask whether the thing you cannot recover was ever the right quantity, not just how to
+recover it. (The clashscore figures in the same geometry row still come from the lost set, so that row
+stays marked — resolving one sub-figure is not resolving the row, which is the miscount this round had to
+avoid.)
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
