@@ -25,7 +25,8 @@ free for a CCP4-style `FreeR_flag` column, where flags run 0-19 and the free set
 `flag == 0` (~5 %): there, `flag != 0` calls 95 % of reflections free. The two
 conventions cannot be told apart by column values alone in every case, so the flag
 convention is inferred conservatively and every inference is printed; `--free-value`
-overrides. An inferred free fraction outside 1-30 % is refused, loudly.
+overrides. A free fraction outside 0.1-30 % is refused, loudly, whether inferred or
+given (#302).
 
 Usage:
     python3 scripts/gemmi_rfactor.py obs.mtz calc.mtz
@@ -48,8 +49,11 @@ CALC_CANDIDATES = ("FC", "F-calc", "FCALC")
 FREE_CANDIDATES = ("R-free-flags", "FreeR_flag", "FREE", "FreeRflag")
 
 # A free set outside this fraction band means the flag convention was misread, and
-# an R-free computed on it would be confidently wrong. Refuse instead.
-FREE_FRACTION_BAND = (0.01, 0.30)
+# an R-free computed on it would be confidently wrong. Refuse instead. The floor is
+# 0.1 %, not 1 %: large high-resolution datasets commonly cap the test set at
+# ~1000-2000 reflections, well under 1 % of the total, while a swapped convention
+# lands at ~70-99 % and is caught by the ceiling (#302).
+FREE_FRACTION_BAND = (0.001, 0.30)
 
 
 def hkl_key(hkl: np.ndarray) -> np.ndarray:
@@ -176,10 +180,16 @@ def compute(obs_path: str, calc_path: str, obs_columns: str | None,
     work_mask = ~free_mask
     fraction = free_mask.mean()
     if not (FREE_FRACTION_BAND[0] <= fraction <= FREE_FRACTION_BAND[1]):
+        # Refused under an explicit --free-value too — an asserted-but-wrong value
+        # must not produce a plausible-looking wrong R-free — but the message must
+        # not send the caller in a circle (#302).
+        hint = ("the flag convention was misread; pass --free-value"
+                if free_value is None else
+                "that cannot be a test set; check the flag column and value")
+        origin = "inferred" if free_value is None else "given"
         raise SystemExit(
-            f"gemmi_rfactor: free set is {fraction:.1%} of reflections with free "
-            f"value {inferred} — outside {FREE_FRACTION_BAND}; the flag convention "
-            f"was misread. Pass --free-value")
+            f"gemmi_rfactor: free set is {fraction:.1%} of reflections ({origin} "
+            f"free value {inferred}) — outside {FREE_FRACTION_BAND}; {hint}")
 
     cell = mtz_o.cell
     s2 = np.array([cell.calculate_1_d2((int(h), int(k), int(l))) for h, k, l in hkl])

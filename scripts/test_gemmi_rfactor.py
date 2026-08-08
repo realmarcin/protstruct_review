@@ -145,4 +145,15 @@ with tempfile.TemporaryDirectory() as tmp:
     check_raises("majority-side free value refused",
                  lambda: gr.compute(str(obs), str(calc), None, None, None, 0, 20))
 
+    # A sub-1 % free set is legitimate (large datasets cap the test set at
+    # ~1000-2000 reflections); the 0.1 % floor must accept it (#302).
+    tiny_free = np.zeros(len(hkls))
+    tiny_free[60] = 1                                    # 1 of 125 = 0.8 %
+    obs_tiny = Path(tmp) / "obs_tiny.mtz"
+    write_mtz(obs_tiny, [("F-obs", "F"), ("SIGF-obs", "Q"), ("R-free-flags", "I")],
+              np.column_stack([hkl_arr, f_true, np.ones(len(hkls)), tiny_free]))
+    tiny = gr.compute(str(obs_tiny), str(calc), None, None, None, None, 20)
+    check("0.8 % free set accepted with the widened floor", tiny["n_free"], 1)
+    check("0.8 % free set still yields exact-model R-free 0", tiny["r_free"], 0.0)
+
 print(f"\n{PASSED} checks passed")
