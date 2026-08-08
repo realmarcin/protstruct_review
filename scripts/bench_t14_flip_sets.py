@@ -131,6 +131,20 @@ def reduce2_flip_calls(model: Path, cache: Path) -> dict[tuple[str, int, str], t
     return calls or None
 
 
+def confident_conflicts(reduce_calls: dict, reduce2_calls: dict) -> list:
+    """Residues where `reduce` is confident (category F/K) and `reduce2` disagrees (#287).
+
+    The load-bearing flip-set measure. A raw disagreement where `reduce` wrote category
+    `X` (uncertain) or `C` (clashes either way) is one builder declining to commit, not a
+    genuine conflict about the model, so it is excluded here and kept only as a diagnostic.
+    Keyed like the callers: `(chain, resnum, resname)`, value `(flipped_bool, category)`.
+    """
+    shared = set(reduce_calls) & set(reduce2_calls)
+    return sorted(k for k in shared
+                  if reduce_calls[k][0] != reduce2_calls[k][0]
+                  and reduce_calls[k][1] in ("F", "K"))
+
+
 def flip_calls(model_h: Path) -> dict[tuple[str, int, str], tuple[bool, str]]:
     """Map each flippable residue to (was_flipped, category) from its USER MOD line."""
     calls = {}
@@ -177,6 +191,7 @@ def collect(pdb_ids: list[str], cache: Path) -> tuple[list[dict], list[dict]]:
         # The cross-implementation comparison: reduce (either build) vs reduce2.
         r2_shared = sorted(set(a) & set(r2)) if r2 else []
         r2_diffs = [k for k in r2_shared if a[k][0] != r2[k][0]]
+        r2_confident_diffs = confident_conflicts(a, r2) if r2 else []
         rows.append({
             "pdb_id": pdb_id,
             "n_flippable_phenix": len(a),
@@ -194,6 +209,8 @@ def collect(pdb_ids: list[str], cache: Path) -> tuple[list[dict], list[dict]]:
             "n_reduce2_shared": len(r2_shared),
             "n_reduce2_decision_disagreements": len(r2_diffs),
             "reduce2_disagreements": [f"{c}{r} {n}" for c, r, n in r2_diffs],
+            "n_reduce2_confident_conflicts": len(r2_confident_diffs),
+            "reduce2_confident_conflicts": [f"{c}{r} {n}" for c, r, n in r2_confident_diffs],
             "n_flipped_reduce2": sum(1 for v in r2.values() if v[0]) if r2 else None,
             "n_decision_disagreements": len(decision_diffs),
             "n_category_only_disagreements": len(category_diffs),
@@ -237,7 +254,9 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
         "total_decision_disagreements": sum(r["n_decision_disagreements"] for r in rows),
         "reduce_vs_reduce2": {
             "n_residues_compared": sum(r["n_reduce2_shared"] for r in rows),
+            # Raw disagreements (diagnostic) vs the load-bearing confident-conflict count (#287).
             "n_decision_disagreements": sum(r["n_reduce2_decision_disagreements"] for r in rows),
+            "n_confident_conflicts": sum(r["n_reduce2_confident_conflicts"] for r in rows),
             "n_models": sum(1 for r in rows if r["n_reduce2_shared"]),
         },
         "total_category_only_disagreements": sum(r["n_category_only_disagreements"] for r in rows),
