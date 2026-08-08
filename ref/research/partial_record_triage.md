@@ -5,9 +5,9 @@ committed subset" (works only when the lost members were unremarkable) and round
 unfixable" — namely **retire the lost estimator and re-base the figure on a coverage/distribution bound
 over named data.** This document triages the **6 remaining** marked rows (round 42 resolved the ΔRMSD
 row) into one of three routes. **Status: round 44 resolved #1 (geometry/clashscore, #275); item #2 was
-verified and reclassified REPLACE → RETAIN; round 45 resolved #3 (favored %) and half-resolved #4
-(outlier % — record done, rotamer band open #284). So 4 rows remain marked: #2 and #6 RETAIN, #4
-band-blocked, #5 the one clean REMEASURE left.**
+verified and reclassified REPLACE → RETAIN; round 45 resolved #3 (favored %) and committed #4's record;
+round 46 resolved #4 (outlier %) by making the check classification agreement (#284 closed). So 3 rows
+remain marked: #2 and #6 RETAIN, and #5 the one clean REMEASURE left.**
 
 - **REPLACE** — re-base on named data now (a round-42-style move); resolves the mark, changes the
   registry, so needs pre-registration + approval.
@@ -24,7 +24,7 @@ Every figure below was checked against the committed data before classifying.
 | 1 | Geometry Δ clause — **clashscore** | the 4.26× null ratio and 17.2 starting clashscore come from the lost ~11 entries | **REPLACE — DONE (round 44, #275)** | resolved |
 | 2 | **L-test** ⟨\|L\|⟩ | only 5 of 27 datasets named; set uncommitted | **RETAIN** (was REPLACE; verified — see below) | already stated |
 | 3 | Ramachandran/rotamer **favored %** | aggregate median/p90/max sound, but no per-entry value recorded | REMEASURE — **DONE (round 45)** | resolved |
-| 4 | Ramachandran/rotamer **outlier %** | only the nonzero entries named; input set uncommitted | REMEASURE — **record half done (round 45); mark stays, rotamer band open #284** | partial |
+| 4 | Ramachandran/rotamer **outlier %** | only the nonzero entries named; input set uncommitted | REMEASURE — **DONE (round 45 record + round 46 band, #284 closed)** | resolved |
 | 5 | **H-placement** agreement | "worst 16.4 %" from an uncommitted 17-model set; 0 % members unnamed | REMEASURE | small round |
 | 6 | Map-model fit (EM **CC_mask + d_FSC_model**) | publishes its uncertainty as a *range* (17–22) rather than a point | **RETAIN** | already honest |
 
@@ -98,14 +98,16 @@ disclosed limit. Lowest priority; retain unless a fresh EM round is being run fo
    No registry change. This is a documentation correction only.
 3. ~~**#3 favored (round 45)**~~ — **DONE.** Re-based on 42 named entries; band holds, mark cleared
    (registry 15 → 16 backed, 5 → 4 marked).
-4. **#4 outlier** — **record half done (round 45); mark stays.** Blocked on the rotamer-band decision
-   (#284): classification agreement (holds 41/41) vs raw-% agreement (breached by two altloc entries).
+4. ~~**#4 outlier (round 45 record + round 46 band)**~~ — **DONE (#284 closed).** Round 45 committed the
+   record; round 46 made the load-bearing check per-shared-residue **classification agreement** (rotamer
+   1.0000/41, Ramachandran 1.0000 on 40 + 0.9976 on 15C8), demoting the denominator-sensitive raw-%
+   bands to diagnostics. Mark resolved (registry 16 → 17 backed, 4 → 3 marked).
 5. **#5 H-placement** — the remaining clean REMEASURE (a `bench_t05_clashscore_h` re-run on a committed
-   set); highest-value remaining work now that #3 is done and #4 is band-blocked.
+   set); **the one un-blocked resolvable mark left.**
 6. **#6** — retain; revisit only alongside a fresh EM round.
 
-**After round 45: 4 rows remain marked — #2 and #6 are RETAIN (honest, disclosed limits), #4 is
-record-done-but-band-blocked (#284), and #5 is the one clean REMEASURE left.**
+**After round 46: 3 rows remain marked — #2 and #6 are RETAIN (honest, disclosed limits), and #5 is the
+one clean REMEASURE left.**
 
 No registry value is changed by this document; it is the plan. Executing #1 (or any REPLACE) changes a
 `[benchmark]` row and requires the round-42 discipline: pre-register the method, compute from a committed

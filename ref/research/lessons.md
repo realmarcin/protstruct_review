@@ -31,6 +31,7 @@ maxims.
 | A band sized on a lost maximum was mis-based, not merely under-documented | 42 |
 | Finish resolving the row, not just the sub-figure you started with | 44 |
 | Re-measuring can resolve the record yet fail the band — and the instrument may be the bug | 45 |
+| When the band is the wrong instrument, change what the check measures | 46 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -365,6 +366,22 @@ pass/fail can hinge on the statistic you registered, so register it deliberately
 band** — the two are separate claims. The record half was done; the band question (#284) was not, so the
 mark stayed. Resolving a partial record is necessary but not sufficient: a named, committed basis on
 which the band *doesn't* hold is a finding about the band, not a resolution.
+
+Round 46 resolved what round 45 had left open, and the move is worth naming: **when a band is the wrong
+instrument, don't widen it — change what the check measures.** Round 45 found the rotamer ±0.5 pp
+agreement band fired on altloc entries because `phenix` and the wwPDB report evaluate a different residue
+*set*, not because they *classified* any residue differently — on 14ZZ every one of 402 shared rotamers
+agreed. The three tempting fixes were all wrong: widening the band (option c) would loosen the check
+globally to swallow an artefact; documenting exceptions (option b) leaves the spurious fires in place. The
+right fix was to make the check measure the thing we actually care about — **per-shared-residue
+classification agreement** — which is robust to the denominator by construction. It holds 1.0000 for
+rotamer on all 41 entries and 1.0000 for Ramachandran on 40, dropping to 0.9976 on exactly one residue
+(15C8's boundary glycine, Favored↔Allowed) — a genuine, named, single-residue difference, which is
+precisely what the check *should* surface while the altloc denominator noise it *shouldn't* now vanishes.
+The general lesson: a tolerance is a proxy for a question, and when the proxy and the question diverge
+(here, "agree on the percentage" vs "agree on the classification"), fix the proxy, don't re-tune its
+threshold. Retuning a mis-specified band buys a number that passes; re-specifying the check buys the
+answer you wanted.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its

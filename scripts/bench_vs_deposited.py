@@ -338,6 +338,62 @@ def rotamer_agreement(xml: str, rotalyze_log: str) -> dict[str, Any]:
     }
 
 
+# phenix.ramalyze per-residue line:  A   8 BLEU:9.82:-83.73:98.71:Favored:General
+# The resname field may carry a leading altloc code ("BLEU" = altloc B, LEU), so the
+# 3-letter name is its last three characters.
+_RAMALYZE_RESIDUE = re.compile(
+    r"^\s*(?P<chain>\S+)\s+(?P<resseq>-?\d+)\s+(?P<resname>.{3,4}):"
+    r"[\d.]+:[-\d.]+:[-\d.]+:(?P<verdict>Favored|Allowed|OUTLIER):", re.M)
+
+
+def report_ramachandran(xml: str) -> dict[tuple[str, int, str], str]:
+    """Per-residue Ramachandran verdict (Favored/Allowed/OUTLIER) from the report."""
+    out = {}
+    for block in _XML_SUBGROUP.findall(xml):
+        attrs = dict(re.findall(r'([\w-]+)="([^"]*)"', block))
+        rama, chain, resnum = attrs.get("rama"), attrs.get("chain"), attrs.get("resnum")
+        if not rama or not chain or resnum is None:
+            continue
+        try:
+            out[(chain, int(resnum), attrs.get("resname", "").upper())] = rama
+        except ValueError:
+            continue
+    return out
+
+
+def local_ramachandran(ramalyze_log: str) -> dict[tuple[str, int, str], str]:
+    """Per-residue Ramachandran verdict from a phenix.ramalyze log."""
+    out = {}
+    for m in _RAMALYZE_RESIDUE.finditer(ramalyze_log):
+        resname = m.group("resname").strip()[-3:].upper()
+        out[(m.group("chain"), int(m.group("resseq")), resname)] = m.group("verdict")
+    return out
+
+
+def ramachandran_agreement(xml: str, ramalyze_log: str) -> dict[str, Any]:
+    """Do the two pipelines assign the same Ramachandran verdict to the same residue?
+
+    The denominator-robust companion to the raw favored-/outlier-% |Δ| (#284): the raw
+    percentages differ when the pipelines evaluate different residue *sets* (altloc /
+    completeness), but the per-shared-residue verdict agreement isolates whether they
+    *classify* the residues they both see the same way. Keyed `(chain, resnum, resname)`,
+    exactly like `rotamer_agreement`.
+    """
+    ref, local = report_ramachandran(xml), local_ramachandran(ramalyze_log)
+    shared = sorted(set(ref) & set(local))
+    if not shared:
+        return {"n_shared": 0}
+    same = [k for k in shared if ref[k] == local[k]]
+    disagree = [{"residue": list(k), "report": ref[k], "phenix": local[k]}
+                for k in shared if ref[k] != local[k]]
+    return {
+        "n_shared": len(shared),
+        "n_same": len(same),
+        "agreement": round(len(same) / len(shared), 4),
+        "disagreements": disagree,
+    }
+
+
 def fetch_text(url: str, dest: Path) -> str | None:
     """Download a text resource, cached; None if the server has none."""
     if dest.exists() and dest.stat().st_size:
@@ -435,6 +491,7 @@ def collect(pdb_ids: list[str], cache: Path, mvd_cache: Path | None) -> tuple[li
         rota_fav = _ROTA_FAV.search(rota_log)
         row["phenix_rota_favored_pct"] = float(rota_fav.group(1)) if rota_fav else None
         row.update({f"rotamer_{k}": v for k, v in rotamer_agreement(xml, rota_log).items()})
+        row.update({f"ramachandran_{k}": v for k, v in ramachandran_agreement(xml, rama_log).items()})
         row.update({f"boundary_{k}": v for k, v in boundary_exposure(rota_log).items()})
         row.update(chi1_agreement(model, rota_log))
         row.update(cross_library_sidechain(model, rota_log))
