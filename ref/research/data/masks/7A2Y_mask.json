@@ -5,6 +5,10 @@
     "b_tail_factor": 2.0,
     "lattice_cutoff_a": 4.0
   },
+  "density_coverage": {
+    "rsrz": 0.986,
+    "owab": 1.0
+  },
   "n_residues": 73,
   "n_masked": 47,
   "mask_fraction": 0.644,

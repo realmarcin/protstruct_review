@@ -115,4 +115,12 @@ check("injected lattice key is masked",
 loose = gm.classify(residues, lattice=set(), b_tail_factor=5.0)
 check("B tail factor is a parameter", loose[("A", 5, "")]["masked"], [])
 
+# Density coverage is recorded, not inferred (#306): full here, and zero when the
+# report carries no EDS data — the case where the density rules go inert.
+check("full density coverage recorded",
+      gm.density_coverage(residues), {"rsrz": 1.0, "owab": 1.0})
+no_eds = {k: dict(r, rsrz=None, owab=None) for k, r in residues.items()}
+check("EDS-absent coverage is zero, recorded (#306)",
+      gm.density_coverage(no_eds), {"rsrz": 0.0, "owab": 0.0})
+
 print(f"\n{PASSED} checks passed")

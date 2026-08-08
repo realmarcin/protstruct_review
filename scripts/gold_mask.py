@@ -134,6 +134,17 @@ def merge_rows(rows: list[dict]) -> dict[tuple, dict]:
     return merged
 
 
+def density_coverage(residues: dict[tuple, dict]) -> dict:
+    """Fraction of residues carrying per-residue EDS data. When the report has no
+    rsrz/owab, the two density rules go inert and the mask is a WEAKER artifact —
+    that must be recorded, not inferred (#306)."""
+    n = len(residues) or 1
+    return {"rsrz": round(sum(1 for r in residues.values()
+                              if r["rsrz"] is not None) / n, 3),
+            "owab": round(sum(1 for r in residues.values()
+                              if r["owab"] is not None) / n, 3)}
+
+
 def classify(residues: dict[tuple, dict], lattice: set[tuple],
              rsrz_cut: float = RSRZ_CUT,
              b_tail_factor: float = B_TAIL_FACTOR) -> dict:
@@ -205,6 +216,12 @@ def build_mask(pdb_id: str, cache: Path) -> dict:
                          f"validation XML — nothing to mask")
     lattice = lattice_residues(cif_path)
     classified = classify(residues, lattice)
+    coverage = density_coverage(residues)
+    for metric, fraction in coverage.items():
+        if fraction < 0.5:
+            print(f"  ! {pdb_id.upper()}: only {fraction:.0%} of residues carry "
+                  f"{metric}; the density mask rules are partly inert (#306)",
+                  file=sys.stderr)
 
     n = len(classified)
     n_masked = sum(1 for c in classified.values() if c["masked"])
@@ -218,6 +235,7 @@ def build_mask(pdb_id: str, cache: Path) -> dict:
         "pdb_id": pdb_id.upper(),
         "thresholds": {"rsrz": RSRZ_CUT, "b_tail_factor": B_TAIL_FACTOR,
                        "lattice_cutoff_a": LATTICE_CUTOFF_A},
+        "density_coverage": coverage,
         "n_residues": n,
         "n_masked": n_masked,
         "mask_fraction": round(n_masked / n, 3),
