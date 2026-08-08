@@ -101,7 +101,8 @@ RAMA_LOG = (
 
 def test_ramachandran_local_strips_altloc_resname() -> None:
     loc = local_ramachandran(RAMA_LOG)
-    check("altloc resname -> 3-letter key", loc.get(("A", 11, "ILE")), "Favored")
+    # key is (chain, resseq, icode, resname); A/11 has no insertion code
+    check("altloc resname -> 3-letter key", loc.get(("A", 11, "", "ILE")), "Favored")
 
 
 def test_ramachandran_agreement_counts_shared_verdicts() -> None:
@@ -110,7 +111,27 @@ def test_ramachandran_agreement_counts_shared_verdicts() -> None:
     check("rama shared", a["n_shared"], 4)
     check("rama agreement 3/4", a["agreement"], 0.75)
     check("rama one disagreement", len(a["disagreements"]), 1)
-    check("rama disagreement is named", a["disagreements"][0]["residue"], ["A", 4, "SER"])
+    check("rama disagreement is named (with icode slot)",
+          a["disagreements"][0]["residue"], ["A", 4, "", "SER"])
+
+
+def test_ramachandran_icode_residues_kept_distinct() -> None:
+    # Chain H position 100 has three residues by insertion code: 100 (GLY), 100A (HIS),
+    # 100B (GLY). Without icode in the key the two GLYs collide (last-wins) and pair up
+    # mismatched residues -> a spurious disagreement (#284 review). With icode, all agree.
+    xml = (
+        '<ModelledSubgroup rama="Allowed" chain="H" resnum="100" icode=" " resname="GLY">'
+        '<ModelledSubgroup rama="Favored" chain="H" resnum="100" icode="A" resname="HIS">'
+        '<ModelledSubgroup rama="Favored" chain="H" resnum="100" icode="B" resname="GLY">'
+    )
+    log = (
+        " H 100  GLY:0.24:-31.43:-62.75:Allowed:Glycine\n"
+        " H 100A HIS:37.60:-107.74:142.53:Favored:General\n"
+        " H 100B GLY:17.40:101.25:145.71:Favored:Glycine\n"
+    )
+    a = ramachandran_agreement(xml, log)
+    check("icode residues all shared", a["n_shared"], 3)
+    check("icode residues all agree (no spurious mismatch)", a["agreement"], 1.0)
 
 
 def test_ramachandran_outlier_verdict_matches() -> None:
@@ -125,14 +146,15 @@ def test_ramachandran_no_shared_is_reported() -> None:
 
 
 def test_regression_rama_agreement_real_15c8() -> None:
-    """15C8 is the one entry below 1.0 in round 45: 0.9976 (one boundary residue)."""
+    """15C8's apparent 0.9976 was an insertion-code collision (H/100 GLY vs 100B GLY);
+    with icode in the key it is 1.0000 (#284 review)."""
     xmlf = Path("/tmp/round45_cache/15c8_validation.xml")
     logf = Path("/tmp/round45_cache/rama_15c8.log")
     if not (xmlf.exists() and logf.exists()):
         print("  (skip real-15C8 regression: cache not present)")
         return
     a = ramachandran_agreement(xmlf.read_text(errors="ignore"), logf.read_text(errors="ignore"))
-    check("15C8 rama agreement 0.9976", a["agreement"], 0.9976)
+    check("15C8 rama agreement 1.0 after icode fix", a["agreement"], 1.0)
 
 
 def main() -> int:

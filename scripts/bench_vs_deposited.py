@@ -87,7 +87,7 @@ ROTAMER_FAVORED_CUTOFF = 2.0
 
 # phenix.rotalyze per-residue line:  A   1  MET:1.00:79.0:...:Favored:mmm
 _ROTALYZE_RESIDUE = re.compile(
-    r"^\s*(?P<chain>\S+)\s+(?P<resseq>-?\d+)\s+(?P<resname>[A-Z]{3}):"
+    r"^\s*(?P<chain>\S+)\s+(?P<resseq>-?\d+)(?P<icode>[A-Za-z]?)\s+(?P<resname>[A-Z]{3}):"
     r"(?P<occ>[\d.]+):(?P<score>[\d.]+):"
     r"(?P<rest>.*?):(?P<verdict>Favored|Allowed|OUTLIER):(?P<rotamer>\S+)\s*$", re.M)
 
@@ -164,19 +164,21 @@ def report_rotamers(xml: str) -> dict[tuple[str, int, str], str]:
         rota, chain, resnum = attrs.get("rota"), attrs.get("chain"), attrs.get("resnum")
         if not rota or not chain or resnum is None:
             continue
+        icode = attrs.get("icode", "").strip()
         try:
-            out[(chain, int(resnum), attrs.get("resname", "").upper())] = rota
+            out[(chain, int(resnum), icode, attrs.get("resname", "").upper())] = rota
         except ValueError:
             continue
     return out
 
 
-def local_rotamers(rotalyze_log: str) -> dict[tuple[str, int, str], tuple[str, str]]:
+def local_rotamers(rotalyze_log: str) -> dict[tuple[str, int, str, str], tuple[str, str]]:
     """Per-residue (rotamer name, verdict) from a phenix.rotalyze log."""
     out = {}
     for m in _ROTALYZE_RESIDUE.finditer(rotalyze_log):
-        out[(m.group("chain"), int(m.group("resseq")), m.group("resname").upper())] = (
-            m.group("rotamer"), m.group("verdict"))
+        key = (m.group("chain"), int(m.group("resseq")), m.group("icode").strip(),
+               m.group("resname").upper())
+        out[key] = (m.group("rotamer"), m.group("verdict"))
     return out
 
 
@@ -329,10 +331,19 @@ def rotamer_agreement(xml: str, rotalyze_log: str) -> dict[str, Any]:
     if not shared:
         return {"n_shared": 0}
     same = [k for k in shared if ref[k] == local[k][0]]
+    # The OUTLIER verdict is what the outlier tolerance concerns, and it agrees whenever
+    # `rota="OUTLIER"` (report) matches the phenix verdict. A name mismatch where BOTH call
+    # the residue non-outlier (report "t0" vs phenix "Cg_exo", both Favored) is a finer
+    # rotamer-assignment nuance, not an outlier disagreement — so each disagreement carries
+    # the phenix verdict to show it.
+    disagree = [{"residue": list(k), "report": ref[k], "phenix": local[k][0],
+                 "phenix_verdict": local[k][1]}
+                for k in shared if ref[k] != local[k][0]]
     return {
         "n_shared": len(shared),
         "n_same_rotamer": len(same),
         "rotamer_agreement": round(len(same) / len(shared), 4),
+        "name_disagreements": disagree,
         "local_favored_pct": round(
             100.0 * sum(1 for k in shared if local[k][1] == "Favored") / len(shared), 2),
     }
@@ -340,9 +351,12 @@ def rotamer_agreement(xml: str, rotalyze_log: str) -> dict[str, Any]:
 
 # phenix.ramalyze per-residue line:  A   8 BLEU:9.82:-83.73:98.71:Favored:General
 # The resname field may carry a leading altloc code ("BLEU" = altloc B, LEU), so the
-# 3-letter name is its last three characters.
+# 3-letter name is its last three characters. An insertion code is a letter suffix on the
+# residue number ("100A HIS"); it MUST be captured, or the line fails to match and the
+# residue is silently dropped — and residues that share a resnum across icodes then collide
+# when keyed without it (#284 review).
 _RAMALYZE_RESIDUE = re.compile(
-    r"^\s*(?P<chain>\S+)\s+(?P<resseq>-?\d+)\s+(?P<resname>.{3,4}):"
+    r"^\s*(?P<chain>\S+)\s+(?P<resseq>-?\d+)(?P<icode>[A-Za-z]?)\s+(?P<resname>.{3,4}):"
     r"[\d.]+:[-\d.]+:[-\d.]+:(?P<verdict>Favored|Allowed|OUTLIER):", re.M)
 
 
@@ -354,19 +368,21 @@ def report_ramachandran(xml: str) -> dict[tuple[str, int, str], str]:
         rama, chain, resnum = attrs.get("rama"), attrs.get("chain"), attrs.get("resnum")
         if not rama or not chain or resnum is None:
             continue
+        icode = attrs.get("icode", "").strip()
         try:
-            out[(chain, int(resnum), attrs.get("resname", "").upper())] = rama
+            out[(chain, int(resnum), icode, attrs.get("resname", "").upper())] = rama
         except ValueError:
             continue
     return out
 
 
-def local_ramachandran(ramalyze_log: str) -> dict[tuple[str, int, str], str]:
+def local_ramachandran(ramalyze_log: str) -> dict[tuple[str, int, str, str], str]:
     """Per-residue Ramachandran verdict from a phenix.ramalyze log."""
     out = {}
     for m in _RAMALYZE_RESIDUE.finditer(ramalyze_log):
         resname = m.group("resname").strip()[-3:].upper()
-        out[(m.group("chain"), int(m.group("resseq")), resname)] = m.group("verdict")
+        key = (m.group("chain"), int(m.group("resseq")), m.group("icode").strip(), resname)
+        out[key] = m.group("verdict")
     return out
 
 

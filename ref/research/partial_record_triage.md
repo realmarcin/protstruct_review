@@ -100,8 +100,9 @@ disclosed limit. Lowest priority; retain unless a fresh EM round is being run fo
    (registry 15 → 16 backed, 5 → 4 marked).
 4. ~~**#4 outlier (round 45 record + round 46 band)**~~ — **DONE (#284 closed).** Round 45 committed the
    record; round 46 made the load-bearing check per-shared-residue **classification agreement** (rotamer
-   1.0000/41, Ramachandran 1.0000 on 40 + 0.9976 on 15C8), demoting the denominator-sensitive raw-%
-   bands to diagnostics. Mark resolved (registry 16 → 17 backed, 4 → 3 marked).
+   OUTLIER-verdict and Ramachandran verdict both 1.0000/41; stricter rotamer-name agreement 0.9919 on
+   15C8, three insertion-code residues, all Favored), demoting the denominator-sensitive raw-% bands to
+   diagnostics. Mark resolved (registry 16 → 17 backed, 4 → 3 marked).
 5. **#5 H-placement** — the remaining clean REMEASURE (a `bench_t05_clashscore_h` re-run on a committed
    set); **the one un-blocked resolvable mark left.**
 6. **#6** — retain; revisit only alongside a fresh EM round.

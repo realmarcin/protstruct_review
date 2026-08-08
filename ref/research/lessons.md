@@ -374,10 +374,13 @@ agreement band fired on altloc entries because `phenix` and the wwPDB report eva
 agreed. The three tempting fixes were all wrong: widening the band (option c) would loosen the check
 globally to swallow an artefact; documenting exceptions (option b) leaves the spurious fires in place. The
 right fix was to make the check measure the thing we actually care about — **per-shared-residue
-classification agreement** — which is robust to the denominator by construction. It holds 1.0000 for
-rotamer on all 41 entries and 1.0000 for Ramachandran on 40, dropping to 0.9976 on exactly one residue
-(15C8's boundary glycine, Favored↔Allowed) — a genuine, named, single-residue difference, which is
-precisely what the check *should* surface while the altloc denominator noise it *shouldn't* now vanishes.
+classification agreement** — which is robust to the denominator by construction. The rotamer OUTLIER
+verdict agrees on all 41 and the Ramachandran verdict on all 41; the only sub-1.0 is the stricter
+rotamer-*name* agreement on 15C8 (0.9919 — three insertion-code residues assigned different names but all
+Favored), a genuine, named, per-residue nuance, which is precisely what the check *should* surface while
+the altloc denominator noise it *shouldn't* now vanishes. (An earlier cut of this measure keyed residues
+without the insertion code and reported a spurious 15C8 Ramachandran disagreement; adversarial review
+caught it — a reminder that a residue is `(chain, resnum, icode, altloc)`, not `(chain, resnum)`.)
 The general lesson: a tolerance is a proxy for a question, and when the proxy and the question diverge
 (here, "agree on the percentage" vs "agree on the classification"), fix the proxy, don't re-tune its
 threshold. Retuning a mis-specified band buys a number that passes; re-specifying the check buys the
