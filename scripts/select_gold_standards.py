@@ -18,6 +18,12 @@ criteria. Two of the plan's requirements are not searchable at all and are
 deliberately deferred: residue-level masking (phase 1) and the empirical headroom
 screen (phase 2). A count here is an upper bound on the enrollable pool.
 
+One asymmetry to keep in mind when reading the counts (#301): an RCSB range query
+on a missing field simply does not match, so each tier also excludes every entry
+that does not REPORT the cut's field — at strict, an entry with no header R-free is
+out regardless of its actual quality. Conservative in the right direction for a
+feasibility bound, but it is an exclusion, not a quality verdict.
+
 WHAT WAS VERIFIED LIVE (2026-08-08)
 -----------------------------------
 - `pdbx_vrpt_summary_geometry.clashscore`, `.percent_ramachandran_outliers`,
@@ -282,22 +288,31 @@ def main() -> int:
         mid = f"{windows[len(windows) // 2]:.1f}"
         pool = report["windows"][mid]["strict"]["ids"]
         sample = spread_sample(pool, args.xml_sample)
-        # Canary before the rest: one entry, parsed, non-empty — or say so and stop.
-        first = xml_percentiles(sample[0]) if sample else {}
-        if sample and not any(v is not None for v in first.values()):
-            print(f"  ! percentile canary {sample[0]} returned nothing; "
-                  f"skipping the sample rather than fetching {len(sample)} blanks",
+        if not sample:
+            # An empty strict pool is an answer, not an error (#301) — record the
+            # skip instead of indexing into nothing.
+            print(f"  ! no strict survivors at <= {mid} A; percentile sample skipped",
                   file=sys.stderr)
             report["percentile_sample"] = {"window": mid, "sampled": [],
-                                           "sample_of": len(pool),
-                                           "failed_canary": sample[0]}
+                                           "sample_of": 0}
         else:
-            rows = [{"pdb_id": sample[0], **first}]
-            rows += [{"pdb_id": p, **xml_percentiles(p)} for p in sample[1:]]
-            report["percentile_sample"] = {"window": mid, "sampled": rows,
-                                           "sample_of": len(pool)}
-            print(f"  percentiles sampled for {len(rows)} of {len(pool)} "
-                  f"strict survivors at <= {mid} A", file=sys.stderr)
+            # Canary before the rest: one entry, parsed, non-empty — or say so and
+            # stop rather than fetching a page of blanks.
+            first = xml_percentiles(sample[0])
+            if not any(v is not None for v in first.values()):
+                print(f"  ! percentile canary {sample[0]} returned nothing; "
+                      f"skipping the sample rather than fetching {len(sample)} blanks",
+                      file=sys.stderr)
+                report["percentile_sample"] = {"window": mid, "sampled": [],
+                                               "sample_of": len(pool),
+                                               "failed_canary": sample[0]}
+            else:
+                rows = [{"pdb_id": sample[0], **first}]
+                rows += [{"pdb_id": p, **xml_percentiles(p)} for p in sample[1:]]
+                report["percentile_sample"] = {"window": mid, "sampled": rows,
+                                               "sample_of": len(pool)}
+                print(f"  percentiles sampled for {len(rows)} of {len(pool)} "
+                      f"strict survivors at <= {mid} A", file=sys.stderr)
 
     if args.json_out:
         Path(args.json_out).write_text(json.dumps(report, indent=2) + "\n")

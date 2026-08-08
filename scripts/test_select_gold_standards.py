@@ -141,5 +141,7 @@ check("spread sample is not the head of the pool",
 check("want >= pool returns the whole pool",
       sg.spread_sample(pool[:3], 10), pool[:3])
 check("want 0 returns nothing", sg.spread_sample(pool, 0), [])
+check("an empty pool samples to nothing, not a crash (#301)",
+      sg.spread_sample([], 12), [])
 
 print(f"\n{PASSED} checks passed")

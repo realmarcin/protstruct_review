@@ -39,6 +39,11 @@ entity; **geom** = + clashscore ≤ 2 + zero Ramachandran outliers; **strict** =
 group for (typically short sequences); they are additional diversity of unknown
 degree, reported rather than folded into either column.
 
+A range cut also excludes every entry that does not *report* the cut's field (an
+RCSB range query on a missing field simply does not match) — at strict, an entry
+with no header R-free is out regardless of its actual quality (#301). The counts
+are conservative in that direction.
+
 ## Verification
 
 - **Spot-checks (#238 discipline):** 10 strict survivors per window re-verified
