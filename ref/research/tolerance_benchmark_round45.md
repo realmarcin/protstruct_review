@@ -24,11 +24,20 @@ verdicts. 12CI is nucleic acid (no protein Ramachandran/rotamer), so the geometr
 
 ## #3 favored — resolved
 
-The Ramachandran favored ± 0.2 pp band holds on the named 41-entry set: median \|Δ\| **0.000**, and the
-band is median-based (favored % is never degenerate, so all 41 are informative). The two entries over
-0.2 pp — 1ZY2 (0.36) and 4NJD (0.28) — are the pre-registered weak direction, not band failures. The
-favored row's `⚠ partial record` mark is **resolved**: the set is named and committed, and the per-entry
-values are written down. Registry **15 → 16 fully backed, 5 → 4 marked**.
+The Ramachandran favored comparison on the named 41-entry set: median \|Δ\| **0.000**, p90 0.06. The
+favored row's `⚠ partial record` mark is **resolved** — the set is named and committed and the per-entry
+values are written down (registry **15 → 16 fully backed, 5 → 4 marked**), because the round-45
+pre-registration judged this row on the **median** (P1, held) and pre-declared single-entry
+max-exceedance **non-falsifying** (P2).
+
+**Honesty note — the favored band shows the same denominator-sensitivity as rotamer.** Two entries
+exceed the ± 0.2 pp band: 1ZY2 (0.36, an old low-completeness entry) and 4NJD (0.28). This is the *same*
+effect as the rotamer breach below — `phenix` and the report evaluating slightly different residue sets —
+just smaller. It is "not a band failure" here **only because the pre-registration scored favored on the
+median while scoring rotamer on the max**; the two exceedances are not qualitatively different from
+14ZZ/2YOL. So the favored band's per-entry denominator-sensitivity is **folded into #284** alongside
+rotamer's; what round 45 settles for this row is the *record* (named, committed), not that the raw-%
+band holds on every entry.
 
 ## #4 outlier — Ramachandran reproduces; rotamer surfaces a real band question, so the mark stays
 

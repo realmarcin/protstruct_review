@@ -353,10 +353,14 @@ check found the script had been comparing `phenix.rotalyze` against the wrong ww
 per-residue `rota=OUTLIER` verdicts, which `rotalyze` reproduces exactly (#281). **A dramatic result
 owes an adversarial check first; here it was the oracle, not the tool under test, that was miscalibrated
 — and a shared oracle's bug had been latent for many rounds.** Fixed and tested (#282), then re-run.
-Second, even on the corrected instrument the favored row re-based cleanly (median |Δ| 0.000, mark
-resolved) but the rotamer-outlier row did not: two **altloc** entries (14ZZ 1.52 pp, 2YOL 0.57 pp) breach
-the ±0.5 pp band because wwPDB evaluates altloc sidechains `rotalyze` does not — a *denominator*
-difference, not a classification one, since every shared residue's rotamer name agrees exactly. So
+Second, even on the corrected instrument the record re-based for both rows (named, committed) but the
+raw-% *bands* did not cleanly hold: two **altloc** entries (14ZZ 1.52 pp, 2YOL 0.57 pp) breach the
+rotamer ±0.5 pp band because wwPDB evaluates altloc sidechains `rotalyze` does not — a *denominator*
+difference, not a classification one, since every shared residue's rotamer name agrees exactly. The
+favored ±0.2 pp band shows the *same* effect more mildly (1ZY2 0.36, 4NJD 0.28); it counts as "resolved"
+only because the pre-registration scored favored on the median and rotamer on the max — a reminder that a
+pass/fail can hinge on the statistic you registered, so register it deliberately (both are folded into
+#284). So
 **re-measuring can resolve the record (name the set, commit the per-entry values) and still fail the
 band** — the two are separate claims. The record half was done; the band question (#284) was not, so the
 mark stayed. Resolving a partial record is necessary but not sufficient: a named, committed basis on
