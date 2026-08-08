@@ -263,7 +263,7 @@ def main() -> int:
             n = count_entries(max_res, tier)
             clusters = cluster_stats(max_res, tier, args.identity)
             cells[tier] = {"entries": n, **clusters}
-            print(f"  <= {max_res:.1f} A  {tier:<7} {n:>6} entries  "
+            print(f"  <= {max_res} A  {tier:<7} {n:>6} entries  "
                   f"{clusters['clusters']:>5} clusters "
                   f"(+{clusters['unclustered_entities']} unclustered entities)",
                   file=sys.stderr)
@@ -280,12 +280,14 @@ def main() -> int:
             if problem:
                 print(f"  ! {pdb_id}: {problem}", file=sys.stderr)
         cells["strict"]["spot_checks"] = checks
-        report["windows"][f"{max_res:.1f}"] = cells
+        # str(float), not a fixed-decimal format: f"{0.95:.1f}" and f"{0.9:.1f}" are
+        # both "0.9", and the second window would silently overwrite the first (#303).
+        report["windows"][str(max_res)] = cells
 
     # Percentile ranks for a SAMPLE of the middle window's strict survivors. A full
     # harvest is deliberately out of scope: the ranks live only in per-entry XML.
     if args.xml_sample:
-        mid = f"{windows[len(windows) // 2]:.1f}"
+        mid = str(windows[len(windows) // 2])
         pool = report["windows"][mid]["strict"]["ids"]
         sample = spread_sample(pool, args.xml_sample)
         if not sample:
