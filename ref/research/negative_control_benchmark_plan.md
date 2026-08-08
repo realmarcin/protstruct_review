@@ -1,8 +1,9 @@
 # Plan: gold-standard negative-control benchmark for refinement methods
 
 **Status: plan — nothing below has been measured.** This document records the design and
-its evidence base so the phases can be preregistered and executed in later rounds. The
-tracking issue carries the phase checklist.
+its evidence base so the phases can be preregistered and executed in later rounds.
+Tracking issue: [#295](https://github.com/realmarcin/protstruct_review/issues/295)
+(phase checklist and dependencies).
 
 ## The idea
 
@@ -63,7 +64,9 @@ load-bearing *refutations* are listed too, because the design depends on them.
 
 1. Altconfs: Top2018 excludes all alternate-conformation residues (24% of residue-level
    removals) rather than adjudicating them. Deposited models underrepresent
-   heterogeneity (qFit: 2.9% of deposited residues multiconformer vs 40.7% rebuilt).
+   heterogeneity: 2.9% of deposited residues multiconformer vs 40.7% after qFit
+   rebuilding (Wankowicz et al., eLife 2024,
+   [doi:10.7554/eLife.90606](https://elifesciences.org/articles/90606)).
 2. Lattice contacts: CASP14 residual AF2 "errors" concentrated at crystal-lattice
    contacts; assessors: the reference "may simply reflect … non-natural conformations at
    these points."
@@ -124,7 +127,9 @@ perturb-then-recover positive leg (phase 4).
 4. **Protected genuine outliers** — residues that are MolProbity outliers *in the
    deposited gold standard* (per-residue verdicts from validation XML). NOT masked —
    inverted: a method that removes a protected outlier scores a degradation hit even
-   though the geometry score improved.
+   though the geometry score improved. Protection is applied **after** masks 1–3: a
+   deposited outlier that is also an RSRZ/high-B residue is masked, not protected, so
+   every protected outlier is density-supported by construction.
 
 Scoring happens on unmasked residues only. Mask fraction reported per entry (no silent
 caps — a 40%-masked entry says so).
