@@ -133,12 +133,18 @@ caps — a 40%-masked entry says so).
 
 Because the atomic-resolution-headroom claim was refuted, every candidate is screened:
 
-- Reuse the `bench_refinement_deltas.py` refine→re-measure loop: `phenix.refine` against
-  own deposited data; R-free re-derived by `phenix.model_vs_data` AND the non-cctbx
-  `gemmi_rfactor.py` path.
-- Enroll only entries where both code paths agree the gain is within the known
-  scaling-gap band (~0.01–0.015 R-units). Entries with real headroom are
-  PDB_REDO-improvable, not gold standards — dropped with recorded reason.
+- Extend the `bench_refinement_deltas.py` refine→re-measure loop (which reads R from
+  `phenix.refine` itself): `phenix.refine` against own deposited data, with R-free
+  re-derived by `phenix.model_vs_data` AND a non-cctbx gemmi path. The latter needs
+  promoting first — the only `gemmi_rfactor.py` today is an eval artifact under
+  `data/coscientists/openscientist/`, not harness plumbing (#296).
+- Enroll only entries where both code paths agree there is no headroom. The enrollment
+  tolerance is set at phase-2 preregistration from the null-case spread on the
+  candidates themselves — the same move rounds 7–42 used for the §4 bands — NOT
+  borrowed from the ~0.01–0.015 cross-code-path scaling gap, which is a
+  same-model/two-derivations quantity and is tracked separately as measurement
+  uncertainty (#297). Entries with real headroom are PDB_REDO-improvable, not gold
+  standards — dropped with recorded reason.
 - 🐤 Canary: one entry end-to-end (fetch → mask → refine → both oracles → non-empty JSON
   on disk) before fanning out.
 
@@ -150,7 +156,7 @@ Three metric families, each cross-tool:
 
 | Family | Primary | Independent confirmation |
 |---|---|---|
-| Data fit | `phenix.model_vs_data` R-free/R-work | `gemmi_rfactor.py`; DCC value from validation XML as tiebreaker |
+| Data fit | `phenix.model_vs_data` R-free/R-work | gemmi R-factor path (#296); DCC value from validation XML as tiebreaker |
 | Geometry | standalone MolProbity (non-cctbx) | `phenix.holton_geometry_validation` (cctbx); shared Top8000 ancestry noted in `notes:` |
 | Distance-to-start | raw Cα shift over matched pairs, no re-superposition (§4 convention) | TM-score + lDDT mandatory pair for any reported comparison |
 
