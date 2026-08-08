@@ -25,7 +25,7 @@ Every figure below was checked against the committed data before classifying.
 | 2 | **L-test** ⟨\|L\|⟩ | only 5 of 27 datasets named; set uncommitted | **RETAIN** (was REPLACE; verified — see below) | already stated |
 | 3 | Ramachandran/rotamer **favored %** | aggregate median/p90/max sound, but no per-entry value recorded | REMEASURE — **DONE (round 45)** | resolved |
 | 4 | Ramachandran/rotamer **outlier %** | only the nonzero entries named; input set uncommitted | REMEASURE — **DONE (round 45 record + round 46 band, #284 closed)** | resolved |
-| 5 | **H-placement** agreement | "worst 16.4 %" from an uncommitted 17-model set; 0 % members unnamed | REMEASURE | small round |
+| 5 | **H-placement** agreement | "worst 16.4 %" from an uncommitted 17-model set; 0 % members unnamed | REMEASURE — **record done (round 47); raw band breached, mark stays, confident-conflict fix #287 (round 48)** | partial |
 | 6 | Map-model fit (EM **CC_mask + d_FSC_model**) | publishes its uncertainty as a *range* (17–22) rather than a point | **RETAIN** | already honest |
 
 ## Detail and evidence

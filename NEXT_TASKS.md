@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Forty-six rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Forty-seven rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -76,12 +76,13 @@ floors row.
 | 44 | (2026-08-07) | **P3b triage item #1** — re-based the geometry row's last partial figures (clashscore 4.26× null ratio, 17.2 starting) onto the **44 fresh named entries**: max null ratio **4.25×** (37 gate-valid, none ≥ 5×; the figure that set the gate reproduces on named data) and starting clashscore reaches **38.70** (the lost "not reproducible 17.2" exceeded). **No band value changed**; the geometry row **resolves** — 14→**15 backed**, 6→**5 marked**. Five partial rows remain (triage: 3 remeasure, 1 cite round 21, 1 retain) |
 | 45 | (2026-08-07) | **P3b items #3 + #4** — re-based the vs-deposited geometry-% rows on the **42 named entries** (`round45_ids.json`). The run first uncovered an **oracle bug** (#281/#282: rotamer outlier % was read from `key_validation_stats`' `protein_sidechains`, a broader metric inconsistent with the report's per-residue `rota=OUTLIER` verdicts — fixed, tested). On the corrected instrument: **#3 favored resolves** (median \|Δ\| **0.000**, band holds — 15→**16 backed**), **#4 outlier half-resolves** — Ramachandran ≤ 0.11 pp, rotamer exact on **39/41**, but **14ZZ (1.52 pp)** and 2YOL (0.57) breach ±0.5 for an **altloc denominator** reason (rotamer names agree exactly). Per the decision rule a breached band is a finding, not a widen — #4's mark **stays** (#284); historical rotamer "0.34 pp" superseded. **5→4 marked** |
 | 46 | (2026-08-07) | **#284 closed** — settled the vs-deposited band question round 45 opened. The raw favored-/rotamer-% bands are denominator-sensitive under altloc/completeness, so the **load-bearing check is now per-shared-residue classification agreement** (do the pipelines assign the same verdict to residues they both evaluate?), robust to the denominator difference; raw-% `\|Δ\|` demoted to reported diagnostics. Rotamer OUTLIER-verdict agreement **1.0000 on all 41** and Ramachandran verdict agreement (new `ramachandran_agreement`, tested, keyed with insertion code) **1.0000 on all 41**; the stricter rotamer-*name* agreement is 0.9919 on 15C8 (three insertion-code residues, different names, all Favored — named). **#4 outlier row resolves** — 16→**17 backed**, 4→**3 marked** |
+| 47 | (2026-08-07) | **P3b item #5** — re-based the H-placement flip-set figure (`reduce` vs `mmtbx.reduce2`) on the fresh named 42-set (`round45_ids.json`), **not** the lost 17 (round 22: a subset re-run would mislead). Record committed. **P1 falsified**: the raw flip-disagreement rate is **10.95 %** (340/3105), above the ≤ 10 % band (worst 1TIJ 40 %, 25/41 models over 10 %). But **P3 confirmed** — **82 %** of disagreements (279/340) are residues `reduce` itself flagged **uncertain (X)**; the **genuine confident-conflict rate is 1.80 %**. Per the decision rule a breached band is a finding, not a widen — **mark stays**; the check is being switched to the confident-conflict rate (**#287**, approved), which round 48 applies. **No count change** (17 backed / 3 marked) |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — forty-six rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — forty-seven rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -215,9 +216,12 @@ detail lives in `ref/research/tolerance_benchmark_round40.md` and the memo #258.
   per-entry values) yet surface that the **band itself** fails on named data — the rotamer ±0.5 pp check
   is denominator-sensitive under altlocs. Round 46 then showed the *fifth*: when the raw band is the
   wrong instrument, **change what the check measures** — per-shared-residue classification agreement is
-  robust to the denominator and resolved #4 (#284 closed). The remaining three: #2 L-test and #6 EM
-  map-model are RETAIN; #5 H-placement is the one clean REMEASURE left. Ask what the lost members
-  contributed before trying to re-measure.
+  robust to the denominator and resolved #4 (#284 closed). Round 47 hit that same shape on #5: the
+  flip-set re-measure committed the record but the **raw** ≤ 10 % band breached at 10.95 % — 82 % of it
+  one builder's own uncertain (X) calls, genuine confident-conflict only 1.80 % — so the check is being
+  switched to the confident-conflict rate (#287, round 48). The remaining three marks: #2 L-test and #6
+  EM map-model are RETAIN; #5 H-placement is record-done and band-blocked pending round 48. Ask what the
+  lost members contributed before trying to re-measure.
 - **The §4 X-ray band widths no longer rest on lost entries** (was a standing risk through round 41).
   Round 42 re-based both `d_min ≥ 2.5 Å` widths onto coverage bounds over the 44 fresh named entries
   (rounds 37/38/41), so the widths are now fully-backed, re-runnable figures. The two lost maxima
