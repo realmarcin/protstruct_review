@@ -33,6 +33,7 @@ maxims.
 | Re-measuring can resolve the record yet fail the band — and the instrument may be the bug | 45 |
 | When the band is the wrong instrument, change what the check measures | 46 |
 | A raw disagreement rate can count one builder's own hedging as conflict | 47 |
+| Resolvable partial records exhausted; what remains is RETAIN by nature | 48 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -399,7 +400,13 @@ this split (P3), so the fix (count confident conflicts, not raw disagreements) i
 direction, not a post-hoc rescue — but it is still a *new* measure, so it is a follow-up round (48),
 never a silent switch inside the round whose rule the raw rate just failed. The discipline: when the data
 falsifies the registered prediction, honour it — the mark stays — and let the better measure be its own
-pre-registered round, not a goalpost you move after seeing the score.
+pre-registered round, not a goalpost you move after seeing the score. Round 48 applied that measure
+(confident-conflict rate 1.80 %, well under the band) and resolved the row, which retired the **last
+resolvable partial record**: the two marks that remain (the L-test and the EM map-model row) are RETAIN
+by nature — honest, disclosed limits that no re-measurement can erase — so the partial-record programme
+that ran from round 17's audit through the round-42/44/45/46/47/48 re-basings has reached the point where
+what is left is *supposed* to stay marked. Knowing when a cleanup is finished is itself a result: the
+remaining marks are not a backlog, they are the honest residue.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its

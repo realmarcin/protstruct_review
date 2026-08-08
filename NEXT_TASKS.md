@@ -11,7 +11,7 @@ repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a mer
 
 ## Where the tolerance work stands
 
-Forty-seven rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
+Forty-eight rounds of benchmarking have replaced inferred magnitudes with measured ones. Round 6 found
 that **two of three "blockers" were wrong** — both mis-invocations rather than limits of a tool.
 Round 7 then found that **two bands set in rounds 5 and 6 were themselves wrong**, fitted to a narrow
 resolution range and breached by null re-refinement once low-resolution entries were included.
@@ -19,7 +19,7 @@ resolution range and breached by null re-refinement once low-resolution entries 
 **Where the registry stands.** Round 17 audited every `[benchmark]` row and found **7 quote a figure
 from a set that can no longer be reconstructed**; they are marked `⚠ partial record`. Round 18 fixed
 the cause — **every `bench_*.py` now commits the set it ran on**, and `scripts/validate.sh` fails if
-one does not. **17 rows are fully backed** (rounds 42 and 44 re-based every §4 `d_min ≥ 2.5 Å` X-ray figure — both band widths and the geometry row's clashscore null ratio / starting ceiling — off their lost sets onto the 44 named entries, fully backing the ΔRMSD and geometry rows; rounds 45–46 backed both vs-deposited geometry-% rows on the 42 named entries — **favored %** on named data, and **outlier %** by making the check per-shared-residue classification agreement rather than the denominator-sensitive raw % (#284)).
+one does not. **18 rows are fully backed** (rounds 42 and 44 re-based every §4 `d_min ≥ 2.5 Å` X-ray figure — both band widths and the geometry row's clashscore null ratio / starting ceiling — off their lost sets onto the 44 named entries, fully backing the ΔRMSD and geometry rows; rounds 45–46 backed both vs-deposited geometry-% rows on the 42 named entries — **favored %** on named data, and **outlier %** by making the check per-shared-residue classification agreement rather than the denominator-sensitive raw % (#284); rounds 47–48 backed the **H-placement flip-set** row on the named set with the check made the confident-conflict rate rather than the raw disagreement rate inflated by one builder's uncertainty (#287) — the two remaining marks are both RETAIN, so every *resolvable* partial record is resolved).
 
 **The counts, reconciled (round 18) — there are two different 21s and both are right.** §3 and §4
 hold **21 rows**, of which **20 carry `[benchmark]`**; the exception is §4's *absolute geometry
@@ -77,12 +77,13 @@ floors row.
 | 45 | (2026-08-07) | **P3b items #3 + #4** — re-based the vs-deposited geometry-% rows on the **42 named entries** (`round45_ids.json`). The run first uncovered an **oracle bug** (#281/#282: rotamer outlier % was read from `key_validation_stats`' `protein_sidechains`, a broader metric inconsistent with the report's per-residue `rota=OUTLIER` verdicts — fixed, tested). On the corrected instrument: **#3 favored resolves** (median \|Δ\| **0.000**, band holds — 15→**16 backed**), **#4 outlier half-resolves** — Ramachandran ≤ 0.11 pp, rotamer exact on **39/41**, but **14ZZ (1.52 pp)** and 2YOL (0.57) breach ±0.5 for an **altloc denominator** reason (rotamer names agree exactly). Per the decision rule a breached band is a finding, not a widen — #4's mark **stays** (#284); historical rotamer "0.34 pp" superseded. **5→4 marked** |
 | 46 | (2026-08-07) | **#284 closed** — settled the vs-deposited band question round 45 opened. The raw favored-/rotamer-% bands are denominator-sensitive under altloc/completeness, so the **load-bearing check is now per-shared-residue classification agreement** (do the pipelines assign the same verdict to residues they both evaluate?), robust to the denominator difference; raw-% `\|Δ\|` demoted to reported diagnostics. Rotamer OUTLIER-verdict agreement **1.0000 on all 41** and Ramachandran verdict agreement (new `ramachandran_agreement`, tested, keyed with insertion code) **1.0000 on all 41**; the stricter rotamer-*name* agreement is 0.9919 on 15C8 (three insertion-code residues, different names, all Favored — named). **#4 outlier row resolves** — 16→**17 backed**, 4→**3 marked** |
 | 47 | (2026-08-07) | **P3b item #5** — re-based the H-placement flip-set figure (`reduce` vs `mmtbx.reduce2`) on the fresh named 42-set (`round45_ids.json`), **not** the lost 17 (round 22: a subset re-run would mislead). Record committed. **P1 falsified**: the raw flip-disagreement rate is **10.95 %** (340/3105), above the ≤ 10 % band (worst 1TIJ 40 %, 25/41 models over 10 %). But **P3 confirmed** — **82 %** of disagreements (279/340) are residues `reduce` itself flagged **uncertain (X)**; the **genuine confident-conflict rate is 1.80 %**. Per the decision rule a breached band is a finding, not a widen — **mark stays**; the check is being switched to the confident-conflict rate (**#287**, approved), which round 48 applies. **No count change** (17 backed / 3 marked) |
+| 48 | (2026-08-07) | **#287 closed** — made the flip-set check the **confident-conflict rate** (`reduce` confident F/K but `reduce2` disagrees; category X/C is one builder hedging, not conflict), raw rate demoted to diagnostic. **56/3105 = 1.80 %** on the named set, well under ≤ 10 % (band unchanged); four small-n models named over 10 % (1TIJ 20 %, …). Same shape as 45→46. **#5 H-placement resolves** — 17→**18 backed**, 3→**2 marked**; the two remaining marks (L-test, EM map-model) are both **RETAIN**, so **every resolvable partial record is now resolved**. `confident_conflicts()` tested |
 
 Per-tolerance detail lives in the audit trails under `ref/research/tolerance_benchmark_*.md` and in
 the re-runnable `scripts/bench_*.py`. It is deliberately **not** duplicated here — a backlog that
 accumulates a changelog stops being readable as a backlog.
 
-**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — forty-seven rounds of
+**Lessons live in [`ref/research/lessons.md`](ref/research/lessons.md)** — forty-eight rounds of
 rules about how these tolerances fail, extracted so this file stays readable as a backlog (#65).
 Record new ones there. The operative few, for anyone about to add a tolerance or widen a band:
 
@@ -204,9 +205,11 @@ detail lives in `ref/research/tolerance_benchmark_round40.md` and the memo #258.
 
 ### Standing risk, not tasks
 
-- **Three rows carry `⚠ partial record`** (rounds 42/44 resolved the ΔRMSD and geometry rows; rounds
-  45–46 resolved both vs-deposited geometry-% rows — favored on named data, outlier by making the check
-  classification agreement, #284). Round 21 showed one route
+- **Two rows carry `⚠ partial record`, both RETAIN by nature** (rounds 42/44 resolved the ΔRMSD and
+  geometry rows; rounds 45–46 resolved both vs-deposited geometry-% rows, #284; rounds 47–48 resolved the
+  H-placement flip-set row, #287). The two that remain — #2 L-test and #6 EM map-model — are RETAIN
+  (honest disclosed limits, not resolvable by re-measurement), so **every *resolvable* partial record is
+  now resolved.** Round 21 showed one route
   out (re-measure on a committed subset) and round 22 showed its limit: **it works only when the lost
   members were unremarkable.** For the flip-set row it is established *not* to work — the five missing
   models are the zero-disagreement ones, so a 12-model re-run would report a higher rate than the
@@ -220,8 +223,9 @@ detail lives in `ref/research/tolerance_benchmark_round40.md` and the memo #258.
   flip-set re-measure committed the record but the **raw** ≤ 10 % band breached at 10.95 % — 82 % of it
   one builder's own uncertain (X) calls, genuine confident-conflict only 1.80 % — so the check is being
   switched to the confident-conflict rate (#287, round 48). The remaining three marks: #2 L-test and #6
-  EM map-model are RETAIN; #5 H-placement is record-done and band-blocked pending round 48. Ask what the
-  lost members contributed before trying to re-measure.
+  EM map-model are RETAIN; #5 H-placement was resolved in round 48 (confident-conflict measure, #287).
+  **Every *resolvable* partial record is now resolved; the two that remain are RETAIN by nature.** Ask
+  what the lost members contributed before trying to re-measure.
 - **The §4 X-ray band widths no longer rest on lost entries** (was a standing risk through round 41).
   Round 42 re-based both `d_min ≥ 2.5 Å` widths onto coverage bounds over the 44 fresh named entries
   (rounds 37/38/41), so the widths are now fully-backed, re-runnable figures. The two lost maxima
