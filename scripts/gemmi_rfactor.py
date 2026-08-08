@@ -17,6 +17,13 @@ rescale, no anisotropic correction, linear reflection-count bins. Expect R-work
 0.005-0.015 HIGHER than PHENIX on identical data — the price of an independent code
 path, and the reason its numbers must never be averaged with PHENIX's.
 
+One more assumption, inherited deliberately (#304): the per-bin scales are fit on
+ALL matched reflections, free set included — mild test-set leakage that can make
+R-free marginally optimistic versus a work-only fit. The original used the same
+fit, and so did the recorded 1SAR cross-tool gap (0.013), so changing it here would
+silently invalidate that band. A work-only fit is a possible future tightening that
+must re-measure the 1SAR band in the same change.
+
 WHAT THE PROMOTION FIXED (vs data/coscientists/openscientist/gemmi_rfactor.py)
 ------------------------------------------------------------------------------
 The eval-artifact original hardcoded `free = (flag != 0)`. That is correct for a
