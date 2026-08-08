@@ -376,11 +376,12 @@ check("a rotator is not a flip", ("A", 4, "LYS") in calls, False)
 
 SUBGROUP = ('<ModelledSubgroup rota="mmm" model="1" chain="A" resnum="1" resname="MET"/>'
             '<ModelledSubgroup rscc="0.9" model="1" chain="A" resnum="2" resname="GLY"/>')
+# Keys carry the insertion code (empty here); a residue is (chain, resnum, icode, resname) (#284 review).
 check("report rotamer assignment keyed by residue",
-      dep.report_rotamers(SUBGROUP), {("A", 1, "MET"): "mmm"})
+      dep.report_rotamers(SUBGROUP), {("A", 1, "", "MET"): "mmm"})
 check("rotalyze per-residue line parsed",
       dep.local_rotamers(" A   1  MET:1.00:79.0:306.4:300.1:284.6::Favored:mmm"),
-      {("A", 1, "MET"): ("mmm", "Favored")})
+      {("A", 1, "", "MET"): ("mmm", "Favored")})
 check("agreement computed over shared residues only",
       dep.rotamer_agreement(SUBGROUP, " A   1  MET:1.00:79.0::::Favored:mmm")["rotamer_agreement"],
       1.0)

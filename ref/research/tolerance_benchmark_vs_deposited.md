@@ -48,6 +48,15 @@ completeness are available for the 9 that also have a `model_vs_data` run.
 > exactly). The **rotamer "max 0.34 pp" below is superseded** by that named measurement; the ±0.5 band's
 > semantics are open in **#284**. See `tolerance_benchmark_round45.md`. The favored, R-free, and
 > completeness rows are unaffected (favored was always counted from the XML; see Finding 1b).
+>
+> **Round 46 update (#284 closed).** The band question is settled: the load-bearing vs-deposited
+> geometry-% check is now **per-shared-residue classification agreement** — do the pipelines assign the
+> same verdict to residues they both evaluate? — robust to the altloc/completeness denominator
+> difference. Rotamer OUTLIER-verdict agreement is **1.0000 on all 41** and Ramachandran verdict
+> agreement (added in round 46, keyed with the insertion code) is **1.0000 on all 41**; the stricter
+> exact rotamer-*name* agreement is 1.0000 on 40 and 0.9919 on 15C8 (three insertion-code residues,
+> different names, all Favored — named). The raw-% `|Δ|` rows below are **retained as reported
+> diagnostics**, not gates. See `tolerance_benchmark_round46.md`.
 
 | Tolerance | n | median \|Δ\| | p90 | max | current band |
 |---|---:|---:|---:|---:|---|
