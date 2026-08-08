@@ -60,8 +60,8 @@ completeness are available for the 9 that also have a `model_vs_data` run.
 
 | Tolerance | n | median \|Δ\| | p90 | max | current band |
 |---|---:|---:|---:|---:|---|
-| Ramachandran outlier % | 17 | **0.00 pp** | 0.00 | **0.00 pp** *(→ ≤0.11 pp, round 45 named 41)* | ± 0.5 pp |
-| Rotamer outlier % | 17 | 0.00 pp | 0.00 | **0.34 pp** *(superseded → 1.52 pp, round 45; #284)* | ± 0.5 pp |
+| Ramachandran outlier % | 17 | **0.00 pp** | 0.00 | **0.00 pp** *(round-17 measurement; superseded — the round-46 check is per-shared-residue verdict agreement, 1.0000/41, #284 closed)* | ± 0.5 pp |
+| Rotamer outlier % | 17 | 0.00 pp | 0.00 | **0.34 pp** *(round-17 measurement; superseded — round-46 check is verdict agreement 1.0000/41; raw-% is a diagnostic, #284 closed)* | ± 0.5 pp |
 | R-free vs **deposited** | 9 | 0.0020 | 0.0097 | **0.0128** | ≤ 0.02 |
 | R-free vs **wwPDB-recomputed** | 9 | **0.0000** | 0.0033 | 0.0067 | — |
 | Completeness | 9 | 0.05 pp | 0.10 | **0.11 pp** | ± 1 pp |
