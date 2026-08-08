@@ -11,9 +11,17 @@ coverage/confidence, over the 44 fresh NAMED entries from rounds 37 + 38 + 41 (r
 pre-registration; #269), so the widths rest on committed data rather than a lost number.
 
 Method, per the round-42 pre-registration:
-  - Ca-shift RMSD is positive and right-skewed; log(Ca-shift) passes Shapiro-Wilk normality
-    (W=0.960, p=0.129) while raw does not (p=0.037), so a LOGNORMAL one-sided upper
-    tolerance limit is used: exp(mean_log + k * sd_log), k = Natrella one-sided factor.
+  - Ca-shift RMSD is positive and right-skewed, so a LOGNORMAL one-sided upper tolerance
+    limit is used: exp(mean_log + k * sd_log), k = Natrella one-sided factor. The lognormal
+    assumption is **guarded, not asserted** (P3c): every run recomputes a Filliben PPCC
+    normality test on the current log(Ca) and raw Ca, and the band is only trusted while
+    log passes the alpha=0.05 critical value AND beats raw; otherwise the script exits
+    non-zero so the gate catches the assumption rotting as entries accrue. (The original
+    one-off check was Shapiro-Wilk W=0.960, p=0.129 for log vs p=0.037 for raw. PPCC is a
+    standard, no-scipy normality GoF; it is less powerful than Shapiro-Wilk, so on this
+    sample it rates raw Ca as borderline-passing where SW rejects it -- which is why the
+    guard also requires log to *beat* raw, capturing that the log transform is the better
+    fit, not merely that log alone clears the bar.)
   - favored DROP has no clean parametric fit (left-skewed by large favored *gains*), so its
     bound is NONPARAMETRIC: the empirical coverage of the current -6 pp band is reported and
     the band value is kept (round 39 settled it; the breach is an unrestrained artefact).
@@ -69,6 +77,51 @@ def natrella_k(n: int, p: float, conf: float) -> float:
     return (zp + math.sqrt(zp**2 - a*b)) / a
 
 
+def filliben_ppcc(values: list[float]) -> float:
+    """Filliben's probability-plot correlation coefficient for normality (no scipy).
+
+    The correlation between the sorted values and the normal order-statistic medians. r
+    near 1 means the sample tracks a normal distribution; a low r rejects it. This is the
+    computed goodness-of-fit that replaces the docstring's once-asserted Shapiro-Wilk claim,
+    so the lognormal assumption behind the Ca UTL is re-checked on every run (P3c).
+    """
+    xs = sorted(values)
+    n = len(xs)
+
+    def uniform_median(i: int) -> float:  # i in 1..n; Filliben's median-rank estimates
+        if i == 1:
+            return 1 - 0.5 ** (1 / n)
+        if i == n:
+            return 0.5 ** (1 / n)
+        return (i - 0.3175) / (n + 0.365)
+
+    m = [norm_ppf(uniform_median(i)) for i in range(1, n + 1)]
+    mx, mm = statistics.mean(xs), statistics.mean(m)
+    sxx = sum((x - mx) ** 2 for x in xs)
+    smm = sum((mi - mm) ** 2 for mi in m)
+    sxm = sum((x - mx) * (mi - mm) for x, mi in zip(xs, m))
+    return sxm / math.sqrt(sxx * smm)
+
+
+# Filliben (1975) PPCC critical values at alpha = 0.05: below these, normality is rejected.
+_FILLIBEN_05 = {10: 0.9198, 20: 0.9505, 30: 0.9639, 40: 0.9715, 50: 0.9764,
+                60: 0.9799, 75: 0.9835, 100: 0.9870}
+
+
+def filliben_critical(n: int) -> float:
+    """0.05 critical value for the PPCC, linearly interpolated between tabulated n."""
+    ns = sorted(_FILLIBEN_05)
+    if n <= ns[0]:
+        return _FILLIBEN_05[ns[0]]
+    if n >= ns[-1]:
+        return _FILLIBEN_05[ns[-1]]
+    lo = max(k for k in ns if k <= n)
+    hi = min(k for k in ns if k >= n)
+    if lo == hi:
+        return _FILLIBEN_05[lo]
+    return _FILLIBEN_05[lo] + (n - lo) / (hi - lo) * (_FILLIBEN_05[hi] - _FILLIBEN_05[lo])
+
+
 def pooled(key: str) -> list[float]:
     """Values across the three fresh named X-ray sets, usable protein entries only."""
     out = []
@@ -91,7 +144,20 @@ def main() -> int:
     k = natrella_k(n, COVERAGE, CONFIDENCE)
     utl = math.exp(mu + k * sd)
     band = round(utl, 2)  # to the nearest 0.01 A (0.2514 -> 0.25)
-    print("Ca-shift RMSD (lognormal one-sided upper tolerance limit)")
+
+    # Goodness-of-fit guard (P3c): the lognormal UTL is only valid if log(Ca) is normal.
+    # Re-checked on the CURRENT data every run, so the assumption cannot silently rot as
+    # entries accrue. Requires log to pass the Filliben PPCC test AND to beat raw Ca (the
+    # reason a log transform was chosen). A failure means the band must be re-derived, not
+    # trusted -- so the script exits non-zero and the gate catches it.
+    ppcc_log, ppcc_raw = filliben_ppcc(logca), filliben_ppcc(ca)
+    crit = filliben_critical(n)
+    lognormal_ok = ppcc_log >= crit and ppcc_log > ppcc_raw
+    print("lognormal goodness-of-fit (Filliben PPCC, alpha=0.05; re-checked on each run)")
+    print(f"  PPCC log(Ca) {ppcc_log:.4f}  vs raw {ppcc_raw:.4f}  |  critical(n={n}) {crit:.4f}  ->  "
+          f"{'OK -- lognormal justified' if lognormal_ok else 'FAIL -- assumption no longer holds; re-derive the band'}")
+
+    print("\nCa-shift RMSD (lognormal one-sided upper tolerance limit)")
     print(f"  fresh max {max(ca):.4f}  |  {int(COVERAGE*100)}/{int(CONFIDENCE*100)} UTL "
           f"{utl:.4f} A (k={k:.3f})  ->  band {band:.2f} A")
     print(f"  false positives at band {band:.2f}: {sum(1 for x in ca if x > band)} of {n}")
@@ -126,7 +192,8 @@ def main() -> int:
           f"(>= 5x: {over5 or 'none'}; was 4.26x on the lost 19)")
     print(f"  starting clashscore ceiling: {max(starts):.2f} over {len(starts)} entries, "
           f"{sum(1 for s in starts if s > 20)} above pre = 20  (was 17.2 on the lost set)")
-    return 0
+    # Non-zero exit if the lognormal assumption behind the Ca band no longer holds (P3c).
+    return 0 if lognormal_ok else 1
 
 
 if __name__ == "__main__":

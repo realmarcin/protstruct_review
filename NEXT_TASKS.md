@@ -186,9 +186,14 @@ was "state as of round 27" — a menu of three candidates — has resolved into 
 ([`ref/research/codex_review_action_plan.md`](ref/research/codex_review_action_plan.md)): **P1** — the
 registry→consumer drift gate — shipped (#271); **P2** is this reconciliation; **P3** is a preregistered
 **cross-version reproducibility round** (pinned `phenix-2.0-5936` vs a newer build), a **triage of the
-remaining `⚠ partial record` rows**, and **shoring up the small-n load-bearing fits** (round 42's n = 44
-lognormal, round 40's 19 labels); **P4** is explicit stopping/consolidation criteria for the round
-cadence and its gate machinery.
+remaining `⚠ partial record` rows** (done — every resolvable one resolved), and **shoring up the small-n
+load-bearing fits**: round 42's n = 44 lognormal is now **guarded not assumed** — a Filliben PPCC
+normality test recomputed every run (`analyze_xray_band_coverage.py`) and gated by
+`test_xray_band_coverage.py`, so the lognormal assumption cannot silently rot as entries accrue (P3c);
+round 40's n = 19 determinacy correlation is a rank correlation, not a distributional fit, and is already
+mitigated by that round's leave-one-out and partial-correlation robustness checks, so it needs no GoF
+guard (growing it toward the ~300 a nonparametric bound wants remains the only further lever). **P4** is
+explicit stopping/consolidation criteria for the round cadence and its gate machinery.
 
 The one **unbounded** option that persists from the old menu: **another `scripts/` audit pass with a
 new lens** — it has found defects every time (12, then 2, then 5), the lens must differ each pass, and
