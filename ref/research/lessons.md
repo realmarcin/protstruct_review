@@ -32,6 +32,7 @@ maxims.
 | Finish resolving the row, not just the sub-figure you started with | 44 |
 | Re-measuring can resolve the record yet fail the band — and the instrument may be the bug | 45 |
 | When the band is the wrong instrument, change what the check measures | 46 |
+| A raw disagreement rate can count one builder's own hedging as conflict | 47 |
 | Measure a defect class before mechanising it | 28 |
 | A write-once document rots; a re-read one does not | 28 |
 | A guard that cannot be tested has not been checked | 27 |
@@ -385,6 +386,20 @@ The general lesson: a tolerance is a proxy for a question, and when the proxy an
 (here, "agree on the percentage" vs "agree on the classification"), fix the proxy, don't re-tune its
 threshold. Retuning a mis-specified band buys a number that passes; re-specifying the check buys the
 answer you wanted.
+
+Round 47 is the same lesson from a third angle: **a raw disagreement rate can count one builder's own
+hedging as a conflict.** Re-measuring the Asn/Gln/His flip-set agreement (`reduce` vs `reduce2`) on the
+fresh named 42-set gave a raw flip-disagreement rate of 10.95 %, over the ≤ 10 % band — a clean P1
+falsification, so per the pre-registration the mark stays. But 82 % of those "disagreements" were
+residues where `reduce` had itself written category `X` (uncertain): it declined to commit, and reduce2's
+independent call landed differently. That is not two builders conflicting about the model; it is one
+builder hedging and the other guessing. The genuine confident-conflict rate — where `reduce` is sure and
+reduce2 still disagrees — is **1.80 %**, far under the band. The pre-registration had predicted exactly
+this split (P3), so the fix (count confident conflicts, not raw disagreements) is the registered
+direction, not a post-hoc rescue — but it is still a *new* measure, so it is a follow-up round (48),
+never a silent switch inside the round whose rule the raw rate just failed. The discipline: when the data
+falsifies the registered prediction, honour it — the mark stays — and let the better measure be its own
+pre-registered round, not a goalpost you move after seeing the score.
 
 Round 29 set out to close a real gap — the registry gated 12 aggregate figures and zero per-entry
 ones, and both errors round 28 found there were per-entry — and then **did not close it, because its
