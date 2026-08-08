@@ -1,0 +1,2318 @@
+{
+  "pdb_id": "2VXN",
+  "thresholds": {
+    "rsrz": 2.0,
+    "b_tail_factor": 2.0,
+    "lattice_cutoff_a": 4.0
+  },
+  "n_residues": 257,
+  "n_masked": 101,
+  "mask_fraction": 0.393,
+  "mask_reason_counts": {
+    "rsrz_outlier": 1,
+    "high_b": 18,
+    "lattice_contact": 73,
+    "altconf": 25
+  },
+  "n_protected": 2,
+  "protected": [
+    {
+      "chain": "A",
+      "resnum": 96,
+      "icode": "",
+      "resname": "SER",
+      "reasons": [
+        "clash"
+      ]
+    },
+    {
+      "chain": "A",
+      "resnum": 206,
+      "icode": "",
+      "resname": "LEU",
+      "reasons": [
+        "clash"
+      ]
+    }
+  ],
+  "residues": [
+    {
+      "chain": "A",
+      "resnum": 2,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [
+        "rsrz_outlier",
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 3,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 4,
+      "icode": "",
+      "resname": "PRO",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 5,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 6,
+      "icode": "",
+      "resname": "PRO",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 7,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 8,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 9,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 10,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 11,
+      "icode": "",
+      "resname": "ASN",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 12,
+      "icode": "",
+      "resname": "TRP",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 13,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 14,
+      "icode": "",
+      "resname": "CYS",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 15,
+      "icode": "",
+      "resname": "ASN",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 16,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 17,
+      "icode": "",
+      "resname": "THR",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 18,
+      "icode": "",
+      "resname": "THR",
+      "masked": [
+        "altconf",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 19,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 20,
+      "icode": "",
+      "resname": "SER",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 21,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 22,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 23,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "high_b",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 24,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 25,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 26,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 27,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 28,
+      "icode": "",
+      "resname": "PHE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 29,
+      "icode": "",
+      "resname": "ASN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 30,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 31,
+      "icode": "",
+      "resname": "HIS",
+      "masked": [
+        "altconf",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 32,
+      "icode": "",
+      "resname": "THR",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 33,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 34,
+      "icode": "",
+      "resname": "SER",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 35,
+      "icode": "",
+      "resname": "HIS",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 36,
+      "icode": "",
+      "resname": "ASP",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 37,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 38,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 39,
+      "icode": "",
+      "resname": "CYS",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 40,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 41,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 42,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 43,
+      "icode": "",
+      "resname": "PRO",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 44,
+      "icode": "",
+      "resname": "THR",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 45,
+      "icode": "",
+      "resname": "PHE",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 46,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [
+        "altconf",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 47,
+      "icode": "",
+      "resname": "HIS",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 48,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 49,
+      "icode": "",
+      "resname": "PRO",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 50,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 51,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 52,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 53,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 54,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 55,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 56,
+      "icode": "",
+      "resname": "ARG",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 57,
+      "icode": "",
+      "resname": "ASN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 58,
+      "icode": "",
+      "resname": "PRO",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 59,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 60,
+      "icode": "",
+      "resname": "TYR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 61,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 62,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 63,
+      "icode": "",
+      "resname": "SER",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 64,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 65,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 66,
+      "icode": "",
+      "resname": "ASN",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 67,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 68,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 69,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 70,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 71,
+      "icode": "",
+      "resname": "SER",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 72,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 73,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 74,
+      "icode": "",
+      "resname": "PHE",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 75,
+      "icode": "",
+      "resname": "THR",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 76,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 77,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 78,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 79,
+      "icode": "",
+      "resname": "SER",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 80,
+      "icode": "",
+      "resname": "MET",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 81,
+      "icode": "",
+      "resname": "PRO",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 82,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 83,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 84,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "altconf",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 85,
+      "icode": "",
+      "resname": "ASP",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 86,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 87,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 88,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 89,
+      "icode": "",
+      "resname": "HIS",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 90,
+      "icode": "",
+      "resname": "TRP",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 91,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 92,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 93,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 94,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 95,
+      "icode": "",
+      "resname": "HIS",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 96,
+      "icode": "",
+      "resname": "SER",
+      "masked": [],
+      "protected": [
+        "clash"
+      ]
+    },
+    {
+      "chain": "A",
+      "resnum": 97,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 98,
+      "icode": "",
+      "resname": "ARG",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 99,
+      "icode": "",
+      "resname": "ARG",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 100,
+      "icode": "",
+      "resname": "THR",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 101,
+      "icode": "",
+      "resname": "TYR",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 102,
+      "icode": "",
+      "resname": "TYR",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 103,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 104,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 105,
+      "icode": "",
+      "resname": "THR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 106,
+      "icode": "",
+      "resname": "ASP",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 107,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 108,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 109,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 110,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 111,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 112,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 113,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 114,
+      "icode": "",
+      "resname": "SER",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 115,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 116,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 117,
+      "icode": "",
+      "resname": "CYS",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 118,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 119,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 120,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 121,
+      "icode": "",
+      "resname": "PHE",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 122,
+      "icode": "",
+      "resname": "MET",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 123,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 124,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 125,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 126,
+      "icode": "",
+      "resname": "CYS",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 127,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 128,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 129,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 130,
+      "icode": "",
+      "resname": "THR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 131,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 132,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [
+        "altconf",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 133,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 134,
+      "icode": "",
+      "resname": "ARG",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 135,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [
+        "altconf",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 136,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 137,
+      "icode": "",
+      "resname": "ASN",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 138,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 139,
+      "icode": "",
+      "resname": "THR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 140,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 141,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "high_b",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 142,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 143,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 144,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 145,
+      "icode": "",
+      "resname": "SER",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 146,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 147,
+      "icode": "",
+      "resname": "THR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 148,
+      "icode": "",
+      "resname": "SER",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 149,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 150,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 151,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 152,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 153,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 154,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 155,
+      "icode": "",
+      "resname": "THR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 156,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 157,
+      "icode": "",
+      "resname": "ASP",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 158,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 159,
+      "icode": "",
+      "resname": "TRP",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 160,
+      "icode": "",
+      "resname": "ASN",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 161,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 162,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 163,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 164,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 165,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 166,
+      "icode": "",
+      "resname": "TYR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 167,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 168,
+      "icode": "",
+      "resname": "PRO",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 169,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 170,
+      "icode": "",
+      "resname": "TRP",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 171,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 172,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 173,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 174,
+      "icode": "",
+      "resname": "THR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 175,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [
+        "altconf",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 176,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "altconf",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 177,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 178,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 179,
+      "icode": "",
+      "resname": "THR",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 180,
+      "icode": "",
+      "resname": "PRO",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 181,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 182,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 183,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 184,
+      "icode": "",
+      "resname": "GLN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 185,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 186,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 187,
+      "icode": "",
+      "resname": "HIS",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 188,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 189,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 190,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 191,
+      "icode": "",
+      "resname": "ARG",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 192,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 193,
+      "icode": "",
+      "resname": "TRP",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 194,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 195,
+      "icode": "",
+      "resname": "SER",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 196,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [
+        "altconf",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 197,
+      "icode": "",
+      "resname": "ASN",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 198,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 199,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 200,
+      "icode": "",
+      "resname": "THR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 201,
+      "icode": "",
+      "resname": "ASP",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 202,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 203,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 204,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 205,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 206,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": [
+        "clash"
+      ]
+    },
+    {
+      "chain": "A",
+      "resnum": 207,
+      "icode": "",
+      "resname": "ARG",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 208,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 209,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 210,
+      "icode": "",
+      "resname": "TYR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 211,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 212,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 213,
+      "icode": "",
+      "resname": "SER",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 214,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 215,
+      "icode": "",
+      "resname": "ASN",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 216,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 217,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 218,
+      "icode": "",
+      "resname": "ASN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 219,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 220,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 221,
+      "icode": "",
+      "resname": "THR",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 222,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 223,
+      "icode": "",
+      "resname": "TYR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 224,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 225,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 226,
+      "icode": "",
+      "resname": "PRO",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 227,
+      "icode": "",
+      "resname": "ASP",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 228,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 229,
+      "icode": "",
+      "resname": "ASN",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 230,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 231,
+      "icode": "",
+      "resname": "PHE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 232,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 233,
+      "icode": "",
+      "resname": "VAL",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 234,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 235,
+      "icode": "",
+      "resname": "GLY",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 236,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 237,
+      "icode": "",
+      "resname": "SER",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 238,
+      "icode": "",
+      "resname": "LEU",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 239,
+      "icode": "",
+      "resname": "LYS",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 240,
+      "icode": "",
+      "resname": "PRO",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 241,
+      "icode": "",
+      "resname": "GLU",
+      "masked": [
+        "altconf",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 242,
+      "icode": "",
+      "resname": "PHE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 243,
+      "icode": "",
+      "resname": "ARG",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 244,
+      "icode": "",
+      "resname": "ASP",
+      "masked": [
+        "altconf",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 245,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 246,
+      "icode": "",
+      "resname": "ILE",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 247,
+      "icode": "",
+      "resname": "ASP",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 248,
+      "icode": "",
+      "resname": "ALA",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 249,
+      "icode": "",
+      "resname": "THR",
+      "masked": [],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 250,
+      "icode": "",
+      "resname": "ARG",
+      "masked": [
+        "high_b"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 1251,
+      "icode": "",
+      "resname": "PGH",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 1252,
+      "icode": "",
+      "resname": "PGA",
+      "masked": [
+        "altconf"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 1253,
+      "icode": "",
+      "resname": "GOL",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 1254,
+      "icode": "",
+      "resname": "GOL",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 1255,
+      "icode": "",
+      "resname": "GOL",
+      "masked": [
+        "high_b",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 1256,
+      "icode": "",
+      "resname": "GOL",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 1257,
+      "icode": "",
+      "resname": "GOL",
+      "masked": [
+        "high_b",
+        "lattice_contact"
+      ],
+      "protected": []
+    },
+    {
+      "chain": "A",
+      "resnum": 1258,
+      "icode": "",
+      "resname": "ACT",
+      "masked": [
+        "lattice_contact"
+      ],
+      "protected": []
+    }
+  ]
+}
