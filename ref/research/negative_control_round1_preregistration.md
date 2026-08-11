@@ -38,7 +38,8 @@ reported this round (D7-P4).
 clashscore, then lower reported R-free, then lexicographic id (deterministic).
 Representatives failing D3 or the D6 screen are replaced by the cluster's next
 candidate, with the replacement recorded — a cluster is exhausted, never silently
-skipped.
+skipped. Replacements are within-cluster and do not count against the D7 scope,
+which is a **cluster** count.
 
 **D5 — mask thresholds finalized for round 1:** |RSRZ| > 2 (wwPDB definition),
 B tail factor 2.0×median owab, lattice cutoff 4.0 Å (symmetry images, non-water
@@ -57,12 +58,20 @@ within each path and is never part of Δ. Noise scale per path:
 only add noise or reveal headroom; the worsening side is pure noise, so it prices
 the noise without contamination from real headroom). **Exclusion rule: an entry is
 excluded when Δ < −3S on BOTH paths.** One-path-only exclusions are named and
-retained, mirroring the cross-tool trust model.
+retained, mirroring the cross-tool trust model. Registered fallback for a thin
+estimator (#308): if a path's worsening side holds fewer than 8 entries, S for
+both paths is the MAD of the POOLED worsening sides; if the pool is still under 8,
+the round stops at a finding — a tolerance invented after seeing the data is
+exactly what #297 prohibits.
 
-**D7 — screen scope: 30 representatives** — every ≤ 0.9 Å cluster representative
-(the stratum), topped up to 30 by ascending d_min. At ~10 min of `phenix.refine`
-each this is a ~5 h batch; canary first (one entry end-to-end, artifacts on disk
-and non-empty, both R paths parsed) per the standing canary rule.
+**D7 — screen scope: 30 clusters.** The ≤ 0.9 Å stratum alone holds **50 clusters
+(77 entities)** under the D2 criteria (measured live 2026-08-10), so "all stratum
+representatives" does not fit a 30-screen scope (#308). Registered draw,
+deterministic: **20 representatives spread evenly across the ≤ 0.9 Å stratum's
+d_min-sorted cluster list** (an even spread, not the head — the #243 lesson) **+
+10 from (0.9, 1.0] by ascending d_min**. At ~10 min of `phenix.refine` each this
+is a ~5 h batch; canary first (one entry end-to-end, artifacts on disk and
+non-empty, both R paths parsed) per the standing canary rule.
 
 ## Predictions
 
