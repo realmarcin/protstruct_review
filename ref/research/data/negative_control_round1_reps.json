@@ -1,0 +1,4239 @@
+{
+  "criteria": "D2 of negative_control_round1_preregistration.md",
+  "stratum_d_min": 0.9,
+  "n_clusters": 170,
+  "n_stratum_clusters": 60,
+  "n_band_clusters": 110,
+  "initial_representatives": [
+    {
+      "cluster": "4396_30",
+      "stratum": true,
+      "pdb_id": "1EJG",
+      "d_min": 0.54,
+      "clashscore": 1.15,
+      "r_free_reported": 0.094,
+      "deposit_year": 2000
+    },
+    {
+      "cluster": "87917_30",
+      "stratum": true,
+      "pdb_id": "6UFA",
+      "d_min": 0.77,
+      "clashscore": 0.0,
+      "r_free_reported": 0.1318,
+      "deposit_year": 2019
+    },
+    {
+      "cluster": "531_30",
+      "stratum": true,
+      "pdb_id": "7R2H",
+      "d_min": 0.79,
+      "clashscore": 0.8,
+      "r_free_reported": 0.1549,
+      "deposit_year": 2022
+    },
+    {
+      "cluster": "17447_30",
+      "stratum": true,
+      "pdb_id": "5HB7",
+      "d_min": 0.8,
+      "clashscore": 0.43,
+      "r_free_reported": 0.1315,
+      "deposit_year": 2015
+    },
+    {
+      "cluster": "6408_30",
+      "stratum": true,
+      "pdb_id": "5WQQ",
+      "d_min": 0.8,
+      "clashscore": 1.36,
+      "r_free_reported": 0.129,
+      "deposit_year": 2016
+    },
+    {
+      "cluster": "ungrouped:6UF8_1",
+      "stratum": true,
+      "pdb_id": "6UF8",
+      "d_min": 0.8,
+      "clashscore": 0.0,
+      "r_free_reported": 0.1483,
+      "deposit_year": 2019
+    },
+    {
+      "cluster": "130802_30",
+      "stratum": true,
+      "pdb_id": "9MDB",
+      "d_min": 0.81,
+      "clashscore": 0.0,
+      "r_free_reported": 0.1546,
+      "deposit_year": 2024
+    },
+    {
+      "cluster": "151579_30",
+      "stratum": true,
+      "pdb_id": "6EVH",
+      "d_min": 0.82,
+      "clashscore": 0.0,
+      "r_free_reported": 0.0932,
+      "deposit_year": 2017
+    },
+    {
+      "cluster": "157359_30",
+      "stratum": true,
+      "pdb_id": "8GK1",
+      "d_min": 0.83,
+      "clashscore": 0.0,
+      "r_free_reported": 0.119,
+      "deposit_year": 2023
+    },
+    {
+      "cluster": "203907_30",
+      "stratum": true,
+      "pdb_id": "8V5Z",
+      "d_min": 0.84,
+      "clashscore": 0.0,
+      "r_free_reported": 0.1391,
+      "deposit_year": 2023
+    },
+    {
+      "cluster": "5058_30",
+      "stratum": true,
+      "pdb_id": "6Q01",
+      "d_min": 0.85,
+      "clashscore": 0.41,
+      "r_free_reported": 0.1143,
+      "deposit_year": 2019
+    },
+    {
+      "cluster": "ungrouped:9C06_1",
+      "stratum": true,
+      "pdb_id": "9C06",
+      "d_min": 0.85,
+      "clashscore": 0.0,
+      "r_free_reported": 0.1375,
+      "deposit_year": 2024
+    },
+    {
+      "cluster": "1118_30",
+      "stratum": true,
+      "pdb_id": "5XS6",
+      "d_min": 0.87,
+      "clashscore": 1.53,
+      "r_free_reported": 0.1663,
+      "deposit_year": 2017
+    },
+    {
+      "cluster": "1378_30",
+      "stratum": true,
+      "pdb_id": "9YGW",
+      "d_min": 0.88,
+      "clashscore": 1.9,
+      "r_free_reported": 0.1252,
+      "deposit_year": 2025
+    },
+    {
+      "cluster": "10815_30",
+      "stratum": true,
+      "pdb_id": "9P25",
+      "d_min": 0.89,
+      "clashscore": 0.16,
+      "r_free_reported": 0.1532,
+      "deposit_year": 2025
+    },
+    {
+      "cluster": "1916_30",
+      "stratum": true,
+      "pdb_id": "9QDV",
+      "d_min": 0.89,
+      "clashscore": 0.24,
+      "r_free_reported": 0.131,
+      "deposit_year": 2025
+    },
+    {
+      "cluster": "ungrouped:6DIY_1",
+      "stratum": true,
+      "pdb_id": "6DIY",
+      "d_min": 0.89,
+      "clashscore": 0.0,
+      "r_free_reported": 0.1198,
+      "deposit_year": 2018
+    },
+    {
+      "cluster": "28085_30",
+      "stratum": true,
+      "pdb_id": "4NSV",
+      "d_min": 0.9,
+      "clashscore": 0.63,
+      "r_free_reported": 0.1579,
+      "deposit_year": 2013
+    },
+    {
+      "cluster": "4975_30",
+      "stratum": true,
+      "pdb_id": "7A2P",
+      "d_min": 0.9,
+      "clashscore": 0.0,
+      "r_free_reported": 0.1496,
+      "deposit_year": 2020
+    },
+    {
+      "cluster": "7247_30",
+      "stratum": true,
+      "pdb_id": "4NPD",
+      "d_min": 0.9,
+      "clashscore": 0.6,
+      "r_free_reported": 0.13,
+      "deposit_year": 2013
+    },
+    {
+      "cluster": "10707_30",
+      "stratum": false,
+      "pdb_id": "7P1Q",
+      "d_min": 0.91,
+      "clashscore": 0.49,
+      "r_free_reported": 0.1556,
+      "deposit_year": 2021
+    },
+    {
+      "cluster": "12467_30",
+      "stratum": false,
+      "pdb_id": "5LHW",
+      "d_min": 0.91,
+      "clashscore": 0.0,
+      "r_free_reported": 0.1387,
+      "deposit_year": 2016
+    },
+    {
+      "cluster": "36_30",
+      "stratum": false,
+      "pdb_id": "8QH8",
+      "d_min": 0.91,
+      "clashscore": 1.63,
+      "r_free_reported": 0.13657,
+      "deposit_year": 2023
+    },
+    {
+      "cluster": "1207_30",
+      "stratum": false,
+      "pdb_id": "7MBO",
+      "d_min": 0.92,
+      "clashscore": 0.0,
+      "r_free_reported": 0.1683,
+      "deposit_year": 2021
+    },
+    {
+      "cluster": "12669_30",
+      "stratum": false,
+      "pdb_id": "9GYD",
+      "d_min": 0.92,
+      "clashscore": 0.65,
+      "r_free_reported": 0.1384,
+      "deposit_year": 2024
+    },
+    {
+      "cluster": "143145_30",
+      "stratum": false,
+      "pdb_id": "9EG0",
+      "d_min": 0.92,
+      "clashscore": 0.0,
+      "r_free_reported": 0.1681,
+      "deposit_year": 2024
+    },
+    {
+      "cluster": "183985_30",
+      "stratum": false,
+      "pdb_id": "9EJV",
+      "d_min": 0.92,
+      "clashscore": 0.0,
+      "r_free_reported": 0.1348,
+      "deposit_year": 2024
+    },
+    {
+      "cluster": "21182_30",
+      "stratum": false,
+      "pdb_id": "1IQZ",
+      "d_min": 0.92,
+      "clashscore": 0.82,
+      "r_free_reported": 0.113,
+      "deposit_year": 2001
+    },
+    {
+      "cluster": "2126_30",
+      "stratum": false,
+      "pdb_id": "6EQE",
+      "d_min": 0.92,
+      "clashscore": 0.95,
+      "r_free_reported": 0.1101,
+      "deposit_year": 2017
+    },
+    {
+      "cluster": "2166_30",
+      "stratum": false,
+      "pdb_id": "6UWW",
+      "d_min": 0.92,
+      "clashscore": 0.36,
+      "r_free_reported": 0.1454,
+      "deposit_year": 2019
+    }
+  ],
+  "clusters": [
+    {
+      "cluster": "104186_30",
+      "members": [
+        {
+          "pdb_id": "5OQZ",
+          "d_min": 0.8,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0913,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "113273_30",
+      "members": [
+        {
+          "pdb_id": "6SYJ",
+          "d_min": 0.81,
+          "clashscore": 1.53,
+          "r_free_reported": 0.1363,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "168001_30",
+      "members": [
+        {
+          "pdb_id": "8GL4",
+          "d_min": 0.76,
+          "clashscore": 0.0,
+          "r_free_reported": 0.104,
+          "deposit_year": 2023
+        }
+      ]
+    },
+    {
+      "cluster": "1486_30",
+      "members": [
+        {
+          "pdb_id": "6Y0H",
+          "d_min": 1.0,
+          "clashscore": 1.94,
+          "r_free_reported": 0.1535,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "6994_30",
+      "members": [
+        {
+          "pdb_id": "8QMJ",
+          "d_min": 0.98,
+          "clashscore": 1.31,
+          "r_free_reported": 0.1572,
+          "deposit_year": 2023
+        }
+      ]
+    },
+    {
+      "cluster": "12669_30",
+      "members": [
+        {
+          "pdb_id": "9GYD",
+          "d_min": 0.92,
+          "clashscore": 0.65,
+          "r_free_reported": 0.1384,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "9TXE",
+          "d_min": 0.95,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1784,
+          "deposit_year": 2026
+        },
+        {
+          "pdb_id": "9GYN",
+          "d_min": 1.0,
+          "clashscore": 1.96,
+          "r_free_reported": 0.1561,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "15325_30",
+      "members": [
+        {
+          "pdb_id": "3X2P",
+          "d_min": 0.99,
+          "clashscore": 0.73,
+          "r_free_reported": 0.2597,
+          "deposit_year": 2014
+        },
+        {
+          "pdb_id": "3X2O",
+          "d_min": 1.0,
+          "clashscore": 0.41,
+          "r_free_reported": 0.2506,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "7643_30",
+      "members": [
+        {
+          "pdb_id": "8ERE",
+          "d_min": 0.87,
+          "clashscore": 1.38,
+          "r_free_reported": 0.131,
+          "deposit_year": 2022
+        }
+      ]
+    },
+    {
+      "cluster": "105210_30",
+      "members": [
+        {
+          "pdb_id": "8VOG",
+          "d_min": 0.94,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0898,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "52113_30",
+      "members": [
+        {
+          "pdb_id": "9TEU",
+          "d_min": 0.9,
+          "clashscore": 1.33,
+          "r_free_reported": 0.168,
+          "deposit_year": 2025
+        }
+      ]
+    },
+    {
+      "cluster": "10318_30",
+      "members": [
+        {
+          "pdb_id": "4LFS",
+          "d_min": 0.97,
+          "clashscore": 0.0,
+          "r_free_reported": 0.158,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "6208_30",
+      "members": [
+        {
+          "pdb_id": "5XR0",
+          "d_min": 0.94,
+          "clashscore": 0.0,
+          "r_free_reported": 0.121,
+          "deposit_year": 2017
+        },
+        {
+          "pdb_id": "5XQV",
+          "d_min": 0.97,
+          "clashscore": 1.0,
+          "r_free_reported": 0.158,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "478_30",
+      "members": [
+        {
+          "pdb_id": "2VXN",
+          "d_min": 0.82,
+          "clashscore": 1.67,
+          "r_free_reported": 0.103,
+          "deposit_year": 2008
+        }
+      ]
+    },
+    {
+      "cluster": "166_30",
+      "members": [
+        {
+          "pdb_id": "9P34",
+          "d_min": 0.99,
+          "clashscore": 1.41,
+          "r_free_reported": 0.1497,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "6I7Y",
+          "d_min": 1.0,
+          "clashscore": 1.35,
+          "r_free_reported": 0.1307,
+          "deposit_year": 2018
+        }
+      ]
+    },
+    {
+      "cluster": "1428_30",
+      "members": [
+        {
+          "pdb_id": "5U3A",
+          "d_min": 0.95,
+          "clashscore": 0.87,
+          "r_free_reported": 0.1205,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "28085_30",
+      "members": [
+        {
+          "pdb_id": "4NSV",
+          "d_min": 0.9,
+          "clashscore": 0.63,
+          "r_free_reported": 0.1579,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "902_30",
+      "members": [
+        {
+          "pdb_id": "7LTD",
+          "d_min": 0.9,
+          "clashscore": 1.62,
+          "r_free_reported": 0.172,
+          "deposit_year": 2021
+        },
+        {
+          "pdb_id": "7LTI",
+          "d_min": 0.91,
+          "clashscore": 2.0,
+          "r_free_reported": 0.1701,
+          "deposit_year": 2021
+        },
+        {
+          "pdb_id": "7LTV",
+          "d_min": 0.95,
+          "clashscore": 1.19,
+          "r_free_reported": 0.1699,
+          "deposit_year": 2021
+        },
+        {
+          "pdb_id": "5KXV",
+          "d_min": 0.98,
+          "clashscore": 1.94,
+          "r_free_reported": 0.114,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "29683_30",
+      "members": [
+        {
+          "pdb_id": "5MTU",
+          "d_min": 1.0,
+          "clashscore": 1.48,
+          "r_free_reported": 0.143,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "6420_30",
+      "members": [
+        {
+          "pdb_id": "2NLS",
+          "d_min": 0.98,
+          "clashscore": 1.89,
+          "r_free_reported": 0.124,
+          "deposit_year": 2006
+        }
+      ]
+    },
+    {
+      "cluster": "5058_30",
+      "members": [
+        {
+          "pdb_id": "6Q01",
+          "d_min": 0.85,
+          "clashscore": 0.41,
+          "r_free_reported": 0.1143,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6Q00",
+          "d_min": 0.85,
+          "clashscore": 0.8,
+          "r_free_reported": 0.1118,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "181759_30",
+      "members": [
+        {
+          "pdb_id": "4G13",
+          "d_min": 0.8,
+          "clashscore": 0.0,
+          "r_free_reported": 0.081,
+          "deposit_year": 2012
+        }
+      ]
+    },
+    {
+      "cluster": "1729_30",
+      "members": [
+        {
+          "pdb_id": "5DGJ",
+          "d_min": 1.0,
+          "clashscore": 0.74,
+          "r_free_reported": 0.1544,
+          "deposit_year": 2015
+        }
+      ]
+    },
+    {
+      "cluster": "1118_30",
+      "members": [
+        {
+          "pdb_id": "5XS6",
+          "d_min": 0.87,
+          "clashscore": 1.53,
+          "r_free_reported": 0.1663,
+          "deposit_year": 2017
+        },
+        {
+          "pdb_id": "5XSA",
+          "d_min": 0.89,
+          "clashscore": 1.71,
+          "r_free_reported": 0.1534,
+          "deposit_year": 2017
+        },
+        {
+          "pdb_id": "6TJ8",
+          "d_min": 0.92,
+          "clashscore": 0.77,
+          "r_free_reported": 0.1064,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "5XSB",
+          "d_min": 0.92,
+          "clashscore": 1.74,
+          "r_free_reported": 0.1475,
+          "deposit_year": 2017
+        },
+        {
+          "pdb_id": "5XTV",
+          "d_min": 0.93,
+          "clashscore": 1.33,
+          "r_free_reported": 0.1399,
+          "deposit_year": 2017
+        },
+        {
+          "pdb_id": "6TJ9",
+          "d_min": 0.95,
+          "clashscore": 1.04,
+          "r_free_reported": 0.1102,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "5XSM",
+          "d_min": 0.97,
+          "clashscore": 1.45,
+          "r_free_reported": 0.1462,
+          "deposit_year": 2017
+        },
+        {
+          "pdb_id": "5XU2",
+          "d_min": 0.97,
+          "clashscore": 2.0,
+          "r_free_reported": 0.14568,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "228_30",
+      "members": [
+        {
+          "pdb_id": "5CE4",
+          "d_min": 0.98,
+          "clashscore": 0.47,
+          "r_free_reported": 0.1592,
+          "deposit_year": 2015
+        }
+      ]
+    },
+    {
+      "cluster": "52425_30",
+      "members": [
+        {
+          "pdb_id": "4YNH",
+          "d_min": 1.0,
+          "clashscore": 0.98,
+          "r_free_reported": 0.1491,
+          "deposit_year": 2015
+        }
+      ]
+    },
+    {
+      "cluster": "38260_30",
+      "members": [
+        {
+          "pdb_id": "6RVU",
+          "d_min": 0.99,
+          "clashscore": 1.44,
+          "r_free_reported": 0.147,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "48242_30",
+      "members": [
+        {
+          "pdb_id": "4MTU",
+          "d_min": 0.97,
+          "clashscore": 0.88,
+          "r_free_reported": 0.159,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "66677_30",
+      "members": [
+        {
+          "pdb_id": "6G1I",
+          "d_min": 0.99,
+          "clashscore": 1.63,
+          "r_free_reported": 0.14734,
+          "deposit_year": 2018
+        }
+      ]
+    },
+    {
+      "cluster": "100_30",
+      "members": [
+        {
+          "pdb_id": "6MU9",
+          "d_min": 0.97,
+          "clashscore": 1.57,
+          "r_free_reported": 0.1112,
+          "deposit_year": 2018
+        },
+        {
+          "pdb_id": "6MZ1",
+          "d_min": 1.0,
+          "clashscore": 1.7,
+          "r_free_reported": 0.1613,
+          "deposit_year": 2018
+        }
+      ]
+    },
+    {
+      "cluster": "39108_30",
+      "members": [
+        {
+          "pdb_id": "7TVL",
+          "d_min": 0.89,
+          "clashscore": 1.37,
+          "r_free_reported": 0.1307,
+          "deposit_year": 2022
+        }
+      ]
+    },
+    {
+      "cluster": "452_30",
+      "members": [
+        {
+          "pdb_id": "6TGU",
+          "d_min": 0.83,
+          "clashscore": 1.2,
+          "r_free_reported": 0.1669,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "9Q8C",
+          "d_min": 0.9,
+          "clashscore": 1.25,
+          "r_free_reported": 0.1477,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9Q9G",
+          "d_min": 0.94,
+          "clashscore": 1.61,
+          "r_free_reported": 0.1571,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7ATV",
+          "d_min": 0.96,
+          "clashscore": 1.46,
+          "r_free_reported": 0.1411,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "9Q8Q",
+          "d_min": 0.98,
+          "clashscore": 0.18,
+          "r_free_reported": 0.1794,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9QAK",
+          "d_min": 0.98,
+          "clashscore": 0.72,
+          "r_free_reported": 0.1752,
+          "deposit_year": 2025
+        }
+      ]
+    },
+    {
+      "cluster": "446_30",
+      "members": [
+        {
+          "pdb_id": "7T89",
+          "d_min": 1.0,
+          "clashscore": 1.49,
+          "r_free_reported": 0.1428,
+          "deposit_year": 2021
+        }
+      ]
+    },
+    {
+      "cluster": "3977_30",
+      "members": [
+        {
+          "pdb_id": "1Q6Z",
+          "d_min": 1.0,
+          "clashscore": 1.78,
+          "r_free_reported": 0.1402,
+          "deposit_year": 2003
+        }
+      ]
+    },
+    {
+      "cluster": "2126_30",
+      "members": [
+        {
+          "pdb_id": "6EQE",
+          "d_min": 0.92,
+          "clashscore": 0.95,
+          "r_free_reported": 0.1101,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "1207_30",
+      "members": [
+        {
+          "pdb_id": "7MBO",
+          "d_min": 0.92,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1683,
+          "deposit_year": 2021
+        }
+      ]
+    },
+    {
+      "cluster": "130802_30",
+      "members": [
+        {
+          "pdb_id": "9MDB",
+          "d_min": 0.81,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1546,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "169788_30",
+      "members": [
+        {
+          "pdb_id": "8GKX",
+          "d_min": 0.81,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1381,
+          "deposit_year": 2023
+        }
+      ]
+    },
+    {
+      "cluster": "783_30",
+      "members": [
+        {
+          "pdb_id": "9Y2E",
+          "d_min": 0.78,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1395,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9XZU",
+          "d_min": 0.82,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1477,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9Y00",
+          "d_min": 0.83,
+          "clashscore": 0.0,
+          "r_free_reported": 0.13951,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9Y0Z",
+          "d_min": 0.86,
+          "clashscore": 0.0,
+          "r_free_reported": 0.14947,
+          "deposit_year": 2025
+        }
+      ]
+    },
+    {
+      "cluster": "10707_30",
+      "members": [
+        {
+          "pdb_id": "7P1Q",
+          "d_min": 0.91,
+          "clashscore": 0.49,
+          "r_free_reported": 0.1556,
+          "deposit_year": 2021
+        }
+      ]
+    },
+    {
+      "cluster": "3623_30",
+      "members": [
+        {
+          "pdb_id": "9TNG",
+          "d_min": 0.95,
+          "clashscore": 1.78,
+          "r_free_reported": 0.1679,
+          "deposit_year": 2025
+        }
+      ]
+    },
+    {
+      "cluster": "8394_30",
+      "members": [
+        {
+          "pdb_id": "9ECS",
+          "d_min": 0.99,
+          "clashscore": 1.86,
+          "r_free_reported": 0.1203,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "5846_30",
+      "members": [
+        {
+          "pdb_id": "7Q0O",
+          "d_min": 0.96,
+          "clashscore": 0.75,
+          "r_free_reported": 0.1291,
+          "deposit_year": 2021
+        }
+      ]
+    },
+    {
+      "cluster": "147280_30",
+      "members": [
+        {
+          "pdb_id": "9MFJ",
+          "d_min": 0.88,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0881,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "1041_30",
+      "members": [
+        {
+          "pdb_id": "6Y5S",
+          "d_min": 0.95,
+          "clashscore": 1.23,
+          "r_free_reported": 0.1549,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "36_30",
+      "members": [
+        {
+          "pdb_id": "8QH8",
+          "d_min": 0.91,
+          "clashscore": 1.63,
+          "r_free_reported": 0.13657,
+          "deposit_year": 2023
+        },
+        {
+          "pdb_id": "6ROB",
+          "d_min": 0.93,
+          "clashscore": 0.98,
+          "r_free_reported": 0.1203,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6ROE",
+          "d_min": 0.94,
+          "clashscore": 0.98,
+          "r_free_reported": 0.1185,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6SBL",
+          "d_min": 0.94,
+          "clashscore": 1.23,
+          "r_free_reported": 0.1365,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6RH4",
+          "d_min": 0.95,
+          "clashscore": 1.03,
+          "r_free_reported": 0.117,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6S9Z",
+          "d_min": 0.95,
+          "clashscore": 1.34,
+          "r_free_reported": 0.1365,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6SBM",
+          "d_min": 0.95,
+          "clashscore": 1.37,
+          "r_free_reported": 0.1284,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6RQI",
+          "d_min": 0.95,
+          "clashscore": 1.41,
+          "r_free_reported": 0.1296,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6SBH",
+          "d_min": 0.95,
+          "clashscore": 1.62,
+          "r_free_reported": 0.1337,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6RKN",
+          "d_min": 0.96,
+          "clashscore": 1.2,
+          "r_free_reported": 0.1242,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6RFH",
+          "d_min": 0.97,
+          "clashscore": 1.44,
+          "r_free_reported": 0.1357,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6SG6",
+          "d_min": 0.98,
+          "clashscore": 1.5,
+          "r_free_reported": 0.1354,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "7OYN",
+          "d_min": 0.98,
+          "clashscore": 1.65,
+          "r_free_reported": 0.1363,
+          "deposit_year": 2021
+        },
+        {
+          "pdb_id": "6YZK",
+          "d_min": 0.99,
+          "clashscore": 1.4,
+          "r_free_reported": 0.1426,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "6RL9",
+          "d_min": 1.0,
+          "clashscore": 0.79,
+          "r_free_reported": 0.1296,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6SFQ",
+          "d_min": 1.0,
+          "clashscore": 1.08,
+          "r_free_reported": 0.1468,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6RIG",
+          "d_min": 1.0,
+          "clashscore": 1.23,
+          "r_free_reported": 0.1358,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "4MTY",
+          "d_min": 1.0,
+          "clashscore": 1.39,
+          "r_free_reported": 0.1226,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "1101_30",
+      "members": [
+        {
+          "pdb_id": "9HDS",
+          "d_min": 0.86,
+          "clashscore": 1.51,
+          "r_free_reported": 0.1351,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "9HOV",
+          "d_min": 0.92,
+          "clashscore": 1.04,
+          "r_free_reported": 0.1372,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "9HY0",
+          "d_min": 0.95,
+          "clashscore": 0.65,
+          "r_free_reported": 0.1313,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7ASQ",
+          "d_min": 0.95,
+          "clashscore": 1.78,
+          "r_free_reported": 0.1199,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "9HP2",
+          "d_min": 1.0,
+          "clashscore": 0.65,
+          "r_free_reported": 0.1464,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "6ZWY",
+          "d_min": 1.0,
+          "clashscore": 1.76,
+          "r_free_reported": 0.1471,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "2960_30",
+      "members": [
+        {
+          "pdb_id": "9R6D",
+          "d_min": 0.94,
+          "clashscore": 0.82,
+          "r_free_reported": 0.1479,
+          "deposit_year": 2025
+        }
+      ]
+    },
+    {
+      "cluster": "277_30",
+      "members": [
+        {
+          "pdb_id": "6TWT",
+          "d_min": 0.95,
+          "clashscore": 0.69,
+          "r_free_reported": 0.1199,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5ZJ7",
+          "d_min": 0.96,
+          "clashscore": 1.14,
+          "r_free_reported": 0.1312,
+          "deposit_year": 2018
+        },
+        {
+          "pdb_id": "5ZJ1",
+          "d_min": 0.96,
+          "clashscore": 1.65,
+          "r_free_reported": 0.1499,
+          "deposit_year": 2018
+        },
+        {
+          "pdb_id": "5ZJC",
+          "d_min": 0.96,
+          "clashscore": 1.69,
+          "r_free_reported": 0.1455,
+          "deposit_year": 2018
+        },
+        {
+          "pdb_id": "7UOX",
+          "d_min": 0.99,
+          "clashscore": 1.9,
+          "r_free_reported": 0.1482,
+          "deposit_year": 2022
+        },
+        {
+          "pdb_id": "5ZGE",
+          "d_min": 1.0,
+          "clashscore": 1.07,
+          "r_free_reported": 0.1451,
+          "deposit_year": 2018
+        }
+      ]
+    },
+    {
+      "cluster": "95_30",
+      "members": [
+        {
+          "pdb_id": "5HQI",
+          "d_min": 0.97,
+          "clashscore": 0.0,
+          "r_free_reported": 0.15774,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "7247_30",
+      "members": [
+        {
+          "pdb_id": "4NPD",
+          "d_min": 0.9,
+          "clashscore": 0.6,
+          "r_free_reported": 0.13,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "10815_30",
+      "members": [
+        {
+          "pdb_id": "9P25",
+          "d_min": 0.89,
+          "clashscore": 0.16,
+          "r_free_reported": 0.1532,
+          "deposit_year": 2025
+        }
+      ]
+    },
+    {
+      "cluster": "7457_30",
+      "members": [
+        {
+          "pdb_id": "5O2X",
+          "d_min": 0.95,
+          "clashscore": 1.14,
+          "r_free_reported": 0.12741,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "1242_30",
+      "members": [
+        {
+          "pdb_id": "9I4O",
+          "d_min": 0.99,
+          "clashscore": 0.78,
+          "r_free_reported": 0.158,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "6QLN",
+          "d_min": 1.0,
+          "clashscore": 1.61,
+          "r_free_reported": 0.1471,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "181597_30",
+      "members": [
+        {
+          "pdb_id": "6UDR",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0919,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "3255_30",
+      "members": [
+        {
+          "pdb_id": "6ZX4",
+          "d_min": 0.96,
+          "clashscore": 1.2,
+          "r_free_reported": 0.1362,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "10047_30",
+      "members": [
+        {
+          "pdb_id": "8B5M",
+          "d_min": 0.97,
+          "clashscore": 1.56,
+          "r_free_reported": 0.148,
+          "deposit_year": 2022
+        }
+      ]
+    },
+    {
+      "cluster": "151595_30",
+      "members": [
+        {
+          "pdb_id": "9MFI",
+          "d_min": 0.89,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0813,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "914_30",
+      "members": [
+        {
+          "pdb_id": "7DMM",
+          "d_min": 0.99,
+          "clashscore": 1.13,
+          "r_free_reported": 0.16564,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "31926_30",
+      "members": [
+        {
+          "pdb_id": "2DDX",
+          "d_min": 0.86,
+          "clashscore": 0.39,
+          "r_free_reported": 0.14772,
+          "deposit_year": 2006
+        }
+      ]
+    },
+    {
+      "cluster": "248149_30",
+      "members": [
+        {
+          "pdb_id": "7A2Y",
+          "d_min": 0.97,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1461,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "257583_30",
+      "members": [
+        {
+          "pdb_id": "4LN2",
+          "d_min": 1.0,
+          "clashscore": 1.52,
+          "r_free_reported": 0.15188,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "2575_30",
+      "members": [
+        {
+          "pdb_id": "6RHX",
+          "d_min": 0.96,
+          "clashscore": 1.05,
+          "r_free_reported": 0.1326,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6RHU",
+          "d_min": 0.96,
+          "clashscore": 1.18,
+          "r_free_reported": 0.13172,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6RHH",
+          "d_min": 0.97,
+          "clashscore": 1.05,
+          "r_free_reported": 0.13136,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6RGP",
+          "d_min": 0.97,
+          "clashscore": 1.58,
+          "r_free_reported": 0.12311,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6RII",
+          "d_min": 0.97,
+          "clashscore": 1.82,
+          "r_free_reported": 0.12073,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6RI0",
+          "d_min": 1.0,
+          "clashscore": 1.58,
+          "r_free_reported": 0.13677,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "55147_30",
+      "members": [
+        {
+          "pdb_id": "6GZ8",
+          "d_min": 1.0,
+          "clashscore": 1.37,
+          "r_free_reported": 0.15364,
+          "deposit_year": 2018
+        }
+      ]
+    },
+    {
+      "cluster": "10384_30",
+      "members": [
+        {
+          "pdb_id": "4TXR",
+          "d_min": 1.0,
+          "clashscore": 1.21,
+          "r_free_reported": 0.1798,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "13403_30",
+      "members": [
+        {
+          "pdb_id": "2XTT",
+          "d_min": 0.93,
+          "clashscore": 1.81,
+          "r_free_reported": 0.1397,
+          "deposit_year": 2010
+        }
+      ]
+    },
+    {
+      "cluster": "12584_30",
+      "members": [
+        {
+          "pdb_id": "9AYN",
+          "d_min": 0.97,
+          "clashscore": 0.0,
+          "r_free_reported": 0.139,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "9886_30",
+      "members": [
+        {
+          "pdb_id": "7T89",
+          "d_min": 1.0,
+          "clashscore": 1.49,
+          "r_free_reported": 0.1428,
+          "deposit_year": 2021
+        }
+      ]
+    },
+    {
+      "cluster": "8950_30",
+      "members": [
+        {
+          "pdb_id": "6L8G",
+          "d_min": 1.0,
+          "clashscore": 1.47,
+          "r_free_reported": 0.1758,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "12069_30",
+      "members": [
+        {
+          "pdb_id": "3AGN",
+          "d_min": 0.96,
+          "clashscore": 0.56,
+          "r_free_reported": 0.127,
+          "deposit_year": 2010
+        }
+      ]
+    },
+    {
+      "cluster": "203907_30",
+      "members": [
+        {
+          "pdb_id": "8V5Z",
+          "d_min": 0.84,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1391,
+          "deposit_year": 2023
+        }
+      ]
+    },
+    {
+      "cluster": "151890_30",
+      "members": [
+        {
+          "pdb_id": "8RC7",
+          "d_min": 0.98,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1318,
+          "deposit_year": 2023
+        }
+      ]
+    },
+    {
+      "cluster": "502_30",
+      "members": [
+        {
+          "pdb_id": "1UG6",
+          "d_min": 0.99,
+          "clashscore": 1.92,
+          "r_free_reported": 0.13,
+          "deposit_year": 2003
+        }
+      ]
+    },
+    {
+      "cluster": "44_30",
+      "members": [
+        {
+          "pdb_id": "7TWR",
+          "d_min": 0.9,
+          "clashscore": 1.22,
+          "r_free_reported": 0.1212,
+          "deposit_year": 2022
+        },
+        {
+          "pdb_id": "7TWS",
+          "d_min": 0.9,
+          "clashscore": 1.6,
+          "r_free_reported": 0.1265,
+          "deposit_year": 2022
+        },
+        {
+          "pdb_id": "7TWT",
+          "d_min": 0.9,
+          "clashscore": 1.61,
+          "r_free_reported": 0.1202,
+          "deposit_year": 2022
+        },
+        {
+          "pdb_id": "7TWQ",
+          "d_min": 0.9,
+          "clashscore": 1.79,
+          "r_free_reported": 0.1258,
+          "deposit_year": 2022
+        },
+        {
+          "pdb_id": "7TWP",
+          "d_min": 0.9,
+          "clashscore": 1.92,
+          "r_free_reported": 0.124,
+          "deposit_year": 2022
+        },
+        {
+          "pdb_id": "13RP",
+          "d_min": 0.95,
+          "clashscore": 1.2,
+          "r_free_reported": 0.1553,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "6WEY",
+          "d_min": 0.95,
+          "clashscore": 1.7,
+          "r_free_reported": 0.1362,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "13RO",
+          "d_min": 0.95,
+          "clashscore": 1.79,
+          "r_free_reported": 0.1619,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9D6I",
+          "d_min": 0.97,
+          "clashscore": 0.95,
+          "r_free_reported": 0.1377,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HQM",
+          "d_min": 0.97,
+          "clashscore": 1.05,
+          "r_free_reported": 0.1474,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HPT",
+          "d_min": 0.97,
+          "clashscore": 1.05,
+          "r_free_reported": 0.1682,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFP",
+          "d_min": 0.97,
+          "clashscore": 1.18,
+          "r_free_reported": 0.1564,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFR",
+          "d_min": 0.97,
+          "clashscore": 1.18,
+          "r_free_reported": 0.1567,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HF4",
+          "d_min": 0.97,
+          "clashscore": 1.2,
+          "r_free_reported": 0.154,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7IJ3",
+          "d_min": 0.97,
+          "clashscore": 1.22,
+          "r_free_reported": 0.1658,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7HQ3",
+          "d_min": 0.97,
+          "clashscore": 1.26,
+          "r_free_reported": 0.1594,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HE2",
+          "d_min": 0.98,
+          "clashscore": 0.59,
+          "r_free_reported": 0.1602,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HDV",
+          "d_min": 0.98,
+          "clashscore": 0.91,
+          "r_free_reported": 0.1583,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HCL",
+          "d_min": 0.98,
+          "clashscore": 0.93,
+          "r_free_reported": 0.155,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HD1",
+          "d_min": 0.98,
+          "clashscore": 1.0,
+          "r_free_reported": 0.1588,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEN",
+          "d_min": 0.98,
+          "clashscore": 1.04,
+          "r_free_reported": 0.1552,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HQC",
+          "d_min": 0.98,
+          "clashscore": 1.06,
+          "r_free_reported": 0.1535,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HF1",
+          "d_min": 0.98,
+          "clashscore": 1.06,
+          "r_free_reported": 0.1617,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7IJK",
+          "d_min": 0.98,
+          "clashscore": 1.08,
+          "r_free_reported": 0.1531,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7HEV",
+          "d_min": 0.98,
+          "clashscore": 1.08,
+          "r_free_reported": 0.1557,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HDB",
+          "d_min": 0.98,
+          "clashscore": 1.19,
+          "r_free_reported": 0.1595,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HDQ",
+          "d_min": 0.98,
+          "clashscore": 1.2,
+          "r_free_reported": 0.1575,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEL",
+          "d_min": 0.98,
+          "clashscore": 1.2,
+          "r_free_reported": 0.1583,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEH",
+          "d_min": 0.98,
+          "clashscore": 1.21,
+          "r_free_reported": 0.1538,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HF2",
+          "d_min": 0.98,
+          "clashscore": 1.31,
+          "r_free_reported": 0.1602,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HDE",
+          "d_min": 0.98,
+          "clashscore": 1.4,
+          "r_free_reported": 0.1533,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HER",
+          "d_min": 0.98,
+          "clashscore": 1.5,
+          "r_free_reported": 0.16,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7IJJ",
+          "d_min": 0.98,
+          "clashscore": 1.6,
+          "r_free_reported": 0.1723,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7HCM",
+          "d_min": 0.98,
+          "clashscore": 1.62,
+          "r_free_reported": 0.1563,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HDY",
+          "d_min": 0.98,
+          "clashscore": 1.67,
+          "r_free_reported": 0.1593,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HCQ",
+          "d_min": 0.98,
+          "clashscore": 1.77,
+          "r_free_reported": 0.1688,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HE0",
+          "d_min": 0.98,
+          "clashscore": 1.82,
+          "r_free_reported": 0.16,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFN",
+          "d_min": 0.99,
+          "clashscore": 0.72,
+          "r_free_reported": 0.1578,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEE",
+          "d_min": 0.99,
+          "clashscore": 0.75,
+          "r_free_reported": 0.1611,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "13RR",
+          "d_min": 0.99,
+          "clashscore": 0.91,
+          "r_free_reported": 0.1645,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7HFK",
+          "d_min": 0.99,
+          "clashscore": 0.91,
+          "r_free_reported": 0.1699,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "13RQ",
+          "d_min": 0.99,
+          "clashscore": 0.92,
+          "r_free_reported": 0.161,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7HFA",
+          "d_min": 0.99,
+          "clashscore": 0.95,
+          "r_free_reported": 0.1614,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFE",
+          "d_min": 0.99,
+          "clashscore": 0.98,
+          "r_free_reported": 0.1667,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFJ",
+          "d_min": 0.99,
+          "clashscore": 1.16,
+          "r_free_reported": 0.16,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HD8",
+          "d_min": 0.99,
+          "clashscore": 1.19,
+          "r_free_reported": 0.1631,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HQL",
+          "d_min": 0.99,
+          "clashscore": 1.21,
+          "r_free_reported": 0.1595,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFI",
+          "d_min": 0.99,
+          "clashscore": 1.21,
+          "r_free_reported": 0.1625,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HF3",
+          "d_min": 0.99,
+          "clashscore": 1.21,
+          "r_free_reported": 0.1651,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HQ1",
+          "d_min": 0.99,
+          "clashscore": 1.39,
+          "r_free_reported": 0.1655,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HF8",
+          "d_min": 0.99,
+          "clashscore": 1.4,
+          "r_free_reported": 0.1666,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HCS",
+          "d_min": 0.99,
+          "clashscore": 1.48,
+          "r_free_reported": 0.165,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HI6",
+          "d_min": 0.99,
+          "clashscore": 1.51,
+          "r_free_reported": 0.1624,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HF6",
+          "d_min": 0.99,
+          "clashscore": 1.52,
+          "r_free_reported": 0.165,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HQ8",
+          "d_min": 0.99,
+          "clashscore": 1.55,
+          "r_free_reported": 0.1516,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEX",
+          "d_min": 0.99,
+          "clashscore": 1.67,
+          "r_free_reported": 0.1602,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HQ0",
+          "d_min": 0.99,
+          "clashscore": 1.69,
+          "r_free_reported": 0.1627,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFH",
+          "d_min": 0.99,
+          "clashscore": 1.72,
+          "r_free_reported": 0.1597,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFM",
+          "d_min": 0.99,
+          "clashscore": 1.76,
+          "r_free_reported": 0.1632,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFO",
+          "d_min": 0.99,
+          "clashscore": 1.87,
+          "r_free_reported": 0.1599,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HPX",
+          "d_min": 0.99,
+          "clashscore": 1.88,
+          "r_free_reported": 0.1573,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HDK",
+          "d_min": 1.0,
+          "clashscore": 0.74,
+          "r_free_reported": 0.1576,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEP",
+          "d_min": 1.0,
+          "clashscore": 0.75,
+          "r_free_reported": 0.152,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFL",
+          "d_min": 1.0,
+          "clashscore": 0.77,
+          "r_free_reported": 0.1593,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HQ4",
+          "d_min": 1.0,
+          "clashscore": 0.78,
+          "r_free_reported": 0.1648,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEW",
+          "d_min": 1.0,
+          "clashscore": 0.88,
+          "r_free_reported": 0.157,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFU",
+          "d_min": 1.0,
+          "clashscore": 0.9,
+          "r_free_reported": 0.1537,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFY",
+          "d_min": 1.0,
+          "clashscore": 0.92,
+          "r_free_reported": 0.1543,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HDH",
+          "d_min": 1.0,
+          "clashscore": 0.94,
+          "r_free_reported": 0.1579,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HE4",
+          "d_min": 1.0,
+          "clashscore": 1.02,
+          "r_free_reported": 0.1553,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HCF",
+          "d_min": 1.0,
+          "clashscore": 1.05,
+          "r_free_reported": 0.1498,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEM",
+          "d_min": 1.0,
+          "clashscore": 1.06,
+          "r_free_reported": 0.1536,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HE9",
+          "d_min": 1.0,
+          "clashscore": 1.06,
+          "r_free_reported": 0.1609,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HPV",
+          "d_min": 1.0,
+          "clashscore": 1.12,
+          "r_free_reported": 0.1418,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEI",
+          "d_min": 1.0,
+          "clashscore": 1.18,
+          "r_free_reported": 0.155,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEK",
+          "d_min": 1.0,
+          "clashscore": 1.18,
+          "r_free_reported": 0.1602,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEF",
+          "d_min": 1.0,
+          "clashscore": 1.19,
+          "r_free_reported": 0.1534,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HET",
+          "d_min": 1.0,
+          "clashscore": 1.19,
+          "r_free_reported": 0.155,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HCW",
+          "d_min": 1.0,
+          "clashscore": 1.25,
+          "r_free_reported": 0.1589,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HCB",
+          "d_min": 1.0,
+          "clashscore": 1.28,
+          "r_free_reported": 0.1545,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEA",
+          "d_min": 1.0,
+          "clashscore": 1.29,
+          "r_free_reported": 0.1549,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HE3",
+          "d_min": 1.0,
+          "clashscore": 1.31,
+          "r_free_reported": 0.1623,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HFQ",
+          "d_min": 1.0,
+          "clashscore": 1.32,
+          "r_free_reported": 0.1683,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEZ",
+          "d_min": 1.0,
+          "clashscore": 1.33,
+          "r_free_reported": 0.1536,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7IJD",
+          "d_min": 1.0,
+          "clashscore": 1.33,
+          "r_free_reported": 0.1648,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7HI0",
+          "d_min": 1.0,
+          "clashscore": 1.34,
+          "r_free_reported": 0.1622,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HCD",
+          "d_min": 1.0,
+          "clashscore": 1.37,
+          "r_free_reported": 0.1543,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEC",
+          "d_min": 1.0,
+          "clashscore": 1.38,
+          "r_free_reported": 0.1588,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HQI",
+          "d_min": 1.0,
+          "clashscore": 1.47,
+          "r_free_reported": 0.1582,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7IJE",
+          "d_min": 1.0,
+          "clashscore": 1.47,
+          "r_free_reported": 0.1647,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7HCN",
+          "d_min": 1.0,
+          "clashscore": 1.47,
+          "r_free_reported": 0.1727,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HD4",
+          "d_min": 1.0,
+          "clashscore": 1.49,
+          "r_free_reported": 0.1621,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HEB",
+          "d_min": 1.0,
+          "clashscore": 1.51,
+          "r_free_reported": 0.1611,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HDR",
+          "d_min": 1.0,
+          "clashscore": 1.52,
+          "r_free_reported": 0.1582,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HCG",
+          "d_min": 1.0,
+          "clashscore": 1.53,
+          "r_free_reported": 0.1486,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "5RT8",
+          "d_min": 1.0,
+          "clashscore": 1.55,
+          "r_free_reported": 0.1599,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RUX",
+          "d_min": 1.0,
+          "clashscore": 1.55,
+          "r_free_reported": 0.163,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RUI",
+          "d_min": 1.0,
+          "clashscore": 1.55,
+          "r_free_reported": 0.1655,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "7HI4",
+          "d_min": 1.0,
+          "clashscore": 1.56,
+          "r_free_reported": 0.1779,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7IJB",
+          "d_min": 1.0,
+          "clashscore": 1.61,
+          "r_free_reported": 0.1573,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7HCR",
+          "d_min": 1.0,
+          "clashscore": 1.62,
+          "r_free_reported": 0.1646,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7IJF",
+          "d_min": 1.0,
+          "clashscore": 1.62,
+          "r_free_reported": 0.1766,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7HEJ",
+          "d_min": 1.0,
+          "clashscore": 1.64,
+          "r_free_reported": 0.1552,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HE7",
+          "d_min": 1.0,
+          "clashscore": 1.64,
+          "r_free_reported": 0.1634,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7FR5",
+          "d_min": 1.0,
+          "clashscore": 1.66,
+          "r_free_reported": 0.1558,
+          "deposit_year": 2022
+        },
+        {
+          "pdb_id": "7HDL",
+          "d_min": 1.0,
+          "clashscore": 1.66,
+          "r_free_reported": 0.1688,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7IJ8",
+          "d_min": 1.0,
+          "clashscore": 1.69,
+          "r_free_reported": 0.1735,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7HEQ",
+          "d_min": 1.0,
+          "clashscore": 1.73,
+          "r_free_reported": 0.1646,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "5RUC",
+          "d_min": 1.0,
+          "clashscore": 1.73,
+          "r_free_reported": 0.1697,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RU8",
+          "d_min": 1.0,
+          "clashscore": 1.74,
+          "r_free_reported": 0.1558,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RUN",
+          "d_min": 1.0,
+          "clashscore": 1.74,
+          "r_free_reported": 0.1711,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RT7",
+          "d_min": 1.0,
+          "clashscore": 1.74,
+          "r_free_reported": 0.1735,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RV8",
+          "d_min": 1.0,
+          "clashscore": 1.74,
+          "r_free_reported": 0.1767,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "9D6G",
+          "d_min": 1.0,
+          "clashscore": 1.81,
+          "r_free_reported": 0.1419,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HCX",
+          "d_min": 1.0,
+          "clashscore": 1.84,
+          "r_free_reported": 0.1638,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HDP",
+          "d_min": 1.0,
+          "clashscore": 1.92,
+          "r_free_reported": 0.159,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "5RUS",
+          "d_min": 1.0,
+          "clashscore": 1.93,
+          "r_free_reported": 0.1609,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RVA",
+          "d_min": 1.0,
+          "clashscore": 1.93,
+          "r_free_reported": 0.1651,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RSW",
+          "d_min": 1.0,
+          "clashscore": 1.93,
+          "r_free_reported": 0.1774,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RTZ",
+          "d_min": 1.0,
+          "clashscore": 1.93,
+          "r_free_reported": 0.1782,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RUT",
+          "d_min": 1.0,
+          "clashscore": 1.93,
+          "r_free_reported": 0.1783,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RV1",
+          "d_min": 1.0,
+          "clashscore": 1.94,
+          "r_free_reported": 0.1799,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "7HQ2",
+          "d_min": 1.0,
+          "clashscore": 1.98,
+          "r_free_reported": 0.1706,
+          "deposit_year": 2024
+        },
+        {
+          "pdb_id": "7HC4",
+          "d_min": 1.0,
+          "clashscore": 1.99,
+          "r_free_reported": 0.1583,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "5094_30",
+      "members": [
+        {
+          "pdb_id": "8PB5",
+          "d_min": 0.89,
+          "clashscore": 1.43,
+          "r_free_reported": 0.1515,
+          "deposit_year": 2023
+        },
+        {
+          "pdb_id": "8PB7",
+          "d_min": 0.92,
+          "clashscore": 1.96,
+          "r_free_reported": 0.1612,
+          "deposit_year": 2023
+        },
+        {
+          "pdb_id": "8PB6",
+          "d_min": 0.93,
+          "clashscore": 1.44,
+          "r_free_reported": 0.1518,
+          "deposit_year": 2023
+        },
+        {
+          "pdb_id": "8QXQ",
+          "d_min": 0.94,
+          "clashscore": 1.44,
+          "r_free_reported": 0.1494,
+          "deposit_year": 2023
+        }
+      ]
+    },
+    {
+      "cluster": "3889_30",
+      "members": [
+        {
+          "pdb_id": "5JSK",
+          "d_min": 0.95,
+          "clashscore": 1.77,
+          "r_free_reported": 0.1202,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "15453_30",
+      "members": [
+        {
+          "pdb_id": "6U97",
+          "d_min": 1.0,
+          "clashscore": 1.59,
+          "r_free_reported": 0.1528,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "232677_30",
+      "members": [
+        {
+          "pdb_id": "7TMH",
+          "d_min": 0.8,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1272,
+          "deposit_year": 2022
+        }
+      ]
+    },
+    {
+      "cluster": "150134_30",
+      "members": [
+        {
+          "pdb_id": "3A0M",
+          "d_min": 0.98,
+          "clashscore": 1.65,
+          "r_free_reported": 0.1429,
+          "deposit_year": 2009
+        }
+      ]
+    },
+    {
+      "cluster": "4604_30",
+      "members": [
+        {
+          "pdb_id": "5TVY",
+          "d_min": 1.0,
+          "clashscore": 1.13,
+          "r_free_reported": 0.1215,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "10446_30",
+      "members": [
+        {
+          "pdb_id": "7DC4",
+          "d_min": 0.95,
+          "clashscore": 1.79,
+          "r_free_reported": 0.1477,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "154932_30",
+      "members": [
+        {
+          "pdb_id": "8GK9",
+          "d_min": 0.97,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1586,
+          "deposit_year": 2023
+        }
+      ]
+    },
+    {
+      "cluster": "15100_30",
+      "members": [
+        {
+          "pdb_id": "8A3G",
+          "d_min": 0.96,
+          "clashscore": 1.8,
+          "r_free_reported": 0.1687,
+          "deposit_year": 2022
+        }
+      ]
+    },
+    {
+      "cluster": "2423_30",
+      "members": [
+        {
+          "pdb_id": "9BB0",
+          "d_min": 0.98,
+          "clashscore": 0.52,
+          "r_free_reported": 0.1467,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "4117_30",
+      "members": [
+        {
+          "pdb_id": "9QQT",
+          "d_min": 0.98,
+          "clashscore": 0.5,
+          "r_free_reported": 0.1481,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9QR1",
+          "d_min": 0.98,
+          "clashscore": 0.55,
+          "r_free_reported": 0.1176,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7B1S",
+          "d_min": 0.99,
+          "clashscore": 1.35,
+          "r_free_reported": 0.1275,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "183985_30",
+      "members": [
+        {
+          "pdb_id": "9EJV",
+          "d_min": 0.92,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1348,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "53_30",
+      "members": [
+        {
+          "pdb_id": "5R32",
+          "d_min": 0.9,
+          "clashscore": 0.62,
+          "r_free_reported": 0.1368,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RBR",
+          "d_min": 0.9,
+          "clashscore": 1.69,
+          "r_free_reported": 0.1553,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5R35",
+          "d_min": 0.91,
+          "clashscore": 0.62,
+          "r_free_reported": 0.1268,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5R33",
+          "d_min": 0.92,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1367,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5R2D",
+          "d_min": 0.92,
+          "clashscore": 0.41,
+          "r_free_reported": 0.1252,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5R39",
+          "d_min": 0.92,
+          "clashscore": 0.42,
+          "r_free_reported": 0.1206,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5R31",
+          "d_min": 0.92,
+          "clashscore": 0.42,
+          "r_free_reported": 0.1307,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RCK",
+          "d_min": 0.92,
+          "clashscore": 1.21,
+          "r_free_reported": 0.15542,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RDJ",
+          "d_min": 0.93,
+          "clashscore": 1.42,
+          "r_free_reported": 0.15128,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RD3",
+          "d_min": 0.93,
+          "clashscore": 1.42,
+          "r_free_reported": 0.15199,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5R3L",
+          "d_min": 0.94,
+          "clashscore": 0.21,
+          "r_free_reported": 0.132,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5SAN",
+          "d_min": 0.94,
+          "clashscore": 0.39,
+          "r_free_reported": 0.1472,
+          "deposit_year": 2021
+        },
+        {
+          "pdb_id": "5R1V",
+          "d_min": 0.94,
+          "clashscore": 0.42,
+          "r_free_reported": 0.132,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RCV",
+          "d_min": 0.95,
+          "clashscore": 0.0,
+          "r_free_reported": 0.15987,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5R3C",
+          "d_min": 0.95,
+          "clashscore": 0.42,
+          "r_free_reported": 0.1291,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "7IIL",
+          "d_min": 0.96,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1362,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "5R2Z",
+          "d_min": 0.97,
+          "clashscore": 0.21,
+          "r_free_reported": 0.1467,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5R2O",
+          "d_min": 0.97,
+          "clashscore": 0.62,
+          "r_free_reported": 0.159,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RDP",
+          "d_min": 0.97,
+          "clashscore": 0.63,
+          "r_free_reported": 0.15854,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RDS",
+          "d_min": 0.97,
+          "clashscore": 0.84,
+          "r_free_reported": 0.17072,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RDF",
+          "d_min": 0.97,
+          "clashscore": 1.01,
+          "r_free_reported": 0.16847,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RCS",
+          "d_min": 0.97,
+          "clashscore": 1.04,
+          "r_free_reported": 0.17954,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RC2",
+          "d_min": 0.97,
+          "clashscore": 1.79,
+          "r_free_reported": 0.15408,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5R3R",
+          "d_min": 0.98,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1352,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5MB5",
+          "d_min": 0.98,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1404,
+          "deposit_year": 2016
+        },
+        {
+          "pdb_id": "5R3D",
+          "d_min": 0.98,
+          "clashscore": 0.21,
+          "r_free_reported": 0.1385,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5SAR",
+          "d_min": 0.98,
+          "clashscore": 0.79,
+          "r_free_reported": 0.1754,
+          "deposit_year": 2021
+        },
+        {
+          "pdb_id": "5RDA",
+          "d_min": 0.98,
+          "clashscore": 0.83,
+          "r_free_reported": 0.15718,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RDX",
+          "d_min": 0.98,
+          "clashscore": 0.83,
+          "r_free_reported": 0.16041,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RC3",
+          "d_min": 0.98,
+          "clashscore": 0.98,
+          "r_free_reported": 0.16348,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RD8",
+          "d_min": 0.98,
+          "clashscore": 1.42,
+          "r_free_reported": 0.15152,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RDN",
+          "d_min": 0.98,
+          "clashscore": 1.42,
+          "r_free_reported": 0.15505,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "4Y5L",
+          "d_min": 0.99,
+          "clashscore": 0.81,
+          "r_free_reported": 0.1296,
+          "deposit_year": 2015
+        },
+        {
+          "pdb_id": "5R2G",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1357,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5R2L",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1372,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RDI",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1646,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "7IIM",
+          "d_min": 1.0,
+          "clashscore": 0.21,
+          "r_free_reported": 0.1388,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "5R34",
+          "d_min": 1.0,
+          "clashscore": 0.21,
+          "r_free_reported": 0.1414,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5RBS",
+          "d_min": 1.0,
+          "clashscore": 0.47,
+          "r_free_reported": 0.16134,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5SAO",
+          "d_min": 1.0,
+          "clashscore": 1.2,
+          "r_free_reported": 0.1458,
+          "deposit_year": 2021
+        },
+        {
+          "pdb_id": "5RCJ",
+          "d_min": 1.0,
+          "clashscore": 1.42,
+          "r_free_reported": 0.15837,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5SAL",
+          "d_min": 1.0,
+          "clashscore": 1.56,
+          "r_free_reported": 0.1599,
+          "deposit_year": 2021
+        },
+        {
+          "pdb_id": "5RD1",
+          "d_min": 1.0,
+          "clashscore": 1.62,
+          "r_free_reported": 0.16196,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "531_30",
+      "members": [
+        {
+          "pdb_id": "7R2H",
+          "d_min": 0.79,
+          "clashscore": 0.8,
+          "r_free_reported": 0.1549,
+          "deposit_year": 2022
+        },
+        {
+          "pdb_id": "4O8H",
+          "d_min": 0.85,
+          "clashscore": 0.39,
+          "r_free_reported": 0.1188,
+          "deposit_year": 2013
+        },
+        {
+          "pdb_id": "7PMT",
+          "d_min": 0.98,
+          "clashscore": 0.4,
+          "r_free_reported": 0.1476,
+          "deposit_year": 2021
+        }
+      ]
+    },
+    {
+      "cluster": "140281_30",
+      "members": [
+        {
+          "pdb_id": "9EG5",
+          "d_min": 0.98,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1378,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "4438_30",
+      "members": [
+        {
+          "pdb_id": "4TXR",
+          "d_min": 1.0,
+          "clashscore": 1.21,
+          "r_free_reported": 0.1798,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "1378_30",
+      "members": [
+        {
+          "pdb_id": "9YGW",
+          "d_min": 0.88,
+          "clashscore": 1.9,
+          "r_free_reported": 0.1252,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9YFR",
+          "d_min": 0.92,
+          "clashscore": 1.17,
+          "r_free_reported": 0.1125,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9YFS",
+          "d_min": 0.94,
+          "clashscore": 1.6,
+          "r_free_reported": 0.137,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9YGX",
+          "d_min": 0.97,
+          "clashscore": 1.16,
+          "r_free_reported": 0.1127,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9YKF",
+          "d_min": 0.98,
+          "clashscore": 0.94,
+          "r_free_reported": 0.1144,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "5SY4",
+          "d_min": 0.98,
+          "clashscore": 1.25,
+          "r_free_reported": 0.1266,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "6504_30",
+      "members": [
+        {
+          "pdb_id": "4WKA",
+          "d_min": 0.95,
+          "clashscore": 1.47,
+          "r_free_reported": 0.1227,
+          "deposit_year": 2014
+        },
+        {
+          "pdb_id": "4WJX",
+          "d_min": 1.0,
+          "clashscore": 1.86,
+          "r_free_reported": 0.1475,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "68447_30",
+      "members": [
+        {
+          "pdb_id": "2O6N",
+          "d_min": 1.0,
+          "clashscore": 1.54,
+          "r_free_reported": 0.132,
+          "deposit_year": 2006
+        }
+      ]
+    },
+    {
+      "cluster": "4396_30",
+      "members": [
+        {
+          "pdb_id": "1EJG",
+          "d_min": 0.54,
+          "clashscore": 1.15,
+          "r_free_reported": 0.094,
+          "deposit_year": 2000
+        },
+        {
+          "pdb_id": "3U7T",
+          "d_min": 0.85,
+          "clashscore": 0.0,
+          "r_free_reported": 0.136,
+          "deposit_year": 2011
+        }
+      ]
+    },
+    {
+      "cluster": "12467_30",
+      "members": [
+        {
+          "pdb_id": "5LHW",
+          "d_min": 0.91,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1387,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "254608_30",
+      "members": [
+        {
+          "pdb_id": "5I6A",
+          "d_min": 0.81,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0766,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "124454_30",
+      "members": [
+        {
+          "pdb_id": "1BYZ",
+          "d_min": 0.9,
+          "clashscore": 0.0,
+          "r_free_reported": 0.105,
+          "deposit_year": 1998
+        }
+      ]
+    },
+    {
+      "cluster": "1916_30",
+      "members": [
+        {
+          "pdb_id": "9QDV",
+          "d_min": 0.89,
+          "clashscore": 0.24,
+          "r_free_reported": 0.131,
+          "deposit_year": 2025
+        }
+      ]
+    },
+    {
+      "cluster": "14150_30",
+      "members": [
+        {
+          "pdb_id": "7L71",
+          "d_min": 0.97,
+          "clashscore": 1.09,
+          "r_free_reported": 0.1501,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "15237_30",
+      "members": [
+        {
+          "pdb_id": "7P24",
+          "d_min": 0.97,
+          "clashscore": 1.69,
+          "r_free_reported": 0.1362,
+          "deposit_year": 2021
+        }
+      ]
+    },
+    {
+      "cluster": "168403_30",
+      "members": [
+        {
+          "pdb_id": "8GL5",
+          "d_min": 0.96,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1592,
+          "deposit_year": 2023
+        }
+      ]
+    },
+    {
+      "cluster": "236862_30",
+      "members": [
+        {
+          "pdb_id": "7TLS",
+          "d_min": 0.73,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1293,
+          "deposit_year": 2022
+        }
+      ]
+    },
+    {
+      "cluster": "18_30",
+      "members": [
+        {
+          "pdb_id": "9RZL",
+          "d_min": 0.9,
+          "clashscore": 1.06,
+          "r_free_reported": 0.1302,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "6F1O",
+          "d_min": 0.96,
+          "clashscore": 0.99,
+          "r_free_reported": 0.1416,
+          "deposit_year": 2017
+        },
+        {
+          "pdb_id": "5HMV",
+          "d_min": 0.98,
+          "clashscore": 1.94,
+          "r_free_reported": 0.14652,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "9903_30",
+      "members": [
+        {
+          "pdb_id": "2BF9",
+          "d_min": 0.99,
+          "clashscore": 1.7,
+          "r_free_reported": 0.1794,
+          "deposit_year": 2004
+        }
+      ]
+    },
+    {
+      "cluster": "4309_30",
+      "members": [
+        {
+          "pdb_id": "9QQT",
+          "d_min": 0.98,
+          "clashscore": 0.5,
+          "r_free_reported": 0.1481,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9QR1",
+          "d_min": 0.98,
+          "clashscore": 0.55,
+          "r_free_reported": 0.1176,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7B1S",
+          "d_min": 0.99,
+          "clashscore": 1.35,
+          "r_free_reported": 0.1275,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "2317_30",
+      "members": [
+        {
+          "pdb_id": "3WH1",
+          "d_min": 1.0,
+          "clashscore": 0.63,
+          "r_free_reported": 0.15506,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "2110_30",
+      "members": [
+        {
+          "pdb_id": "4TXR",
+          "d_min": 1.0,
+          "clashscore": 1.21,
+          "r_free_reported": 0.1798,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "1186_30",
+      "members": [
+        {
+          "pdb_id": "5JSK",
+          "d_min": 0.95,
+          "clashscore": 1.77,
+          "r_free_reported": 0.1202,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "89005_30",
+      "members": [
+        {
+          "pdb_id": "8EY3",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1095,
+          "deposit_year": 2022
+        }
+      ]
+    },
+    {
+      "cluster": "15889_30",
+      "members": [
+        {
+          "pdb_id": "3PSM",
+          "d_min": 0.98,
+          "clashscore": 0.68,
+          "r_free_reported": 0.1637,
+          "deposit_year": 2010
+        }
+      ]
+    },
+    {
+      "cluster": "204866_30",
+      "members": [
+        {
+          "pdb_id": "5MAS",
+          "d_min": 0.84,
+          "clashscore": 0.0,
+          "r_free_reported": 0.131,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "3707_30",
+      "members": [
+        {
+          "pdb_id": "4EIC",
+          "d_min": 0.84,
+          "clashscore": 1.37,
+          "r_free_reported": 0.1271,
+          "deposit_year": 2012
+        }
+      ]
+    },
+    {
+      "cluster": "4389_30",
+      "members": [
+        {
+          "pdb_id": "9QQT",
+          "d_min": 0.98,
+          "clashscore": 0.5,
+          "r_free_reported": 0.1481,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "9QR1",
+          "d_min": 0.98,
+          "clashscore": 0.55,
+          "r_free_reported": 0.1176,
+          "deposit_year": 2025
+        },
+        {
+          "pdb_id": "7B1S",
+          "d_min": 0.99,
+          "clashscore": 1.35,
+          "r_free_reported": 0.1275,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "18320_30",
+      "members": [
+        {
+          "pdb_id": "4M7G",
+          "d_min": 0.79,
+          "clashscore": 1.88,
+          "r_free_reported": 0.12,
+          "deposit_year": 2013
+        },
+        {
+          "pdb_id": "5DJ7",
+          "d_min": 0.87,
+          "clashscore": 1.25,
+          "r_free_reported": 0.1212,
+          "deposit_year": 2015
+        },
+        {
+          "pdb_id": "5DK1",
+          "d_min": 0.94,
+          "clashscore": 1.48,
+          "r_free_reported": 0.1171,
+          "deposit_year": 2015
+        }
+      ]
+    },
+    {
+      "cluster": "17447_30",
+      "members": [
+        {
+          "pdb_id": "5HB7",
+          "d_min": 0.8,
+          "clashscore": 0.43,
+          "r_free_reported": 0.1315,
+          "deposit_year": 2015
+        }
+      ]
+    },
+    {
+      "cluster": "247757_30",
+      "members": [
+        {
+          "pdb_id": "7A2X",
+          "d_min": 0.92,
+          "clashscore": 0.76,
+          "r_free_reported": 0.1483,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "153567_30",
+      "members": [
+        {
+          "pdb_id": "9EH3",
+          "d_min": 0.8,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1527,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "151579_30",
+      "members": [
+        {
+          "pdb_id": "6EVH",
+          "d_min": 0.82,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0932,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "20562_30",
+      "members": [
+        {
+          "pdb_id": "2E4T",
+          "d_min": 0.96,
+          "clashscore": 1.96,
+          "r_free_reported": 0.14606,
+          "deposit_year": 2006
+        }
+      ]
+    },
+    {
+      "cluster": "236655_30",
+      "members": [
+        {
+          "pdb_id": "7TM2",
+          "d_min": 0.88,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1054,
+          "deposit_year": 2022
+        }
+      ]
+    },
+    {
+      "cluster": "10278_30",
+      "members": [
+        {
+          "pdb_id": "3ZOJ",
+          "d_min": 0.88,
+          "clashscore": 0.69,
+          "r_free_reported": 0.10739,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "4975_30",
+      "members": [
+        {
+          "pdb_id": "7A2P",
+          "d_min": 0.9,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1496,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "6XVM",
+          "d_min": 0.9,
+          "clashscore": 1.31,
+          "r_free_reported": 0.1495,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "7A2X",
+          "d_min": 0.92,
+          "clashscore": 0.76,
+          "r_free_reported": 0.1483,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "7A2O",
+          "d_min": 0.94,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1753,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "7A31",
+          "d_min": 0.94,
+          "clashscore": 0.53,
+          "r_free_reported": 0.1665,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "7A33",
+          "d_min": 0.96,
+          "clashscore": 0.95,
+          "r_free_reported": 0.1341,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "7A2Y",
+          "d_min": 0.97,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1461,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "23628_30",
+      "members": [
+        {
+          "pdb_id": "4HGU",
+          "d_min": 0.98,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1236,
+          "deposit_year": 2012
+        }
+      ]
+    },
+    {
+      "cluster": "192686_30",
+      "members": [
+        {
+          "pdb_id": "8V56",
+          "d_min": 0.98,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1473,
+          "deposit_year": 2023
+        }
+      ]
+    },
+    {
+      "cluster": "22451_30",
+      "members": [
+        {
+          "pdb_id": "4K8Y",
+          "d_min": 1.0,
+          "clashscore": 1.32,
+          "r_free_reported": 0.1702,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "91_30",
+      "members": [
+        {
+          "pdb_id": "6Q01",
+          "d_min": 0.85,
+          "clashscore": 0.41,
+          "r_free_reported": 0.1143,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6Q00",
+          "d_min": 0.85,
+          "clashscore": 0.8,
+          "r_free_reported": 0.1118,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "4808_30",
+      "members": [
+        {
+          "pdb_id": "5OAV",
+          "d_min": 0.95,
+          "clashscore": 0.46,
+          "r_free_reported": 0.1595,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "157359_30",
+      "members": [
+        {
+          "pdb_id": "8GK1",
+          "d_min": 0.83,
+          "clashscore": 0.0,
+          "r_free_reported": 0.119,
+          "deposit_year": 2023
+        }
+      ]
+    },
+    {
+      "cluster": "409_30",
+      "members": [
+        {
+          "pdb_id": "6TD8",
+          "d_min": 0.95,
+          "clashscore": 1.21,
+          "r_free_reported": 0.1212,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6T3P",
+          "d_min": 0.95,
+          "clashscore": 1.58,
+          "r_free_reported": 0.1151,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "8AE9",
+          "d_min": 0.95,
+          "clashscore": 1.73,
+          "r_free_reported": 0.1243,
+          "deposit_year": 2022
+        },
+        {
+          "pdb_id": "5OUJ",
+          "d_min": 0.96,
+          "clashscore": 1.46,
+          "r_free_reported": 0.1465,
+          "deposit_year": 2017
+        },
+        {
+          "pdb_id": "5OUK",
+          "d_min": 0.96,
+          "clashscore": 1.65,
+          "r_free_reported": 0.1488,
+          "deposit_year": 2017
+        },
+        {
+          "pdb_id": "4PRT",
+          "d_min": 0.96,
+          "clashscore": 1.83,
+          "r_free_reported": 0.1366,
+          "deposit_year": 2014
+        },
+        {
+          "pdb_id": "8B34",
+          "d_min": 0.97,
+          "clashscore": 1.62,
+          "r_free_reported": 0.114,
+          "deposit_year": 2022
+        },
+        {
+          "pdb_id": "6XUM",
+          "d_min": 0.97,
+          "clashscore": 1.79,
+          "r_free_reported": 0.1279,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "4QBX",
+          "d_min": 0.98,
+          "clashscore": 1.71,
+          "r_free_reported": 0.1514,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "113902_30",
+      "members": [
+        {
+          "pdb_id": "8VPS",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1462,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "257135_30",
+      "members": [
+        {
+          "pdb_id": "8GBI",
+          "d_min": 0.95,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1699,
+          "deposit_year": 2023
+        }
+      ]
+    },
+    {
+      "cluster": "21182_30",
+      "members": [
+        {
+          "pdb_id": "1IQZ",
+          "d_min": 0.92,
+          "clashscore": 0.82,
+          "r_free_reported": 0.113,
+          "deposit_year": 2001
+        }
+      ]
+    },
+    {
+      "cluster": "3647_30",
+      "members": [
+        {
+          "pdb_id": "2H5D",
+          "d_min": 0.9,
+          "clashscore": 1.83,
+          "r_free_reported": 0.091,
+          "deposit_year": 2006
+        }
+      ]
+    },
+    {
+      "cluster": "6583_30",
+      "members": [
+        {
+          "pdb_id": "5O0U",
+          "d_min": 0.99,
+          "clashscore": 0.0,
+          "r_free_reported": 0.13985,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "1209_30",
+      "members": [
+        {
+          "pdb_id": "8R5K",
+          "d_min": 0.89,
+          "clashscore": 1.76,
+          "r_free_reported": 0.15007,
+          "deposit_year": 2023
+        },
+        {
+          "pdb_id": "6TX6",
+          "d_min": 0.98,
+          "clashscore": 0.86,
+          "r_free_reported": 0.1212,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "116224_30",
+      "members": [
+        {
+          "pdb_id": "5OAV",
+          "d_min": 0.95,
+          "clashscore": 0.46,
+          "r_free_reported": 0.1595,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "38709_30",
+      "members": [
+        {
+          "pdb_id": "4NDS",
+          "d_min": 1.0,
+          "clashscore": 1.91,
+          "r_free_reported": 0.1245,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "87917_30",
+      "members": [
+        {
+          "pdb_id": "6UFA",
+          "d_min": 0.77,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1318,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "2749_30",
+      "members": [
+        {
+          "pdb_id": "4K8Y",
+          "d_min": 1.0,
+          "clashscore": 1.32,
+          "r_free_reported": 0.1702,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "1144_30",
+      "members": [
+        {
+          "pdb_id": "2P5K",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.16,
+          "deposit_year": 2007
+        }
+      ]
+    },
+    {
+      "cluster": "2166_30",
+      "members": [
+        {
+          "pdb_id": "6UWW",
+          "d_min": 0.92,
+          "clashscore": 0.36,
+          "r_free_reported": 0.1454,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "8308_30",
+      "members": [
+        {
+          "pdb_id": "6L8G",
+          "d_min": 1.0,
+          "clashscore": 1.47,
+          "r_free_reported": 0.1758,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "21505_30",
+      "members": [
+        {
+          "pdb_id": "4LN2",
+          "d_min": 1.0,
+          "clashscore": 1.52,
+          "r_free_reported": 0.15188,
+          "deposit_year": 2013
+        }
+      ]
+    },
+    {
+      "cluster": "71_30",
+      "members": [
+        {
+          "pdb_id": "5MOQ",
+          "d_min": 0.93,
+          "clashscore": 0.29,
+          "r_free_reported": 0.1032,
+          "deposit_year": 2016
+        },
+        {
+          "pdb_id": "5MNH",
+          "d_min": 0.93,
+          "clashscore": 1.63,
+          "r_free_reported": 0.1012,
+          "deposit_year": 2016
+        },
+        {
+          "pdb_id": "2XTT",
+          "d_min": 0.93,
+          "clashscore": 1.81,
+          "r_free_reported": 0.1397,
+          "deposit_year": 2010
+        },
+        {
+          "pdb_id": "5MON",
+          "d_min": 0.94,
+          "clashscore": 0.59,
+          "r_free_reported": 0.1044,
+          "deposit_year": 2016
+        },
+        {
+          "pdb_id": "5MNB",
+          "d_min": 0.94,
+          "clashscore": 1.95,
+          "r_free_reported": 0.107,
+          "deposit_year": 2016
+        },
+        {
+          "pdb_id": "6SY3",
+          "d_min": 0.95,
+          "clashscore": 1.41,
+          "r_free_reported": 0.1338,
+          "deposit_year": 2019
+        },
+        {
+          "pdb_id": "6YIV",
+          "d_min": 0.95,
+          "clashscore": 1.95,
+          "r_free_reported": 0.1345,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5MOS",
+          "d_min": 0.96,
+          "clashscore": 0.29,
+          "r_free_reported": 0.1044,
+          "deposit_year": 2016
+        },
+        {
+          "pdb_id": "6YIW",
+          "d_min": 0.97,
+          "clashscore": 1.38,
+          "r_free_reported": 0.1421,
+          "deposit_year": 2020
+        },
+        {
+          "pdb_id": "5MOR",
+          "d_min": 0.98,
+          "clashscore": 0.88,
+          "r_free_reported": 0.1077,
+          "deposit_year": 2016
+        },
+        {
+          "pdb_id": "5MNM",
+          "d_min": 0.98,
+          "clashscore": 1.38,
+          "r_free_reported": 0.1123,
+          "deposit_year": 2016
+        },
+        {
+          "pdb_id": "5MOP",
+          "d_min": 0.99,
+          "clashscore": 0.58,
+          "r_free_reported": 0.1027,
+          "deposit_year": 2016
+        },
+        {
+          "pdb_id": "4NIV",
+          "d_min": 1.0,
+          "clashscore": 0.97,
+          "r_free_reported": 0.1729,
+          "deposit_year": 2013
+        },
+        {
+          "pdb_id": "6ZFJ",
+          "d_min": 1.0,
+          "clashscore": 1.92,
+          "r_free_reported": 0.1261,
+          "deposit_year": 2020
+        }
+      ]
+    },
+    {
+      "cluster": "6408_30",
+      "members": [
+        {
+          "pdb_id": "5WQQ",
+          "d_min": 0.8,
+          "clashscore": 1.36,
+          "r_free_reported": 0.129,
+          "deposit_year": 2016
+        }
+      ]
+    },
+    {
+      "cluster": "143145_30",
+      "members": [
+        {
+          "pdb_id": "9EG0",
+          "d_min": 0.92,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1681,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:1HHZ_1",
+      "members": [
+        {
+          "pdb_id": "1HHZ",
+          "d_min": 0.99,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1403,
+          "deposit_year": 2000
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:2OL9_1",
+      "members": [
+        {
+          "pdb_id": "2OL9",
+          "d_min": 0.85,
+          "clashscore": 0.0,
+          "r_free_reported": 0.078,
+          "deposit_year": 2007
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:2YGJ_1",
+      "members": [
+        {
+          "pdb_id": "2YGJ",
+          "d_min": 0.8,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1091,
+          "deposit_year": 2011
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:4TUT_1",
+      "members": [
+        {
+          "pdb_id": "4TUT",
+          "d_min": 0.9,
+          "clashscore": 0.0,
+          "r_free_reported": 0.098,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:4UBY_1",
+      "members": [
+        {
+          "pdb_id": "4UBY",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1577,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:4UBZ_1",
+      "members": [
+        {
+          "pdb_id": "4UBZ",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1104,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:4W5L_1",
+      "members": [
+        {
+          "pdb_id": "4W5L",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1769,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:4W67_1",
+      "members": [
+        {
+          "pdb_id": "4W67",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1482,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:4W71_1",
+      "members": [
+        {
+          "pdb_id": "4W71",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1534,
+          "deposit_year": 2014
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:5N9H_1",
+      "members": [
+        {
+          "pdb_id": "5N9H",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0959,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:5WHP_1",
+      "members": [
+        {
+          "pdb_id": "5WHP",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0929,
+          "deposit_year": 2017
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:5ZGL_1",
+      "members": [
+        {
+          "pdb_id": "5ZGL",
+          "d_min": 0.95,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1211,
+          "deposit_year": 2018
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:6C3T_1",
+      "members": [
+        {
+          "pdb_id": "6C3T",
+          "d_min": 1.0,
+          "clashscore": 0.0,
+          "r_free_reported": 0.124,
+          "deposit_year": 2018
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:6DIY_1",
+      "members": [
+        {
+          "pdb_id": "6DIY",
+          "d_min": 0.89,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1198,
+          "deposit_year": 2018
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:6DKZ_1",
+      "members": [
+        {
+          "pdb_id": "6DKZ",
+          "d_min": 0.99,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1739,
+          "deposit_year": 2018
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:6UF7_1",
+      "members": [
+        {
+          "pdb_id": "6UF7",
+          "d_min": 0.8,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0518,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:6UF8_1",
+      "members": [
+        {
+          "pdb_id": "6UF8",
+          "d_min": 0.8,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1483,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:6UGB_1",
+      "members": [
+        {
+          "pdb_id": "6UGB",
+          "d_min": 0.95,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1618,
+          "deposit_year": 2019
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:7ETN_1",
+      "members": [
+        {
+          "pdb_id": "7ETN",
+          "d_min": 0.82,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0873,
+          "deposit_year": 2021
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:9BZV_1",
+      "members": [
+        {
+          "pdb_id": "9BZV",
+          "d_min": 0.8,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1073,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:9C01_1",
+      "members": [
+        {
+          "pdb_id": "9C01",
+          "d_min": 0.83,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1162,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:9C03_1",
+      "members": [
+        {
+          "pdb_id": "9C03",
+          "d_min": 0.93,
+          "clashscore": 0.0,
+          "r_free_reported": 0.0792,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:9C04_1",
+      "members": [
+        {
+          "pdb_id": "9C04",
+          "d_min": 0.94,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1086,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:9C05_1",
+      "members": [
+        {
+          "pdb_id": "9C05",
+          "d_min": 0.97,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1112,
+          "deposit_year": 2024
+        }
+      ]
+    },
+    {
+      "cluster": "ungrouped:9C06_1",
+      "members": [
+        {
+          "pdb_id": "9C06",
+          "d_min": 0.85,
+          "clashscore": 0.0,
+          "r_free_reported": 0.1375,
+          "deposit_year": 2024
+        }
+      ]
+    }
+  ]
+}
