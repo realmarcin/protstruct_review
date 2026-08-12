@@ -68,8 +68,11 @@ exactly what #297 prohibits.
 (77 entities)** under the D2 criteria (measured live 2026-08-10), so "all stratum
 representatives" does not fit a 30-screen scope (#308). Registered draw,
 deterministic: **20 representatives spread evenly across the ≤ 0.9 Å stratum's
-d_min-sorted cluster list** (an even spread, not the head — the #243 lesson) **+
-10 from (0.9, 1.0] by ascending d_min**. At ~10 min of `phenix.refine` each this
+d_min-sorted cluster list** — spread per
+`scripts/select_gold_standards.py::spread_sample` (index `int(i * len/want)`,
+pinned by its tests), not the head of the list (the #243 lesson) — **+ 10 from
+(0.9, 1.0] by ascending d_min** (best-data-first on purpose; the d_min sort is
+not the deposition-order head that produced #243). At ~10 min of `phenix.refine` each this
 is a ~5 h batch; canary first (one entry end-to-end, artifacts on disk and
 non-empty, both R paths parsed) per the standing canary rule.
 
@@ -89,8 +92,9 @@ two-path-agreement rule is doing less than it appears.
 deposition years (older refinement software left more on the table — the
 PDB_REDO mechanism). Recorded, not banded.
 
-**P4 — the D3 floor is not load-bearing at enrollment scale.** ≤ 3 of 30
-representatives fail the ≥ 50-unmasked floor once masks are built. If more fail,
+**P4 — the D3 floor is not load-bearing at enrollment scale.** ≤ 3 of the 30
+INITIAL representatives (before any D4 replacement — the denominator is fixed,
+#309) fail the ≥ 50-unmasked floor once masks are built. If more fail,
 the floor interacts with selection more than the phase-1 sample suggested and D3's
 value is re-registered before any benchmark round uses it.
 
