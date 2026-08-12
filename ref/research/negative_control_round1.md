@@ -48,7 +48,9 @@ conversions.
 
 ## The one screened entry is the mechanism working
 
-5SY4 (0.98 Å, 267 unmasked residues, initial representative):
+5SY4 (0.98 Å, 267 unmasked residues — a **D4 replacement**, not an initial
+representative; not one of the 30 initial representatives survived to the
+screen (#311), which sharpens the P4 finding):
 
 | path | R-free pre | R-free post | Δ |
 |---|---:|---:|---:|
