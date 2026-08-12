@@ -60,10 +60,13 @@ def _load(name: str):
     return module
 
 
-_bench = _load("bench_refinement_deltas")     # refine protocol + PHENIX_BIN
+_bench = _load("bench_refinement_deltas")     # refine protocol
 _gold = _load("gold_mask")                    # phase-1 masks
 _gr = _load("gemmi_rfactor")                  # independent R path
-PHENIX_BIN = _bench.PHENIX_BIN
+# Same literal as every other PHENIX-calling script — the validate.sh tool-path
+# guard compares the assignment text across scripts, so an alias through another
+# module would hide a divergence from it.
+PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
 
 
 def fetch_pair(pdb_id: str, cache: Path) -> tuple[Path | None, Path | None, str]:
