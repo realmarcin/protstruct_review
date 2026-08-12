@@ -74,12 +74,18 @@ def fetch_pair(pdb_id: str, cache: Path) -> tuple[Path | None, Path | None, str]
         return model, mtz, ""
     # PHENIX 2.0's fetch_pdb is phil-based: the 1.x `--mtz` flag is gone (the
     # round-1 canary caught this); model+data plus convert_to_mtz=True is the
-    # equivalent.
-    result = subprocess.run(
-        ["bash", "-c", f"cd {cache} && {PHENIX_BIN / 'phenix.fetch_pdb'} "
-         f"{pdb_id} action=model+data fetch.convert_to_mtz=True "
-         f"> fetch_{pdb_id}.log 2>&1"],
-        capture_output=True, text=True, timeout=1800, env=dict(os.environ))
+    # equivalent. Two attempts: the canary also caught a transient
+    # IncompleteRead killing the download mid-file, so one retry (with
+    # --overwrite, since partial files are then present) is cheap insurance
+    # against pure network noise; a second failure is a real data defect.
+    for attempt, extra in enumerate(("", "--overwrite")):
+        subprocess.run(
+            ["bash", "-c", f"cd {cache} && {PHENIX_BIN / 'phenix.fetch_pdb'} "
+             f"{pdb_id} action=model+data fetch.convert_to_mtz=True {extra} "
+             f"> fetch_{pdb_id}.log 2>&1"],
+            capture_output=True, text=True, timeout=1800, env=dict(os.environ))
+        if model.exists() and mtz.exists():
+            break
     if not model.exists() or not mtz.exists():
         tail = (cache / f"fetch_{pdb_id}.log").read_text(errors="ignore") \
             .strip().splitlines()[-2:] if (cache / f"fetch_{pdb_id}.log").exists() else []
