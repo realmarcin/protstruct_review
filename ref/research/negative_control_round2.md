@@ -41,7 +41,10 @@ R3 kept restraint generation out of the protocol).
 ## The headroom machinery discriminated
 
 2DDX: Δ = **−0.0085 / −0.0083** (phenix/gemmi), past both −3S lines
-(−0.00825 / −0.00780) — excluded, with the registered mask-fraction report:
+(−0.00825 / −0.00780) — but only just: the margins are 2.5×10⁻⁴ and
+5×10⁻⁴ respectively, a borderline call on both paths that a different
+noise sample could flip. Excluded per the registered rule, disclosed as
+marginal, with the registered mask-fraction report:
 0.229 masked, 253 unmasked, 4 protected residues (a low mask fraction, so the
 apparent headroom is not obviously a masked-region artifact — the #321
 confound is quantified, not silent). 7R2H (−0.0051/−0.0054) sat INSIDE the
