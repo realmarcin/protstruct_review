@@ -352,7 +352,7 @@ def d6_statistics(rows: list[dict]) -> dict:
         side_structs[path] = {p for p, _ in worsening}
         stats[f"{path}_worsening_n"] = len(worsening)
     if all(len(v) >= MIN_NOISE_N for v in side_structs.values()):
-        s = {path: mad(v) for path, v in sides.items()}
+        raw_s = {path: mad(v) for path, v in sides.items()}
         stats["fallback"] = "none"
     else:
         pooled_structs = side_structs["phenix"] | side_structs["gemmi"]
@@ -365,12 +365,13 @@ def d6_statistics(rows: list[dict]) -> dict:
                 f"the round at a finding rather than inventing a tolerance")
             return stats
         pooled = sides["phenix"] + sides["gemmi"]
-        s = {path: mad(pooled) for path in sides}
+        raw_s = {path: mad(pooled) for path in sides}
         stats["fallback"] = "pooled"
-    s = {path: max(v, S_FLOOR) for path, v in s.items()}
+    # The floor report compares the scales the mode ACTUALLY produced — not
+    # per-path MADs that a pooled fallback never used (inner review r1).
+    s = {path: max(v, S_FLOOR) for path, v in raw_s.items()}
     stats["noise_scale"] = {k: round(v, 6) for k, v in s.items()}
-    stats["s_floor_applied"] = any(mad(sides[p]) < S_FLOOR if sides[p] else True
-                                   for p in sides)
+    stats["s_floor_applied"] = any(v < S_FLOOR for v in raw_s.values())
     for r in screened:
         excluded = all(r["paths"][p]["delta"] < -SIGMA_FACTOR * s[p]
                        for p in ("phenix", "gemmi"))
@@ -403,15 +404,17 @@ def main() -> int:
     # mode is the ONLY mode that writes the canonical files.
     full_run = not (args.canary or args.only or args.no_replacements
                     or Path(args.reps).resolve() != REPS_JSON.resolve())
-    if full_run:
+    # --out overrides in EVERY mode — an explicit flag that silently did
+    # nothing on full runs was inner-review-r1's finding.
+    if args.out:
+        screen_out = Path(args.out)
+        enrolled_out = screen_out.with_name(screen_out.stem + "_enrolled.json")
+    elif full_run:
         screen_out, enrolled_out = SCREEN_JSON, ENROLLED_JSON
     else:
-        if args.out:
-            screen_out = Path(args.out)
-        else:
-            screen_out = Path("/tmp/nc_screen_diagnostic.json")
-            print(f"  diagnostic run: writing {screen_out} (use --out to "
-                  f"choose); the canonical record is untouched", file=sys.stderr)
+        screen_out = Path("/tmp/nc_screen_diagnostic.json")
+        print(f"  diagnostic run: writing {screen_out} (use --out to "
+              f"choose); the canonical record is untouched", file=sys.stderr)
         enrolled_out = screen_out.with_name(screen_out.stem + "_enrolled.json")
     if not full_run and screen_out.resolve() in (SCREEN_JSON.resolve(),
                                                  ENROLLED_JSON.resolve()):
