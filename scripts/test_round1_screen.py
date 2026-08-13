@@ -198,7 +198,6 @@ with tempfile.TemporaryDirectory() as tmp:
 
 versions = scr.tool_versions()
 check("#320: manifest tool identity carries the required keys",
-      sorted(versions) >= ["gemmi_cli"] and
       {"phenix_bin", "gemmi_cli", "gemmi_python", "python"} <= set(versions),
       True)
 
