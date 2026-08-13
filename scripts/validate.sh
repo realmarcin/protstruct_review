@@ -94,6 +94,13 @@ if ! python3 "${REPO_ROOT}/scripts/check_referential_integrity.py"; then
   fail "referential integrity"
 fi
 
+# 3b. Negative-control series records reconcile (#312): screen/enrolled/reps
+#     internal consistency, full-run manifests only in committed records
+#     (#319), and round-doc headline figures matching the record (#311 class).
+if ! python3 "${REPO_ROOT}/scripts/check_negative_control_records.py"; then
+  fail "negative-control record reconciliation"
+fi
+
 # 4. QDS emitter regression tests (geometry-slot completeness, site/ligand/
 #    per-residue/pairwise/tool-recs builder coverage, fail-hard negative test)
 if ! python3 "${REPO_ROOT}/scripts/test_qds_emit.py"; then
