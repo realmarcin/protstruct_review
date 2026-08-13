@@ -130,6 +130,11 @@ def binwise_scale(fobs: np.ndarray, fcalc: np.ndarray, s2: np.ndarray,
     """
     if fit_mask is None:
         fit_mask = np.ones_like(fobs, dtype=bool)
+    if not fit_mask.any():
+        # Unreachable via compute() (the free-fraction band guarantees a work
+        # majority) but importable: an empty fit selection would silently
+        # scale everything to zero.
+        raise SystemExit("gemmi_rfactor: empty fit selection for the scale fit")
     global_s = (fobs[fit_mask] * fcalc[fit_mask]).sum() / \
         max((fcalc[fit_mask] ** 2).sum(), 1e-12)
     scale = np.ones_like(fcalc)

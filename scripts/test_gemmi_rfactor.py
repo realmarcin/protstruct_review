@@ -120,6 +120,9 @@ scaled_fb = gr.binwise_scale(np.array([20.0] * 5 + [30.0] * 5),
                              fit_mask=work_none_in_high)
 check("#316: empty-fit bin uses the global work scale",
       np.allclose(scaled_fb[5:], 20.0), True)
+check_raises("#316 r1: an all-empty fit selection is refused",
+             lambda: gr.binwise_scale(fobs_l, fcalc_l, s2_l, 1,
+                                      np.zeros(10, dtype=bool)))
 
 fobs_r = np.array([10.0, 10.0])
 fcalc_r = np.array([9.0, 12.0])
