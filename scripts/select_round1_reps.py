@@ -15,11 +15,13 @@ D4 rank within a cluster: best d_min, then lower clashscore, then lower reported
 R-free, then lexicographic id. Missing values rank last (a tie-break that cannot
 be read must not win one).
 
-D7 draw: 20 spread across the <= 0.9 A stratum's d_min-sorted cluster list —
-spread per `select_gold_standards.spread_sample`, imported, not re-implemented —
-plus 10 from (0.9, 1.0] by ascending representative d_min. A cluster is in the
-stratum iff its representative's d_min is <= 0.9 (equivalent to any-member, since
-the representative has the cluster's best d_min).
+D7' draw (round-2 preregistration): every <= 0.9 A stratum cluster
+representative + top-up to the 30-cluster scope from (0.9, 1.0] by ascending
+representative d_min; if the pool moves and the stratum exceeds the scope, fall
+back to the round-1 spread across it (`select_gold_standards.spread_sample`,
+imported, not re-implemented) — never the head (#243). A cluster is in the
+stratum iff its representative's d_min is <= 0.9 (equivalent to any-member,
+since the representative has the cluster's best d_min).
 
 Usage:
     python3 scripts/select_round1_reps.py --json ref/research/data/negative_control_round1_reps.json
@@ -70,6 +72,12 @@ D2_NODES = [
     {"type": "terminal", "service": "text", "parameters": {
         "attribute": "rcsb_entry_info.polymer_entity_count_protein",
         "operator": "range", "value": {"from": 1, "include_lower": True}}},
+    # R1 of the round-2 preregistration: the round-1 floor failures were the
+    # tiny designed-peptide population; >= 100 deposited polymer monomers puts
+    # the D3 floor (50 unmasked at median mask fraction 0.43) within reach.
+    {"type": "terminal", "service": "text", "parameters": {
+        "attribute": "rcsb_entry_info.deposited_polymer_monomer_count",
+        "operator": "range", "value": {"from": 100, "include_lower": True}}},
     {"type": "terminal", "service": "text", "parameters": {
         "attribute": "pdbx_vrpt_summary_geometry.clashscore",
         "operator": "range", "value": {"to": 2.0, "include_upper": True}}},
@@ -204,9 +212,18 @@ def rank_clusters(clusters: dict[str, list[str]],
     return ranked
 
 
-def d7_draw(ranked: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
-    """(stratum_clusters_sorted, band_clusters_sorted, initial_30). The draw is
-    over CLUSTERS; each contributes its D4 representative."""
+def d7_draw(ranked: list[dict]) -> tuple[list[dict], list[dict], list[dict],
+                                         list[dict]]:
+    """(stratum_clusters, band_clusters, initial_30, collisions). The draw is
+    over CLUSTERS; each contributes its highest-ranked member not already
+    drawn for another cluster.
+
+    The collision handling is #323: entity-level clustering collapsed to entry
+    ids means one multi-protein entry can sit in several clusters (444 member
+    rows vs 425 unique ids in the round-1 record). A duplicate representative
+    is a recorded CLUSTER COLLISION that immediately falls through to the
+    cluster's next candidate — never a silent skip downstream.
+    """
     def rep_d_min(cluster):
         d = cluster["members"][0]["d_min"]
         return d if d is not None else float("inf")
@@ -216,18 +233,40 @@ def d7_draw(ranked: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
     band = sorted((c for c in ranked
                    if STRATUM_D_MIN < rep_d_min(c) <= 1.0),
                   key=lambda c: (rep_d_min(c), c["cluster"]))
-    drawn = spread_sample(stratum, N_STRATUM) + band[:N_BAND]
-    initial = [{"cluster": c["cluster"],
-                "stratum": rep_d_min(c) <= STRATUM_D_MIN,
-                **c["members"][0]} for c in drawn]
-    return stratum, band, initial
+    # D7' (round-2 preregistration): every stratum representative + top-up to
+    # the 30-cluster scope from the band, ascending. If the pool moved and the
+    # stratum exceeds the scope, fall back to the round-1 spread across it —
+    # never the head (#243).
+    total = N_STRATUM + N_BAND
+    if len(stratum) <= total:
+        drawn = stratum + band[:total - len(stratum)]
+    else:
+        drawn = spread_sample(stratum, total)
+
+    initial, used, collisions = [], set(), []
+    for c in drawn:
+        pick = next((m for m in c["members"] if m["pdb_id"] not in used), None)
+        skipped = [m["pdb_id"] for m in c["members"]
+                   if m["pdb_id"] in used and
+                   (pick is None or c["members"].index(m) <
+                    c["members"].index(pick))]
+        if skipped:
+            collisions.append({"cluster": c["cluster"],
+                               "already_drawn": skipped,
+                               "resolved_to": pick["pdb_id"] if pick else None})
+        if pick is None:
+            continue                     # exhausted by collisions — recorded above
+        used.add(pick["pdb_id"])
+        initial.append({"cluster": c["cluster"],
+                        "stratum": rep_d_min(c) <= STRATUM_D_MIN, **pick})
+    return stratum, band, initial, collisions
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--json", dest="json_out",
-                    default="ref/research/data/negative_control_round1_reps.json")
+                    default="ref/research/data/negative_control_round2_reps.json")
     args = ap.parse_args()
 
     clusters = fetch_clusters()
@@ -241,18 +280,23 @@ def main() -> int:
               f"{missing[:5]}...", file=sys.stderr)
 
     ranked = rank_clusters(clusters, data)
-    stratum, band, initial = d7_draw(ranked)
+    stratum, band, initial, collisions = d7_draw(ranked)
     print(f"stratum clusters (<= {STRATUM_D_MIN} A): {len(stratum)}; "
-          f"band clusters: {len(band)}; drawn: {len(initial)}", file=sys.stderr)
+          f"band clusters: {len(band)}; drawn: {len(initial)}; "
+          f"collisions: {len(collisions)}", file=sys.stderr)
 
-    report = {"criteria": "D2 of negative_control_round1_preregistration.md",
+    report = {"criteria": "D2+R1 of negative_control_round2_preregistration.md",
               "stratum_d_min": STRATUM_D_MIN,
               "n_clusters": len(clusters),
               "n_stratum_clusters": len(stratum),
               "n_band_clusters": len(band),
+              "cluster_collisions": collisions,
               "initial_representatives": initial,
               "clusters": ranked}
-    Path(args.json_out).write_text(json.dumps(report, indent=2) + "\n")
+    out = Path(args.json_out)
+    tmp = out.with_suffix(out.suffix + ".tmp")
+    tmp.write_text(json.dumps(report, indent=2) + "\n")
+    tmp.replace(out)
     print(json.dumps({"initial": [r["pdb_id"] for r in initial]}, indent=2))
     return 0
 

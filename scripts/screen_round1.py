@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Round-1 headroom screen: null re-refinement of gold-standard candidates (#295).
+"""Negative-control headroom screen: null re-refinement of candidates (#295).
 
-Executes D3, D4 and D6 of `negative_control_round1_preregistration.md` over the
+Executes D3, D4 and D6 of `negative_control_round1_preregistration.md` as
+amended by `negative_control_round2_preregistration.md` (R2 registered
+data-array selection; R1 size criterion lives in the selector) over the
 representatives selected by `select_round1_reps.py`. Per entry:
 
   1. fetch model + structure factors (`phenix.fetch_pdb --mtz`, cached)
@@ -42,13 +44,20 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-REPS_JSON = REPO / "ref/research/data/negative_control_round1_reps.json"
-SCREEN_JSON = REPO / "ref/research/data/negative_control_round1_screen.json"
-ENROLLED_JSON = REPO / "ref/research/data/negative_control_round1_enrolled.json"
+# Round-2 outputs (#314): the round-1 record is committed history and a
+# round-2 run must never overwrite it.
+REPS_JSON = REPO / "ref/research/data/negative_control_round2_reps.json"
+SCREEN_JSON = REPO / "ref/research/data/negative_control_round2_screen.json"
+ENROLLED_JSON = REPO / "ref/research/data/negative_control_round2_enrolled.json"
 
 FLOOR_UNMASKED = 50          # D3
 SIGMA_FACTOR = 3.0           # D6: exclude at delta < -3*S on both paths
-MIN_NOISE_N = 8              # D6 fallback trigger
+MIN_NOISE_N = 8              # D6 fallback trigger — counted over UNIQUE structures
+# D6 measurement floor for the noise scale (#318): a constant or near-constant
+# worsening side would otherwise yield S ~ 0 and a zero-width tolerance where
+# any jointly negative delta excludes. 5e-4 is half the last digit of the
+# conventional 4-decimal R-value reporting precision.
+S_FLOOR = 0.0005
 MVD_RFREE = re.compile(r"^\s*r_free\s*:\s*([\d.]+)\s*$", re.M)
 
 
@@ -98,12 +107,112 @@ def fetch_pair(pdb_id: str, cache: Path) -> tuple[Path | None, Path | None, str]
     return model, mtz, ""
 
 
-def model_vs_data_rfree(model: Path, mtz: Path, work: Path, tag: str) -> float | None:
+# Round-2 registered rule (negative_control_round2_preregistration.md): converted
+# deposited MTZs frequently carry several observation arrays, and phenix.refine
+# rightly refuses to guess — 40 of round 1's 48 data defects were exactly this.
+# The observation array is chosen deterministically: first amplitude pair from the
+# list below present in the MTZ, then first intensity pair; no match is a named
+# data defect. Amplitudes are preferred because both R paths consume F directly.
+OBS_LABEL_CANDIDATES: tuple[tuple[str, str], ...] = (
+    ("F-obs-filtered", "SIGF-obs-filtered"), ("F-obs", "SIGF-obs"),
+    ("FOBS", "SIGFOBS"), ("FP", "SIGFP"), ("F", "SIGF"),
+    ("I-obs", "SIGI-obs"), ("IOBS", "SIGIOBS"), ("I", "SIGI"))
+
+# Converted MTZs can also carry SEVERAL R-free flag arrays (9YGW: R-free-flags
+# AND R-free-flags-1) — the second ambiguity behind the first. Same registered
+# treatment: first present label wins. PHENIX matches the selector by exact
+# label before substring, which is what makes "R-free-flags" safe even though
+# it is a prefix of "R-free-flags-1" (verified live on 9YGW).
+FLAG_LABEL_CANDIDATES: tuple[str, ...] = (
+    "R-free-flags", "FreeR_flag", "FREE", "FreeRflag", "R-free-flags-1")
+
+
+def pick_obs_labels(labels: list[str]) -> tuple[str, str] | None:
+    """First registered (obs, sigma) pair present in `labels`, else None."""
+    for pair in OBS_LABEL_CANDIDATES:
+        if pair[0] in labels and pair[1] in labels:
+            return pair
+    return None
+
+
+def pick_flag_label(labels: list[str]) -> str | None:
+    """First registered free-flag label present in `labels`, else None (a
+    single-array MTZ needs no selector, and phenix's own detection handles a
+    lone unconventional name better than a wrong guess would)."""
+    for label in FLAG_LABEL_CANDIDATES:
+        if label in labels:
+            return label
+    return None
+
+
+def select_arrays(mtz: Path) -> tuple[tuple[str, str] | None, str | None]:
+    """THE registered selection, computed once per entry (#317).
+
+    Every consumer of the MTZ — phenix.refine, phenix.model_vs_data, and the
+    gemmi path — receives these exact labels as arguments; none re-derives its
+    own. The Codex review found the previous shape violated the registered
+    "one selection rule, three consumers" claim: the gemmi path used
+    gemmi_rfactor's own candidate list (different order, no F-obs-filtered)
+    and autodetected its free column from a list missing R-free-flags-1.
+    """
+    import gemmi
+    labels = [c.label for c in gemmi.read_mtz_file(str(mtz)).columns]
+    return pick_obs_labels(labels), pick_flag_label(labels)
+
+
+def refine_null(model: Path, mtz: Path, work: Path,
+                pair: tuple[str, str], flag: str | None) -> tuple[Path | None, dict]:
+    """The bench_refinement_deltas null protocol plus the registered round-2
+    observation-array selection. Own prefix (r2n_) so a rerun with a different
+    label rule can never silently adopt a cached round-1 output (the #124
+    argument: any parameter that moves the refinement belongs in the prefix).
+    `pair`/`flag` come from select_arrays — this function does no picking."""
+    # PHENIX 2.0's data manager does array selection BEFORE the legacy
+    # refinement.input scope is consulted, so the selector is
+    # miller_array.labels.name — the exact phil the refusal message names
+    # (refinement.input.xray_data.labels parses but is ignored; canaried on
+    # 9YGW). One selector per ambiguous array kind.
+    selectors = f"\"miller_array.labels.name={pair[0]},{pair[1]}\""
+    if flag is not None:
+        selectors += f" \"miller_array.labels.name={flag}\""
+    prefix = f"r2n_{model.stem}"
+    out = work / f"{prefix}_001.pdb"
+    log = work / f"refine_{prefix}.log"
+    if not out.exists():
+        subprocess.run(
+            ["bash", "-c",
+             f"cd {work} && {PHENIX_BIN / 'phenix.refine'} {model} {mtz} "
+             f"main.number_of_macro_cycles={_bench.MACRO_CYCLES} "
+             f"{selectors} "
+             f"output.prefix={prefix} --overwrite > {log} 2>&1"],
+            capture_output=True, text=True, timeout=7200, env=dict(os.environ))
+    if not out.exists():
+        return None, {"failure_reason": _bench.refine_failure_reason(log)}
+    r_values = _bench._R_WORK.findall(log.read_text(errors="ignore")) \
+        if log.exists() else []
+    stats: dict = {"obs_labels": list(pair)}
+    if r_values:
+        stats["r_work_pre"], stats["r_free_pre"] = \
+            float(r_values[0][0]), float(r_values[0][1])
+        stats["r_work_post"], stats["r_free_post"] = \
+            float(r_values[-1][0]), float(r_values[-1][1])
+    return out, stats
+
+
+def model_vs_data_rfree(model: Path, mtz: Path, work: Path, tag: str,
+                        pair: tuple[str, str], flag: str | None) -> float | None:
+    """phenix.model_vs_data R-free, with the SAME registered array selection as
+    the refinement, passed in from select_arrays — mvd's selectors are its own
+    f_obs_label / r_free_flags_label params (the round-2 canary caught mvd
+    failing on the identical ambiguity after the refine selector was fixed)."""
+    selectors = f"f_obs_label=\"{pair[0]}\""
+    if flag is not None:
+        selectors += f" r_free_flags_label=\"{flag}\""
     log = work / f"mvd_{tag}.log"
     if not log.exists() or not MVD_RFREE.search(log.read_text(errors="ignore")):
         subprocess.run(
             ["bash", "-c", f"cd {work} && {PHENIX_BIN / 'phenix.model_vs_data'} "
-             f"{model} {mtz} > {log} 2>&1"],
+             f"{model} {mtz} {selectors} > {log} 2>&1"],
             capture_output=True, text=True, timeout=3600, env=dict(os.environ))
     if not log.exists():
         return None
@@ -111,14 +220,17 @@ def model_vs_data_rfree(model: Path, mtz: Path, work: Path, tag: str) -> float |
     return float(match.group(1)) if match else None
 
 
-def gemmi_rfree(model: Path, obs_mtz: Path, work: Path, tag: str) -> float | None:
-    """gemmi sfcalc (FFT, bulk solvent + scaling vs obs) + gemmi_rfactor."""
+def gemmi_rfree(model: Path, obs_mtz: Path, work: Path, tag: str,
+                pair: tuple[str, str], flag: str | None) -> float | None:
+    """gemmi sfcalc (FFT, bulk solvent + scaling vs obs) + gemmi_rfactor,
+    consuming the SAME select_arrays labels as the phenix consumers (#317) —
+    obs columns AND the free column are passed explicitly; gemmi_rfactor's own
+    autodetection (different candidate order, no R-free-flags-1) is bypassed.
+    The gemmi path needs amplitudes: an intensity pair is a named no-measure."""
     import gemmi
-    labels = [c.label for c in gemmi.read_mtz_file(str(obs_mtz)).columns]
-    try:
-        f_label, sig_label = _gr.pick_columns(labels, _gr.OBS_CANDIDATES, "Fobs")
-    except SystemExit:
-        return None                                   # intensity-only or exotic labels
+    f_label, sig_label = pair
+    if f_label.upper().startswith("I"):
+        return None                                   # intensity-only: no F for sfcalc
     d_min = gemmi.read_mtz_file(str(obs_mtz)).resolution_high()
     calc = work / f"calc_{tag}.mtz"
     log = work / f"sfcalc_{tag}.log"
@@ -133,7 +245,7 @@ def gemmi_rfree(model: Path, obs_mtz: Path, work: Path, tag: str) -> float | Non
         return None
     try:
         result = _gr.compute(str(obs_mtz), str(calc),
-                             f"{f_label},{sig_label}", None, None, None, 20)
+                             f"{f_label},{sig_label}", None, flag, None, 20)
     except SystemExit:
         return None
     return result["r_free"]
@@ -165,7 +277,16 @@ def screen_entry(rep: dict, cache: Path, work: Path) -> dict:
             f"{unmasked} unmasked residues < {FLOOR_UNMASKED} (D3)"
         return row
 
-    refined, r_stats = _bench.refine(model, mtz, work, restraints=False)
+    # THE selection, once; every consumer below receives it verbatim (#317)
+    # and the row records it.
+    pair, flag = select_arrays(mtz)
+    if pair is None:
+        row["status"], row["reason"] = "data_defect", \
+            "no registered observation labels in the MTZ"
+        return row
+    row["array_selection"] = {"obs": list(pair), "free_flag": flag}
+
+    refined, r_stats = refine_null(model, mtz, work, pair, flag)
     if refined is None:
         row["status"] = "data_defect"
         row["reason"] = r_stats.get("failure_reason", "phenix.refine failed")
@@ -174,12 +295,19 @@ def screen_entry(rep: dict, cache: Path, work: Path) -> dict:
 
     deltas = {}
     for path_name, fn in (("phenix", model_vs_data_rfree), ("gemmi", gemmi_rfree)):
-        pre = fn(model, mtz, work, f"{path_name}_pre_{pdb_id}")
-        post = fn(refined, mtz, work, f"{path_name}_post_{pdb_id}")
+        # Tags carry the measured model's stem (#314): the deposited stem for
+        # pre, the per-round refined prefix for post, so a cached measurement
+        # of one protocol's output can never be adopted for another's — the
+        # #124 argument applied to measurement caching.
+        pre = fn(model, mtz, work, f"{path_name}_{model.stem}", pair, flag)
+        post = fn(refined, mtz, work, f"{path_name}_{refined.stem}", pair, flag)
         deltas[path_name] = {
             "pre": pre, "post": post,
-            "delta": round(post - pre, 4) if pre is not None and post is not None
-            else None}
+            # Full precision for the D6 statistics (#318); the rounded value is
+            # display-only and never feeds MAD.
+            "delta": post - pre if pre is not None and post is not None else None,
+            "delta_display": round(post - pre, 4)
+            if pre is not None and post is not None else None}
     row["paths"] = deltas
     if any(d["delta"] is None for d in deltas.values()):
         dead = [n for n, d in deltas.items() if d["delta"] is None]
@@ -191,36 +319,59 @@ def screen_entry(rep: dict, cache: Path, work: Path) -> dict:
     return row
 
 
+def write_json_atomic(path: Path, payload: dict) -> None:
+    """Temp-file + rename: a killed run leaves the previous record intact
+    (#319 — write_text alone is not the crash-safety it claimed to be)."""
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, indent=2) + "\n")
+    tmp.replace(path)
+
+
 def mad(values: list[float]) -> float:
     med = statistics.median(values)
     return statistics.median(abs(v - med) for v in values)
 
 
 def d6_statistics(rows: list[dict]) -> dict:
-    """Noise scales, the registered fallback, and per-entry exclusion verdicts."""
+    """Noise scales, the registered fallback, and per-entry exclusion verdicts.
+
+    #318 discipline: the two paths measure the SAME structure with the same
+    model, data, and flags — they are paired, not independent (twice they have
+    produced identical 4-decimal deltas). Every n-threshold therefore counts
+    UNIQUE structures, deltas enter at full precision, and the noise scale has
+    a registered floor (S_FLOOR) so a degenerate sample cannot produce a
+    zero-width tolerance.
+    """
     screened = [r for r in rows if r["status"] == "screened"]
     stats: dict = {"n_screened": len(screened)}
-    sides = {}
+    sides, side_structs = {}, {}
     for path in ("phenix", "gemmi"):
-        worsening = [r["paths"][path]["delta"] for r in screened
+        worsening = [(r["pdb_id"], r["paths"][path]["delta"]) for r in screened
                      if r["paths"][path]["delta"] >= 0]
-        sides[path] = worsening
+        sides[path] = [d for _, d in worsening]
+        side_structs[path] = {p for p, _ in worsening}
         stats[f"{path}_worsening_n"] = len(worsening)
-    if all(len(v) >= MIN_NOISE_N for v in sides.values()):
-        s = {path: mad(v) for path, v in sides.items()}
+    if all(len(v) >= MIN_NOISE_N for v in side_structs.values()):
+        raw_s = {path: mad(v) for path, v in sides.items()}
         stats["fallback"] = "none"
     else:
-        pooled = sides["phenix"] + sides["gemmi"]
-        if len(pooled) < MIN_NOISE_N:
+        pooled_structs = side_structs["phenix"] | side_structs["gemmi"]
+        stats["pooled_worsening_unique_structures"] = len(pooled_structs)
+        if len(pooled_structs) < MIN_NOISE_N:
             stats["fallback"] = "stop"
             stats["stop_reason"] = (
-                f"pooled worsening side has {len(pooled)} entries "
-                f"< {MIN_NOISE_N}: the registered D6 fallback stops the round "
-                f"at a finding rather than inventing a tolerance")
+                f"pooled worsening side covers {len(pooled_structs)} unique "
+                f"structures < {MIN_NOISE_N}: the registered D6 fallback stops "
+                f"the round at a finding rather than inventing a tolerance")
             return stats
-        s = {path: mad(pooled) for path in sides}
+        pooled = sides["phenix"] + sides["gemmi"]
+        raw_s = {path: mad(pooled) for path in sides}
         stats["fallback"] = "pooled"
-    stats["noise_scale"] = {k: round(v, 4) for k, v in s.items()}
+    # The floor report compares the scales the mode ACTUALLY produced — not
+    # per-path MADs that a pooled fallback never used (inner review r1).
+    s = {path: max(v, S_FLOOR) for path, v in raw_s.items()}
+    stats["noise_scale"] = {k: round(v, 6) for k, v in s.items()}
+    stats["s_floor_applied"] = any(v < S_FLOOR for v in raw_s.values())
     for r in screened:
         excluded = all(r["paths"][p]["delta"] < -SIGMA_FACTOR * s[p]
                        for p in ("phenix", "gemmi"))
@@ -245,7 +396,38 @@ def main() -> int:
     ap.add_argument("--only", default="", help="comma-separated pdb ids")
     ap.add_argument("--no-replacements", action="store_true",
                     help="screen initial reps only (P4 needs their verdicts first)")
+    ap.add_argument("--out", help="output JSON for subset/diagnostic runs")
     args = ap.parse_args()
+
+    # A diagnostic run must never overwrite the canonical record (#319 — a
+    # canary already clobbered the committed round-1 screen once). Full-batch
+    # mode is the ONLY mode that writes the canonical files.
+    full_run = not (args.canary or args.only or args.no_replacements
+                    or Path(args.reps).resolve() != REPS_JSON.resolve())
+    # --out overrides in EVERY mode — an explicit flag that silently did
+    # nothing on full runs was inner-review-r1's finding.
+    if args.out:
+        screen_out = Path(args.out)
+        enrolled_out = screen_out.with_name(screen_out.stem + "_enrolled.json")
+    elif full_run:
+        screen_out, enrolled_out = SCREEN_JSON, ENROLLED_JSON
+    else:
+        screen_out = Path("/tmp/nc_screen_diagnostic.json")
+        print(f"  diagnostic run: writing {screen_out} (use --out to "
+              f"choose); the canonical record is untouched", file=sys.stderr)
+        enrolled_out = screen_out.with_name(screen_out.stem + "_enrolled.json")
+    if not full_run and (REPO / "ref") in screen_out.resolve().parents:
+        # Not just the two canonical screen files: ANY committed artifact under
+        # ref/ (reps records, masks, …) is off-limits to a diagnostic run
+        # (#319, inner review r2).
+        raise SystemExit("screen_round1: a diagnostic run may not write inside "
+                         "ref/ — committed records come from full runs only (#319)")
+    manifest = {"run_mode": "full" if full_run else "diagnostic",
+                "flags": {"canary": args.canary, "only": args.only,
+                          "no_replacements": args.no_replacements},
+                "reps": str(args.reps),
+                "preregistration": "negative_control_round2_preregistration.md",
+                "round": 2}
 
     reps_doc = json.loads(Path(args.reps).read_text())
     queue = list(reps_doc["initial_representatives"])
@@ -289,21 +471,20 @@ def main() -> int:
             else:
                 print(f"  cluster {row['cluster']} exhausted (recorded)",
                       file=sys.stderr)
-        # Crash-safe: the record on disk is always current.
-        SCREEN_JSON.write_text(json.dumps({"rows": rows}, indent=2) + "\n")
+        # Crash-safe for real (#319): temp + atomic rename, every row.
+        write_json_atomic(screen_out, {"run": manifest, "rows": rows})
 
     stats = d6_statistics(rows)
-    report = {"preregistration": "negative_control_round1_preregistration.md",
+    report = {"run": manifest,
               "floor_unmasked": FLOOR_UNMASKED, "sigma_factor": SIGMA_FACTOR,
-              "min_noise_n": MIN_NOISE_N, "rows": rows, "d6": stats}
-    SCREEN_JSON.write_text(json.dumps(report, indent=2) + "\n")
+              "min_noise_n": MIN_NOISE_N, "s_floor": S_FLOOR,
+              "rows": rows, "d6": stats}
+    write_json_atomic(screen_out, report)
 
-    if stats.get("fallback") != "stop" and not args.canary:
+    if stats.get("fallback") != "stop" and full_run:
         enrolled = [r for r in rows if r.get("enrolled")]
-        ENROLLED_JSON.write_text(json.dumps(
-            {"preregistration": "negative_control_round1_preregistration.md",
-             "n_enrolled": len(enrolled), "entries": enrolled},
-            indent=2) + "\n")
+        write_json_atomic(enrolled_out, {
+            "run": manifest, "n_enrolled": len(enrolled), "entries": enrolled})
     print(json.dumps({"attempted": len(rows), **{k: v for k, v in stats.items()
                                                  if not isinstance(v, dict)}},
                      indent=2))

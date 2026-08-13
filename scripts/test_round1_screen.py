@@ -62,14 +62,37 @@ clusters = [{"cluster": f"c{i}", "members": [entry(f"S{i:03d}", 0.5 + i * 0.005)
             for i in range(40)]                                   # 40 stratum
 clusters += [{"cluster": f"b{i}", "members": [entry(f"B{i:03d}", 0.91 + i * 0.003)]}
              for i in range(30)]                                  # 30 band, all <= 1.0
-stratum, band, initial = sel.d7_draw(clusters)
-check("D7: stratum/band split", (len(stratum), len(band)), (40, 30))
-check("D7: draws exactly 30", len(initial), 30)
-check("D7: 20 from the stratum", sum(1 for r in initial if r["stratum"]), 20)
-check("D7: stratum draw is a spread, not the head",
-      [r["pdb_id"] for r in initial[:3]], ["S000", "S002", "S004"])
-check("D7: band draw is ascending d_min head",
-      [r["pdb_id"] for r in initial[20:23]], ["B000", "B001", "B002"])
+stratum, band, initial, collisions = sel.d7_draw(clusters)
+check("D7': unique members draw with no collisions", collisions, [])
+check("D7': stratum/band split", (len(stratum), len(band)), (40, 30))
+check("D7': draws exactly 30", len(initial), 30)
+check("D7': oversized stratum falls back to a spread, not the head (#243)",
+      [r["pdb_id"] for r in initial[:3]], ["S000", "S001", "S002"])
+check("D7': oversized stratum leaves no band slots",
+      sum(1 for r in initial if not r["stratum"]), 0)
+
+# The registered D7' shape: stratum fits the scope -> ALL stratum reps + band
+# top-up ascending (the measured round-2 case is 26 + 4).
+small = clusters[:26] + [{"cluster": f"b{i}",
+                          "members": [entry(f"B{i:03d}", 0.91 + i * 0.003)]}
+                         for i in range(30)]
+_, _, initial2, _ = sel.d7_draw(small)
+check("D7': whole stratum drawn when it fits",
+      sum(1 for r in initial2 if r["stratum"]), 26)
+check("D7': band top-up is ascending d_min",
+      [r["pdb_id"] for r in initial2[26:]], ["B000", "B001", "B002", "B003"])
+
+# --- #323: cluster collisions are recorded and resolved, never silent -------------
+
+dup = [{"cluster": "c1", "members": [entry("SAME", 0.5), entry("ALT1", 0.6)]},
+       {"cluster": "c2", "members": [entry("SAME", 0.55)]},
+       {"cluster": "c3", "members": [entry("SAME", 0.58), entry("ALT3", 0.7)]}]
+_, _, drawn3, coll3 = sel.d7_draw(dup)
+check("#323: duplicate rep falls through to the next member",
+      [r["pdb_id"] for r in drawn3], ["SAME", "ALT3"])
+check("#323: collisions recorded with resolution",
+      [(c["cluster"], c["resolved_to"]) for c in coll3],
+      [("c2", None), ("c3", "ALT3")])
 
 # --- D6 statistics -----------------------------------------------------------------
 
@@ -95,17 +118,66 @@ check("D6: one-path improver enrolled but named",
 check("D6: enrolled count", stats["n_enrolled"], 11)
 check("D6: excluded count", stats["n_excluded_headroom"], 1)
 
-# Thin one side (3 worsening on gemmi) but pooled >= 8 -> pooled fallback.
-rows2 = [row(f"P{i}", 0.001 * (i + 1), -0.0001) for i in range(3)]
-rows2 += [row(f"Q{i}", 0.001 * (i + 1), 0.0005) for i in range(3)]
+# Thin gemmi side (3 structures) but 9 UNIQUE structures on the pooled
+# worsening side -> pooled fallback.
+rows2 = [row(f"P{i}", 0.001 * (i + 1), -0.0001) for i in range(6)]
+rows2 += [row(f"Q{i}", 0.0005 * (i + 1), 0.0005 * (i + 1)) for i in range(3)]
 stats2 = scr.d6_statistics(rows2)
 check("D6: thin side triggers pooled fallback", stats2["fallback"], "pooled")
+check("D6: pooled n counts unique structures (#318)",
+      stats2["pooled_worsening_unique_structures"], 9)
+
+# 8 pooled VALUES from only 4 unique structures (both paths worsening) must
+# STOP: the paths are paired, not independent (#318).
+rows2b = [row(f"U{i}", 0.001 * (i + 1), 0.0011 * (i + 1)) for i in range(4)]
+stats2b = scr.d6_statistics(rows2b)
+check("D6: 8 correlated values from 4 structures still stop (#318)",
+      stats2b["fallback"], "stop")
 
 # Pooled still thin -> registered stop, no verdicts.
 rows3 = [row("X1", -0.02, -0.02), row("X2", -0.03, -0.01)]
 stats3 = scr.d6_statistics(rows3)
 check("D6: still-thin pool stops the round", stats3["fallback"], "stop")
 check("D6: stop emits no enrollment verdicts", "n_enrolled" in stats3, False)
+
+# A degenerate (constant) worsening side gets the registered S floor instead
+# of a zero-width tolerance (#318): with S = 0.0005, -0.001 survives
+# (-3S = -0.0015) and -0.0016 is excluded.
+rows4 = [row(f"C{i}", 0.002, 0.002) for i in range(8)]
+rows4.append(row("NEAR", -0.001, -0.001))
+rows4.append(row("PAST", -0.0016, -0.0016))
+stats4 = scr.d6_statistics(rows4)
+check("D6: constant sample triggers the S floor", stats4["s_floor_applied"], True)
+check("D6: floored S is not zero-width",
+      stats4["noise_scale"], {"phenix": 0.0005, "gemmi": 0.0005})
+check("D6: jointly small-negative delta survives the floor",
+      next(r for r in rows4 if r["pdb_id"] == "NEAR")["enrolled"], True)
+check("D6: jointly past-floor delta is excluded",
+      next(r for r in rows4 if r["pdb_id"] == "PAST")["enrolled"], False)
+
+# --- round-2 observation-label rule ------------------------------------------------
+
+check("labels: amplitude pair preferred over intensities",
+      scr.pick_obs_labels(["H", "K", "L", "I-obs", "SIGI-obs", "F-obs",
+                           "SIGF-obs"]), ("F-obs", "SIGF-obs"))
+check("labels: filtered amplitudes outrank plain (phenix-refined MTZs)",
+      scr.pick_obs_labels(["F-obs", "SIGF-obs", "F-obs-filtered",
+                           "SIGF-obs-filtered"]),
+      ("F-obs-filtered", "SIGF-obs-filtered"))
+check("labels: intensities accepted when no amplitudes",
+      scr.pick_obs_labels(["H", "K", "L", "IOBS", "SIGIOBS"]),
+      ("IOBS", "SIGIOBS"))
+check("labels: F without its sigma does not match",
+      scr.pick_obs_labels(["F", "SIGI"]), None)
+check("labels: no registered pair -> None (named data defect)",
+      scr.pick_obs_labels(["H", "K", "L", "FC", "PHIC"]), None)
+check("flags: canonical name wins over its -1 twin (the 9YGW case)",
+      scr.pick_flag_label(["R-free-flags", "R-free-flags-1", "FOBS"]),
+      "R-free-flags")
+check("flags: -1 twin used when it is all there is",
+      scr.pick_flag_label(["R-free-flags-1", "FOBS"]), "R-free-flags-1")
+check("flags: none present -> no selector (phenix's own detection)",
+      scr.pick_flag_label(["FOBS", "SIGFOBS"]), None)
 
 # --- mad ---------------------------------------------------------------------------
 
