@@ -107,6 +107,30 @@ stats3 = scr.d6_statistics(rows3)
 check("D6: still-thin pool stops the round", stats3["fallback"], "stop")
 check("D6: stop emits no enrollment verdicts", "n_enrolled" in stats3, False)
 
+# --- round-2 observation-label rule ------------------------------------------------
+
+check("labels: amplitude pair preferred over intensities",
+      scr.pick_obs_labels(["H", "K", "L", "I-obs", "SIGI-obs", "F-obs",
+                           "SIGF-obs"]), ("F-obs", "SIGF-obs"))
+check("labels: filtered amplitudes outrank plain (phenix-refined MTZs)",
+      scr.pick_obs_labels(["F-obs", "SIGF-obs", "F-obs-filtered",
+                           "SIGF-obs-filtered"]),
+      ("F-obs-filtered", "SIGF-obs-filtered"))
+check("labels: intensities accepted when no amplitudes",
+      scr.pick_obs_labels(["H", "K", "L", "IOBS", "SIGIOBS"]),
+      ("IOBS", "SIGIOBS"))
+check("labels: F without its sigma does not match",
+      scr.pick_obs_labels(["F", "SIGI"]), None)
+check("labels: no registered pair -> None (named data defect)",
+      scr.pick_obs_labels(["H", "K", "L", "FC", "PHIC"]), None)
+check("flags: canonical name wins over its -1 twin (the 9YGW case)",
+      scr.pick_flag_label(["R-free-flags", "R-free-flags-1", "FOBS"]),
+      "R-free-flags")
+check("flags: -1 twin used when it is all there is",
+      scr.pick_flag_label(["R-free-flags-1", "FOBS"]), "R-free-flags-1")
+check("flags: none present -> no selector (phenix's own detection)",
+      scr.pick_flag_label(["FOBS", "SIGFOBS"]), None)
+
 # --- mad ---------------------------------------------------------------------------
 
 check("mad of a constant list is 0", scr.mad([0.5, 0.5, 0.5]), 0)

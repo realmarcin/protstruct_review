@@ -98,6 +98,88 @@ def fetch_pair(pdb_id: str, cache: Path) -> tuple[Path | None, Path | None, str]
     return model, mtz, ""
 
 
+# Round-2 registered rule (negative_control_round2_preregistration.md): converted
+# deposited MTZs frequently carry several observation arrays, and phenix.refine
+# rightly refuses to guess — 40 of round 1's 48 data defects were exactly this.
+# The observation array is chosen deterministically: first amplitude pair from the
+# list below present in the MTZ, then first intensity pair; no match is a named
+# data defect. Amplitudes are preferred because both R paths consume F directly.
+OBS_LABEL_CANDIDATES: tuple[tuple[str, str], ...] = (
+    ("F-obs-filtered", "SIGF-obs-filtered"), ("F-obs", "SIGF-obs"),
+    ("FOBS", "SIGFOBS"), ("FP", "SIGFP"), ("F", "SIGF"),
+    ("I-obs", "SIGI-obs"), ("IOBS", "SIGIOBS"), ("I", "SIGI"))
+
+# Converted MTZs can also carry SEVERAL R-free flag arrays (9YGW: R-free-flags
+# AND R-free-flags-1) — the second ambiguity behind the first. Same registered
+# treatment: first present label wins. PHENIX matches the selector by exact
+# label before substring, which is what makes "R-free-flags" safe even though
+# it is a prefix of "R-free-flags-1" (verified live on 9YGW).
+FLAG_LABEL_CANDIDATES: tuple[str, ...] = (
+    "R-free-flags", "FreeR_flag", "FREE", "FreeRflag", "R-free-flags-1")
+
+
+def pick_obs_labels(labels: list[str]) -> tuple[str, str] | None:
+    """First registered (obs, sigma) pair present in `labels`, else None."""
+    for pair in OBS_LABEL_CANDIDATES:
+        if pair[0] in labels and pair[1] in labels:
+            return pair
+    return None
+
+
+def pick_flag_label(labels: list[str]) -> str | None:
+    """First registered free-flag label present in `labels`, else None (a
+    single-array MTZ needs no selector, and phenix's own detection handles a
+    lone unconventional name better than a wrong guess would)."""
+    for label in FLAG_LABEL_CANDIDATES:
+        if label in labels:
+            return label
+    return None
+
+
+def refine_null(model: Path, mtz: Path, work: Path) -> tuple[Path | None, dict]:
+    """The bench_refinement_deltas null protocol plus the registered round-2
+    observation-array selection. Own prefix (r2n_) so a rerun with a different
+    label rule can never silently adopt a cached round-1 output (the #124
+    argument: any parameter that moves the refinement belongs in the prefix)."""
+    import gemmi
+    labels = [c.label for c in gemmi.read_mtz_file(str(mtz)).columns]
+    pair = pick_obs_labels(labels)
+    if pair is None:
+        return None, {"failure_reason":
+                      f"no registered observation labels among {labels}"}
+    flag = pick_flag_label(labels)
+    # PHENIX 2.0's data manager does array selection BEFORE the legacy
+    # refinement.input scope is consulted, so the selector is
+    # miller_array.labels.name — the exact phil the refusal message names
+    # (refinement.input.xray_data.labels parses but is ignored; canaried on
+    # 9YGW). One selector per ambiguous array kind.
+    selectors = f"\"miller_array.labels.name={pair[0]},{pair[1]}\""
+    if flag is not None:
+        selectors += f" \"miller_array.labels.name={flag}\""
+    prefix = f"r2n_{model.stem}"
+    out = work / f"{prefix}_001.pdb"
+    log = work / f"refine_{prefix}.log"
+    if not out.exists():
+        subprocess.run(
+            ["bash", "-c",
+             f"cd {work} && {PHENIX_BIN / 'phenix.refine'} {model} {mtz} "
+             f"main.number_of_macro_cycles={_bench.MACRO_CYCLES} "
+             f"{selectors} "
+             f"output.prefix={prefix} --overwrite > {log} 2>&1"],
+            capture_output=True, text=True, timeout=7200, env=dict(os.environ))
+    if not out.exists():
+        return None, {"failure_reason": _bench.refine_failure_reason(log)}
+    r_values = _bench._R_WORK.findall(log.read_text(errors="ignore")) \
+        if log.exists() else []
+    stats: dict = {"obs_labels": list(pair)}
+    if r_values:
+        stats["r_work_pre"], stats["r_free_pre"] = \
+            float(r_values[0][0]), float(r_values[0][1])
+        stats["r_work_post"], stats["r_free_post"] = \
+            float(r_values[-1][0]), float(r_values[-1][1])
+    return out, stats
+
+
 def model_vs_data_rfree(model: Path, mtz: Path, work: Path, tag: str) -> float | None:
     log = work / f"mvd_{tag}.log"
     if not log.exists() or not MVD_RFREE.search(log.read_text(errors="ignore")):
@@ -165,7 +247,7 @@ def screen_entry(rep: dict, cache: Path, work: Path) -> dict:
             f"{unmasked} unmasked residues < {FLOOR_UNMASKED} (D3)"
         return row
 
-    refined, r_stats = _bench.refine(model, mtz, work, restraints=False)
+    refined, r_stats = refine_null(model, mtz, work)
     if refined is None:
         row["status"] = "data_defect"
         row["reason"] = r_stats.get("failure_reason", "phenix.refine failed")
