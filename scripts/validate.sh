@@ -101,6 +101,13 @@ if ! python3 "${REPO_ROOT}/scripts/check_negative_control_records.py"; then
   fail "negative-control record reconciliation"
 fi
 
+# 3c. Trust invariant on committed QDS files (#315): no gradeable task rests
+#     on cctbx-only or unclassifiable evidence without a named waiver;
+#     pre-cutover history is grandfathered BY NAME, never silently.
+if ! python3 "${REPO_ROOT}/scripts/check_qds_trust_invariant.py"; then
+  fail "QDS trust invariant"
+fi
+
 # 4. QDS emitter regression tests (geometry-slot completeness, site/ligand/
 #    per-residue/pairwise/tool-recs builder coverage, fail-hard negative test)
 if ! python3 "${REPO_ROOT}/scripts/test_qds_emit.py"; then

@@ -4,6 +4,17 @@ evaluation_runs:
   structure_ref: 1sar
   artifact_ref: cdba2c07-daff-4f60-ae96-12452b3a5fbb
   run_date: '2026-04-24'
+  cross_tool_waivers:
+  - id: WAIVER_1sar_T06_cctbx_only
+    catalog_task_ref: T06
+    reason: >-
+      No non-cctbx R-factor path was wired when this eval ran: R-work/R-free
+      came from phenix.model_vs_data and phenix.mtz.dump only. The independent
+      gemmi path (scripts/gemmi_rfactor.py) landed later (#296, hardened in
+      #316); re-measuring this historical eval with it would change a dated
+      record. Declared 2026-08-13 when the trust invariant became enforceable
+      (#315) — this is an admission of the gap, not a pass.
+    as_of_date: '2026-08-13'
   catalog_tasks_applied:
   - T01
   - T03

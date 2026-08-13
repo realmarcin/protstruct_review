@@ -564,6 +564,7 @@ class CatalogTask(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -624,6 +625,7 @@ class Tool(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -681,6 +683,7 @@ class MetricDefinition(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -742,6 +745,7 @@ class Structure(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -803,6 +807,7 @@ class ExperimentalData(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -862,6 +867,7 @@ class AgentArtifact(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -930,6 +936,7 @@ class Refinement(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -999,6 +1006,7 @@ class MeasurementProvenance(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1056,6 +1064,7 @@ class MeasurementValue(Finding):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1082,7 +1091,7 @@ class MeasurementValue(Finding):
                        'CoordinationContact',
                        'Site',
                        'SiteQuality']} })
-    catalog_task_ref: CatalogTaskId = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'TaskCoverage']} })
+    catalog_task_ref: CatalogTaskId = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'TaskCoverage', 'CrossToolWaiver']} })
     stage: Stage = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue']} })
     scope: Optional[MeasurementScope] = Field(default=None, description="""Granularity of this specific measurement. Optional override of the canonical `scope` on the referenced MetricDefinition. When set, the `agent_claim` / `oracle_measure` may be a summary (mean+SD over a residue/chain/site array) — see TypedMeasurementValue.mean / std_dev / count.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MetricDefinition', 'MeasurementValue', 'Assumption']} })
     scope_selector: Optional[str] = Field(default=None, description="""When `scope` is `chain`, `site`, `residue`, `atom`, or `ligand`, this is a free-text selector identifying what was measured (e.g. \"chain A residues 30-45\", \"active site 1\", \"Asn A 39\"). Site / residue selectors should also have a structured ResidueRef / Site reference where appropriate.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue']} })
@@ -1092,7 +1101,7 @@ class MeasurementValue(Finding):
                        'ToolRecommendation',
                        'PerResidueValue']} })
     oracle_tool_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
-    oracle_family: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
+    oracle_family: Optional[ToolFamily] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     agent_claim: Optional[TypedMeasurementValue] = Field(default=None, description="""Value reported by the agent.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'HeadlineFinding']} })
     oracle_measure: Optional[TypedMeasurementValue] = Field(default=None, description="""Value the independent oracle returned.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'HeadlineFinding']} })
     delta: Optional[TypedMeasurementValue] = Field(default=None, description="""Optional pre-computed difference (oracle − agent or post − pre).""", json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue']} })
@@ -1156,6 +1165,7 @@ class HeadlineFinding(Finding):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1189,7 +1199,7 @@ class HeadlineFinding(Finding):
                        'ToolRecommendation',
                        'PerResidueValue']} })
     oracle_tool_ref: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
-    oracle_family: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
+    oracle_family: Optional[ToolFamily] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding', 'MeasurementValue', 'HeadlineFinding']} })
     agent_claim: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'HeadlineFinding']} })
     oracle_measure: Optional[TypedMeasurementValue] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'HeadlineFinding']} })
     verdict_label: Optional[str] = Field(default=None, description="""Free-text label such as \"confirms\", \"off_by_0.015\", \"fails_<_0.05_criterion\". Not an enum at v0 — the label space is still settling.""", json_schema_extra = { "linkml_meta": {'domain_of': ['HeadlineFinding']} })
@@ -1231,6 +1241,7 @@ class EvaluationRun(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1274,6 +1285,7 @@ class EvaluationRun(ConfiguredBaseModel):
     run_date: date = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
     catalog_tasks_applied: list[CatalogTaskId] = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
     measurements: Optional[list[MeasurementValue]] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
+    cross_tool_waivers: Optional[list[CrossToolWaiver]] = Field(default=None, description="""Per-task exceptions to the no-cctbx-only invariant (#315), declared here so the admission travels with the evidence it excuses.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun', 'QualityDataSheet']} })
     headline_findings: Optional[list[HeadlineFinding]] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
     residue_outliers: Optional[list[ResidueOutlier]] = Field(default=None, description="""Per-residue outlier rows for this eval. The QDS emitter aggregates these into PerResidueQuality.outliers[]. When this list is non-empty, the QDS MUST surface a PerResidueQuality block.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun']} })
     density_peaks: Optional[list[DensityPeak]] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun', 'PerResidueQuality']} })
@@ -1318,6 +1330,7 @@ class QualityDataSheet(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1372,6 +1385,7 @@ class QualityDataSheet(ConfiguredBaseModel):
     pairwise_comparisons: Optional[list[PairwiseComparison]] = Field(default=None, description="""One per relevant reference (deposited / starting / AlphaFold / truth). Empty when no reference comparison applies.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Container', 'EvaluationRun', 'QualityDataSheet']} })
     per_residue_quality: Optional[PerResidueQuality] = Field(default=None, description="""Residue-scoped local quality (per-residue lDDT/displacement, outlier residues, density-difference peaks, flagged regions). Required when the trust model needs evidence that local regions — especially active sites and interfaces — are not worse than the global average.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
     site_qualities: Optional[list[SiteQuality]] = Field(default=None, description="""One per active site / binding site / interface / metal site on this structure. Each carries the site-scoped metrics (site RMSD to reference, mean per-residue lDDT, ligand quality if a ligand is bound). Empty when the structure has no functional site of record.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
+    cross_tool_waivers: Optional[list[CrossToolWaiver]] = Field(default=None, description="""Waivers inherited from the source evals (#315), surfaced so a QDS reader sees the admission next to the coverage row it excuses.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvaluationRun', 'QualityDataSheet']} })
     cross_tool_coverage: Optional[CrossToolCoverage] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
     tool_recommendations_applied: Optional[list[ToolRecommendation]] = Field(default=None, description="""Snapshot of which recommendations were active at issue time. The QDS is immutable; recommendations evolve, so this captures the recommendations as-of issued_at.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
     assumptions_report: Optional[list[Assumption]] = Field(default=None, description="""Aggregated tool / measurement / framework assumptions that shaped this QDS. Built by qds_emit.py from tool.assumptions[] (joined via measurement.oracle_tool_ref) + measurement.assumptions[] + eval_run.assumptions[]. Anyone citing this QDS sees the full inferential basis without having to dig into per-tool docs.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QualityDataSheet']} })
@@ -1402,6 +1416,7 @@ class IdentityBlock(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1465,6 +1480,7 @@ class GeometrySummary(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1530,6 +1546,7 @@ class RefinementSummary(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1587,6 +1604,7 @@ class MapSummary(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1651,6 +1669,7 @@ class CrossToolCoverage(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1704,6 +1723,7 @@ class TaskCoverage(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1730,10 +1750,66 @@ class TaskCoverage(ConfiguredBaseModel):
                        'CoordinationContact',
                        'Site',
                        'SiteQuality']} })
-    catalog_task_ref: CatalogTaskId = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'TaskCoverage']} })
+    catalog_task_ref: CatalogTaskId = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'TaskCoverage', 'CrossToolWaiver']} })
     cctbx_oracles: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['TaskCoverage']} })
     non_cctbx_oracles: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['TaskCoverage']} })
     gap_status: Optional[str] = Field(default=None, description="""Free-text (e.g. \"closed\", \"closed at clashscore\", \"open — needs standalone Rama-Z\"). Settling into an enum once we see more data.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TaskCoverage']} })
+
+
+class CrossToolWaiver(ConfiguredBaseModel):
+    """
+    A machine-readable, per-task exception to the trust-model invariant that no gradeable applied task may rest on cctbx-only evidence (#315). Declared on the EvaluationRun and surfaced verbatim in the QDS; the emitter fails hard on a cctbx-only or unclassifiable coverage row with no matching waiver. A waiver is a named, dated admission — not a pass.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/protstruct-review/schema'})
+
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask',
+                       'Tool',
+                       'MetricDefinition',
+                       'Structure',
+                       'ExperimentalData',
+                       'AgentArtifact',
+                       'Refinement',
+                       'MeasurementProvenance',
+                       'MeasurementValue',
+                       'HeadlineFinding',
+                       'EvaluationRun',
+                       'QualityDataSheet',
+                       'IdentityBlock',
+                       'GeometrySummary',
+                       'RefinementSummary',
+                       'MapSummary',
+                       'CrossToolCoverage',
+                       'TaskCoverage',
+                       'CrossToolWaiver',
+                       'DataQualitySummary',
+                       'PredictedConfidenceSummary',
+                       'PackingSummary',
+                       'ClassificationSummary',
+                       'InterfaceQualitySummary',
+                       'PredictionEnsembleSummary',
+                       'NmrValidationSummary',
+                       'PairwiseComparison',
+                       'ToolRecommendation',
+                       'ResidueRef',
+                       'ResidueOutlier',
+                       'DensityPeak',
+                       'FlaggedRegion',
+                       'PerResidueValue',
+                       'PerResidueQuality',
+                       'SecondaryStructureAssignment',
+                       'DomainAssignment',
+                       'InterfaceQuality',
+                       'NmrEnsembleQuality',
+                       'PredictionEnsembleQuality',
+                       'Ligand',
+                       'LigandQuality',
+                       'Assumption',
+                       'CoordinationContact',
+                       'Site',
+                       'SiteQuality']} })
+    catalog_task_ref: CatalogTaskId = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['MeasurementValue', 'TaskCoverage', 'CrossToolWaiver']} })
+    reason: str = Field(default=..., description="""Why no non-cctbx oracle ran — name the missing tool or the documented no-equivalent gap, not a restatement of the fact.""", json_schema_extra = { "linkml_meta": {'domain_of': ['CrossToolWaiver']} })
+    as_of_date: date = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['CrossToolWaiver', 'ToolRecommendation']} })
 
 
 class DataQualitySummary(ConfiguredBaseModel):
@@ -1760,6 +1836,7 @@ class DataQualitySummary(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1819,6 +1896,7 @@ class PredictedConfidenceSummary(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1880,6 +1958,7 @@ class PackingSummary(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1935,6 +2014,7 @@ class ClassificationSummary(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -1993,6 +2073,7 @@ class InterfaceQualitySummary(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2049,6 +2130,7 @@ class PredictionEnsembleSummary(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2103,6 +2185,7 @@ class NmrValidationSummary(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2158,6 +2241,7 @@ class PairwiseComparison(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2226,6 +2310,7 @@ class ToolRecommendation(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2271,7 +2356,7 @@ class ToolRecommendation(ConfiguredBaseModel):
     rank: Optional[int] = Field(default=None, description="""1 = primary recommendation, 2+ = alternatives in order.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation']} })
     justification: Optional[str] = Field(default=None, description="""One-line rationale (\"CASP gold standard for fold similarity\"; \"matches PHENIX within 0.03 Å on 1SAR eval\"). Cite the source paper or the EvaluationRun id that supplies the evidence.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation']} })
     evidence_refs: Optional[list[str]] = Field(default=None, description="""Citation keys (e.g. \"Zhang2004\", \"Williams2018\") and/or EvaluationRun ids that support this recommendation.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation', 'Assumption']} })
-    as_of_date: Optional[date] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ToolRecommendation']} })
+    as_of_date: Optional[date] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['CrossToolWaiver', 'ToolRecommendation']} })
     notes: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Finding',
                        'MeasurementValue',
                        'HeadlineFinding',
@@ -2309,6 +2394,7 @@ class ResidueRef(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2381,6 +2467,7 @@ class ResidueOutlier(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2448,6 +2535,7 @@ class DensityPeak(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2515,6 +2603,7 @@ class FlaggedRegion(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2597,6 +2686,7 @@ class PerResidueValue(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2666,6 +2756,7 @@ class PerResidueQuality(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2729,6 +2820,7 @@ class SecondaryStructureAssignment(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2827,6 +2919,7 @@ class DomainAssignment(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -2928,6 +3021,7 @@ class InterfaceQuality(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -3021,6 +3115,7 @@ class NmrEnsembleQuality(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -3110,6 +3205,7 @@ class PredictionEnsembleQuality(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -3199,6 +3295,7 @@ class Ligand(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -3275,6 +3372,7 @@ class LigandQuality(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -3334,6 +3432,7 @@ class Assumption(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -3424,6 +3523,7 @@ class CoordinationContact(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -3498,6 +3598,7 @@ class Site(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -3574,6 +3675,7 @@ class SiteQuality(ConfiguredBaseModel):
                        'MapSummary',
                        'CrossToolCoverage',
                        'TaskCoverage',
+                       'CrossToolWaiver',
                        'DataQualitySummary',
                        'PredictedConfidenceSummary',
                        'PackingSummary',
@@ -3633,6 +3735,7 @@ RefinementSummary.model_rebuild()
 MapSummary.model_rebuild()
 CrossToolCoverage.model_rebuild()
 TaskCoverage.model_rebuild()
+CrossToolWaiver.model_rebuild()
 DataQualitySummary.model_rebuild()
 PredictedConfidenceSummary.model_rebuild()
 PackingSummary.model_rebuild()
