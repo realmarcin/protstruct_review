@@ -416,10 +416,12 @@ def main() -> int:
         print(f"  diagnostic run: writing {screen_out} (use --out to "
               f"choose); the canonical record is untouched", file=sys.stderr)
         enrolled_out = screen_out.with_name(screen_out.stem + "_enrolled.json")
-    if not full_run and screen_out.resolve() in (SCREEN_JSON.resolve(),
-                                                 ENROLLED_JSON.resolve()):
-        raise SystemExit("screen_round1: a diagnostic run may not target the "
-                         "canonical record (#319)")
+    if not full_run and (REPO / "ref") in screen_out.resolve().parents:
+        # Not just the two canonical screen files: ANY committed artifact under
+        # ref/ (reps records, masks, …) is off-limits to a diagnostic run
+        # (#319, inner review r2).
+        raise SystemExit("screen_round1: a diagnostic run may not write inside "
+                         "ref/ — committed records come from full runs only (#319)")
     manifest = {"run_mode": "full" if full_run else "diagnostic",
                 "flags": {"canary": args.canary, "only": args.only,
                           "no_replacements": args.no_replacements},
