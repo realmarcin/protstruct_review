@@ -1,0 +1,2363 @@
+{
+  "run": {
+    "run_mode": "full",
+    "flags": {
+      "canary": false,
+      "only": "",
+      "no_replacements": false
+    },
+    "reps": "/Users/marcin/Documents/VIMSS/ontology/protstruct_review/ref/research/data/negative_control_round2_reps.json",
+    "preregistration": "negative_control_round2_preregistration.md",
+    "round": 2,
+    "tools": {
+      "phenix_bin": "/Users/marcin/phenix-2.0-5936/phenix_bin",
+      "gemmi_cli": "/opt/homebrew/bin/gemmi",
+      "gemmi_cli_version": "gemmi 0.7.5",
+      "gemmi_python": "0.7.5",
+      "python": "3.13.12"
+    },
+    "protocol": {
+      "macro_cycles": 3,
+      "refine_prefix": "r2n_",
+      "nbins": 20
+    }
+  },
+  "floor_unmasked": 50,
+  "sigma_factor": 3.0,
+  "min_noise_n": 8,
+  "s_floor": 0.0005,
+  "rows": [
+    {
+      "pdb_id": "4M7G",
+      "cluster": "18320_30",
+      "stratum": true,
+      "d_min": 0.79,
+      "deposit_year": 2013,
+      "input_hashes": {
+        "model": "e94b951321c791fef757e407640e4e3c1d36e605b8ec19761de2157075bf2b31",
+        "mtz": "f6824a5b756b807d236bdcdfa75c1a8babf7c157fd9634c4a166fc96ce1c336b",
+        "validation_xml": "0a590cb2d664b84c462021e81011cad0072d69dc035ea4fa7d73a8a29af63d68",
+        "cif": "ee8f8322f86b8fc95edd51265bf1acbbfcd5d79a9dcf27e1b99a70dcec7a4b0b"
+      },
+      "n_unmasked": 136,
+      "mask_fraction": 0.39,
+      "n_protected": 3,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1109,
+        "r_free_pre": 0.1213,
+        "r_work_post": 0.1196,
+        "r_free_post": 0.13
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1209,
+          "post": 0.1292,
+          "delta": 0.008300000000000016,
+          "delta_display": 0.0083
+        },
+        "gemmi": {
+          "pre": 0.1205,
+          "post": 0.1295,
+          "delta": 0.009000000000000008,
+          "delta_display": 0.009
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "7R2H",
+      "cluster": "531_30",
+      "stratum": true,
+      "d_min": 0.79,
+      "deposit_year": 2022,
+      "input_hashes": {
+        "model": "a166df0a2539dd441cc9382e0dd229fdc2236dacf336fb319b2e41d23c74e783",
+        "mtz": "ecf8fa25e60626644672631ec37caa3e477ac5f6d4b8705eeafbde4f99197aa7",
+        "validation_xml": "6df2ed14f639eba64d13feeb64f7f4086cc8df3dba4f4c80efe7ba634ec26775",
+        "cif": "254ed93f8fe79009f4066f633ab78e0962b5469ad79b736db73c4f68464aac40"
+      },
+      "n_unmasked": 115,
+      "mask_fraction": 0.303,
+      "n_protected": 3,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1437,
+        "r_free_pre": 0.1545,
+        "r_work_post": 0.1371,
+        "r_free_post": 0.1494
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1545,
+          "post": 0.1494,
+          "delta": -0.005099999999999993,
+          "delta_display": -0.0051
+        },
+        "gemmi": {
+          "pre": 0.1577,
+          "post": 0.1523,
+          "delta": -0.005400000000000016,
+          "delta_display": -0.0054
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "5HB7",
+      "cluster": "17447_30",
+      "stratum": true,
+      "d_min": 0.8,
+      "deposit_year": 2015,
+      "input_hashes": {
+        "model": "aae8ff4258845d3274fe1ebc563db5b12b1426a6023230cb458659918a7447e9",
+        "mtz": "6c26aecb40948ca48f46a79acc025b65e0411e3c638ceca2eb3dff022ab5a8eb",
+        "validation_xml": "7adf37a9662692c7ffbae3517fad292319eb8087a1f2de7d4bbdc8e2e80d9c82",
+        "cif": "dc1840ea201dc74326725c259ebc4c578fc1a6f96f7e75aeb735f7e8c40af303"
+      },
+      "n_unmasked": 40,
+      "mask_fraction": 0.688,
+      "n_protected": 1,
+      "status": "floor",
+      "reason": "40 unmasked residues < 50 (D3)",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "2VXN",
+      "cluster": "478_30",
+      "stratum": true,
+      "d_min": 0.82,
+      "deposit_year": 2008,
+      "input_hashes": {
+        "model": "63cd65e6b6c11aa4d96c30cd01e3352e5c1cec0137db4888524ff8bf3ba7519f",
+        "mtz": "1ce4b08130d6183b9aab0fa85d4abbc0e3b0a7195aeba1be8262715ee76e227f",
+        "validation_xml": "e448cd2bf93ac7eb458c81a8649964b46a698f325bf99e7bc5516d1345b16eb2",
+        "cif": "ebc8092611358b8602e9736be86a5807be5e4b261399ebf9eb1f12fbd3100cdc"
+      },
+      "n_unmasked": 156,
+      "mask_fraction": 0.393,
+      "n_protected": 2,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1052,
+        "r_free_pre": 0.1065,
+        "r_work_post": 0.1177,
+        "r_free_post": 0.1276
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1043,
+          "post": 0.1257,
+          "delta": 0.021400000000000002,
+          "delta_display": 0.0214
+        },
+        "gemmi": {
+          "pre": 0.1059,
+          "post": 0.1279,
+          "delta": 0.02200000000000002,
+          "delta_display": 0.022
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "6TGU",
+      "cluster": "452_30",
+      "stratum": true,
+      "d_min": 0.83,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "c164f3ee5f13daf9392a2ebc328ffb888cdaf9c7ad6dd25f8143489253af158c",
+        "mtz": "6d72a4bc922572e721d7a9ea2ab470e758c1ddcaf66c3b73e6224c97fe38337d",
+        "validation_xml": "8718007d39d792a00a3a3bfdd77964dff8e0e313333687b863f4212772460e6f",
+        "cif": "fde747e76e05a1949d8d211403aa517aedf14e82dfca7336104c433a0dff6de8"
+      },
+      "n_unmasked": 273,
+      "mask_fraction": 0.185,
+      "n_protected": 4,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "r_work_pre": 0.1445,
+        "r_free_pre": 0.1674,
+        "r_work_post": 0.1487,
+        "r_free_post": 0.1718
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.167,
+          "post": 0.168,
+          "delta": 0.0010000000000000009,
+          "delta_display": 0.001
+        },
+        "gemmi": {
+          "pre": null,
+          "post": null,
+          "delta": null,
+          "delta_display": null
+        }
+      },
+      "status": "data_defect",
+      "reason": "R path(s) ['gemmi'] unmeasurable \u2014 two-path agreement is impossible, cannot verify at-optimum (D6)",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "9Q8C",
+      "cluster": "452_30",
+      "stratum": true,
+      "d_min": 0.9,
+      "deposit_year": 2025,
+      "input_hashes": {
+        "model": "1a896def1de0667450ee114614e4d3fc41605f109005df97b014a01fdb26d618",
+        "mtz": "51b7902b4f09ba3822b61275193bf3ab7d809f40adeec64227863df3c153fc2f",
+        "validation_xml": "ac93b708e646dae40e359fbb204155e2fd019862733238f2fb7050c68547389c",
+        "cif": "022d8b23b9fec55bcaa12d90b75f192b9db93ec9a2edc3c90903185fa6f43de2"
+      },
+      "n_unmasked": 288,
+      "mask_fraction": 0.127,
+      "n_protected": 4,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "r_work_pre": 0.1345,
+        "r_free_pre": 0.1478,
+        "r_work_post": 0.1395,
+        "r_free_post": 0.1527
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1477,
+          "post": 0.1527,
+          "delta": 0.0050000000000000044,
+          "delta_display": 0.005
+        },
+        "gemmi": {
+          "pre": null,
+          "post": null,
+          "delta": null,
+          "delta_display": null
+        }
+      },
+      "status": "data_defect",
+      "reason": "R path(s) ['gemmi'] unmeasurable \u2014 two-path agreement is impossible, cannot verify at-optimum (D6)",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "9Q9G",
+      "cluster": "452_30",
+      "stratum": true,
+      "d_min": 0.94,
+      "deposit_year": 2025,
+      "input_hashes": {
+        "model": "7f9e4a19530964e39c51702d4e74571e5660283efcbc70f157aabe7cea2e9457",
+        "mtz": "d27446a7ddc84e2ca3574f45f90d0b6dd015e6b1e2e6d7356b7c16129a447ba6",
+        "validation_xml": "b90d05eb3b0974cca61cff7f51a0e0639dabf7993fca75d13c5903bd0863a82e",
+        "cif": "4090938cd8461c2b619241cd3eb7f79b2140b46ea06d96e7570c78345fe36959"
+      },
+      "n_unmasked": 283,
+      "mask_fraction": 0.142,
+      "n_protected": 6,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "r_work_pre": 0.1391,
+        "r_free_pre": 0.1571,
+        "r_work_post": 0.1419,
+        "r_free_post": 0.1578
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1571,
+          "post": 0.1577,
+          "delta": 0.0006000000000000172,
+          "delta_display": 0.0006
+        },
+        "gemmi": {
+          "pre": null,
+          "post": null,
+          "delta": null,
+          "delta_display": null
+        }
+      },
+      "status": "data_defect",
+      "reason": "R path(s) ['gemmi'] unmeasurable \u2014 two-path agreement is impossible, cannot verify at-optimum (D6)",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "7ATV",
+      "cluster": "452_30",
+      "stratum": true,
+      "d_min": 0.96,
+      "deposit_year": 2020,
+      "input_hashes": {
+        "model": "2059afd7eb1004c18460ac66501cb822bffa098a11d87fc5be6cbacfc718e9f9",
+        "mtz": "915590b23c0279deb17a0b38d41ff915e4b90d9e353149d9a0f8f5bacbc8efd9",
+        "validation_xml": "2928934ef51fcf6e0404e234f147cccbe5d4d3b387ffe4d88520847cf00700df",
+        "cif": "8393c5991cf506fa085716972f655f9a326e228884f8fe75848459c2644f2483"
+      },
+      "n_unmasked": 244,
+      "mask_fraction": 0.263,
+      "n_protected": 9,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1275,
+        "r_free_pre": 0.1411,
+        "r_work_post": 0.1317,
+        "r_free_post": 0.1459
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1407,
+          "post": 0.1455,
+          "delta": 0.004799999999999999,
+          "delta_display": 0.0048
+        },
+        "gemmi": {
+          "pre": 0.1448,
+          "post": 0.1502,
+          "delta": 0.005399999999999988,
+          "delta_display": 0.0054
+        }
+      },
+      "status": "screened",
+      "initial_representative": false,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "6Q01",
+      "cluster": "5058_30",
+      "stratum": true,
+      "d_min": 0.85,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "2fa8a027a1678ce20690b88f686635d351362d9652563917fbc9a5b4607cf85b",
+        "mtz": "5ea2d59285ed96bd9e4153b38a7d3c4183f7554c793930f892765d6d1d889b7c",
+        "validation_xml": "04e9ca704b28148a4bd745b2bba1a120f822c0a9226a739fbbbe59d4806a8260",
+        "cif": "e1f0fe07df4a4bfefc5f4557f3ed8daf97b07fb53e43a8b077430fd8d50a26cd"
+      },
+      "n_unmasked": 98,
+      "mask_fraction": 0.606,
+      "n_protected": 0,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1015,
+        "r_free_pre": 0.1146,
+        "r_work_post": 0.1132,
+        "r_free_post": 0.1295
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1142,
+          "post": 0.1261,
+          "delta": 0.011899999999999994,
+          "delta_display": 0.0119
+        },
+        "gemmi": {
+          "pre": 0.117,
+          "post": 0.1284,
+          "delta": 0.01139999999999998,
+          "delta_display": 0.0114
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "6Q00",
+      "cluster": "91_30",
+      "stratum": true,
+      "d_min": 0.85,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "03923f01b3b1c52be63dc3051e5e70c70db55f9a20a5e8e82b8b663ea2fdadb1",
+        "mtz": "554e1ee1266fea8bca653f7ef0d49944881ba4c92dda6f89c6683b5c97ade1da",
+        "validation_xml": "8b24e32e7af366cdd37aeaf4e3c0aeb9ffec369e1d50c417c62256aa128f0fc4",
+        "cif": "14b9d334cb8b7277bf452c38ac61f31618d338aa93b5feff3aba8f869b9a0d87"
+      },
+      "n_unmasked": 41,
+      "mask_fraction": 0.667,
+      "n_protected": 0,
+      "status": "floor",
+      "reason": "41 unmasked residues < 50 (D3)",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "9HDS",
+      "cluster": "1101_30",
+      "stratum": true,
+      "d_min": 0.86,
+      "deposit_year": 2024,
+      "input_hashes": {
+        "model": "200e60767ace6b5067b898b1507383796ac8b692ed123f8681a392122b95c45c",
+        "mtz": "5f21a277cc7e502b96173b5bff70289e408d4ef2d891e35bcfd4d6af1e0d7d63",
+        "validation_xml": "bc7af696ee1b6ea6535f515d706954932b8ec30d15b1d2247c204626c41cd3e9",
+        "cif": "787768116f31eac634bc0d7b3b0ab6ea5f279837c4cc43ed006711e92128a795"
+      },
+      "n_unmasked": 121,
+      "mask_fraction": 0.535,
+      "n_protected": 1,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "r_work_pre": 0.1276,
+        "r_free_pre": 0.136,
+        "r_work_post": 0.1343,
+        "r_free_post": 0.1426
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1358,
+          "post": 0.1422,
+          "delta": 0.006399999999999989,
+          "delta_display": 0.0064
+        },
+        "gemmi": {
+          "pre": null,
+          "post": null,
+          "delta": null,
+          "delta_display": null
+        }
+      },
+      "status": "data_defect",
+      "reason": "R path(s) ['gemmi'] unmeasurable \u2014 two-path agreement is impossible, cannot verify at-optimum (D6)",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "9HOV",
+      "cluster": "1101_30",
+      "stratum": true,
+      "d_min": 0.92,
+      "deposit_year": 2024,
+      "input_hashes": {
+        "model": "e91538430dd99b1229aaeaa74064327218d7501c9e1e6bd54e9dba92cfb405e6",
+        "mtz": "b69176e25e2a4e6716497739ffaa38a6fc3825a7a88d42428a704373b3285190",
+        "validation_xml": "933271fc0215e94c933531d4729d39e4c74b9783a6016246859c188d56ce12f2",
+        "cif": "944bb6525389664179cc6fe4faf592f71ce306716bad765f6960ce245ab0bd2e"
+      },
+      "n_unmasked": 110,
+      "mask_fraction": 0.575,
+      "n_protected": 2,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "r_work_pre": 0.1222,
+        "r_free_pre": 0.1375,
+        "r_work_post": 0.1257,
+        "r_free_post": 0.1413
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1375,
+          "post": 0.1415,
+          "delta": 0.003999999999999976,
+          "delta_display": 0.004
+        },
+        "gemmi": {
+          "pre": null,
+          "post": null,
+          "delta": null,
+          "delta_display": null
+        }
+      },
+      "status": "data_defect",
+      "reason": "R path(s) ['gemmi'] unmeasurable \u2014 two-path agreement is impossible, cannot verify at-optimum (D6)",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "9HY0",
+      "cluster": "1101_30",
+      "stratum": true,
+      "d_min": 0.95,
+      "deposit_year": 2025,
+      "input_hashes": {
+        "model": "b8ddb5c4439798a7d9324459a35f96cb2e8ce948d2b941c98426ace668dddcce",
+        "mtz": "6628dfcb2aed41e596bf0e0eb0fb14ceb7612f903e3c87674ca96c4bd3e028c7",
+        "validation_xml": "b80e084a9a2b7ce309434d4960ef2c9d8bb3db87975b376e15f36523b3bc8fd9",
+        "cif": "aa8b892d5363afe3b15fc3b1dc3aae3c3034acc0911c2395801f0d87bcfdf648"
+      },
+      "n_unmasked": 119,
+      "mask_fraction": 0.541,
+      "n_protected": 2,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "r_work_pre": 0.123,
+        "r_free_pre": 0.1307,
+        "r_work_post": 0.1282,
+        "r_free_post": 0.1361
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1308,
+          "post": 0.1364,
+          "delta": 0.005599999999999994,
+          "delta_display": 0.0056
+        },
+        "gemmi": {
+          "pre": null,
+          "post": null,
+          "delta": null,
+          "delta_display": null
+        }
+      },
+      "status": "data_defect",
+      "reason": "R path(s) ['gemmi'] unmeasurable \u2014 two-path agreement is impossible, cannot verify at-optimum (D6)",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "7ASQ",
+      "cluster": "1101_30",
+      "stratum": true,
+      "d_min": 0.95,
+      "deposit_year": 2020,
+      "input_hashes": {
+        "model": "462ca963871101b3369d6e90981941e8792b14dfb566ccde4e6250af3b84e5a3",
+        "mtz": "2ad3c760a755748daebc6272572ae23075e5ee55a05a69b5002150a88ebba9d2",
+        "validation_xml": "07fc357efd4113d9d14c18eb16ccb00adc2f49529d8d646ac18dbac5a92808cf",
+        "cif": "fa6a091470b308e45021d4380e6502e4c828862a51d03c33d28c018aec6d9c29"
+      },
+      "n_unmasked": 105,
+      "mask_fraction": 0.598,
+      "n_protected": 4,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "r_work_pre": 0.108,
+        "r_free_pre": 0.1196,
+        "r_work_post": 0.1119,
+        "r_free_post": 0.1236
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1194,
+          "post": 0.1236,
+          "delta": 0.004199999999999995,
+          "delta_display": 0.0042
+        },
+        "gemmi": {
+          "pre": null,
+          "post": null,
+          "delta": null,
+          "delta_display": null
+        }
+      },
+      "status": "data_defect",
+      "reason": "R path(s) ['gemmi'] unmeasurable \u2014 two-path agreement is impossible, cannot verify at-optimum (D6)",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "9HP2",
+      "cluster": "1101_30",
+      "stratum": true,
+      "d_min": 1.0,
+      "deposit_year": 2024,
+      "input_hashes": {
+        "model": "5944c38c57aaaed6f87a0ca850be0bf188b10e93757ffd136236d5385d4c95b7",
+        "mtz": "80b3c297fe86c2e094ad9cce39470599a9fcdb30ada007ac8d7d704ebae0e39b",
+        "validation_xml": "af2441f26d42627905e1e6e20948a9abffef43e23a094eb652118239d4ef6332",
+        "cif": "a774da2bb75b266860bd3f2717f9d334442eb9832f9b1cac49e8e0e2578e89ce"
+      },
+      "n_unmasked": 123,
+      "mask_fraction": 0.527,
+      "n_protected": 1,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "r_work_pre": 0.131,
+        "r_free_pre": 0.1465,
+        "r_work_post": 0.1373,
+        "r_free_post": 0.1498
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1465,
+          "post": 0.1503,
+          "delta": 0.003799999999999998,
+          "delta_display": 0.0038
+        },
+        "gemmi": {
+          "pre": null,
+          "post": null,
+          "delta": null,
+          "delta_display": null
+        }
+      },
+      "status": "data_defect",
+      "reason": "R path(s) ['gemmi'] unmeasurable \u2014 two-path agreement is impossible, cannot verify at-optimum (D6)",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "6ZWY",
+      "cluster": "1101_30",
+      "stratum": true,
+      "d_min": 1.0,
+      "deposit_year": 2020,
+      "input_hashes": {
+        "model": "1edcb8619d3c951a90b22c29a078517314a09f205ab38c75f1ceeb85ef0fcb82",
+        "mtz": "26aadabbe0a095864e61729905ae262fb92ec093129c5e3d851653185cfb7196",
+        "validation_xml": "55a0198e843a7853f648279b2b9e071550ee655bf90994f3dcda7e96161c42dd",
+        "cif": "d73e6e75ed64fc9dec46a0a592708290dc9da9f5b43b378f71829d1a82ea2483"
+      },
+      "n_unmasked": 150,
+      "mask_fraction": 0.425,
+      "n_protected": 2,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1396,
+        "r_free_pre": 0.1503,
+        "r_work_post": 0.1348,
+        "r_free_post": 0.1509
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1511,
+          "post": 0.1498,
+          "delta": -0.0013000000000000234,
+          "delta_display": -0.0013
+        },
+        "gemmi": {
+          "pre": 0.1531,
+          "post": 0.1526,
+          "delta": -0.0005000000000000004,
+          "delta_display": -0.0005
+        }
+      },
+      "status": "screened",
+      "initial_representative": false,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "2DDX",
+      "cluster": "31926_30",
+      "stratum": true,
+      "d_min": 0.86,
+      "deposit_year": 2006,
+      "input_hashes": {
+        "model": "15e5283c8084b3454e0e3060c75166f5b5d0af44924261dbebb1edd5277745d3",
+        "mtz": "036dc9e8b0fc62f49b19437561f15f28ebfbbf06e43b2e22c643f4caab123579",
+        "validation_xml": "346d4cd1b02656ca6d5ca6b895e609f7c8a47d2c322aac8a4e3dce78fe319e90",
+        "cif": "7822ce40a62745798e3fdead091fa2f270688302356eab07179c8dba5fda185b"
+      },
+      "n_unmasked": 253,
+      "mask_fraction": 0.229,
+      "n_protected": 4,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1468,
+        "r_free_pre": 0.1545,
+        "r_work_post": 0.1341,
+        "r_free_post": 0.1466
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1544,
+          "post": 0.1459,
+          "delta": -0.008500000000000008,
+          "delta_display": -0.0085
+        },
+        "gemmi": {
+          "pre": 0.1575,
+          "post": 0.1492,
+          "delta": -0.008300000000000002,
+          "delta_display": -0.0083
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": true,
+      "headroom_one_path_only": [],
+      "enrolled": false
+    },
+    {
+      "pdb_id": "5XS6",
+      "cluster": "1118_30",
+      "stratum": true,
+      "d_min": 0.87,
+      "deposit_year": 2017,
+      "input_hashes": {
+        "model": "18a0aba6813a2b9c2fd489086628c3f321760376e858c3424c5bec2f6e765239",
+        "mtz": "bd2d6923a19763ccae607ae4783a46b89b52b49fbb282d849b479b9aa9c7d3b4",
+        "validation_xml": "66de7bfe726c9f13909dfa2467c10729c3ad6c1e42f742e5884898649bdb848a",
+        "cif": "e036a189333e711c9025d5b75fb9b71ede8fb31c1a54dbba5c5113b0534e20bc"
+      },
+      "n_unmasked": 426,
+      "mask_fraction": 0.374,
+      "n_protected": 10,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1584,
+        "r_free_pre": 0.1668,
+        "r_work_post": 0.1621,
+        "r_free_post": 0.1736
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1666,
+          "post": 0.1704,
+          "delta": 0.003799999999999998,
+          "delta_display": 0.0038
+        },
+        "gemmi": {
+          "pre": 0.1712,
+          "post": 0.174,
+          "delta": 0.002799999999999997,
+          "delta_display": 0.0028
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "8ERE",
+      "cluster": "7643_30",
+      "stratum": true,
+      "d_min": 0.87,
+      "deposit_year": 2022,
+      "input_hashes": {
+        "model": "9ecfb9999f6e5228052dc298145f17839a9e681f53fc6ca6b24a2074f38d9423",
+        "mtz": "35f5f3e12c555f25b8ed416a354f79f9f7f9eb410cb9faa0850ece24bdd80e52",
+        "validation_xml": "4d14b706c522df78c0d1bf85b040ee3a2d17c914967d10a9f973598bcd7a639b",
+        "cif": "ee1815757a105c16a97855ebf143664bed5bcd83897f24215fc929416f64a71b"
+      },
+      "n_unmasked": 109,
+      "mask_fraction": 0.142,
+      "n_protected": 3,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1203,
+        "r_free_pre": 0.1307,
+        "r_work_post": 0.1236,
+        "r_free_post": 0.1381
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1307,
+          "post": 0.137,
+          "delta": 0.0063,
+          "delta_display": 0.0063
+        },
+        "gemmi": {
+          "pre": 0.1338,
+          "post": 0.1393,
+          "delta": 0.005500000000000005,
+          "delta_display": 0.0055
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "3ZOJ",
+      "cluster": "10278_30",
+      "stratum": true,
+      "d_min": 0.88,
+      "deposit_year": 2013,
+      "input_hashes": {
+        "model": "5c7b8268d6852b7499cc75695bb5a1fda71fb83386d8721c87fb66748e64b750",
+        "mtz": "aa1eccad676599bd047c44c2bdc612b899a4080cdc9942e15b1217bb7b5f1316",
+        "validation_xml": "e4b453e9a83efad7eec27a12aafe4b459372cf91a03932ca1d6175e0f0123afc",
+        "cif": "a3f41850fe6f97328b1a91bd1ad296cb82fe74fcb64a1af923067c1891e32b01"
+      },
+      "n_unmasked": 120,
+      "mask_fraction": 0.554,
+      "n_protected": 3,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.0962,
+        "r_free_pre": 0.1001,
+        "r_work_post": 0.101,
+        "r_free_post": 0.1083
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.0997,
+          "post": 0.1076,
+          "delta": 0.007900000000000004,
+          "delta_display": 0.0079
+        },
+        "gemmi": {
+          "pre": 0.1041,
+          "post": 0.1115,
+          "delta": 0.007400000000000004,
+          "delta_display": 0.0074
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "9YGW",
+      "cluster": "1378_30",
+      "stratum": true,
+      "d_min": 0.88,
+      "deposit_year": 2025,
+      "input_hashes": {
+        "model": "e56874e596758d862c2e2f6137921e4c4d18c1093fe81a6c3fe9e7a385f16c71",
+        "mtz": "b05e4cb06ca7399d526b55d6324c61b8486762a818b9c265f054dea80f54a3d3",
+        "validation_xml": "8da8106ef2b86c1516a359f19c68557efaed60fdb326091bf450aecf4ddd1327",
+        "cif": "6270c732064c8818ece9cf1d35592d13cf5064c90e5b13f5dff6a9eee50b3666"
+      },
+      "n_unmasked": 252,
+      "mask_fraction": 0.36,
+      "n_protected": 9,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1158,
+        "r_free_pre": 0.1274,
+        "r_work_post": 0.1206,
+        "r_free_post": 0.1353
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1274,
+          "post": 0.1339,
+          "delta": 0.006499999999999978,
+          "delta_display": 0.0065
+        },
+        "gemmi": {
+          "pre": 0.1286,
+          "post": 0.1351,
+          "delta": 0.006500000000000006,
+          "delta_display": 0.0065
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "9P25",
+      "cluster": "10815_30",
+      "stratum": true,
+      "d_min": 0.89,
+      "deposit_year": 2025,
+      "input_hashes": {
+        "model": "63b30af0f3e24146f06fe3ede114003ac0a55b14ef7e396d00df928f28577437",
+        "mtz": "dc49e65682f7250baa4c832f90c249fb61b6b452b13f8d9f70ad649314e97a58",
+        "validation_xml": "4bac7fed1b5f2278927dde42c0e84388a53c77921f3ffd898327192b97779006",
+        "cif": "16d748f36db52ae9501d84fcc8b5748e180717004b3bffbe280aee88e76ec9f6"
+      },
+      "n_unmasked": 321,
+      "mask_fraction": 0.219,
+      "n_protected": 2,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1455,
+        "r_free_pre": 0.1529,
+        "r_work_post": 0.151,
+        "r_free_post": 0.1562
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1529,
+          "post": 0.1538,
+          "delta": 0.0008999999999999841,
+          "delta_display": 0.0009
+        },
+        "gemmi": {
+          "pre": 0.1585,
+          "post": 0.1605,
+          "delta": 0.0020000000000000018,
+          "delta_display": 0.002
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "8R5K",
+      "cluster": "1209_30",
+      "stratum": true,
+      "d_min": 0.89,
+      "deposit_year": 2023,
+      "input_hashes": {
+        "model": "89b06927f2fd2cb0d8506277d6cc7b9dfd2a804cfbccf95fe31bc4fef75dcf2c",
+        "mtz": "ac8966b6b6bcf8e1450366fbb20a5f48f56019ed740a08d9f1c34a4ff4c022a6",
+        "validation_xml": "de21a66aff502b752ef05c36dfcfe0972e186280c7fb23c46e96f171a4eac101",
+        "cif": "e2c9937c8aaf1b67bcec35f79e82931f95bce8b924183e8fff075b6a0b9d8d35"
+      },
+      "n_unmasked": 69,
+      "mask_fraction": 0.465,
+      "n_protected": 0,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.149,
+        "r_free_pre": 0.1565,
+        "r_work_post": 0.1543,
+        "r_free_post": 0.1605
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1563,
+          "post": 0.1603,
+          "delta": 0.0040000000000000036,
+          "delta_display": 0.004
+        },
+        "gemmi": {
+          "pre": 0.1584,
+          "post": 0.1631,
+          "delta": 0.004699999999999982,
+          "delta_display": 0.0047
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "9QDV",
+      "cluster": "1916_30",
+      "stratum": true,
+      "d_min": 0.89,
+      "deposit_year": 2025,
+      "input_hashes": {
+        "model": "9d85760e026c53ea89de307325958b348bff6a83bb7846a40ad9240e5d301a84",
+        "mtz": "73ef2195213c089b91f622445f3a6cc53501af8ffa53629b2643de5e1df8d0d0",
+        "validation_xml": "74fc97f32e542c8fbc5cda6a481c1b92a6a6f4f4dcd764019c2cd4c12d21717b",
+        "cif": "4c43118a84ba062290b8137a72c8881eb2988ef464f9a98e772408d1c50190af"
+      },
+      "n_unmasked": 382,
+      "mask_fraction": 0.263,
+      "n_protected": 2,
+      "status": "data_defect",
+      "reason": "no registered observation labels in the MTZ",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "7TVL",
+      "cluster": "39108_30",
+      "stratum": true,
+      "d_min": 0.89,
+      "deposit_year": 2022,
+      "input_hashes": {
+        "model": "e288d4c5472d172e53f05aa0296e7bb50d9d4d4c0c3ef8000de338600a7c1d55",
+        "mtz": "2e453c18154ccef983c4dd09805bf578bcbde67becdec6774ffe3f9d064d31b1",
+        "validation_xml": "c26f69155416c8212941eab503cc57827849f816fb2850e85250d36c969074c6",
+        "cif": "97a355abe83052466af5b4b57ba96eb459c3c0642868c2bdd4bde826ac58b9fd"
+      },
+      "n_unmasked": 156,
+      "mask_fraction": 0.325,
+      "n_protected": 3,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1216,
+        "r_free_pre": 0.1323,
+        "r_work_post": 0.1225,
+        "r_free_post": 0.1337
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1322,
+          "post": 0.1321,
+          "delta": -0.00010000000000001674,
+          "delta_display": -0.0001
+        },
+        "gemmi": {
+          "pre": 0.1342,
+          "post": 0.1339,
+          "delta": -0.00030000000000002247,
+          "delta_display": -0.0003
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "8PB5",
+      "cluster": "5094_30",
+      "stratum": true,
+      "d_min": 0.89,
+      "deposit_year": 2023,
+      "input_hashes": {
+        "model": "16b292c7d2fd06e97103e6abd968fc5617cc5f9456109b13048c272d9d2fcca7",
+        "mtz": "1ebca53165c467e9ac9d5e6f6efcf9e2d76c565562b93774f26c75d87bb564d6",
+        "validation_xml": "975d1db95e26a19e0b8c0d2413430851e178e41b59aa931d342c27dd171d0e41",
+        "cif": "70d97bf7c241d2ba37f36b5588ac0b881f81cba46092bc6f39f8ef9f3974ceaa"
+      },
+      "n_unmasked": 205,
+      "mask_fraction": 0.367,
+      "n_protected": 7,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "8PB7",
+      "cluster": "5094_30",
+      "stratum": true,
+      "d_min": 0.92,
+      "deposit_year": 2023,
+      "input_hashes": {
+        "model": "9e736f101cecf8730896f23a7cea48c5faebd27d2281a9a0d22283a6be2eac93",
+        "mtz": "fb61366da13579f9619cf34b774ddf8a8bbba08d1e07cbff0f36e21b658ddbc6",
+        "validation_xml": "e29c4dfc13bca11672ec8c876cb533fcf8867212117868902eb7721012c43564",
+        "cif": "e2b9216cf4a9fdbbb9b77b951d24a7b38cd74786c669f1ae0f11855dd4d3bedf"
+      },
+      "n_unmasked": 197,
+      "mask_fraction": 0.392,
+      "n_protected": 10,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "8PB6",
+      "cluster": "5094_30",
+      "stratum": true,
+      "d_min": 0.93,
+      "deposit_year": 2023,
+      "input_hashes": {
+        "model": "2312fb0c9ec5e93b914bd803ab46695cfb9d5f5246b68cf3422a2d6c6a257073",
+        "mtz": "f31cc62153c75c3ebca16eeac1d78fab82990abd87da91eb967ac6be02ae47d8",
+        "validation_xml": "d23d4f3a485e01d75bfb31184539eed7db4031105d0c6cb2a8fe1e4b311ee208",
+        "cif": "0b4365875277e8b546bf1504b3be7a5741166b49bbab31f8eabf68391496e312"
+      },
+      "n_unmasked": 207,
+      "mask_fraction": 0.361,
+      "n_protected": 8,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "8QXQ",
+      "cluster": "5094_30",
+      "stratum": true,
+      "d_min": 0.94,
+      "deposit_year": 2023,
+      "input_hashes": {
+        "model": "864bc500d73a49e49f0539139348646d8b2e2abfc86a89d0fedf56bf3d7c38ed",
+        "mtz": "e193f767ad16111a3ef53f62fd0936afb47f4d17059c2a4313d8f1575ce6d58e",
+        "validation_xml": "f2a799b9e067c323be8fe40ca294bd2f4d065c9c4d119161fb6362a3b86eb738",
+        "cif": "0d290cdef5c8e50c6675f801769c70a5be08500bf330c1659b5aa401ab6451eb"
+      },
+      "n_unmasked": 205,
+      "mask_fraction": 0.367,
+      "n_protected": 5,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1366,
+        "r_free_pre": 0.1495,
+        "r_work_post": 0.1409,
+        "r_free_post": 0.1524
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1495,
+          "post": 0.1523,
+          "delta": 0.002799999999999997,
+          "delta_display": 0.0028
+        },
+        "gemmi": {
+          "pre": 0.1582,
+          "post": 0.16,
+          "delta": 0.001799999999999996,
+          "delta_display": 0.0018
+        }
+      },
+      "status": "screened",
+      "initial_representative": false,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "9RZL",
+      "cluster": "18_30",
+      "stratum": true,
+      "d_min": 0.9,
+      "deposit_year": 2025,
+      "input_hashes": {
+        "model": "1aa1b9fc39bb67cca6b4b657b041bb25dfa554e3ca3997ba8f54a8206abc34d2",
+        "mtz": "69684ddbf8194343707c7d0a35699ef7a35c8ac9228ba73ce5b44e91f2e92415",
+        "validation_xml": "430cf45ebc1974f5794a7e7fc1a44d2c4e9ee1010ccbcf9061c2249a8d63dd95",
+        "cif": "42606d4592a629456679d3fdae913db2ef42bee8bfdc2fa8e71b3751a26e2c1b"
+      },
+      "n_unmasked": 38,
+      "mask_fraction": 0.719,
+      "n_protected": 1,
+      "status": "floor",
+      "reason": "38 unmasked residues < 50 (D3)",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "6F1O",
+      "cluster": "18_30",
+      "stratum": true,
+      "d_min": 0.96,
+      "deposit_year": 2017,
+      "input_hashes": {
+        "model": "cad2051362b564e16fde6317a7957cd2ce0d97c3967aa80860b10492be8246f3",
+        "mtz": "ee54ad7457be949fbed0c1c0ec3ef973c04ed5f11dee132e2d2c205878b86f48",
+        "validation_xml": "e67b827bfc218e3806605bc8f1085c659aa2dd6f094b13965bef61c53b06bb7a",
+        "cif": "e58b688d4283df6ef39e9c194e7c2a6dab63bd2f037a6d661cd6d5cc601b6b22"
+      },
+      "n_unmasked": 78,
+      "mask_fraction": 0.395,
+      "n_protected": 1,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1322,
+        "r_free_pre": 0.1436,
+        "r_work_post": 0.1344,
+        "r_free_post": 0.1464
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1435,
+          "post": 0.1463,
+          "delta": 0.0028000000000000247,
+          "delta_display": 0.0028
+        },
+        "gemmi": {
+          "pre": 0.1484,
+          "post": 0.1531,
+          "delta": 0.00470000000000001,
+          "delta_display": 0.0047
+        }
+      },
+      "status": "screened",
+      "initial_representative": false,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "4NSV",
+      "cluster": "28085_30",
+      "stratum": true,
+      "d_min": 0.9,
+      "deposit_year": 2013,
+      "input_hashes": {
+        "model": "4db413b06fe7157209f035e0a1611716b3fe27cb8f77ef970be692200959e681",
+        "mtz": "8c2d9ecc1df078576c49c2e6233b418dc01d375412c36aeb235f28aa2c6c359a",
+        "validation_xml": "8f915dc2d5d76af8fd31e788a580f1e7d708929e5b482f7af7b076871d527402",
+        "cif": "556d5405218294f503e26afc67a567cfbf4bf147381001131e2a90be0f25fc5b"
+      },
+      "n_unmasked": 457,
+      "mask_fraction": 0.144,
+      "n_protected": 8,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "2H5D",
+      "cluster": "3647_30",
+      "stratum": true,
+      "d_min": 0.9,
+      "deposit_year": 2006,
+      "input_hashes": {
+        "model": "f3ae664ba0c37b49ccfbebab80b4b67dedcc76d4e06ec31a68ef6f5af3c6f723",
+        "mtz": "5a6c5896da90cbd33dbcee54b0d092a65599c45d11848fcad0e43ee639ce688f",
+        "validation_xml": "398ba345e603fb9ae2059d8c25e83fbb4ff39d64d1d90cfbb54f286c469d8de9",
+        "cif": "4359ad6dbe6d4739fedd6d7c615017958002d12d8127544545554d2ccc2bb89e"
+      },
+      "n_unmasked": 119,
+      "mask_fraction": 0.439,
+      "n_protected": 4,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "7TWR",
+      "cluster": "44_30",
+      "stratum": true,
+      "d_min": 0.9,
+      "deposit_year": 2022,
+      "input_hashes": {
+        "model": "f3e1d1d078b88c13c24b40dad39b1f31029b67d25c9e3bff04e48af23b090223",
+        "mtz": "35b3aa7ee2cae8a07dcb692bf549bd326cc0f7e55cd3f519e6b7a79087c8c204",
+        "validation_xml": "e275ea37bd87b95107f2b775d572fba2e5bc7e56ff7f9ef90ec8c63f77523099",
+        "cif": "5301771f608e27aa3a42710292dcb90d3c406df4d4c63ca5e22a80e859a30b34"
+      },
+      "n_unmasked": 192,
+      "mask_fraction": 0.43,
+      "n_protected": 3,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1061,
+        "r_free_pre": 0.1212,
+        "r_work_post": 0.1086,
+        "r_free_post": 0.1246
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1212,
+          "post": 0.1244,
+          "delta": 0.0031999999999999945,
+          "delta_display": 0.0032
+        },
+        "gemmi": {
+          "pre": 0.1211,
+          "post": 0.1241,
+          "delta": 0.0030000000000000027,
+          "delta_display": 0.003
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "6XVM",
+      "cluster": "4975_30",
+      "stratum": true,
+      "d_min": 0.9,
+      "deposit_year": 2020,
+      "input_hashes": {
+        "model": "d5b7a11630f05a3c38e306cc8a16596e45189ab527f2b2af52b71c351fc289c0",
+        "mtz": "22f1553ce956a8005e6fc8080796a81891dfac8852bbda4d394c9f90ffb8dd1c",
+        "validation_xml": "86cb50be3386c8b09f95e21d8f547c2c25aa5caf8024a42876229890c51b2eb9",
+        "cif": "299f6b32af83a729c6336587fd0da4d69b25472352d5614878c54ae3c281aa3b"
+      },
+      "n_unmasked": 83,
+      "mask_fraction": 0.653,
+      "n_protected": 3,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1406,
+        "r_free_pre": 0.1439,
+        "r_work_post": 0.1454,
+        "r_free_post": 0.1593
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1435,
+          "post": 0.1596,
+          "delta": 0.016100000000000003,
+          "delta_display": 0.0161
+        },
+        "gemmi": {
+          "pre": 0.1127,
+          "post": 0.1283,
+          "delta": 0.015600000000000003,
+          "delta_display": 0.0156
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "9TEU",
+      "cluster": "52113_30",
+      "stratum": true,
+      "d_min": 0.9,
+      "deposit_year": 2025,
+      "input_hashes": {
+        "model": "ae8cd7f299d7c9adc9fbc9be3ec3b73686da18c5d492c0918ab0f02191d1d646",
+        "mtz": "f8cd3dd344a8337fd610ebe753c0286552af9a1fc766776742c288aa34dd504e",
+        "validation_xml": "96c0f07004f79e430380378b71ab82edc38060c5d0521ee6fce46277d0b1d9ce",
+        "cif": "2e6d0fc17fa096f0165b1cf472fcad028b22653ecc8ec36b699cd65078ae4e3e"
+      },
+      "n_unmasked": 68,
+      "mask_fraction": 0.481,
+      "n_protected": 1,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1568,
+        "r_free_pre": 0.1687,
+        "r_work_post": 0.1573,
+        "r_free_post": 0.1668
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1681,
+          "post": 0.1653,
+          "delta": -0.002799999999999997,
+          "delta_display": -0.0028
+        },
+        "gemmi": {
+          "pre": 0.1686,
+          "post": 0.1666,
+          "delta": -0.0020000000000000018,
+          "delta_display": -0.002
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "5R32",
+      "cluster": "53_30",
+      "stratum": true,
+      "d_min": 0.9,
+      "deposit_year": 2020,
+      "input_hashes": {
+        "model": "269f36c4005cdda4aa6f01182f53503868fc0f1dde7fa7c84266d8190b6c0670",
+        "mtz": "818d0efe22ced6a75deb6f8bede56f0eb880ea8559d44ea912e47f1da9020107",
+        "validation_xml": "513d68c6523512f2e4477a3ff40dcb582629be0d20f4b1da71ec3412c46f7d9f",
+        "cif": "ab9677cf052a34a411987abb93d697dc25b26a6035b203a2236717b50c0b7c46"
+      },
+      "n_unmasked": 271,
+      "mask_fraction": 0.179,
+      "n_protected": 2,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1266,
+        "r_free_pre": 0.1378,
+        "r_work_post": 0.1269,
+        "r_free_post": 0.1433
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1359,
+          "post": 0.1399,
+          "delta": 0.0040000000000000036,
+          "delta_display": 0.004
+        },
+        "gemmi": {
+          "pre": 0.1469,
+          "post": 0.1519,
+          "delta": 0.0050000000000000044,
+          "delta_display": 0.005
+        }
+      },
+      "status": "screened",
+      "initial_representative": true,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "7LTD",
+      "cluster": "902_30",
+      "stratum": true,
+      "d_min": 0.9,
+      "deposit_year": 2021,
+      "input_hashes": {
+        "model": "eee62842fc73762452586485c93f64e36a1fb0a2f6cd3a67d26520223c072c1c",
+        "mtz": "7dea780e4bb14c767534e9c991d2972d6a8694f4b615a63f5fd34b3b3c36bb73",
+        "validation_xml": "acc2c747ee10c85454c36bb81f4792dad04c73bbfe81ad2b66ab66cdcd1f71bb",
+        "cif": "f6b64154e388fa8066306030b7616dc17787a48bacac634879a89fd7e1ce682e"
+      },
+      "n_unmasked": 149,
+      "mask_fraction": 0.477,
+      "n_protected": 4,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "r_work_pre": 0.1587,
+        "r_free_pre": 0.1726,
+        "r_work_post": 0.1582,
+        "r_free_post": 0.1728
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1724,
+          "post": 0.1732,
+          "delta": 0.0007999999999999952,
+          "delta_display": 0.0008
+        },
+        "gemmi": {
+          "pre": null,
+          "post": null,
+          "delta": null,
+          "delta_display": null
+        }
+      },
+      "status": "data_defect",
+      "reason": "R path(s) ['gemmi'] unmeasurable \u2014 two-path agreement is impossible, cannot verify at-optimum (D6)",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "7LTI",
+      "cluster": "902_30",
+      "stratum": true,
+      "d_min": 0.91,
+      "deposit_year": 2021,
+      "input_hashes": {
+        "model": "bec933452d5a7bae320bebb22d892a4119f0503016cccf54f75402139282d280",
+        "mtz": "89b535c6b4be61f757934a59ab5cec4076be33790053eac055f07f67d299d9a7",
+        "validation_xml": "147d68fcc05f955c08c458d92d9b67fec720e2e8475d791de7c2554639b603b8",
+        "cif": "688a0f06eed9b2d9b8bbd18a6bd3d9a1fa8c4f179bf79c553f7e65fc6bf2001c"
+      },
+      "n_unmasked": 141,
+      "mask_fraction": 0.505,
+      "n_protected": 6,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "r_work_pre": 0.1548,
+        "r_free_pre": 0.1709,
+        "r_work_post": 0.1526,
+        "r_free_post": 0.1699
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1707,
+          "post": 0.171,
+          "delta": 0.00030000000000002247,
+          "delta_display": 0.0003
+        },
+        "gemmi": {
+          "pre": null,
+          "post": null,
+          "delta": null,
+          "delta_display": null
+        }
+      },
+      "status": "data_defect",
+      "reason": "R path(s) ['gemmi'] unmeasurable \u2014 two-path agreement is impossible, cannot verify at-optimum (D6)",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "7LTV",
+      "cluster": "902_30",
+      "stratum": true,
+      "d_min": 0.95,
+      "deposit_year": 2021,
+      "input_hashes": {
+        "model": "56c44c53a18ddb6e9a64cedc018fa9cfa38a0279648ba7fe6039f23046c494cc",
+        "mtz": "3597408154a08f5ab687605dc1b3f33cf7c24c7960a04ccbe31a0b6836d5f496",
+        "validation_xml": "6aa17c8bd904785ec0bb15729593c5157616980bdcd8ad2108c24f93458f83c2",
+        "cif": "c59a5318c4a4e8a702e2af275db3581a1885f0ab273b9643501f2ad484b7bbd9"
+      },
+      "n_unmasked": 134,
+      "mask_fraction": 0.53,
+      "n_protected": 3,
+      "array_selection": {
+        "obs": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "IOBS",
+          "SIGIOBS"
+        ],
+        "r_work_pre": 0.1504,
+        "r_free_pre": 0.1702,
+        "r_work_post": 0.1498,
+        "r_free_post": 0.1709
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1701,
+          "post": 0.1708,
+          "delta": 0.0007000000000000062,
+          "delta_display": 0.0007
+        },
+        "gemmi": {
+          "pre": null,
+          "post": null,
+          "delta": null,
+          "delta_display": null
+        }
+      },
+      "status": "data_defect",
+      "reason": "R path(s) ['gemmi'] unmeasurable \u2014 two-path agreement is impossible, cannot verify at-optimum (D6)",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "5KXV",
+      "cluster": "902_30",
+      "stratum": true,
+      "d_min": 0.98,
+      "deposit_year": 2016,
+      "input_hashes": {
+        "model": "fd0ef7d5265a8037c94143677517c9cbffc0bcc2ddc6273c79d16d56fba7855e",
+        "mtz": "c35df96ef84bcec4efb69884a615342c07e54bff4b44b61e862f1ce732a5ea47",
+        "validation_xml": "bacef867d4eef795892b459f571ea552189792f8517fc8f2fce3e8278bb1ac51",
+        "cif": "54181f0708c42ac38dea8e5eb0409cdf62522ce429e41aa34591fad263698894"
+      },
+      "n_unmasked": 164,
+      "mask_fraction": 0.423,
+      "n_protected": 1,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1015,
+        "r_free_pre": 0.1144,
+        "r_work_post": 0.1013,
+        "r_free_post": 0.1154
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1142,
+          "post": 0.1152,
+          "delta": 0.0010000000000000009,
+          "delta_display": 0.001
+        },
+        "gemmi": {
+          "pre": 0.1158,
+          "post": 0.1169,
+          "delta": 0.0011000000000000038,
+          "delta_display": 0.0011
+        }
+      },
+      "status": "screened",
+      "initial_representative": false,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "7P1Q",
+      "cluster": "10707_30",
+      "stratum": false,
+      "d_min": 0.91,
+      "deposit_year": 2021,
+      "input_hashes": {
+        "model": "8d4edb652f4e006871357447ae1d37e5989c9be15150c2915e76431821e1df62",
+        "mtz": "89d27164a51323ff54c8a145194122082e4ab58a364cc3b022a6501005b0f236",
+        "validation_xml": "613e55086eacaa6b3f55972db04329c2b6c941f5c626f011ce9c6c42f56ef39a",
+        "cif": "525fdfdf92313e3b27907cdb44e02e5e0eeee7cff362b6a8d97e6e5881a65f50"
+      },
+      "n_unmasked": 312,
+      "mask_fraction": 0.194,
+      "n_protected": 3,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "8QH8",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.91,
+      "deposit_year": 2023,
+      "input_hashes": {
+        "model": "30f2e672828c1401072cc280634c264323b4d740b40fd35211fc9d137d123edc",
+        "mtz": "d8af756cfa9d8157366bbf274e0f3babb98758d79a8a43e08d673a81f3724740",
+        "validation_xml": "5230ad84599d771cfddb2318fefc2525b0f9f5a7c77385ebe93bb8a7930ba92a",
+        "cif": "d11ba26f23890209959b0ab52fe48524118d81a5e49a42937763fb4151b27333"
+      },
+      "n_unmasked": 188,
+      "mask_fraction": 0.277,
+      "n_protected": 5,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "6ROB",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.93,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "a956b93106d34575c190cb2cbb327cb4e0642bd7fd5d7d443ddbe0581194f4b4",
+        "mtz": "1095c8dbb6dd90267260a94f007eed8bbcee19438dd0b3d0464f3d67b000ec2b",
+        "validation_xml": "1ef6f797ca0506ff0995019dad80915f482be56df7f8ab524b53dc3e8dd10759",
+        "cif": "9c8b5aa30af845c3cfa8fa4ed0cb05270d9cb246bc11a035262705c802348a11"
+      },
+      "n_unmasked": 128,
+      "mask_fraction": 0.517,
+      "n_protected": 4,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "6ROE",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.94,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "492dd90ba931e1a3f7467748c1ba07013554c3471a01714affe77594202ba7e5",
+        "mtz": "55a3d39f96cb24f47881522ce17a59e761891d84f07245ed15f2b4b887c85f9a",
+        "validation_xml": "7438841e841026e8aba9708a58bb828902cb71eabec5c7afd0654f426e01e678",
+        "cif": "d5f2bed358a097ead121000f1f2cf9449a66234091a6385888e4efd0c7e3654b"
+      },
+      "n_unmasked": 131,
+      "mask_fraction": 0.506,
+      "n_protected": 4,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "6SBL",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.94,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "9b90ab901a6d8c5a8b28c8760f300a9fe199ab6902436aee31561e0b6712df8a",
+        "mtz": "fc325274962ae76c1e203d1d33795cd295a63c17d4778b647e25cf620e8784f8",
+        "validation_xml": "9aef9901f33611294599b6edd2752c3aff16dd02111fb587bcdbe4879562e8f7",
+        "cif": "d62e1798f10081cadcbb6c9ace471f335d60bd7fc1cb796ab6a53efa150499b3"
+      },
+      "n_unmasked": 141,
+      "mask_fraction": 0.468,
+      "n_protected": 6,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "6RH4",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.95,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "0054cbac9c1a5aa6b4c9fc62506d1187cfdf720187a47601b2c54d09c312bed5",
+        "mtz": "4ce19b6c1b6fc21e20d67dc5fd9d327e018c967da0e52f59bb3a59fc1d8664e8",
+        "validation_xml": "6bc381f678e6882953da00e0e2ee3a3c836c7d274188bc2985bc8b2f871c5c46",
+        "cif": "4ec91b722eddc38f3d449f997e0637ac60804b1b2524e85390f765c9f11de1f8"
+      },
+      "n_unmasked": 170,
+      "mask_fraction": 0.358,
+      "n_protected": 4,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "6S9Z",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.95,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "c05d8ceb7d44d220e1620f02530a83f41d26a180808a660d069d377b8528ed08",
+        "mtz": "a0d8a9053fb84883832a612ed4cf83847166262afea9d268361436cd328a1bcd",
+        "validation_xml": "5f1a780ef935139892d8d95759325fc2c0c4669c226ae91ebc7098d78ccf9eab",
+        "cif": "74e2d10c625d5a05183b94373bd9f06028722d61889a11c20a9ced1b17b2546a"
+      },
+      "n_unmasked": 116,
+      "mask_fraction": 0.575,
+      "n_protected": 3,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "6SBM",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.95,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "b99a52d95601f24411b71143df2e1e6fbfd4468a8f7e82b17689b21cdd0da5ab",
+        "mtz": "e4a8f571cc31dc81514ce9664a447822e8d83ff43a6b8b90ca392715bd5782e8",
+        "validation_xml": "a5cbb1fdff7bc8ea3163304a94e013a1d74bab2038de12af0b4fdd8cd59ab374",
+        "cif": "ce8eb5a0d112c09b053e1bbe4bb9f6bae505190d65cc7bad27c2e5c974d45bd6"
+      },
+      "n_unmasked": 124,
+      "mask_fraction": 0.532,
+      "n_protected": 5,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "6RQI",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.95,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "8774b8be882d5fa1484eae00c030831dce07e332f53611737e0f48655b0dd4cb",
+        "mtz": "ce458dcdb492b4c80fb8be8dc437e63d0d6b338de20a85403dbce336853ce1c7",
+        "validation_xml": "0f5bd788d9626ddf2d491fab5fd227736e0492ee38987de773881b5078b75e8b",
+        "cif": "95b7fa06c883cac942cdfb7d8312de6f4795e9b6511854e2ea6f5361429bd8ef"
+      },
+      "n_unmasked": 133,
+      "mask_fraction": 0.496,
+      "n_protected": 4,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "6SBH",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.95,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "1f2587f044d714d009b9f9366b0ab9fc62c8e68c2dfc1446cc7e2795b417ab22",
+        "mtz": "5b9863770d88295b76e87730ce2df3af3ed017df58618e5a3ae9aca4c160ebf1",
+        "validation_xml": "08c3e8450ccabc0a85a25d670171906970cd63e4a9a7880d80e4b224a07a6ff9",
+        "cif": "cc84889966a0877c82bd06fc8ba85c351a300c15d52ae801421b4e816e066349"
+      },
+      "n_unmasked": 142,
+      "mask_fraction": 0.462,
+      "n_protected": 7,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "6RKN",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.96,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "f74dc49d3b284c34e091e2558e90f2564824287a46d9f02f46c8480b5391a2b5",
+        "mtz": "e127c76054b5ef663de0b793956641453ba7b25ce8d8084c93f8fc6fe023ddae",
+        "validation_xml": "7627dc9533204448d2a6dfb848b4eb556a306ca777a9fe8dc87c6dd636c36bf4",
+        "cif": "f393b3973db9645bc9de0e38a18fcda894ae1ee36714441a223b2d845ac91028"
+      },
+      "n_unmasked": 163,
+      "mask_fraction": 0.385,
+      "n_protected": 5,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "6RFH",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.97,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "3a387040c5220940c31db874d202186e3180a59f39ecd181c7d5b8767ac6e59e",
+        "mtz": "11dd201b592db0a80f7847799cb3ce8f5e26157b3dbe17cfc9dc29153c82e019",
+        "validation_xml": "4d6d66a26553e908c97b059bdc3d93a9a091c1fac4db3f56f0fb76fa5f837ed0",
+        "cif": "d8c973dc97a03187beb3458f62841006545e9512639be72731caa8a24143f793"
+      },
+      "n_unmasked": 168,
+      "mask_fraction": 0.364,
+      "n_protected": 3,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "6SG6",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.98,
+      "deposit_year": 2019,
+      "input_hashes": {
+        "model": "ab7a2b1f14fd8db7d641276aa28cd421cbbf61a9845683077658f101b95df9c0",
+        "mtz": "b70b4eb627d4cad807467a1f2b496c6c6658756908c8cf58b57412221d3381e5",
+        "validation_xml": "22577b24777ec16585a44cee39c3b039799ba18acc9af72d9c8fa8946f34ceea",
+        "cif": "47dcfbf2d34951f4c90ca3ef264e50cf8cac3355cb39068228c8ac09fcee3302"
+      },
+      "n_unmasked": 154,
+      "mask_fraction": 0.412,
+      "n_protected": 6,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "status": "data_defect",
+      "reason": "phenix.refine failed: CIF file with matching restraint definitions, along with / apply_cif_modification and apply_cif_link parameter definitions / if necessary.",
+      "initial_representative": false
+    },
+    {
+      "pdb_id": "7OYN",
+      "cluster": "36_30",
+      "stratum": false,
+      "d_min": 0.98,
+      "deposit_year": 2021,
+      "input_hashes": {
+        "model": "f2a6948b0a7b56f7d2dac5fdb18ef251a2fd5c4f88a0ed04816f791b82f477a9",
+        "mtz": "68a95fc98f1bbab94cdbc561360b7f3cfd40f7381c78f93fc90be97714dd1450",
+        "validation_xml": "112f059189c3219c942deb787c83559277b845fa7098e32a1e6a1786f3d24855",
+        "cif": "e8b4cc3044e65d6b95b86face4909a203ffec0925544b695cb756c837885520e"
+      },
+      "n_unmasked": 200,
+      "mask_fraction": 0.231,
+      "n_protected": 8,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.136,
+        "r_free_pre": 0.1474,
+        "r_work_post": 0.1373,
+        "r_free_post": 0.1502
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1476,
+          "post": 0.1481,
+          "delta": 0.0005000000000000004,
+          "delta_display": 0.0005
+        },
+        "gemmi": {
+          "pre": 0.1475,
+          "post": 0.1496,
+          "delta": 0.0021000000000000185,
+          "delta_display": 0.0021
+        }
+      },
+      "status": "screened",
+      "initial_representative": false,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    },
+    {
+      "pdb_id": "7MBO",
+      "cluster": "1207_30",
+      "stratum": false,
+      "d_min": 0.92,
+      "deposit_year": 2021,
+      "status": "data_defect",
+      "reason": "fetch failed: usr+sys time: 0.94 seconds / wall clock time: 13.72 seconds",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "9GYD",
+      "cluster": "12669_30",
+      "stratum": false,
+      "d_min": 0.92,
+      "deposit_year": 2024,
+      "input_hashes": {
+        "model": "18de4edbc20bc49aa0a9b112b804c45ce481ac9e009f508872959299e364f550",
+        "mtz": "ed4adbbf08a51a2de1c61c437f4efcf2731416de6e8471cb5559b47189256178",
+        "validation_xml": "ebd649c324101aa09a7fcfa725f9c7824235bcce550c05cd8c5efa5d672108c7",
+        "cif": "b2fab185b9e5fcfaacb19e33dcb7a9fb05de1a4d7b9db257c7a13c1d2709759e"
+      },
+      "n_unmasked": 61,
+      "mask_fraction": 0.396,
+      "n_protected": 1,
+      "status": "data_defect",
+      "reason": "no registered observation labels in the MTZ",
+      "initial_representative": true
+    },
+    {
+      "pdb_id": "9TXE",
+      "cluster": "12669_30",
+      "stratum": false,
+      "d_min": 0.95,
+      "deposit_year": 2026,
+      "input_hashes": {
+        "model": "a599a7216f99165eecee94d99cc91d31a90cbbb3fd49aacd80f6db118fb4300c",
+        "mtz": "f66f968f2b045130998f0e76042794d5ce7cdd686b8a418bab0b29faa1b40742",
+        "validation_xml": "a7f7fc442ced3723c17e159c6d597e8e37cd21fee34f223f57d6572283e10e2a",
+        "cif": "e7cbc4f84d87f7342d8de2c1483c4139d9be2d5dde71ad0826ea1242526d4453"
+      },
+      "n_unmasked": 68,
+      "mask_fraction": 0.327,
+      "n_protected": 0,
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "in_run": {
+        "obs_labels": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "r_work_pre": 0.1643,
+        "r_free_pre": 0.1794,
+        "r_work_post": 0.1666,
+        "r_free_post": 0.1821
+      },
+      "paths": {
+        "phenix": {
+          "pre": 0.1796,
+          "post": 0.1805,
+          "delta": 0.0008999999999999841,
+          "delta_display": 0.0009
+        },
+        "gemmi": {
+          "pre": 0.1844,
+          "post": 0.1866,
+          "delta": 0.0021999999999999797,
+          "delta_display": 0.0022
+        }
+      },
+      "status": "screened",
+      "initial_representative": false,
+      "headroom_both_paths": false,
+      "headroom_one_path_only": [],
+      "enrolled": true
+    }
+  ],
+  "d6": {
+    "n_screened": 23,
+    "phenix_worsening_n": 18,
+    "gemmi_worsening_n": 18,
+    "fallback": "none",
+    "noise_scale": {
+      "phenix": 0.00275,
+      "gemmi": 0.0026
+    },
+    "s_floor_applied": false,
+    "n_excluded_headroom": 1,
+    "n_enrolled": 22
+  }
+}
