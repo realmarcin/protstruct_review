@@ -816,6 +816,14 @@ classes:
         range: MeasurementValue
         multivalued: true
         inlined_as_list: true
+      cross_tool_waivers:
+        range: CrossToolWaiver
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Per-task exceptions to the no-cctbx-only invariant (#315),
+          declared here so the admission travels with the evidence it
+          excuses.
       headline_findings:
         range: HeadlineFinding
         multivalued: true
@@ -1024,6 +1032,14 @@ classes:
           (site RMSD to reference, mean per-residue lDDT, ligand
           quality if a ligand is bound). Empty when the structure has
           no functional site of record.
+      cross_tool_waivers:
+        range: CrossToolWaiver
+        multivalued: true
+        inlined_as_list: true
+        description: >-
+          Waivers inherited from the source evals (#315), surfaced so a
+          QDS reader sees the admission next to the coverage row it
+          excuses.
       cross_tool_coverage:
         range: CrossToolCoverage
         inlined: true
@@ -1250,6 +1266,30 @@ classes:
         description: >-
           Free-text (e.g. "closed", "closed at clashscore", "open — needs
           standalone Rama-Z"). Settling into an enum once we see more data.
+
+  CrossToolWaiver:
+    description: >-
+      A machine-readable, per-task exception to the trust-model invariant
+      that no gradeable applied task may rest on cctbx-only evidence
+      (#315). Declared on the EvaluationRun and surfaced verbatim in the
+      QDS; the emitter fails hard on a cctbx-only or unclassifiable
+      coverage row with no matching waiver. A waiver is a named,
+      dated admission — not a pass.
+    attributes:
+      id:
+        identifier: true
+        required: true
+      catalog_task_ref:
+        range: CatalogTaskId
+        required: true
+      reason:
+        required: true
+        description: >-
+          Why no non-cctbx oracle ran — name the missing tool or the
+          documented no-equivalent gap, not a restatement of the fact.
+      as_of_date:
+        range: date
+        required: true
 
   # ---------------------------------------------- new summary sub-blocks
 

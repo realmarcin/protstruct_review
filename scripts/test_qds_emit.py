@@ -269,6 +269,41 @@ def test_coverage_never_claims_an_absent_family() -> None:
     print("PASS  gap_status reports unknown coverage as unknown, and is otherwise unchanged")
 
 
+def test_trust_invariant_waiver_mechanics() -> None:
+    """#315: cctbx-only coverage without a waiver refuses to emit; with a
+    waiver it emits, surfaces the waiver block, and annotates the row. The
+    1SAR eval is the live case (T06 was the Codex review's exhibit)."""
+    import copy
+    import tempfile
+
+    import yaml as _yaml
+
+    qds = qds_emit.emit_qds([EVAL_1SAR], qds_id="QDS_ti", structure_id="1sar")
+    t06 = next(r for r in qds["cross_tool_coverage"]["task_coverage"]
+               if r["catalog_task_ref"] == "T06")
+    _check("WAIVED" in t06["gap_status"],
+           "T06 coverage row not annotated with its waiver")
+    _check(any(w["catalog_task_ref"] == "T06"
+               for w in qds.get("cross_tool_waivers", [])),
+           "waiver block absent from the QDS")
+
+    doc = _yaml.safe_load(EVAL_1SAR.read_text())
+    doc["evaluation_runs"][0].pop("cross_tool_waivers", None)
+    with tempfile.NamedTemporaryFile("w", suffix=".yaml", delete=False) as f:
+        _yaml.safe_dump(doc, f, sort_keys=False, allow_unicode=True)
+        stripped = Path(f.name)
+    try:
+        try:
+            qds_emit.emit_qds([stripped], qds_id="QDS_ti2", structure_id="1sar")
+            _check(False, "cctbx-only task with no waiver emitted anyway")
+        except qds_emit.QdsCompletenessError as exc:
+            _check("T06" in str(exc) and "#315" in str(exc),
+                   "trust-invariant refusal does not name the task and rule")
+    finally:
+        stripped.unlink()
+    print("PASS  test_trust_invariant_waiver_mechanics")
+
+
 def main() -> int:
     test_coverage_never_claims_an_absent_family()
     test_1sar_geometry_slots_all_present()
@@ -276,6 +311,7 @@ def main() -> int:
     test_negative_site_scope_without_site_decl_fails()
     test_quality_indicator_extensions_present()
     test_negative_structured_scopes_without_rows_fail()
+    test_trust_invariant_waiver_mechanics()
     print("\nall qds_emit regression tests passed")
     return 0
 

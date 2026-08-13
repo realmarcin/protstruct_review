@@ -784,6 +784,39 @@ def _check_implied_blocks(qds: dict[str, Any], eval_runs: list[dict[str, Any]]) 
         raise QdsCompletenessError(msg)
 
 
+def _check_trust_invariant(qds: dict[str, Any], waivers: list[dict[str, Any]]) -> None:
+    """No gradeable applied task rests on cctbx-only or unclassifiable
+    evidence without a named waiver (#315).
+
+    The 2026-08-12 Codex review's top finding: the trust model's central rule
+    was representable as unmet metadata — a schema-valid QDS could carry
+    "open — cctbx only" and still publish. The DIRECTION matters: non-cctbx-
+    only coverage violates nothing (there is no PHENIX self-grading to
+    distrust), so only cctbx-only and unknown-family rows are gated. A waiver
+    annotates the row it excuses so the QDS reads honestly.
+    """
+    waived = {w.get("catalog_task_ref"): w for w in waivers}
+    errors = []
+    for row in qds.get("cross_tool_coverage", {}).get("task_coverage", []):
+        gap = row.get("gap_status", "")
+        if not (gap.startswith("open — cctbx only")
+                or gap.startswith("unknown")):
+            continue
+        task = row.get("catalog_task_ref")
+        waiver = waived.get(task)
+        if waiver is None:
+            errors.append(
+                f"task {task}: {gap!r} with no cross_tool_waiver — add a "
+                f"non-cctbx oracle or declare a waiver naming what is "
+                f"missing (#315)")
+        else:
+            row["gap_status"] = (f"{gap} — WAIVED {waiver.get('as_of_date')}: "
+                                 f"{waiver.get('reason')}")
+    if errors:
+        raise QdsCompletenessError(
+            "QDS trust-invariant check failed:\n  - " + "\n  - ".join(errors))
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -869,6 +902,20 @@ def emit_qds(
 
     # Cross-tool coverage uses every measurement that informed the QDS.
     qds["cross_tool_coverage"] = build_cross_tool_coverage(qds_id, qds_measurements)
+
+    # Waivers travel from the evals to the QDS verbatim (#315), and the trust
+    # invariant is enforced against the coverage just built: a cctbx-only or
+    # unclassifiable task with no waiver is a hard error, not a labeled gap.
+    waivers = []
+    seen_waiver_ids = set()
+    for r in runs:
+        for w in r.get("cross_tool_waivers", []) or []:
+            if w.get("id") not in seen_waiver_ids:
+                seen_waiver_ids.add(w.get("id"))
+                waivers.append(w)
+    if waivers:
+        qds["cross_tool_waivers"] = waivers
+    _check_trust_invariant(qds, waivers)
 
     # Snapshot of recommendations active at issue time.
     recs = build_tool_recommendations_applied(runs)
