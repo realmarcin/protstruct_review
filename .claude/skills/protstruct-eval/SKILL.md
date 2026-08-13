@@ -407,6 +407,8 @@ For waters specifically: do NOT declare every HOH as a Ligand (146 records would
    - `scope=ensemble` measurement → `PredictionEnsembleSummary` or `NmrValidationSummary` rows required
    - `pairwise_comparisons[]` on the eval → must surface in QDS
 
+3. **Fail-hard on cctbx-only coverage (#315).** A gradeable applied task whose cross-tool coverage is cctbx-only or unclassifiable refuses to emit unless the eval declares a matching `CrossToolWaiver` (task ref, reason, `as_of_date`); the waiver is surfaced on the QDS and annotates the coverage row it excuses (`… — WAIVED <date>: <reason>`). Non-cctbx-only coverage is deliberately not gated — the trust model forbids self-grading, not independent-only evidence. Committed QDS files are separately checked by `scripts/check_qds_trust_invariant.py` (validate step 3c); pre-2026-08-13 history is grandfathered by name on every run.
+
 Regression tests at `scripts/test_qds_emit.py` enforce that the 1SAR example has every expected geometry slot populated, the synthetic active-site eval (`data/examples/eval/EVAL_synth_active_site_*.yaml`) populates per_residue_quality / site_qualities / ligand_quality / pairwise_comparisons / tool_recommendations_applied, and the negative test confirms the fail-hard behaviour. `scripts/validate.sh` runs all of this in sequence.
 
 ## Common pitfalls

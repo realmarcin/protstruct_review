@@ -59,6 +59,13 @@ Where this file and the handbook overlap, they must agree; if they drift, that i
 13. **Fail-hard on implied content.** If an eval carries content that implies a QDS block, the
     emitter must emit that block or raise `QdsCompletenessError` (which subclasses `SystemExit` by
     design — preserve that). Adding a metric at a new `scope` means adding its implied-block rule.
+13b. **Fail-hard on cctbx-only coverage (#315).** A gradeable applied task whose cross-tool
+    coverage is cctbx-only or unclassifiable refuses to emit unless the eval declares a matching
+    `CrossToolWaiver` (task ref, reason, date); the waiver annotates the coverage row it excuses.
+    Non-cctbx-only coverage is deliberately NOT gated — the rule forbids self-grading, not
+    independent-only evidence. Committed QDS files are checked by
+    `scripts/check_qds_trust_invariant.py` (validate step 3c) with pre-2026-08-13 history
+    grandfathered by name.
 14. **Behaviour-preserving refactors must be proven so.** After touching the emitter, regenerate a
     committed QDS and diff it: only `issued_at` may differ.
 

@@ -273,7 +273,6 @@ def test_trust_invariant_waiver_mechanics() -> None:
     """#315: cctbx-only coverage without a waiver refuses to emit; with a
     waiver it emits, surfaces the waiver block, and annotates the row. The
     1SAR eval is the live case (T06 was the Codex review's exhibit)."""
-    import copy
     import tempfile
 
     import yaml as _yaml
