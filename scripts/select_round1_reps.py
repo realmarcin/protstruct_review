@@ -212,9 +212,18 @@ def rank_clusters(clusters: dict[str, list[str]],
     return ranked
 
 
-def d7_draw(ranked: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
-    """(stratum_clusters_sorted, band_clusters_sorted, initial_30). The draw is
-    over CLUSTERS; each contributes its D4 representative."""
+def d7_draw(ranked: list[dict]) -> tuple[list[dict], list[dict], list[dict],
+                                         list[dict]]:
+    """(stratum_clusters, band_clusters, initial_30, collisions). The draw is
+    over CLUSTERS; each contributes its highest-ranked member not already
+    drawn for another cluster.
+
+    The collision handling is #323: entity-level clustering collapsed to entry
+    ids means one multi-protein entry can sit in several clusters (444 member
+    rows vs 425 unique ids in the round-1 record). A duplicate representative
+    is a recorded CLUSTER COLLISION that immediately falls through to the
+    cluster's next candidate — never a silent skip downstream.
+    """
     def rep_d_min(cluster):
         d = cluster["members"][0]["d_min"]
         return d if d is not None else float("inf")
@@ -233,10 +242,24 @@ def d7_draw(ranked: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
         drawn = stratum + band[:total - len(stratum)]
     else:
         drawn = spread_sample(stratum, total)
-    initial = [{"cluster": c["cluster"],
-                "stratum": rep_d_min(c) <= STRATUM_D_MIN,
-                **c["members"][0]} for c in drawn]
-    return stratum, band, initial
+
+    initial, used, collisions = [], set(), []
+    for c in drawn:
+        pick = next((m for m in c["members"] if m["pdb_id"] not in used), None)
+        skipped = [m["pdb_id"] for m in c["members"]
+                   if m["pdb_id"] in used and
+                   (pick is None or c["members"].index(m) <
+                    c["members"].index(pick))]
+        if skipped:
+            collisions.append({"cluster": c["cluster"],
+                               "already_drawn": skipped,
+                               "resolved_to": pick["pdb_id"] if pick else None})
+        if pick is None:
+            continue                     # exhausted by collisions — recorded above
+        used.add(pick["pdb_id"])
+        initial.append({"cluster": c["cluster"],
+                        "stratum": rep_d_min(c) <= STRATUM_D_MIN, **pick})
+    return stratum, band, initial, collisions
 
 
 def main() -> int:
@@ -257,18 +280,23 @@ def main() -> int:
               f"{missing[:5]}...", file=sys.stderr)
 
     ranked = rank_clusters(clusters, data)
-    stratum, band, initial = d7_draw(ranked)
+    stratum, band, initial, collisions = d7_draw(ranked)
     print(f"stratum clusters (<= {STRATUM_D_MIN} A): {len(stratum)}; "
-          f"band clusters: {len(band)}; drawn: {len(initial)}", file=sys.stderr)
+          f"band clusters: {len(band)}; drawn: {len(initial)}; "
+          f"collisions: {len(collisions)}", file=sys.stderr)
 
-    report = {"criteria": "D2 of negative_control_round1_preregistration.md",
+    report = {"criteria": "D2+R1 of negative_control_round2_preregistration.md",
               "stratum_d_min": STRATUM_D_MIN,
               "n_clusters": len(clusters),
               "n_stratum_clusters": len(stratum),
               "n_band_clusters": len(band),
+              "cluster_collisions": collisions,
               "initial_representatives": initial,
               "clusters": ranked}
-    Path(args.json_out).write_text(json.dumps(report, indent=2) + "\n")
+    out = Path(args.json_out)
+    tmp = out.with_suffix(out.suffix + ".tmp")
+    tmp.write_text(json.dumps(report, indent=2) + "\n")
+    tmp.replace(out)
     print(json.dumps({"initial": [r["pdb_id"] for r in initial]}, indent=2))
     return 0
 
