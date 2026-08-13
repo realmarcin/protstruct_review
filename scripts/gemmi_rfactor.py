@@ -17,12 +17,18 @@ rescale, no anisotropic correction, linear reflection-count bins. Expect R-work
 0.005-0.015 HIGHER than PHENIX on identical data — the price of an independent code
 path, and the reason its numbers must never be averaged with PHENIX's.
 
-One more assumption, inherited deliberately (#304): the per-bin scales are fit on
-ALL matched reflections, free set included — mild test-set leakage that can make
-R-free marginally optimistic versus a work-only fit. The original used the same
-fit, and so did the recorded 1SAR cross-tool gap (0.013), so changing it here would
-silently invalidate that band. A work-only fit is a possible future tightening that
-must re-measure the 1SAR band in the same change.
+Scale fitting is WORK-ONLY (#316, superseding #304's accept-and-document): the
+per-bin scales are fit on work reflections and applied unchanged to the free
+set, so no information from the test set reaches the reported R-free. The
+eval-artifact original (and this script before #316) fit on all reflections —
+mild leakage the 2026-08-12 Codex review correctly flagged as undermining the
+held-out independence this path exists to provide. #304's condition was honored
+in the same change: the cross-fit offset was re-measured on the four cached
+round-1/2 pairs (5SY4 and 9YGW, pre and post models) — work-only minus all-fit
+R-free was +0.00001, +0.00001, -0.00000, +0.00000, i.e. <= 1e-5. With a ~5 %
+free set and 20 bins the leakage was principled, not practically large; the
+recorded 1SAR gap band (0.005-0.015 vs PHENIX) is unaffected at its stated
+precision, and no prior round's delta moves at 4-decimal reporting.
 
 WHAT THE PROMOTION FIXED (vs data/coscientists/openscientist/gemmi_rfactor.py)
 ------------------------------------------------------------------------------
@@ -109,19 +115,34 @@ def infer_free_value(flags: np.ndarray) -> int:
 
 
 def binwise_scale(fobs: np.ndarray, fcalc: np.ndarray, s2: np.ndarray,
-                  nbins: int = 20) -> np.ndarray:
+                  nbins: int = 20, fit_mask: np.ndarray | None = None) -> np.ndarray:
     """Least-squares scale per equal-count resolution bin, applied to Fcalc.
 
     Removes residual resolution-dependent drift the upstream sfcalc scaling left
     behind. Equal-count (not equal-width) bins, matching the original and differing
     from PHENIX's adaptive shells by design — see the module docstring.
+
+    `fit_mask` selects the reflections the scales are FIT on (the work set, per
+    #316); the fit is applied to every reflection in the bin. A bin whose
+    fit-selection is empty falls back to the global fit-selection scale rather
+    than to a leaky all-reflection fit. None fits on everything (the pre-#316
+    behavior, kept for measuring the offset, never for reporting).
     """
+    if fit_mask is None:
+        fit_mask = np.ones_like(fobs, dtype=bool)
+    global_s = (fobs[fit_mask] * fcalc[fit_mask]).sum() / \
+        max((fcalc[fit_mask] ** 2).sum(), 1e-12)
     scale = np.ones_like(fcalc)
     order = np.argsort(s2)
     for ix in np.array_split(order, nbins):
         if len(ix) == 0:
             continue
-        s = (fobs[ix] * fcalc[ix]).sum() / max((fcalc[ix] ** 2).sum(), 1e-12)
+        fit_ix = ix[fit_mask[ix]]
+        if len(fit_ix) == 0:
+            scale[ix] = global_s
+            continue
+        s = (fobs[fit_ix] * fcalc[fit_ix]).sum() / \
+            max((fcalc[fit_ix] ** 2).sum(), 1e-12)
         scale[ix] = s
     return fcalc * scale
 
@@ -200,7 +221,9 @@ def compute(obs_path: str, calc_path: str, obs_columns: str | None,
 
     cell = mtz_o.cell
     s2 = np.array([cell.calculate_1_d2((int(h), int(k), int(l))) for h, k, l in hkl])
-    fcalc_s = binwise_scale(fobs, fcalc, s2, nbins)
+    # Scales fit on WORK only, applied to all (#316): the free set is held out
+    # of every fitted parameter this script owns.
+    fcalc_s = binwise_scale(fobs, fcalc, s2, nbins, fit_mask=work_mask)
 
     r_work = r_factor(fobs, fcalc_s, work_mask)
     r_free = r_factor(fobs, fcalc_s, free_mask)
