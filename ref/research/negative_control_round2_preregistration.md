@@ -47,10 +47,26 @@ substring (which is what makes `R-free-flags` safe alongside its
 `r2n_` output prefix so no round-1 cached output can be silently adopted
 (the #124 argument).
 
+The same registered labels feed **every consumer** of the converted MTZ:
+`phenix.refine` via `miller_array.labels.name`, and `phenix.model_vs_data` via
+its own `f_obs_label=` / `r_free_flags_label=` params — the 9YGW canary caught
+mvd failing on the identical ambiguity after the refine selector was fixed, so
+one selection rule, three consumers (refine, mvd, gemmi path).
+
 Two-path constraint carried explicitly: the gemmi R path consumes amplitudes,
 so an entry whose MTZ offers only intensities can be refined but not
 cross-checked — it fails the D6 two-path requirement and is recorded as a named
 data defect, not silently single-pathed.
+
+**Disclosed canary (9YGW, 0.87 Å, 252 unmasked — a round-1 array-defect
+casualty), run 2026-08-12 under the full R2 rule:** status `screened`;
+ΔR-free **+0.0065 on the phenix path (0.1274 → 0.1339) and +0.0065 on the
+gemmi path (0.1286 → 0.1351)** — the second entry to show a positive,
+cross-path-identical-to-four-decimals null-re-refinement Δ, after round 1's
+5SY4 (+0.0056/+0.0056). As with round 1's disclosed figures, the registered
+change is the selection rule, not this number; 9YGW re-enters the round-2
+screen with everything else and its cached artifacts are under the round-2
+prefix by construction.
 
 ## R3 — ligand-restraint entries stay named defects
 

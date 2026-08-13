@@ -181,11 +181,23 @@ def refine_null(model: Path, mtz: Path, work: Path) -> tuple[Path | None, dict]:
 
 
 def model_vs_data_rfree(model: Path, mtz: Path, work: Path, tag: str) -> float | None:
+    """phenix.model_vs_data R-free, with the SAME registered array selection as
+    the refinement: the multi-array ambiguity bites every consumer of the
+    converted MTZ, and mvd's selectors are its own f_obs_label /
+    r_free_flags_label params (the round-2 canary caught mvd failing after the
+    refine selector was fixed)."""
+    import gemmi
+    labels = [c.label for c in gemmi.read_mtz_file(str(mtz)).columns]
+    pair = pick_obs_labels(labels)
+    flag = pick_flag_label(labels)
+    selectors = f"f_obs_label=\"{pair[0]}\"" if pair else ""
+    if flag is not None:
+        selectors += f" r_free_flags_label=\"{flag}\""
     log = work / f"mvd_{tag}.log"
     if not log.exists() or not MVD_RFREE.search(log.read_text(errors="ignore")):
         subprocess.run(
             ["bash", "-c", f"cd {work} && {PHENIX_BIN / 'phenix.model_vs_data'} "
-             f"{model} {mtz} > {log} 2>&1"],
+             f"{model} {mtz} {selectors} > {log} 2>&1"],
             capture_output=True, text=True, timeout=3600, env=dict(os.environ))
     if not log.exists():
         return None
