@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Round-1 headroom screen: null re-refinement of gold-standard candidates (#295).
+"""Negative-control headroom screen: null re-refinement of candidates (#295).
 
-Executes D3, D4 and D6 of `negative_control_round1_preregistration.md` over the
+Executes D3, D4 and D6 of `negative_control_round1_preregistration.md` as
+amended by `negative_control_round2_preregistration.md` (R2 registered
+data-array selection; R1 size criterion lives in the selector) over the
 representatives selected by `select_round1_reps.py`. Per entry:
 
   1. fetch model + structure factors (`phenix.fetch_pdb --mtz`, cached)
@@ -42,9 +44,11 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-REPS_JSON = REPO / "ref/research/data/negative_control_round1_reps.json"
-SCREEN_JSON = REPO / "ref/research/data/negative_control_round1_screen.json"
-ENROLLED_JSON = REPO / "ref/research/data/negative_control_round1_enrolled.json"
+# Round-2 outputs (#314): the round-1 record is committed history and a
+# round-2 run must never overwrite it.
+REPS_JSON = REPO / "ref/research/data/negative_control_round2_reps.json"
+SCREEN_JSON = REPO / "ref/research/data/negative_control_round2_screen.json"
+ENROLLED_JSON = REPO / "ref/research/data/negative_control_round2_enrolled.json"
 
 FLOOR_UNMASKED = 50          # D3
 SIGMA_FACTOR = 3.0           # D6: exclude at delta < -3*S on both paths
@@ -268,8 +272,12 @@ def screen_entry(rep: dict, cache: Path, work: Path) -> dict:
 
     deltas = {}
     for path_name, fn in (("phenix", model_vs_data_rfree), ("gemmi", gemmi_rfree)):
-        pre = fn(model, mtz, work, f"{path_name}_pre_{pdb_id}")
-        post = fn(refined, mtz, work, f"{path_name}_post_{pdb_id}")
+        # Tags carry the measured model's stem (#314): the deposited stem for
+        # pre, the per-round refined prefix for post, so a cached measurement
+        # of one protocol's output can never be adopted for another's — the
+        # #124 argument applied to measurement caching.
+        pre = fn(model, mtz, work, f"{path_name}_{model.stem}")
+        post = fn(refined, mtz, work, f"{path_name}_{refined.stem}")
         deltas[path_name] = {
             "pre": pre, "post": post,
             "delta": round(post - pre, 4) if pre is not None and post is not None

@@ -81,7 +81,10 @@ matter, generation becomes a round-3 registered change.
 The size-filtered stratum holds **26 clusters**, so round 1's original intent
 now fits the 30-cluster scope: **every ≤ 0.9 Å stratum cluster representative
 (26 measured) + top-up to 30 from (0.9, 1.0] by ascending representative
-d_min (4)**. D4 ranking and within-cluster replacement unchanged.
+d_min (4)**. If the live pool has moved and the stratum exceeds 30 at run time,
+the draw falls back to the round-1 spread across the stratum (never the head,
+#243) — registered here so the executor has no discretion either way. D4
+ranking and within-cluster replacement unchanged.
 
 ## Predictions
 

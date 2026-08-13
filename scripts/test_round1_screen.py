@@ -63,13 +63,23 @@ clusters = [{"cluster": f"c{i}", "members": [entry(f"S{i:03d}", 0.5 + i * 0.005)
 clusters += [{"cluster": f"b{i}", "members": [entry(f"B{i:03d}", 0.91 + i * 0.003)]}
              for i in range(30)]                                  # 30 band, all <= 1.0
 stratum, band, initial = sel.d7_draw(clusters)
-check("D7: stratum/band split", (len(stratum), len(band)), (40, 30))
-check("D7: draws exactly 30", len(initial), 30)
-check("D7: 20 from the stratum", sum(1 for r in initial if r["stratum"]), 20)
-check("D7: stratum draw is a spread, not the head",
-      [r["pdb_id"] for r in initial[:3]], ["S000", "S002", "S004"])
-check("D7: band draw is ascending d_min head",
-      [r["pdb_id"] for r in initial[20:23]], ["B000", "B001", "B002"])
+check("D7': stratum/band split", (len(stratum), len(band)), (40, 30))
+check("D7': draws exactly 30", len(initial), 30)
+check("D7': oversized stratum falls back to a spread, not the head (#243)",
+      [r["pdb_id"] for r in initial[:3]], ["S000", "S001", "S002"])
+check("D7': oversized stratum leaves no band slots",
+      sum(1 for r in initial if not r["stratum"]), 0)
+
+# The registered D7' shape: stratum fits the scope -> ALL stratum reps + band
+# top-up ascending (the measured round-2 case is 26 + 4).
+small = clusters[:26] + [{"cluster": f"b{i}",
+                          "members": [entry(f"B{i:03d}", 0.91 + i * 0.003)]}
+                         for i in range(30)]
+_, _, initial2 = sel.d7_draw(small)
+check("D7': whole stratum drawn when it fits",
+      sum(1 for r in initial2 if r["stratum"]), 26)
+check("D7': band top-up is ascending d_min",
+      [r["pdb_id"] for r in initial2[26:]], ["B000", "B001", "B002", "B003"])
 
 # --- D6 statistics -----------------------------------------------------------------
 
