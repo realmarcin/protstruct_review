@@ -154,8 +154,12 @@ assumptions:
     title: Flat-bulk solvent, no anisotropic scaling
     description: >-
       `scripts/gemmi_rfactor.py` uses a flat-bulk solvent + bin-wise
-      isotropic rescaling. PHENIX uses anisotropic scaling on top of
-      a Babinet-style bulk-solvent fit.
+      isotropic rescaling, with the scales fit on WORK reflections only
+      and applied unchanged to the free set (#316 — the pre-#316 all-
+      reflection fit leaked the test set into R-free; measured effect
+      on real pairs was <= 1e-5, so the bracket below is unchanged).
+      PHENIX uses anisotropic scaling on top of a Babinet-style
+      bulk-solvent fit.
     consequences: >-
       Expect 0.005–0.015 higher R-work from gemmi than from PHENIX on
       the same data — that is the price of an independent code path.

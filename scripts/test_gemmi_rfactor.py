@@ -92,6 +92,38 @@ scaled = gr.binwise_scale(fobs, fcalc, s2, nbins=2)
 check("bin-wise scale recovers a different scale per bin",
       np.allclose(scaled, fobs), True)
 
+# --- #316: the free set is held out of the scale fit -------------------------------
+
+# One bin; work reflections sit at fobs = 2 x fcalc, free at 3 x fcalc. A leaky
+# all-reflection fit absorbs part of the free-set mismatch; the work-only fit
+# must not (scale exactly 2, free residual fully visible).
+fcalc_l = np.full(10, 10.0)
+fobs_l = np.array([20.0] * 8 + [30.0, 30.0])
+s2_l = np.linspace(0.1, 0.2, 10)
+work_l = np.array([True] * 8 + [False, False])
+scaled_work_only = gr.binwise_scale(fobs_l, fcalc_l, s2_l, nbins=1,
+                                    fit_mask=work_l)
+scaled_leaky = gr.binwise_scale(fobs_l, fcalc_l, s2_l, nbins=1)
+check("#316: work-only fit reproduces the work scale exactly",
+      np.allclose(scaled_work_only[:8], 20.0), True)
+check("#316: free residual survives the work-only fit",
+      gr.r_factor(fobs_l, scaled_work_only, ~work_l) >
+      gr.r_factor(fobs_l, scaled_leaky, ~work_l), True)
+check("#316: work R is exact under the work-only fit",
+      gr.r_factor(fobs_l, scaled_work_only, work_l), 0.0)
+
+# A bin with no work reflections falls back to the global work scale, not to a
+# leaky local fit.
+work_none_in_high = np.array([True] * 5 + [False] * 5)
+scaled_fb = gr.binwise_scale(np.array([20.0] * 5 + [30.0] * 5),
+                             np.full(10, 10.0), s2_l, nbins=2,
+                             fit_mask=work_none_in_high)
+check("#316: empty-fit bin uses the global work scale",
+      np.allclose(scaled_fb[5:], 20.0), True)
+check_raises("#316 r1: an all-empty fit selection is refused",
+             lambda: gr.binwise_scale(fobs_l, fcalc_l, s2_l, 1,
+                                      np.zeros(10, dtype=bool)))
+
 fobs_r = np.array([10.0, 10.0])
 fcalc_r = np.array([9.0, 12.0])
 check("R on hand values: (1+2)/20", gr.r_factor(fobs_r, fcalc_r,
