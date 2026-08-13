@@ -121,4 +121,17 @@ with tempfile.TemporaryDirectory() as tmp:
     code, out = run_guard(root)
     check("screened row with a missing delta fails", code, 1)
 
+# Malformed committed JSON must be a NAMED failure, not a traceback (r1).
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    data = root / "ref" / "research" / "data"
+    data.mkdir(parents=True)
+    (data / "negative_control_round9_screen.json").write_text("{truncated…")
+    code, out = run_guard(root)
+    check("malformed record fails by name", code, 1)
+    check("malformed message names the file",
+          "negative_control_round9_screen.json" in out and
+          "malformed" in out, True)
+    check("no traceback leaks", "Traceback" in out, False)
+
 print(f"\n{PASSED} checks passed")

@@ -130,22 +130,32 @@ def main() -> int:
     data = research / "data"
     failures: list[str] = []
 
+    def guarded(fn, path, *fn_args):
+        """A malformed committed record is a NAMED failure, not a traceback —
+        the gate must say which file and why (inner review r1)."""
+        try:
+            return fn(path, *fn_args)
+        except (json.JSONDecodeError, KeyError, TypeError, OSError) as exc:
+            fail(f"{path.name}: unreadable or malformed record "
+                 f"({type(exc).__name__}: {exc})", failures)
+            return None
+
     screens: dict[str, dict] = {}
     for path in sorted(data.glob("negative_control_round*_screen.json")):
         match = re.match(r"negative_control_round(\d+)_screen\.json", path.name)
-        screen = check_screen(path, failures)
+        screen = guarded(check_screen, path, failures)
         if screen is not None and match:
             screens[match.group(1)] = screen
     for path in sorted(data.glob("negative_control_round*_enrolled.json")):
         match = re.match(r"negative_control_round(\d+)_enrolled\.json", path.name)
-        check_enrolled(path, screens.get(match.group(1)) if match else None,
-                       failures)
+        guarded(check_enrolled, path,
+                screens.get(match.group(1)) if match else None, failures)
     for path in sorted(data.glob("negative_control_round*_reps.json")):
-        check_reps(path, failures)
+        guarded(check_reps, path, failures)
     for md in sorted(research.glob("negative_control_round*.md")):
         match = re.match(r"negative_control_round(\d+)\.md", md.name)
         if match and match.group(1) in screens:
-            check_round_doc(md, screens[match.group(1)], failures)
+            guarded(check_round_doc, md, screens[match.group(1)], failures)
 
     if failures:
         print(f"{len(failures)} negative-control record failure(s)")
