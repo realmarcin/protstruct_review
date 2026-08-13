@@ -179,6 +179,29 @@ check("flags: -1 twin used when it is all there is",
 check("flags: none present -> no selector (phenix's own detection)",
       scr.pick_flag_label(["FOBS", "SIGFOBS"]), None)
 
+# --- #320: input identity and hash-verified caching --------------------------------
+
+import tempfile
+
+with tempfile.TemporaryDirectory() as tmp:
+    f = Path(tmp) / "input.mtz"
+    f.write_bytes(b"reflections")
+    digest = scr.sha256_file(f)
+    check("#320: sha256 is stable", digest, scr.sha256_file(f))
+    check("#320: first sight records the sidecar",
+          scr.verify_or_record_hash(f), None)
+    check("#320: unchanged reuse verifies", scr.verify_or_record_hash(f), None)
+    f.write_bytes(b"reflections MUTATED")
+    problem = scr.verify_or_record_hash(f)
+    check("#320: mutated cache file is a named defect",
+          problem is not None and "cache corruption" in problem, True)
+
+versions = scr.tool_versions()
+check("#320: manifest tool identity carries the required keys",
+      sorted(versions) >= ["gemmi_cli"] and
+      {"phenix_bin", "gemmi_cli", "gemmi_python", "python"} <= set(versions),
+      True)
+
 # --- mad ---------------------------------------------------------------------------
 
 check("mad of a constant list is 0", scr.mad([0.5, 0.5, 0.5]), 0)

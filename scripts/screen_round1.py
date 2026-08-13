@@ -78,6 +78,48 @@ _gr = _load("gemmi_rfactor")                  # independent R path
 PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
 
 
+def sha256_file(path: Path) -> str:
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def verify_or_record_hash(path: Path) -> str | None:
+    """Hash-verified caching (#320): the first successful fetch records the
+    file's SHA-256 in a sidecar; every reuse re-verifies. A mismatch is
+    returned as a reason string — a silently mutated cache file must become a
+    named data defect, never a quietly different measurement."""
+    sidecar = path.with_suffix(path.suffix + ".sha256")
+    digest = sha256_file(path)
+    if sidecar.exists():
+        recorded = sidecar.read_text().strip()
+        if recorded != digest:
+            return (f"cache corruption: {path.name} hash "
+                    f"{digest[:12]}… != recorded {recorded[:12]}…")
+    else:
+        sidecar.write_text(digest + "\n")
+    return None
+
+
+def tool_versions() -> dict:
+    """Tool identity for the run manifest (#320). The gemmi CLI resolves from
+    PATH by design (homebrew), so its resolved path is RECORDED rather than
+    pinned — reproducibility needs the identity, not a machine-specific
+    hardcode; PHENIX is already path-pinned."""
+    import shutil
+    gemmi_cli = shutil.which("gemmi")
+    ver = subprocess.run(["bash", "-c", "gemmi --version 2>/dev/null | head -1"],
+                         capture_output=True, text=True).stdout.strip()
+    import gemmi as gemmi_py
+    return {"phenix_bin": str(PHENIX_BIN),
+            "gemmi_cli": gemmi_cli, "gemmi_cli_version": ver or None,
+            "gemmi_python": gemmi_py.__version__,
+            "python": sys.version.split()[0]}
+
+
 def fetch_pair(pdb_id: str, cache: Path) -> tuple[Path | None, Path | None, str]:
     """Deposited model + amplitudes MTZ via phenix.fetch_pdb --mtz (cached)."""
     pdb_id = pdb_id.lower()
@@ -262,12 +304,25 @@ def screen_entry(rep: dict, cache: Path, work: Path) -> dict:
     if fetch_err:
         row["status"], row["reason"] = "data_defect", fetch_err
         return row
+    # Input identity (#320): hashes recorded per row; cached reuse re-verified
+    # against the fetch-time sidecar.
+    for f in (model, mtz):
+        problem = verify_or_record_hash(f)
+        if problem:
+            row["status"], row["reason"] = "data_defect", problem
+            return row
+    row["input_hashes"] = {"model": sha256_file(model), "mtz": sha256_file(mtz)}
 
     try:
         mask = _gold.build_mask(pdb_id, cache)
     except SystemExit as exc:
         row["status"], row["reason"] = "data_defect", f"mask build failed: {exc}"
         return row
+    for label, name in (("validation_xml", f"{pdb_id.lower()}_validation.xml"),
+                        ("cif", f"{pdb_id.lower()}.cif")):
+        mask_input = cache / name
+        if mask_input.exists():
+            row["input_hashes"][label] = sha256_file(mask_input)
     unmasked = mask["n_residues"] - mask["n_masked"]
     row["n_unmasked"] = unmasked
     row["mask_fraction"] = mask["mask_fraction"]
@@ -427,7 +482,10 @@ def main() -> int:
                           "no_replacements": args.no_replacements},
                 "reps": str(args.reps),
                 "preregistration": "negative_control_round2_preregistration.md",
-                "round": 2}
+                "round": 2,
+                "tools": tool_versions(),
+                "protocol": {"macro_cycles": _bench.MACRO_CYCLES,
+                             "refine_prefix": "r2n_", "nbins": 20}}
 
     reps_doc = json.loads(Path(args.reps).read_text())
     queue = list(reps_doc["initial_representatives"])
