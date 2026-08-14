@@ -43,11 +43,12 @@ structural DEGRADED entries; the two fit-damaged rows it cannot reach (9YGW,
 Per enrolled entry:
 
 1. **Perturb**: `phenix.dynamics stop_at_diff=0.5 random_seed=42` (fixed seed
-   — the draw must reproduce), output prefix `r4p_`. The stop criterion is
-   all-atom, so the Cα displacement lands lower; the ACHIEVED unmasked and
-   all-residue Cα shifts are recorded per entry. Disclosed canary (4M7G):
-   achieved Cα 0.2515 Å over 222 pairs — past the 0.12 Å stay-band, far from
-   catastrophic.
+   — the draw must reproduce), output prefix `r4p_`. The internals of the
+   stop criterion are NOT registered (and not verified); what is registered
+   is that the ACHIEVED unmasked and all-residue Cα shifts are measured and
+   recorded per entry, and V1 is judged on those recorded values. Disclosed
+   canary (4M7G): achieved Cα 0.2515 Å over 222 pairs at stop_at_diff=0.5 —
+   past the 0.12 Å stay-band, far from catastrophic.
 2. **Recover**: the registered null protocol (default `phenix.refine`,
    3 macro cycles, registered array selection) refining the PERTURBED model
    against the deposited data, prefix `r4r_`.
