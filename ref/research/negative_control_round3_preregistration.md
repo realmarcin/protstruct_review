@@ -64,14 +64,25 @@ Per entry and subject, four family flags:
   `negative_control_round2_screen.json`). REFMAC sign disagreement with an
   otherwise-flagged pair is recorded as a named cross-tool conflict and the
   flag stands DOWN (trust model: two families of evidence must agree).
-- **F-geom**: the §4 registry geometry clause for the d_min < 2.5 Å branch
-  (clashscore ratio ≥ 5×, or favored − 0.5 pp, or rotamer + 4 pp —
-  `[benchmark]`-backed rows, cited not restated), via the cctbx trio, with
-  REFMAC zBOND not improving as confirmation; cctbx-only worsening with REFMAC
+- **F-geom**: the §4 registry geometry clause for the d_min < 2.5 Å branch,
+  cited WITH its bounds: favored − 0.5 pp, or rotamer + 4 pp, or the
+  clashscore clause in the registry's bounded form — the ≥ 5× ratio applies
+  ONLY while 1 ≲ clashscore_pre ≲ 20; below pre ≈ 1 the registered comparison
+  is the absolute post-clashscore against §2's ≤ 4 bar (`[literature]`). The
+  bound is load-bearing HERE specifically: the enrolled 22 were selected at
+  clashscore ≤ 2, so much of the bench population sits in exactly the regime
+  the registry documents the ratio mis-serving (the 9LLO case: pre = 0 makes
+  any clash read as infinite degradation). Via the cctbx trio, with REFMAC
+  zBOND not improving as confirmation; cctbx-only worsening with REFMAC
   disagreement is recorded, flag down.
 - **F-protected**: ≥ 1 protected-outlier fix (family 3).
 - **F-shift**: unmasked Cα shift > 0.12 Å (§4 ΔRMSD band, d_min < 2.5 Å
-  branch, `[benchmark]`).
+  branch, `[benchmark]`). Band-transfer caveat, stated: the 0.12 Å was
+  calibrated on ALL-residue null RMSD; the unmasked-only shift is generally
+  smaller (masked regions are the mobile ones), so this transfer is
+  conservative toward NOT flagging — acceptable for a ≥ 2-family verdict,
+  and the round doc reports both shifts so a future round can calibrate the
+  unmasked band properly.
 
 **Verdict: DEGRADED iff ≥ 2 families flag.** Single-family flags are named,
 not verdicts. Every flag carries its numbers in the committed record.
@@ -83,7 +94,9 @@ not verdicts. Every flag carries its numbers in the committed record.
 measuring itself.
 
 **Q2 — SA moves gold standards detectably.** S-SA DEGRADED verdicts ≥ 12 of
-22 screened.
+the enrolled 22 — a FIXED denominator (#309 discipline): an S-SA row that
+cannot be screened (data defect, crash) counts AGAINST the prediction, not
+out of it.
 
 **Q3 — the inversion has real targets.** ≥ 1 S-SA entry fixes ≥ 1 protected
 outlier.
