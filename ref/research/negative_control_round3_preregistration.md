@@ -23,6 +23,13 @@ Two registered subjects, both over the enrolled 22:
   fetch/mask/selection pipeline; execution begins with the standing one-entry
   canary.
 
+  **Disclosed S-SA canary (4M7G, 2026-08-13):** the registered invocation ran
+  end to end in 24 min wall clock (confirming the ~8–16 h batch estimate) and
+  moved the in-run R-free from 0.1213 to 0.1410 — **+0.020**, more than twice
+  the +3·S_r2 line. In-run figures only (the bench measures re-derived,
+  two-path values); as with every disclosed figure, the registered content is
+  the subject definition, not this number.
+
 ## B2 — metric families and oracles (per entry, post vs deposited start)
 
 1. **Data fit**: ΔR-free by the two registered paths (`phenix.model_vs_data`;
