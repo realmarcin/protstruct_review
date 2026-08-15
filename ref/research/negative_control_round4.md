@@ -14,7 +14,12 @@ unmasked reading — the prereg's wording ambiguity (which shift V1 meant) is
 moot on this data and is named here rather than exploited.
 
 **V3 — HOLDS, 22 of 22.** Every unrecovered perturbed model read **DEGRADED**
-(F-data + F-shift everywhere). Together with round 3's Q1 (0/22 false
+— F-data and F-shift on all 22, F-geom additionally on 13, and **F-protected
+on 2: the protected-outlier inversion's first live firings.** The perturber
+itself supplied them — `phenix.dynamics` defaults to
+`fix_rotamer_outliers=True`, i.e. it regularizes genuine protected outliers
+(the Arg126 mechanism the plan's confound section named), which round 3's Q3
+could not observe under SA. Together with round 3's Q1 (0/22 false
 verdicts on correct models), the plan's anti-gaming arch is now measured
 from both ends: **a damaging subject fails round 3; a do-nothing subject
 fails round 4.**
