@@ -68,6 +68,14 @@ perturbed model. Registered operational definition:
   trust model — generation is not reproducible (agents are not), the
   ARTIFACT and its JUDGMENT are. Judged identically under E1 vs the
   deposited start.
+- **Operator-identity disclosure (review r2)**: the S-agent may be the same
+  model family and session tooling as the harness operator. The mitigation
+  is structural, not procedural: every verdict number is recomputed from the
+  committed artifacts by the deterministic bench scripts, agent-reported
+  numbers appear nowhere in verdicts, and the transcript is committed for
+  audit. The conflict is disclosed here because a trust-model registration
+  that leaves it discoverable-but-unstated would be practicing the opposite
+  of what it enforces.
 
 ## Predictions
 
