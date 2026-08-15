@@ -139,8 +139,17 @@ def refine_recover(perturbed: Path, mtz: Path, work: Path,
     return out, {}
 
 
+def s_r2_from_record() -> dict:
+    """Round-2 noise scales, read from their committed record — never
+    restated (inner review r2 caught an inline copy)."""
+    return json.loads((REPO / "ref/research/data/"
+                       "negative_control_round2_screen.json").read_text()
+                      )["d6"]["noise_scale"]
+
+
 def judge_state(state: str, post: Path, model: Path, mtz: Path, work: Path,
-                pair, flag, mask, pre_m, thresholds: dict) -> dict:
+                pair, flag, mask, pre_m, thresholds: dict,
+                s_r2: dict) -> dict:
     """Bench judgment of one state (perturbed or recovered) vs the deposited
     start, with C1 layered on the round-3 families."""
     post_m = _bnc.measure_model(post, mtz, work, state, pair, flag)
@@ -177,8 +186,7 @@ def judge_state(state: str, post: Path, model: Path, mtz: Path, work: Path,
     if numbers["d_phenix"] is None or numbers["d_gemmi"] is None:
         return {"state": state, "status": "unmeasurable",
                 "reason": "an R path is unmeasurable"}
-    flags, conflicts = _bnc.family_flags(numbers, {"phenix": 0.00275,
-                                                   "gemmi": 0.0026})
+    flags, conflicts = _bnc.family_flags(numbers, s_r2)
     return {"state": state, "status": "judged", "numbers": numbers,
             "shift_all_residue": shift_all, "n_unmasked_pairs": n_u,
             "flags": flags, "conflicts": conflicts,
@@ -186,7 +194,8 @@ def judge_state(state: str, post: Path, model: Path, mtz: Path, work: Path,
             "verdict": combined_verdict(flags, numbers, thresholds)}
 
 
-def run_entry(entry: dict, cache: Path, work: Path, thresholds: dict) -> dict:
+def run_entry(entry: dict, cache: Path, work: Path, thresholds: dict,
+              s_r2: dict) -> dict:
     pdb_id = entry["pdb_id"].upper()
     row: dict = {"pdb_id": pdb_id, "stratum": entry.get("stratum"),
                  "d_min": entry.get("d_min")}
@@ -219,9 +228,9 @@ def run_entry(entry: dict, cache: Path, work: Path, thresholds: dict) -> dict:
                                deposited_for_refmac=(cache / f"{pdb_id.lower()}.cif")
                                if (cache / f"{pdb_id.lower()}.cif").exists() else None)
     row["perturbed"] = judge_state("perturbed", perturbed, model, mtz, work,
-                                   pair, flag, mask, pre_m, thresholds)
+                                   pair, flag, mask, pre_m, thresholds, s_r2)
     row["recovered"] = judge_state("recovered", recovered, model, mtz, work,
-                                   pair, flag, mask, pre_m, thresholds)
+                                   pair, flag, mask, pre_m, thresholds, s_r2)
 
     rec = row["recovered"]
     row["recovery_success"] = (
@@ -244,6 +253,7 @@ def main() -> int:
     args = ap.parse_args()
 
     thresholds = fit_thresholds_from_record()
+    s_r2 = s_r2_from_record()
     enrolled = json.loads(ENROLLED_JSON.read_text())["entries"]
     queue = list(enrolled)
     if args.only:
@@ -276,7 +286,7 @@ def main() -> int:
     rows: list[dict] = []
     for entry in queue:
         print(f"[{entry['pdb_id']}]", file=sys.stderr)
-        row = run_entry(entry, cache, work, thresholds)
+        row = run_entry(entry, cache, work, thresholds, s_r2)
         rows.append(row)
         tag = (f"perturbed={row.get('perturbed', {}).get('verdict', '?')} "
                f"recovered={row.get('recovered', {}).get('verdict', '?')} "
