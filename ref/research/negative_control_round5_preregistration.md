@@ -48,11 +48,18 @@ number — but it is why W2 is registered in strong form rather than hedged.
 Per enrolled entry, an agentic session attempts recovery of the `r4p_`
 perturbed model. Registered operational definition:
 
-- **Blinding**: the agent receives the perturbed model, the deposited MTZ,
-  and tool access — **never the deposited model or any derivative of it**
-  (masks, prior round records, this repo's data/ tree are out of bounds).
-  A recovery benchmark where the subject can read the answer measures
-  copying, not repair.
+- **Blinding — auditable, not information-theoretic (review r1).** True
+  blinding is impossible for deposited structures: the perturbed filename
+  carries the id, and even anonymized, the unit cell fingerprints the entry
+  (search-by-cell deanonymizes). So the registered rule is enforce-by-audit:
+  the agent receives the perturbed model, the deposited MTZ, and tool
+  access, and the action space EXCLUDES any retrieval of the entry's
+  deposited coordinates or derivatives — network fetches of the entry,
+  this repo's data/ tree, mask records, prior round records. The full
+  command transcript is part of the artifact; a transcript showing such
+  retrieval **disqualifies that row, by name**. A recovery benchmark where
+  the subject reads the answer measures copying, not repair — this rule
+  makes that detectable rather than pretending it impossible.
 - **Action space**: documented PHENIX tools plus the repo's non-cctbx
   oracles, any phil, at most 6 refinement invocations per entry; the agent
   decides strategy per entry and writes a decision log.
