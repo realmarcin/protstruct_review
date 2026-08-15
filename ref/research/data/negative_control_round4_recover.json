@@ -1,0 +1,1437 @@
+{
+  "run": {
+    "run_mode": "full",
+    "preregistration": "negative_control_round4_preregistration.md",
+    "round": 4,
+    "fit_thresholds": {
+      "d_phenix": 0.0122,
+      "d_gemmi": 0.0109,
+      "d_refmac": 0.0054
+    },
+    "stop_at_diff": 0.5,
+    "random_seed": 42,
+    "tools": {
+      "phenix_bin": "/Users/marcin/phenix-2.0-5936/phenix_bin",
+      "gemmi_cli": "/opt/homebrew/bin/gemmi",
+      "gemmi_cli_version": "gemmi 0.7.5",
+      "gemmi_python": "0.7.5",
+      "python": "3.13.12"
+    }
+  },
+  "rows": [
+    {
+      "pdb_id": "4M7G",
+      "stratum": true,
+      "d_min": 0.79,
+      "achieved_shift_unmasked": 0.2473,
+      "achieved_shift_all": 0.2515,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2775,
+          "d_gemmi": 0.2785,
+          "d_refmac": 0.2276,
+          "clash_pre": 1.6,
+          "clash_post": 3.74,
+          "d_favored_pp": -7.8,
+          "d_rota_pp": 1.95,
+          "d_zbond": -0.644,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2473
+        },
+        "shift_all_residue": 0.2515,
+        "n_unmasked_pairs": 136,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [
+          "F-geom: cctbx worsening but REFMAC zBOND improved (-0.644) \u2014 flag stands down"
+        ],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0169,
+          "d_gemmi": 0.0176,
+          "d_refmac": 0.0087,
+          "clash_pre": 1.6,
+          "clash_post": 1.34,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.49,
+          "d_zbond": -0.928,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0243
+        },
+        "shift_all_residue": 0.0674,
+        "n_unmasked_pairs": 136,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "7R2H",
+      "stratum": true,
+      "d_min": 0.79,
+      "achieved_shift_unmasked": 0.2837,
+      "achieved_shift_all": 0.2769,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2872,
+          "d_gemmi": 0.2863,
+          "d_refmac": 0.2766,
+          "clash_pre": 0.8,
+          "clash_post": 7.61,
+          "d_favored_pp": -9.26,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.357,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2837
+        },
+        "shift_all_residue": 0.2769,
+        "n_unmasked_pairs": 114,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.011,
+          "d_gemmi": 0.011,
+          "d_refmac": 0.0119,
+          "clash_pre": 0.8,
+          "clash_post": 1.2,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.033,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0154
+        },
+        "shift_all_residue": 0.0156,
+        "n_unmasked_pairs": 114,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded"
+      },
+      "recovery_success": true,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "2VXN",
+      "stratum": true,
+      "d_min": 0.82,
+      "achieved_shift_unmasked": 0.1945,
+      "achieved_shift_all": 0.2045,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2865,
+          "d_gemmi": 0.2855,
+          "d_refmac": 0.2229,
+          "clash_pre": 2.37,
+          "clash_post": 8.54,
+          "d_favored_pp": -2.43,
+          "d_rota_pp": 2.7,
+          "d_zbond": -0.6,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.1945
+        },
+        "shift_all_residue": 0.2045,
+        "n_unmasked_pairs": 156,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [
+          "F-geom: cctbx worsening but REFMAC zBOND improved (-0.600) \u2014 flag stands down"
+        ],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0486,
+          "d_gemmi": 0.0487,
+          "d_refmac": 0.0067,
+          "clash_pre": 2.37,
+          "clash_post": 3.79,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": -0.45,
+          "d_zbond": -0.659,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0175
+        },
+        "shift_all_residue": 0.0316,
+        "n_unmasked_pairs": 156,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "7ATV",
+      "stratum": true,
+      "d_min": 0.96,
+      "achieved_shift_unmasked": 0.2275,
+      "achieved_shift_all": 0.2313,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2092,
+          "d_gemmi": 0.2055,
+          "d_refmac": 0.1813,
+          "clash_pre": 1.62,
+          "clash_post": 5.66,
+          "d_favored_pp": -6.75,
+          "d_rota_pp": 0.91,
+          "d_zbond": -0.073,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2275
+        },
+        "shift_all_residue": 0.2313,
+        "n_unmasked_pairs": 241,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [
+          "F-geom: cctbx worsening but REFMAC zBOND improved (-0.073) \u2014 flag stands down"
+        ],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0185,
+          "d_gemmi": 0.0186,
+          "d_refmac": 0.0126,
+          "clash_pre": 1.62,
+          "clash_post": 1.29,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.3,
+          "d_zbond": -0.221,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0199
+        },
+        "shift_all_residue": 0.055,
+        "n_unmasked_pairs": 241,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "6Q01",
+      "stratum": true,
+      "d_min": 0.85,
+      "achieved_shift_unmasked": 0.2303,
+      "achieved_shift_all": 0.2417,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2762,
+          "d_gemmi": 0.2761,
+          "d_refmac": 0.2341,
+          "clash_pre": 0.61,
+          "clash_post": 14.23,
+          "d_favored_pp": -6.44,
+          "d_rota_pp": 0.0,
+          "d_zbond": -0.662,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2303
+        },
+        "shift_all_residue": 0.2417,
+        "n_unmasked_pairs": 98,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [
+          "F-geom: cctbx worsening but REFMAC zBOND improved (-0.662) \u2014 flag stands down"
+        ],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0341,
+          "d_gemmi": 0.0351,
+          "d_refmac": 0.0239,
+          "clash_pre": 0.61,
+          "clash_post": 3.88,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": -0.35,
+          "d_zbond": -0.839,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0174
+        },
+        "shift_all_residue": 0.0462,
+        "n_unmasked_pairs": 98,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "6ZWY",
+      "stratum": true,
+      "d_min": 1.0,
+      "achieved_shift_unmasked": 0.2064,
+      "achieved_shift_all": 0.2037,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2165,
+          "d_gemmi": 0.2162,
+          "d_refmac": 0.2051,
+          "clash_pre": 1.76,
+          "clash_post": 8.13,
+          "d_favored_pp": -5.95,
+          "d_rota_pp": 0.85,
+          "d_zbond": -0.32,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2064
+        },
+        "shift_all_residue": 0.2037,
+        "n_unmasked_pairs": 149,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [
+          "F-geom: cctbx worsening but REFMAC zBOND improved (-0.320) \u2014 flag stands down"
+        ],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0109,
+          "d_gemmi": 0.0124,
+          "d_refmac": 0.0106,
+          "clash_pre": 1.76,
+          "clash_post": 1.55,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": -0.42,
+          "d_zbond": -0.518,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0362
+        },
+        "shift_all_residue": 0.0454,
+        "n_unmasked_pairs": 149,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded"
+      },
+      "recovery_success": true,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "5XS6",
+      "stratum": true,
+      "d_min": 0.87,
+      "achieved_shift_unmasked": 0.2267,
+      "achieved_shift_all": 0.2246,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.1977,
+          "d_gemmi": 0.1966,
+          "d_refmac": 0.1952,
+          "clash_pre": 1.53,
+          "clash_post": 8.81,
+          "d_favored_pp": -3.86,
+          "d_rota_pp": 1.46,
+          "d_zbond": 0.0,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2267
+        },
+        "shift_all_residue": 0.2246,
+        "n_unmasked_pairs": 423,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0163,
+          "d_gemmi": 0.0156,
+          "d_refmac": 0.0144,
+          "clash_pre": 1.53,
+          "clash_post": 2.11,
+          "d_favored_pp": -0.29,
+          "d_rota_pp": 0.36,
+          "d_zbond": 0.0,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0165
+        },
+        "shift_all_residue": 0.0237,
+        "n_unmasked_pairs": 423,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "8ERE",
+      "stratum": true,
+      "d_min": 0.87,
+      "achieved_shift_unmasked": 0.2478,
+      "achieved_shift_all": 0.2512,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2796,
+          "d_gemmi": 0.2784,
+          "d_refmac": 0.254,
+          "clash_pre": 1.37,
+          "clash_post": 7.31,
+          "d_favored_pp": -2.4,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.15,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2478
+        },
+        "shift_all_residue": 0.2512,
+        "n_unmasked_pairs": 109,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0228,
+          "d_gemmi": 0.0234,
+          "d_refmac": 0.0144,
+          "clash_pre": 1.37,
+          "clash_post": 1.83,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.0,
+          "d_zbond": -0.127,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0306
+        },
+        "shift_all_residue": 0.0361,
+        "n_unmasked_pairs": 109,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "3ZOJ",
+      "stratum": true,
+      "d_min": 0.88,
+      "achieved_shift_unmasked": 0.2229,
+      "achieved_shift_all": 0.226,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2775,
+          "d_gemmi": 0.2807,
+          "d_refmac": 0.2247,
+          "clash_pre": 0.69,
+          "clash_post": 5.97,
+          "d_favored_pp": -4.64,
+          "d_rota_pp": 0.49,
+          "d_zbond": -0.627,
+          "n_protected_fixed": 1,
+          "shift_unmasked": 0.2229
+        },
+        "shift_all_residue": 0.226,
+        "n_unmasked_pairs": 119,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": true,
+          "F-shift": true
+        },
+        "conflicts": [
+          "F-geom: cctbx worsening but REFMAC zBOND improved (-0.627) \u2014 flag stands down"
+        ],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0192,
+          "d_gemmi": 0.0178,
+          "d_refmac": 0.0081,
+          "clash_pre": 0.69,
+          "clash_post": 0.92,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.0,
+          "d_zbond": -0.86,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0148
+        },
+        "shift_all_residue": 0.0397,
+        "n_unmasked_pairs": 119,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "9YGW",
+      "stratum": true,
+      "d_min": 0.88,
+      "achieved_shift_unmasked": 0.2695,
+      "achieved_shift_all": 0.264,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2841,
+          "d_gemmi": 0.2825,
+          "d_refmac": null,
+          "clash_pre": 1.75,
+          "clash_post": 8.75,
+          "d_favored_pp": -5.44,
+          "d_rota_pp": 0.82,
+          "d_zbond": null,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2695
+        },
+        "shift_all_residue": 0.264,
+        "n_unmasked_pairs": 248,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": null,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0333,
+          "d_gemmi": 0.0335,
+          "d_refmac": null,
+          "clash_pre": 1.75,
+          "clash_post": 2.19,
+          "d_favored_pp": 0.26,
+          "d_rota_pp": 0.0,
+          "d_zbond": null,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0242
+        },
+        "shift_all_residue": 0.0581,
+        "n_unmasked_pairs": 248,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": null,
+        "verdict": "not-degraded"
+      },
+      "recovery_success": true,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "9P25",
+      "stratum": true,
+      "d_min": 0.89,
+      "achieved_shift_unmasked": 0.209,
+      "achieved_shift_all": 0.2093,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2193,
+          "d_gemmi": 0.2149,
+          "d_refmac": 0.2012,
+          "clash_pre": 0.16,
+          "clash_post": 7.99,
+          "d_favored_pp": -3.73,
+          "d_rota_pp": 0.92,
+          "d_zbond": -0.143,
+          "n_protected_fixed": 1,
+          "shift_unmasked": 0.209
+        },
+        "shift_all_residue": 0.2093,
+        "n_unmasked_pairs": 318,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": true,
+          "F-shift": true
+        },
+        "conflicts": [
+          "F-geom: cctbx worsening but REFMAC zBOND improved (-0.143) \u2014 flag stands down"
+        ],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0138,
+          "d_gemmi": 0.0141,
+          "d_refmac": 0.0116,
+          "clash_pre": 0.16,
+          "clash_post": 1.25,
+          "d_favored_pp": 0.49,
+          "d_rota_pp": 0.0,
+          "d_zbond": -0.418,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0218
+        },
+        "shift_all_residue": 0.0369,
+        "n_unmasked_pairs": 318,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "8R5K",
+      "stratum": true,
+      "d_min": 0.89,
+      "achieved_shift_unmasked": 0.2243,
+      "achieved_shift_all": 0.2241,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.216,
+          "d_gemmi": 0.2191,
+          "d_refmac": null,
+          "clash_pre": 1.76,
+          "clash_post": 6.16,
+          "d_favored_pp": -3.97,
+          "d_rota_pp": 0.0,
+          "d_zbond": null,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2243
+        },
+        "shift_all_residue": 0.2241,
+        "n_unmasked_pairs": 68,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": null,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0263,
+          "d_gemmi": 0.0283,
+          "d_refmac": null,
+          "clash_pre": 1.76,
+          "clash_post": 1.32,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": -1.69,
+          "d_zbond": null,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0358
+        },
+        "shift_all_residue": 0.0602,
+        "n_unmasked_pairs": 68,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": null,
+        "verdict": "not-degraded"
+      },
+      "recovery_success": true,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "7TVL",
+      "stratum": true,
+      "d_min": 0.89,
+      "achieved_shift_unmasked": 0.2221,
+      "achieved_shift_all": 0.2326,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2494,
+          "d_gemmi": 0.2488,
+          "d_refmac": 0.238,
+          "clash_pre": 1.37,
+          "clash_post": 9.35,
+          "d_favored_pp": -4.89,
+          "d_rota_pp": 0.51,
+          "d_zbond": 0.093,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2221
+        },
+        "shift_all_residue": 0.2326,
+        "n_unmasked_pairs": 156,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0139,
+          "d_gemmi": 0.0135,
+          "d_refmac": 0.0143,
+          "clash_pre": 1.37,
+          "clash_post": 1.92,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": -1.02,
+          "d_zbond": -0.061,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0084
+        },
+        "shift_all_residue": 0.0526,
+        "n_unmasked_pairs": 156,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "8QXQ",
+      "stratum": true,
+      "d_min": 0.94,
+      "achieved_shift_unmasked": 0.2554,
+      "achieved_shift_all": 0.2625,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2525,
+          "d_gemmi": 0.2506,
+          "d_refmac": null,
+          "clash_pre": 1.79,
+          "clash_post": 5.56,
+          "d_favored_pp": -7.24,
+          "d_rota_pp": -0.65,
+          "d_zbond": null,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2554
+        },
+        "shift_all_residue": 0.2625,
+        "n_unmasked_pairs": 203,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": null,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.01,
+          "d_gemmi": 0.0082,
+          "d_refmac": null,
+          "clash_pre": 1.79,
+          "clash_post": 1.8,
+          "d_favored_pp": -0.63,
+          "d_rota_pp": -0.65,
+          "d_zbond": null,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0271
+        },
+        "shift_all_residue": 0.0734,
+        "n_unmasked_pairs": 203,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": null,
+        "verdict": "DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "6F1O",
+      "stratum": true,
+      "d_min": 0.96,
+      "achieved_shift_unmasked": 0.2677,
+      "achieved_shift_all": 0.2611,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2651,
+          "d_gemmi": 0.2695,
+          "d_refmac": 0.2386,
+          "clash_pre": 0.99,
+          "clash_post": 4.44,
+          "d_favored_pp": -9.6,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.178,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2677
+        },
+        "shift_all_residue": 0.2611,
+        "n_unmasked_pairs": 78,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.014,
+          "d_gemmi": 0.0147,
+          "d_refmac": 0.0125,
+          "clash_pre": 0.99,
+          "clash_post": 2.47,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.047,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0131
+        },
+        "shift_all_residue": 0.0197,
+        "n_unmasked_pairs": 78,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "7TWR",
+      "stratum": true,
+      "d_min": 0.9,
+      "achieved_shift_unmasked": 0.2735,
+      "achieved_shift_all": 0.2697,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.3083,
+          "d_gemmi": 0.3089,
+          "d_refmac": 0.2671,
+          "clash_pre": 1.22,
+          "clash_post": 9.39,
+          "d_favored_pp": -7.53,
+          "d_rota_pp": 0.64,
+          "d_zbond": 0.116,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2735
+        },
+        "shift_all_residue": 0.2697,
+        "n_unmasked_pairs": 191,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.028,
+          "d_gemmi": 0.0277,
+          "d_refmac": 0.0182,
+          "clash_pre": 1.22,
+          "clash_post": 3.3,
+          "d_favored_pp": 0.6,
+          "d_rota_pp": -0.31,
+          "d_zbond": -0.031,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0248
+        },
+        "shift_all_residue": 0.0398,
+        "n_unmasked_pairs": 191,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "6XVM",
+      "stratum": true,
+      "d_min": 0.9,
+      "achieved_shift_unmasked": 0.267,
+      "achieved_shift_all": 0.2753,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2871,
+          "d_gemmi": 0.3015,
+          "d_refmac": 0.2656,
+          "clash_pre": 1.31,
+          "clash_post": 6.28,
+          "d_favored_pp": -7.56,
+          "d_rota_pp": 2.82,
+          "d_zbond": 0.144,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.267
+        },
+        "shift_all_residue": 0.2753,
+        "n_unmasked_pairs": 82,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0412,
+          "d_gemmi": 0.0423,
+          "d_refmac": 0.0274,
+          "clash_pre": 1.31,
+          "clash_post": 3.66,
+          "d_favored_pp": -0.44,
+          "d_rota_pp": 0.94,
+          "d_zbond": -0.091,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0235
+        },
+        "shift_all_residue": 0.0565,
+        "n_unmasked_pairs": 82,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "9TEU",
+      "stratum": true,
+      "d_min": 0.9,
+      "achieved_shift_unmasked": 0.2267,
+      "achieved_shift_all": 0.231,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2197,
+          "d_gemmi": 0.216,
+          "d_refmac": 0.2025,
+          "clash_pre": 1.33,
+          "clash_post": 3.54,
+          "d_favored_pp": -5.42,
+          "d_rota_pp": 1.64,
+          "d_zbond": -0.105,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2267
+        },
+        "shift_all_residue": 0.231,
+        "n_unmasked_pairs": 68,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [
+          "F-geom: cctbx worsening but REFMAC zBOND improved (-0.105) \u2014 flag stands down"
+        ],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0138,
+          "d_gemmi": 0.0139,
+          "d_refmac": 0.0144,
+          "clash_pre": 1.33,
+          "clash_post": 0.0,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.82,
+          "d_zbond": -0.295,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.019
+        },
+        "shift_all_residue": 0.0261,
+        "n_unmasked_pairs": 68,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "5R32",
+      "stratum": true,
+      "d_min": 0.9,
+      "achieved_shift_unmasked": 0.2856,
+      "achieved_shift_all": 0.2804,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2606,
+          "d_gemmi": 0.2616,
+          "d_refmac": 0.2228,
+          "clash_pre": 0.62,
+          "clash_post": 7.5,
+          "d_favored_pp": -8.23,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.242,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2856
+        },
+        "shift_all_residue": 0.2804,
+        "n_unmasked_pairs": 271,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0265,
+          "d_gemmi": 0.0256,
+          "d_refmac": 0.0142,
+          "clash_pre": 0.62,
+          "clash_post": 0.21,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.009,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0274
+        },
+        "shift_all_residue": 0.0364,
+        "n_unmasked_pairs": 271,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "5KXV",
+      "stratum": true,
+      "d_min": 0.98,
+      "achieved_shift_unmasked": 0.272,
+      "achieved_shift_all": 0.2699,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2928,
+          "d_gemmi": 0.2927,
+          "d_refmac": 0.245,
+          "clash_pre": 1.94,
+          "clash_post": 7.13,
+          "d_favored_pp": -5.05,
+          "d_rota_pp": 1.59,
+          "d_zbond": 0.077,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.272
+        },
+        "shift_all_residue": 0.2699,
+        "n_unmasked_pairs": 162,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0246,
+          "d_gemmi": 0.0254,
+          "d_refmac": 0.017,
+          "clash_pre": 1.94,
+          "clash_post": 1.94,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.4,
+          "d_zbond": -0.059,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.014
+        },
+        "shift_all_residue": 0.0415,
+        "n_unmasked_pairs": 162,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "7OYN",
+      "stratum": false,
+      "d_min": 0.98,
+      "achieved_shift_unmasked": 0.2241,
+      "achieved_shift_all": 0.2363,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.2096,
+          "d_gemmi": 0.2087,
+          "d_refmac": 0.1878,
+          "clash_pre": 1.65,
+          "clash_post": 11.79,
+          "d_favored_pp": -3.53,
+          "d_rota_pp": 0.43,
+          "d_zbond": -0.248,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2241
+        },
+        "shift_all_residue": 0.2363,
+        "n_unmasked_pairs": 198,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [
+          "F-geom: cctbx worsening but REFMAC zBOND improved (-0.248) \u2014 flag stands down"
+        ],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.02,
+          "d_gemmi": 0.0186,
+          "d_refmac": 0.0167,
+          "clash_pre": 1.65,
+          "clash_post": 1.42,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": -0.87,
+          "d_zbond": -0.447,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0451
+        },
+        "shift_all_residue": 0.0958,
+        "n_unmasked_pairs": 198,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "FIT-DEGRADED"
+      },
+      "recovery_success": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "9TXE",
+      "stratum": false,
+      "d_min": 0.95,
+      "achieved_shift_unmasked": 0.2618,
+      "achieved_shift_all": 0.254,
+      "perturbed": {
+        "state": "perturbed",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.1963,
+          "d_gemmi": 0.1882,
+          "d_refmac": 0.1777,
+          "clash_pre": 0.0,
+          "clash_post": 9.3,
+          "d_favored_pp": -9.18,
+          "d_rota_pp": 1.11,
+          "d_zbond": 0.138,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.2618
+        },
+        "shift_all_residue": 0.254,
+        "n_unmasked_pairs": 67,
+        "flags": {
+          "F-data": true,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": true
+        },
+        "conflicts": [],
+        "fit_degraded": true,
+        "verdict": "DEGRADED"
+      },
+      "recovered": {
+        "state": "recovered",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0112,
+          "d_gemmi": 0.0109,
+          "d_refmac": 0.009,
+          "clash_pre": 0.0,
+          "clash_post": 0.0,
+          "d_favored_pp": -1.02,
+          "d_rota_pp": 0.0,
+          "d_zbond": -0.049,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0137
+        },
+        "shift_all_residue": 0.0459,
+        "n_unmasked_pairs": 67,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [
+          "F-geom: cctbx worsening but REFMAC zBOND improved (-0.049) \u2014 flag stands down"
+        ],
+        "fit_degraded": false,
+        "verdict": "not-degraded"
+      },
+      "recovery_success": true,
+      "status": "completed"
+    }
+  ],
+  "summary": {
+    "attempted": 22,
+    "completed": 22,
+    "v1_perturbed_ge_0p15": 22,
+    "v1_unmasked_ge_0p15": 22,
+    "v2_recovery_success": 5,
+    "v3_perturbed_flagged": 22
+  }
+}
