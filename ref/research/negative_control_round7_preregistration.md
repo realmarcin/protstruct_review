@@ -12,8 +12,9 @@ measured 2026-08-17.
 ## H1 — C1 re-registration (the U3 falsification's follow-up)
 
 The clean-null table, computed in round 6 with 8R5K's uncontaminated null
-substituted, is **adopted by this registration** and supersedes the round-3
-C1 table for all future verdicts:
+substituted on the phenix and gemmi paths and ADDED on the REFMAC path
+(see the population disclosure below), is **adopted by this registration**
+and supersedes the round-3 C1 table for all future verdicts:
 
 | path | superseded (round 3) | registered here |
 |---|---|---|
@@ -57,18 +58,19 @@ run in this order and one change at a time:
      deposited model is still aniso-located but the defect is in how each
      tool consumes the records — attributed to the same term, finer-grained.
    - If the spread survives unchanged, aniso is refuted; proceed.
-2. **Hydrogen treatment (demoted, #365).** Disclosed check (2026-08-17):
-   the deposited model contains 0 explicit H among its 2511 atoms, and
-   REFMAC restores riding hydrogens by default. Direction argument: adding
-   riding H at 0.82 Å should LOWER REFMAC's R relative to an H-free
-   calculation, so differential H treatment cannot CAUSE the +0.07 excess
-   — it can only partially mask a larger divergence. The experiment stays
-   registered because it is one keyword and bounds the H term: REFMAC with
-   `MAKE HYDR N` vs default; a null result is expected, not surprising.
-3. **Resolution-cutoff handling.** Cheap log audit first: the exact
+2. **Resolution-cutoff handling.** Cheap log audit first: the exact
    resolution ranges each tool used in round 6, from their existing logs;
    then REFMAC re-run with `RESO` forced to the phenix range if they
    differ.
+3. **Hydrogen treatment (demoted to last, #365, #366).** Disclosed check
+   (2026-08-17): the deposited model contains 0 explicit H among its 2511
+   atoms, and REFMAC restores riding hydrogens by default. Direction
+   argument: adding riding H at 0.82 Å should LOWER REFMAC's R relative to
+   an H-free calculation, so differential H treatment cannot CAUSE the
+   +0.07 excess — it can only partially mask a larger divergence. The
+   experiment stays registered because it is one keyword and bounds the H
+   term: REFMAC with `MAKE HYDR N` vs default; a null result is expected,
+   not surprising.
 
 **Registered outcomes (two-sided):** the divergence is ATTRIBUTED to a
 named mechanism with the invocation change (if any) that closes it — which
