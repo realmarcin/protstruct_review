@@ -1,0 +1,393 @@
+{
+  "run": {
+    "preregistration": "negative_control_round7_preregistration.md",
+    "round": 7,
+    "durable_store": "/Users/marcin/protstruct_bench_inputs",
+    "tools": {
+      "phenix_bin": "/Users/marcin/phenix-2.0-5936/phenix_bin",
+      "gemmi_cli": "/opt/homebrew/bin/gemmi",
+      "gemmi_cli_version": "gemmi 0.7.5",
+      "gemmi_python": "0.7.5",
+      "python": "3.13.12"
+    }
+  },
+  "h1_flip_sweep": {
+    "old_table": {
+      "d_phenix": 0.0122,
+      "d_gemmi": 0.0109,
+      "d_refmac": 0.0054
+    },
+    "new_table": {
+      "d_phenix": 0.012,
+      "d_gemmi": 0.01025,
+      "d_refmac": 0.0056
+    },
+    "rows_checked": 66,
+    "flips": [],
+    "round3_note": "round-3 verdicts are flag-based; the C1 table postdates them \u2014 no flip is possible by construction"
+  },
+  "h2_2vxn_ladder": {
+    "input_hashes": {
+      "model": "ebc8092611358b8602e9736be86a5807be5e4b261399ebf9eb1f12fbd3100cdc",
+      "mtz": "1ce4b08130d6183b9aab0fa85d4abbc0e3b0a7195aeba1be8262715ee76e227f"
+    },
+    "baseline_deposited_cif": {
+      "phenix_mvd": 0.1043,
+      "gemmi_path": 0.1059,
+      "refmac": 0.1712,
+      "servalcat": 0.1473
+    },
+    "exp1_derivation": {
+      "n_aniso_zeroed": 2511,
+      "derived": "2vxn_isoonly.cif",
+      "sha256": "f9ca726da968a89566483a43319bef847bdb6fb03b4a2dbc2c154097a38785a0"
+    },
+    "exp1_iso_only": {
+      "phenix_mvd": 0.1553,
+      "gemmi_path": 0.1569,
+      "refmac": 0.171,
+      "servalcat": 0.1473
+    },
+    "exp2_resolution_audit": {
+      "refmac": [
+        19.0759,
+        0.82
+      ],
+      "phenix_high": 0.82
+    },
+    "exp3_refmac_hydr_n_r_free": 0.1795,
+    "closing_invocation_refmac_bref_anis_r_free": 0.1371,
+    "disclosed_extension_servalcat_adp_aniso_r_free": 0.4068
+  },
+  "h3_9ygw_repair": {
+    "repair": {
+      "n_cso_atom_sites": 22,
+      "n_anisotrop_rows_renamed": 0,
+      "derived": "9ygw_r7fix.cif",
+      "sha256": "80fd76276c955c616ef1d644b7c6b521e708cfc6e0a74653010a1ef7131f0dd6"
+    },
+    "refmac": {
+      "measurable": false,
+      "diagnostic_lines": [
+        "Overall anisotropic B with tr(B) = 0.0",
+        "rdaniso_cif: label_comp_id mismatch",
+        "From aniso record :CYS",
+        "Refmac:  Problem in read aniso",
+        "Refmac:  Problem in read aniso"
+      ]
+    }
+  },
+  "h4_remediation": [
+    {
+      "pdb_id": "7R2H",
+      "fingerprints_match": false,
+      "staged_wavelength": 0.8265,
+      "status": "proof_failed_store_untouched",
+      "mismatched_columns": [
+        "R-free-flags"
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 1016,
+          "n_differing_on_unmeasured": 1016,
+          "free_among_differing_store": 508,
+          "free_among_differing_staged": 508
+        }
+      }
+    },
+    {
+      "pdb_id": "7ATV",
+      "fingerprints_match": false,
+      "staged_wavelength": 0.9184,
+      "status": "proof_failed_store_untouched",
+      "mismatched_columns": [
+        "R-free-flags"
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 844,
+          "n_differing_on_unmeasured": 844,
+          "free_among_differing_store": 425,
+          "free_among_differing_staged": 419
+        }
+      }
+    },
+    {
+      "pdb_id": "6Q01",
+      "fingerprints_match": false,
+      "staged_wavelength": 1.0,
+      "status": "proof_failed_store_untouched",
+      "mismatched_columns": [
+        "R-free-flags"
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 4351,
+          "n_differing_on_unmeasured": 4351,
+          "free_among_differing_store": 2183,
+          "free_among_differing_staged": 2168
+        }
+      }
+    },
+    {
+      "pdb_id": "6ZWY",
+      "fingerprints_match": false,
+      "staged_wavelength": 0.7653,
+      "status": "proof_failed_store_untouched",
+      "mismatched_columns": [
+        "R-free-flags",
+        "R-free-flags-1",
+        "R-free-flags-2"
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 10230,
+          "n_differing_on_unmeasured": 10230,
+          "free_among_differing_store": 5115,
+          "free_among_differing_staged": 5115
+        },
+        "R-free-flags-1": {
+          "n_differing": 100775,
+          "n_differing_on_unmeasured": 100775,
+          "free_among_differing_store": 4986,
+          "free_among_differing_staged": 4986
+        },
+        "R-free-flags-2": {
+          "n_differing": 10246,
+          "n_differing_on_unmeasured": 10246,
+          "free_among_differing_store": 5123,
+          "free_among_differing_staged": 5123
+        }
+      }
+    },
+    {
+      "pdb_id": "3ZOJ",
+      "fingerprints_match": false,
+      "staged_wavelength": 0.65,
+      "status": "proof_failed_store_untouched",
+      "mismatched_columns": [
+        "R-free-flags"
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 6,
+          "n_differing_on_unmeasured": 6,
+          "free_among_differing_store": 3,
+          "free_among_differing_staged": 3
+        }
+      }
+    },
+    {
+      "pdb_id": "9P25",
+      "fingerprints_match": false,
+      "staged_wavelength": 0.7872,
+      "status": "proof_failed_store_untouched",
+      "mismatched_columns": [
+        "R-free-flags"
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 74,
+          "n_differing_on_unmeasured": 74,
+          "free_among_differing_store": 37,
+          "free_among_differing_staged": 37
+        }
+      }
+    },
+    {
+      "pdb_id": "8R5K",
+      "fingerprints_match": true,
+      "staged_wavelength": 0.85,
+      "staged_sha256": "1f72255b54b6ece04779dae7303a5b8a92880061e5378548358011f369965cad",
+      "status": "proof_ok_awaiting_user_go_ahead"
+    },
+    {
+      "pdb_id": "6F1O",
+      "fingerprints_match": false,
+      "staged_wavelength": 1.0,
+      "status": "proof_failed_store_untouched",
+      "mismatched_columns": [
+        "R-free-flags"
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 58,
+          "n_differing_on_unmeasured": 58,
+          "free_among_differing_store": 29,
+          "free_among_differing_staged": 29
+        }
+      }
+    },
+    {
+      "pdb_id": "7TWR",
+      "fingerprints_match": false,
+      "staged_wavelength": 0.7749,
+      "status": "proof_failed_store_untouched",
+      "mismatched_columns": [
+        "R-free-flags"
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 108,
+          "n_differing_on_unmeasured": 108,
+          "free_among_differing_store": 55,
+          "free_among_differing_staged": 53
+        }
+      }
+    },
+    {
+      "pdb_id": "6XVM",
+      "fingerprints_match": false,
+      "staged_wavelength": 0.9793,
+      "status": "proof_failed_store_untouched",
+      "mismatched_columns": [
+        "R-free-flags"
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 1025,
+          "n_differing_on_unmeasured": 1025,
+          "free_among_differing_store": 509,
+          "free_among_differing_staged": 516
+        }
+      }
+    },
+    {
+      "pdb_id": "5R32",
+      "fingerprints_match": false,
+      "staged_wavelength": 0.827,
+      "status": "proof_failed_store_untouched",
+      "mismatched_columns": [
+        "R-free-flags",
+        "R-free-flags-2",
+        "R-free-flags-3"
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 750,
+          "n_differing_on_unmeasured": 750,
+          "free_among_differing_store": 375,
+          "free_among_differing_staged": 375
+        },
+        "R-free-flags-2": {
+          "n_differing": 752,
+          "n_differing_on_unmeasured": 752,
+          "free_among_differing_store": 376,
+          "free_among_differing_staged": 376
+        },
+        "R-free-flags-3": {
+          "n_differing": 744,
+          "n_differing_on_unmeasured": 744,
+          "free_among_differing_store": 372,
+          "free_among_differing_staged": 372
+        }
+      }
+    },
+    {
+      "pdb_id": "9TXE",
+      "fingerprints_match": false,
+      "staged_wavelength": 0.77488,
+      "status": "proof_failed_store_untouched",
+      "mismatched_columns": [
+        "R-free-flags"
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 2,
+          "n_differing_on_unmeasured": 2,
+          "free_among_differing_store": 1,
+          "free_among_differing_staged": 1
+        }
+      }
+    }
+  ],
+  "refmac_census": {
+    "4M7G": {
+      "measurable": true,
+      "r_free": 0.1738
+    },
+    "7R2H": {
+      "measurable": true,
+      "r_free": 0.1676
+    },
+    "2VXN": {
+      "measurable": true,
+      "r_free": 0.1712
+    },
+    "7ATV": {
+      "measurable": true,
+      "r_free": 0.175
+    },
+    "6Q01": {
+      "measurable": true,
+      "r_free": 0.1642
+    },
+    "6ZWY": {
+      "measurable": true,
+      "r_free": 0.1665
+    },
+    "5XS6": {
+      "measurable": true,
+      "r_free": 0.1711
+    },
+    "8ERE": {
+      "measurable": true,
+      "r_free": 0.1602
+    },
+    "3ZOJ": {
+      "measurable": true,
+      "r_free": 0.1608
+    },
+    "9YGW": {
+      "measurable": false
+    },
+    "9P25": {
+      "measurable": true,
+      "r_free": 0.1673
+    },
+    "8R5K": {
+      "measurable": true,
+      "r_free": 0.1837
+    },
+    "7TVL": {
+      "measurable": true,
+      "r_free": 0.1469
+    },
+    "8QXQ": {
+      "measurable": true,
+      "r_free": 0.1955
+    },
+    "6F1O": {
+      "measurable": true,
+      "r_free": 0.1846
+    },
+    "7TWR": {
+      "measurable": true,
+      "r_free": 0.164
+    },
+    "6XVM": {
+      "measurable": true,
+      "r_free": 0.1523
+    },
+    "9TEU": {
+      "measurable": true,
+      "r_free": 0.1829
+    },
+    "5R32": {
+      "measurable": true,
+      "r_free": 0.1814
+    },
+    "5KXV": {
+      "measurable": true,
+      "r_free": 0.1663
+    },
+    "7OYN": {
+      "measurable": true,
+      "r_free": 0.1704
+    },
+    "9TXE": {
+      "measurable": true,
+      "r_free": 0.203
+    }
+  }
+}
