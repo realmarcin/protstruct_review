@@ -149,7 +149,7 @@ def s_r2_from_record() -> dict:
 
 def judge_state(state: str, post: Path, model: Path, mtz: Path, work: Path,
                 pair, flag, mask, pre_m, thresholds: dict,
-                s_r2: dict) -> dict:
+                s_r2: dict, fit_fn=None) -> dict:
     """Bench judgment of one state (perturbed or recovered) vs the deposited
     start, with C1 layered on the round-3 families."""
     post_m = _bnc.measure_model(post, mtz, work, state, pair, flag)
@@ -187,11 +187,20 @@ def judge_state(state: str, post: Path, model: Path, mtz: Path, work: Path,
         return {"state": state, "status": "unmeasurable",
                 "reason": "an R path is unmeasurable"}
     flags, conflicts = _bnc.family_flags(numbers, s_r2)
+    # fit_fn parameterizes the fit rule (round 5's E1 supersedes C1 there);
+    # default None keeps the round-4 C1 behavior byte-for-byte.
+    fit = (fit_fn or fit_degraded)(numbers, thresholds)
+    if _bnc.verdict(flags) == "DEGRADED":
+        verdict_str = "DEGRADED"
+    elif fit:
+        verdict_str = "FIT-DEGRADED"
+    else:
+        verdict_str = "not-degraded"
     return {"state": state, "status": "judged", "numbers": numbers,
             "shift_all_residue": shift_all, "n_unmasked_pairs": n_u,
             "flags": flags, "conflicts": conflicts,
-            "fit_degraded": fit_degraded(numbers, thresholds),
-            "verdict": combined_verdict(flags, numbers, thresholds)}
+            "fit_degraded": fit,
+            "verdict": verdict_str}
 
 
 def run_entry(entry: dict, cache: Path, work: Path, thresholds: dict,
