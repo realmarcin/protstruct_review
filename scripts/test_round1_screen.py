@@ -201,6 +201,55 @@ check("#320: manifest tool identity carries the required keys",
       {"phenix_bin", "gemmi_cli", "gemmi_python", "python"} <= set(versions),
       True)
 
+
+# --- round-6 G2: the three-class column rule ---------------------------------------
+
+check("G2: observation kept", scr.classify_column("FOBS"), "keep")
+check("G2: second-dataset observation kept", scr.classify_column("FOBS-1"), "keep")
+check("G2: anomalous pair kept", scr.classify_column("F(+)"), "keep")
+check("G2: DANO kept", scr.classify_column("DANO"), "keep")
+check("G2: numbered flag kept", scr.classify_column("R-free-flags-3"), "keep")
+check("G2: HL coefficient dropped", scr.classify_column("HLA"), "drop")
+check("G2: map coefficient dropped", scr.classify_column("2FOFCWT"), "drop")
+check("G2: F-model dropped", scr.classify_column("F-model"), "drop")
+try:
+    scr.classify_column("MYSTERY_COL")
+    check("G2: unknown label refuses loudly", "no exception", "SystemExit")
+except SystemExit:
+    check("G2: unknown label refuses loudly", "SystemExit", "SystemExit")
+
+# strip round-trip on a synthetic MTZ with derived columns
+import gemmi as _gemmi
+import numpy as _np
+import tempfile as _tf
+_m = _gemmi.Mtz(with_base=True)
+_m.spacegroup = _gemmi.find_spacegroup_by_name("P 1")
+_m.set_cell_for_all(_gemmi.UnitCell(10, 10, 10, 90, 90, 90))
+_ds = _m.add_dataset("d")
+_ds.wavelength = 0.9795
+for lab, typ in (("R-free-flags", "I"), ("FOBS", "F"), ("SIGFOBS", "Q"),
+                 ("FC", "F"), ("PHIFC", "P"), ("HLA", "A"), ("FWT", "F")):
+    _m.add_column(lab, typ)
+_rows = _np.array([[h, 0, 0, h % 2, 10.0 + h, 1.0, 9.0, 45.0, 0.1, 8.0]
+                   for h in range(1, 21)], dtype=_np.float32)
+_m.set_data(_rows)
+with _tf.TemporaryDirectory() as _tmp:
+    _pth = Path(_tmp) / "t.mtz"
+    _m.write_to_file(str(_pth))
+    _dropped = scr.strip_mtz(_pth)
+    check("G2: strip removes exactly the derived columns",
+          sorted(_dropped), ["FC", "FWT", "HLA", "PHIFC"])
+    _back = _gemmi.read_mtz_file(str(_pth))
+    check("G2: stripped file keeps obs+flags",
+          [c.label for c in _back.columns],
+          ["H", "K", "L", "R-free-flags", "FOBS", "SIGFOBS"])
+    _a = _np.array(_back, copy=False)
+    check("G2: observation values preserved",
+          bool(_np.array_equal(_a[:, 4], _rows[:, 4])), True)
+    check("G2: dataset wavelength survives the strip (#361)",
+          round(_back.datasets[-1].wavelength, 4), 0.9795)
+    check("G2: clean file untouched", scr.strip_mtz(_pth), [])
+
 # --- mad ---------------------------------------------------------------------------
 
 check("mad of a constant list is 0", scr.mad([0.5, 0.5, 0.5]), 0)

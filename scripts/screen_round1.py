@@ -78,6 +78,73 @@ _gr = _load("gemmi_rfactor")                  # independent R path
 PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
 
 
+# --- Round-6 G2: the three-class column rule (registered in
+# negative_control_round6_preregistration.md, census-backed) -----------------
+# KEEP: enumerated experimental families. DROP: enumerated model-derived.
+# UNKNOWN: a named fetch-time error — never a silent pass-through.
+import re as _re
+
+KEEP_COLUMN_PATTERNS = (
+    r"^[HKL]$",
+    r"^(F|FP|FOBS|F-obs|F-obs-filtered)(-\d+)?$",
+    r"^(SIGF|SIGFP|SIGFOBS|SIGF-obs|SIGF-obs-filtered)(-\d+)?$",
+    r"^(I|IOBS|I-obs)(-\d+)?$",
+    r"^(SIGI|SIGIOBS|SIGI-obs)(-\d+)?$",
+    r"^(DANO|SIGDANO)(-\d+)?$",
+    r"^(F|SIGF|I|SIGI)\([+-]\)(-\d+)?$",
+    r"^(R-free-flags|FreeR_flag|FREE|FreeRflag)(-\d+)?$",
+)
+DROP_COLUMNS = {"FC", "PHIFC", "HLA", "HLB", "HLC", "HLD",
+                "FWT", "PHWT", "DELFWT", "PHDELWT", "FOM",
+                "2FOFCWT", "PH2FOFCWT", "FOFCWT", "PHFOFCWT",
+                "F-model", "PHIF-model"}
+
+
+def classify_column(label: str) -> str:
+    """'keep' | 'drop', or a loud SystemExit on an unclassified label."""
+    if label in DROP_COLUMNS:
+        return "drop"
+    if any(_re.match(p, label) for p in KEEP_COLUMN_PATTERNS):
+        return "keep"
+    raise SystemExit(
+        f"screen: MTZ column {label!r} matches neither the registered KEEP "
+        f"families nor the DROP set — classify it by a registered change "
+        f"(round-6 G2), never pass it through")
+
+
+def strip_mtz(path: Path) -> list[str]:
+    """Apply the three-class rule in place; returns the dropped labels.
+    Observation and flag columns are preserved byte-identically."""
+    import gemmi
+    import numpy as np
+    m = gemmi.read_mtz_file(str(path))
+    labels = [c.label for c in m.columns]
+    verdicts = {l: classify_column(l) for l in labels}
+    dropped = [l for l in labels if verdicts[l] == "drop"]
+    if not dropped:
+        return []
+    keep_idx = [i for i, l in enumerate(labels) if verdicts[l] == "keep"]
+    out = gemmi.Mtz(with_base=False)
+    out.spacegroup = m.spacegroup
+    out.set_cell_for_all(m.cell)
+    # #361: the rebuilt file keeps the source dataset's identity — wavelength
+    # feeds f'/f'' downstream; dropping it to 0.0 is a silent data defect.
+    src = m.datasets[-1] if m.datasets else None
+    ds = out.add_dataset(src.dataset_name if src else "stripped")
+    if src is not None:
+        ds.project_name = src.project_name
+        ds.crystal_name = src.crystal_name
+        ds.wavelength = src.wavelength
+    for i in keep_idx:
+        out.add_column(m.columns[i].label, m.columns[i].type)
+    data = np.array(m, copy=False)
+    out.set_data(data[:, keep_idx].astype(np.float32))
+    tmp = path.with_suffix(".mtz.striptmp")
+    out.write_to_file(str(tmp))
+    tmp.replace(path)
+    return dropped
+
+
 def sha256_file(path: Path) -> str:
     import hashlib
     h = hashlib.sha256()
@@ -146,6 +213,12 @@ def fetch_pair(pdb_id: str, cache: Path) -> tuple[Path | None, Path | None, str]
         return (model if model.exists() else None,
                 mtz if mtz.exists() else None,
                 "fetch failed: " + " / ".join(tail) if tail else "fetch failed")
+    # Round-6 G2: strip model-derived columns at fetch time, BEFORE the hash
+    # sidecar is written — the cache holds observations and flags only.
+    dropped = strip_mtz(mtz)
+    if dropped:
+        print(f"  stripped {len(dropped)} derived column(s) from "
+              f"{mtz.name}: {','.join(dropped)}", file=sys.stderr)
     return model, mtz, ""
 
 
@@ -445,7 +518,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--reps", default=str(REPS_JSON))
-    ap.add_argument("--cache", default="/tmp/nc_round1_cache")
+    ap.add_argument("--cache",
+                    default=str(Path.home() / "protstruct_bench_inputs"))
     ap.add_argument("--work", default="/tmp/nc_round1_work")
     ap.add_argument("--canary", action="store_true", help="first rep only")
     ap.add_argument("--only", default="", help="comma-separated pdb ids")
