@@ -1,0 +1,392 @@
+{
+  "run": {
+    "preregistration": "negative_control_round6_preregistration.md",
+    "round": 6,
+    "durable_store": "/Users/marcin/protstruct_bench_inputs",
+    "tools": {
+      "phenix_bin": "/Users/marcin/phenix-2.0-5936/phenix_bin",
+      "gemmi_cli": "/opt/homebrew/bin/gemmi",
+      "gemmi_cli_version": "gemmi 0.7.5",
+      "gemmi_python": "0.7.5",
+      "python": "3.13.12"
+    }
+  },
+  "migration": [
+    {
+      "pdb_id": "4M7G",
+      "dropped_columns": [],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 18,
+      "input_hashes": {
+        "mtz": "f6824a5b756b807d236bdcdfa75c1a8babf7c157fd9634c4a166fc96ce1c336b"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "7R2H",
+      "dropped_columns": [
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 7,
+      "input_hashes": {
+        "mtz": "59291a9837e83691ce9c99c4d452b3ac24f845d1bbfe9bd3289d9557fbd27e02"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "2VXN",
+      "dropped_columns": [],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 6,
+      "input_hashes": {
+        "mtz": "1ce4b08130d6183b9aab0fa85d4abbc0e3b0a7195aeba1be8262715ee76e227f"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "7ATV",
+      "dropped_columns": [
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 9,
+      "input_hashes": {
+        "mtz": "d6e57b222519fd06b10df0dda5b5ed0163b7ea5f99e413e13f4f2ff09cc02a38"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "6Q01",
+      "dropped_columns": [
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 9,
+      "input_hashes": {
+        "mtz": "b51181cc96eb89aff3f062da35aee59387ad58c22ae0f870e01727cf9008aef4"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "6ZWY",
+      "dropped_columns": [
+        "FC",
+        "PHIFC",
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT",
+        "FOM"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 11,
+      "input_hashes": {
+        "mtz": "5a058862f91d2977e1f05d2c0f81365ccf38b7dbd498e9ca58a6d6619094a9d3"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "5XS6",
+      "dropped_columns": [],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 9,
+      "input_hashes": {
+        "mtz": "9a9b7247826fff85c0baa893af0a75b741ddff4966b1f24fed414adc5c6a93a3"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "8ERE",
+      "dropped_columns": [],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 19,
+      "input_hashes": {
+        "mtz": "35f5f3e12c555f25b8ed416a354f79f9f7f9eb410cb9faa0850ece24bdd80e52"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "3ZOJ",
+      "dropped_columns": [
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 6,
+      "input_hashes": {
+        "mtz": "9c65bd9c514360cc775029de3622a9f696f04fd7b75d8f7076da2f5cf50d120e"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "9YGW",
+      "dropped_columns": [],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 19,
+      "input_hashes": {
+        "mtz": "f097f00b834f2c8ed2383438df3fcfce59cda0b341cc91b2bbf806ac441a9705"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "9P25",
+      "dropped_columns": [
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 7,
+      "input_hashes": {
+        "mtz": "12a610d1e161b39676abec2687226655b0c7023af1f05af0799fca59547778d9"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "8R5K",
+      "dropped_columns": [
+        "FC",
+        "PHIFC",
+        "HLA",
+        "HLB",
+        "HLC",
+        "HLD",
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT",
+        "FOM"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 7,
+      "input_hashes": {
+        "mtz": "5691c67bcc4ff4a384c982b0d72b548e0f5629d8d851b3739201d68e572073a4"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "7TVL",
+      "dropped_columns": [],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 19,
+      "input_hashes": {
+        "mtz": "2e453c18154ccef983c4dd09805bf578bcbde67becdec6774ffe3f9d064d31b1"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "8QXQ",
+      "dropped_columns": [],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 7,
+      "input_hashes": {
+        "mtz": "e193f767ad16111a3ef53f62fd0936afb47f4d17059c2a4313d8f1575ce6d58e"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "6F1O",
+      "dropped_columns": [
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 9,
+      "input_hashes": {
+        "mtz": "00fb8eabdc65373964c0fcf54ceb30268d7b0729b59b797ece79ab17ba18e6aa"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "7TWR",
+      "dropped_columns": [
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 9,
+      "input_hashes": {
+        "mtz": "bf0d675c681c5f3162f58dc7d53d4043f2da772d7f6c1bc089c39c52f7d289a1"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "6XVM",
+      "dropped_columns": [
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 9,
+      "input_hashes": {
+        "mtz": "720c01205b23c953e58489b5aea28d92b7f5229297f8b5eaedaed88dbd82b67d"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "9TEU",
+      "dropped_columns": [],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 19,
+      "input_hashes": {
+        "mtz": "f8cd3dd344a8337fd610ebe753c0286552af9a1fc766776742c288aa34dd504e"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "5R32",
+      "dropped_columns": [
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 11,
+      "input_hashes": {
+        "mtz": "88ea97c25f1a1562259bdd56b61623c13da3c99ee2a2deffe5ecb6d3e59b3d35"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "5KXV",
+      "dropped_columns": [],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 8,
+      "input_hashes": {
+        "mtz": "c35df96ef84bcec4efb69884a615342c07e54bff4b44b61e862f1ce732a5ea47"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "7OYN",
+      "dropped_columns": [],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 9,
+      "input_hashes": {
+        "mtz": "8809cac8fefe21166e94f60b7a6204669f8fc2664f23ba721075ca446c65b4e1"
+      },
+      "status": "migrated"
+    },
+    {
+      "pdb_id": "9TXE",
+      "dropped_columns": [
+        "FWT",
+        "PHWT",
+        "DELFWT",
+        "PHDELWT"
+      ],
+      "obs_identity_preserved": true,
+      "n_obs_columns": 9,
+      "input_hashes": {
+        "mtz": "3d4b8934aa481719c510b14bc16f06c4585644c24584b5335e3e69ed01693942"
+      },
+      "status": "migrated"
+    }
+  ],
+  "u1_all_preserved": true,
+  "g3_8r5k_rescreen": {
+    "status": "screened",
+    "array_selection": {
+      "obs": [
+        "FOBS",
+        "SIGFOBS"
+      ],
+      "free_flag": "R-free-flags"
+    },
+    "input_hashes": {
+      "model": "89b06927f2fd2cb0d8506277d6cc7b9dfd2a804cfbccf95fe31bc4fef75dcf2c",
+      "mtz": "5691c67bcc4ff4a384c982b0d72b548e0f5629d8d851b3739201d68e572073a4"
+    },
+    "paths": {
+      "phenix": {
+        "pre": 0.1563,
+        "post": 0.1597,
+        "delta": 0.003400000000000014
+      },
+      "gemmi": {
+        "pre": 0.1584,
+        "post": 0.1627,
+        "delta": 0.004299999999999998
+      },
+      "refmac": {
+        "pre": 0.1837,
+        "post": 0.1897,
+        "delta": 0.006000000000000005
+      }
+    },
+    "clean_null_deltas": {
+      "d_phenix": 0.003400000000000014,
+      "d_gemmi": 0.004299999999999998,
+      "d_refmac": 0.006000000000000005
+    },
+    "fit_degraded_e1": false,
+    "headroom_improvement": false,
+    "enrolls_clean": true
+  },
+  "u3_c1_recomputed": {
+    "table": {
+      "d_phenix": 0.012,
+      "d_gemmi": 0.01025,
+      "d_refmac": 0.0056
+    },
+    "registered": {
+      "d_phenix": 0.0122,
+      "d_gemmi": 0.0109,
+      "d_refmac": 0.0054
+    },
+    "moved": true
+  },
+  "u2_refmac_measurability": {
+    "8R5K": {
+      "measurable": true,
+      "r_free": 0.1837
+    },
+    "9YGW": {
+      "measurable": false,
+      "reason": "REFMAC aniso reader rejects the deposited mmCIF: 'rdaniso_cif: label_comp_id mismatch -- atom record CSO vs aniso record CYS; Problem in read aniso'. The modified residue CSO (S-hydroxycysteine) carries parent-name CYS in its anisotropic-ADP records. Named, specific, and plausibly workaroundable (strip aniso records or rename); carried to round 7. An earlier draft called this a silent termination -- the cause was in the log tail all along."
+    },
+    "8QXQ": {
+      "measurable": true,
+      "r_free": 0.1955
+    }
+  },
+  "g4_2vxn": {
+    "step1_flag_convention": {
+      "result": "REFUTED as cause \u2014 all 22 entries use flag 0 as the test set, matching REFMAC's default (census 2026-08-17)"
+    },
+    "step2_refmac_variants_r_free": {
+      "standard": 0.1712,
+      "simple_scaling": 0.1712,
+      "no_solvent": 0.1511
+    },
+    "step3_servalcat_r_free": 0.1473,
+    "step3_log_tail": [
+      "                                      [--vonmises] [--prefer_intensity]",
+      "                                      [--use_fw] [--config CONFIG]",
+      "servalcat refine_xtal_norefmac: error: the following arguments are required: -s/--source"
+    ],
+    "step3_servalcat_r_work": 0.1435,
+    "step3_note": "first invocation failed on a missing -s flag; re-run with -s xray (servalcat refine_xtal_norefmac, ncycle 0, labin FOBS,SIGFOBS,R-free-flags) \u2014 log servalcat_2vxn.log",
+    "attribution": "PARTIALLY ATTRIBUTED, tiebroken: the four-tool spread on deposited 2VXN is phenix mvd 0.1043 / gemmi path 0.1059 / Servalcat 0.1473 / REFMAC 0.1712, against a deposition-reported R-free of 0.103. The deposition tiebreaker sides with the two same-data code paths; BOTH Murshudov-family tools diverge high, and disagree with each other. The solvent component of REFMAC's divergence is isolated (~0.02: SOLVENT NO 0.1712 -> 0.1511), but the family-level divergence at 0.82 A is NOT attributed (round-7 candidates: resolution-cutoff handling, anisotropic scaling, hydrogen contribution treatment at ultra-high resolution). The registered substitution is NOT enacted -- Servalcat diverges from the tiebroken pair too, so substituting it would be false progress. 2VXN stays a named cross-tool anomaly, now quantified across four tools plus the deposition. Disclosure: an earlier draft claimed Servalcat agreed with the two paths, citing 'phenix 0.1467' -- that figure belongs to 9BB0/5R2Z, not 2VXN; caught against the round-2/3 records and corrected before commit."
+  }
+}
