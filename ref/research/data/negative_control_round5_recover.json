@@ -15,6 +15,19 @@
       "gemmi_cli_version": "gemmi 0.7.5",
       "gemmi_python": "0.7.5",
       "python": "3.13.12"
+    },
+    "provenance_rulings": {
+      "ruling": "C (user-approved): accept refetched inputs only with proven data identity; exclude the unattributable case",
+      "9YGW": "accepted \u2014 refetch proven 100.0000% identical (269978/269978 amplitudes and flags) vs the agent-preserved copy",
+      "9TXE": "accepted \u2014 refetch amplitudes 100.000% identical (66728/66728, max diff 0); free flags 66726/66728 (2 flag values differ, ~0.1% of the test set, ASU-mapping edge) \u2014 recorded verbatim",
+      "6XVM": "EXCLUDED from agent verdicts \u2014 refetch 99.89% amplitude identity with ~140 unattributable differences and no committed pre-deletion hash (issue filed); the agent ARTIFACT stands, the judgment is withheld",
+      "operator_note": "two sidecar re-baselines (9YGW, 6XVM) were performed unilaterally before this ruling and are disclosed as an operator audit finding"
+    },
+    "mlhl_contamination": {
+      "entry": "8R5K",
+      "scope": "only entry whose MTZ carries HL coefficients; every PROTOCOL leg (rounds 2-5 osol) refined it under the auto-selected MLHL target",
+      "osol_effect": "8R5K's S-osol success is REVOKED by name (phase-assisted recovery)",
+      "agent_effect": "the 8R5K AGENT run is the only clean 8R5K refinement \u2014 it detected the leak, stripped the MTZ, restarted; its judgment stands"
     }
   },
   "rows": [
@@ -462,7 +475,9 @@
       },
       "recovery_success": false,
       "w4_contradiction": false,
-      "status": "completed"
+      "status": "completed",
+      "mlhl_contaminated": true,
+      "success_revoked": false
     },
     {
       "pdb_id": "7TVL",
@@ -835,6 +850,939 @@
       "recovery_success": true,
       "w4_contradiction": false,
       "status": "completed"
+    },
+    {
+      "pdb_id": "4M7G",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.79,
+      "artifact_hashes": {
+        "final": "73bfed60344cab6405f904dc5c37bad68c1dcafa1dc64bd3cd53c96a1d89c971",
+        "transcript": "8c017bb1b3bf0be6d0d69fc7edb9b3f2f0d7062fa83f15f907dbde4045ee1b79"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0093,
+          "d_gemmi": 0.011,
+          "d_refmac": 0.0018,
+          "clash_pre": 1.6,
+          "clash_post": 1.88,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.49,
+          "d_zbond": -0.922,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0149
+        },
+        "shift_all_residue": 0.0415,
+        "n_unmasked_pairs": 136,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "7R2H",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.79,
+      "artifact_hashes": {
+        "final": "0a8d3fa8f92af5cdde73c431f059e75bfff9e99fd8368d4c3a237a3f74e6c905",
+        "transcript": "36552091f098542a46f48b7c31ba7c543ea090becaf9daa1ac266ef233906d95"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0033,
+          "d_gemmi": -0.0043,
+          "d_refmac": -0.0028,
+          "clash_pre": 0.8,
+          "clash_post": 1.6,
+          "d_favored_pp": 0.61,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.033,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0041
+        },
+        "shift_all_residue": 0.0048,
+        "n_unmasked_pairs": 114,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "2VXN",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.82,
+      "artifact_hashes": {
+        "final": "7569972757f4ab0d7d994bbef4557d22fcf290e771e47468c0028e0d60e85e8b",
+        "transcript": "c78d5555bd9b11d5da2e97d1e42203abacf1e6488f9e9b9bac452284b04b7ea2"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0017,
+          "d_gemmi": 0.0016,
+          "d_refmac": -0.0196,
+          "clash_pre": 2.37,
+          "clash_post": 5.22,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": -0.45,
+          "d_zbond": -0.497,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0137
+        },
+        "shift_all_residue": 0.0241,
+        "n_unmasked_pairs": 156,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "7ATV",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.96,
+      "artifact_hashes": {
+        "final": "5167cece33b42a9c5e0fefd5951abf3b45b48feb21b6f12ca58a5526af3cf503",
+        "transcript": "b21d268419b5870a03bac4c9788f9d8f7a98e5ece05ccfb51da1568c50863b34"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0074,
+          "d_gemmi": 0.007,
+          "d_refmac": 0.0031,
+          "clash_pre": 1.62,
+          "clash_post": 1.78,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.3,
+          "d_zbond": -0.267,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0127
+        },
+        "shift_all_residue": 0.0299,
+        "n_unmasked_pairs": 241,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "6Q01",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.85,
+      "artifact_hashes": {
+        "final": "8110fc9503562e526ee536e5ffffb18d4eec065becc00a2ace6ea7dbca1c9aea",
+        "transcript": "df190fd6e9b578cc01c90de78badca77435208e6e91bcb85ddbd6ff35264504c"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0095,
+          "d_gemmi": 0.0097,
+          "d_refmac": 0.0056,
+          "clash_pre": 0.61,
+          "clash_post": 1.85,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": -0.35,
+          "d_zbond": -0.7,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0067
+        },
+        "shift_all_residue": 0.0301,
+        "n_unmasked_pairs": 98,
+        "flags": {
+          "F-data": true,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "6ZWY",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 1.0,
+      "artifact_hashes": {
+        "final": "f869ff805a1f648cef58bbadbf2f40755cb8dff54116a9ff576d16e17fc3004e",
+        "transcript": "0fd3809a2a6b39508b050b7fc12004c443162563b2021f8f42f350c240868229"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0217,
+          "d_gemmi": -0.0206,
+          "d_refmac": -0.0059,
+          "clash_pre": 1.76,
+          "clash_post": 2.66,
+          "d_favored_pp": 0.4,
+          "d_rota_pp": -0.42,
+          "d_zbond": -0.354,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0366
+        },
+        "shift_all_residue": 0.0443,
+        "n_unmasked_pairs": 149,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "5XS6",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.87,
+      "artifact_hashes": {
+        "final": "9a28e57a8ca20566a1252a36300490c0d323b850565a1eed4dca671ad0c5193b",
+        "transcript": "0049e8e379965ef6c1ac7abc5a701d03b17f0db0daf74afd56d51abdcb676460"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0153,
+          "d_gemmi": -0.013,
+          "d_refmac": -0.0068,
+          "clash_pre": 1.53,
+          "clash_post": 2.97,
+          "d_favored_pp": -0.14,
+          "d_rota_pp": 0.36,
+          "d_zbond": 0.0,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0094
+        },
+        "shift_all_residue": 0.0156,
+        "n_unmasked_pairs": 423,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "8ERE",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.87,
+      "artifact_hashes": {
+        "final": "873004ca0eea7dcbc195144d4773afb60bfa49ec86fd94e5f619da3a31883846",
+        "transcript": "20a1833e356ef161f85fb4f95fe0285b425c1615c4b026537b9dd379ff36084c"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0112,
+          "d_gemmi": -0.0146,
+          "d_refmac": -0.0056,
+          "clash_pre": 1.37,
+          "clash_post": 4.57,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.049,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0269
+        },
+        "shift_all_residue": 0.027,
+        "n_unmasked_pairs": 109,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "3ZOJ",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.88,
+      "artifact_hashes": {
+        "final": "9034434c60a5e8e1fbdd4623a5395baa415c1a6b3e744d8d8a8a488a43c5ee33",
+        "transcript": "9fa5576ec0cd879f1f891e2ebb8ef8a5f5f13523ece407a6e14e7837640fd81d"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.009,
+          "d_gemmi": 0.0051,
+          "d_refmac": 0.0047,
+          "clash_pre": 0.69,
+          "clash_post": 0.46,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.0,
+          "d_zbond": -0.845,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0107
+        },
+        "shift_all_residue": 0.0222,
+        "n_unmasked_pairs": 119,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "9YGW",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.88,
+      "artifact_hashes": {
+        "final": "c431e476ecbc2aae065e347a1cfcd925d9c47714af949bd77734acd9cbb35113",
+        "transcript": "e2055bbe597567da6f9854db3020332b71dd6ffe574ff185a48122ec9a227531"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0037,
+          "d_gemmi": 0.0055,
+          "d_refmac": null,
+          "clash_pre": 1.75,
+          "clash_post": 2.77,
+          "d_favored_pp": -0.26,
+          "d_rota_pp": 0.0,
+          "d_zbond": null,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0044
+        },
+        "shift_all_residue": 0.0214,
+        "n_unmasked_pairs": 248,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": true
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "9P25",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.89,
+      "artifact_hashes": {
+        "final": "8420c341e44f4c63507a9e6ffb8cf90283cc55d15e9ba341921eb355237f75bd",
+        "transcript": "7a72b8211f8be36c71c39bdcc7eb54165755123bf3cf8fe7d706828c997520f1"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0186,
+          "d_gemmi": -0.0184,
+          "d_refmac": -0.0058,
+          "clash_pre": 0.16,
+          "clash_post": 0.63,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.0,
+          "d_zbond": -0.242,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0161
+        },
+        "shift_all_residue": 0.0214,
+        "n_unmasked_pairs": 318,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "8R5K",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.89,
+      "artifact_hashes": {
+        "final": "2cbec2ed04b24cff7249a9df2458f465b6d86a49bb08df5217a2b81919d66896",
+        "transcript": "12f9f3f002bf7da875bdb721e6f7d3c21086057413ed3304c3c7bf8e7251886b"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0062,
+          "d_gemmi": -0.0038,
+          "d_refmac": null,
+          "clash_pre": 1.76,
+          "clash_post": 1.32,
+          "d_favored_pp": -0.8,
+          "d_rota_pp": -1.69,
+          "d_zbond": null,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0094
+        },
+        "shift_all_residue": 0.0319,
+        "n_unmasked_pairs": 68,
+        "flags": {
+          "F-data": false,
+          "F-geom": true,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": true
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "7TVL",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.89,
+      "artifact_hashes": {
+        "final": "2c832ae577a5c37e87b74e01f19a4c3e6a943fc8e99abce2b1866b601f7d409a",
+        "transcript": "540cff77b811c2c96d2dfcbb7354642eedf306e2fc9ec8ff68426f07742f3dbb"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0235,
+          "d_gemmi": -0.0228,
+          "d_refmac": -0.0036,
+          "clash_pre": 1.37,
+          "clash_post": 2.2,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": -1.02,
+          "d_zbond": 0.104,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0098
+        },
+        "shift_all_residue": 0.0397,
+        "n_unmasked_pairs": 156,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "8QXQ",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.94,
+      "artifact_hashes": {
+        "final": "423eebddcff8468e285e1ed4470266072889489eeecd267d94ae29f137a1e9a7",
+        "transcript": "cd9de75596a03def3130785bb6c180958ec03a9105cba0d30ee5da991981c41e"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0005,
+          "d_gemmi": 0.0,
+          "d_refmac": null,
+          "clash_pre": 1.79,
+          "clash_post": 3.05,
+          "d_favored_pp": -0.32,
+          "d_rota_pp": -0.65,
+          "d_zbond": null,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0139
+        },
+        "shift_all_residue": 0.0429,
+        "n_unmasked_pairs": 203,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": true
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "6F1O",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.96,
+      "artifact_hashes": {
+        "final": "0a2feb7fa540827658de92b0e260f1cd858a71223c091de733be25adec143375",
+        "transcript": "9d4ad1075f3505f25c284b617bbbb48d40465c15ca1861a72c1c32f62ad830a3"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0069,
+          "d_gemmi": -0.0057,
+          "d_refmac": 0.0005,
+          "clash_pre": 0.99,
+          "clash_post": 3.95,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.352,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0109
+        },
+        "shift_all_residue": 0.0173,
+        "n_unmasked_pairs": 78,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "7TWR",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.9,
+      "artifact_hashes": {
+        "final": "e4ff530465714aa0dd682a1fba7ef8c7c2037b13105af08fe8597abd73354da2",
+        "transcript": "86c8d1106ce2734eb53aab0f61ecb7a76606c16b66e72487b6e3f7276d535ee6"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.0016,
+          "d_gemmi": 0.0023,
+          "d_refmac": 0.0016,
+          "clash_pre": 1.22,
+          "clash_post": 1.23,
+          "d_favored_pp": 0.3,
+          "d_rota_pp": 0.0,
+          "d_zbond": -0.041,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0083
+        },
+        "shift_all_residue": 0.0158,
+        "n_unmasked_pairs": 191,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "6XVM",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.9,
+      "artifact_hashes": {
+        "final": "1b7daabc2867e32328209ba0c0fcd1f003cd9d415e93aafbad39fadd0f207afa",
+        "transcript": "d1aeb78944f972d129cca97c8804e6e6f7d3f5867b2193e7997f93dca3396a42"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": 0.008,
+          "d_gemmi": 0.0087,
+          "d_refmac": 0.0024,
+          "clash_pre": 1.31,
+          "clash_post": 2.63,
+          "d_favored_pp": 0.44,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.032,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0141
+        },
+        "shift_all_residue": 0.0272,
+        "n_unmasked_pairs": 82,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "status": "data_defect",
+      "withheld_judgment": {
+        "recovered": {
+          "state": "agent",
+          "status": "judged",
+          "numbers": {
+            "d_phenix": 0.008,
+            "d_gemmi": 0.0087,
+            "d_refmac": 0.0024,
+            "clash_pre": 1.31,
+            "clash_post": 2.63,
+            "d_favored_pp": 0.44,
+            "d_rota_pp": 0.0,
+            "d_zbond": 0.032,
+            "n_protected_fixed": 0,
+            "shift_unmasked": 0.0141
+          },
+          "shift_all_residue": 0.0272,
+          "n_unmasked_pairs": 82,
+          "flags": {
+            "F-data": false,
+            "F-geom": false,
+            "F-protected": false,
+            "F-shift": false
+          },
+          "conflicts": [],
+          "fit_degraded": false,
+          "verdict": "not-degraded",
+          "two_path_only": false
+        },
+        "recovery_success": true,
+        "w4_contradiction": false
+      },
+      "reason": "input provenance unattributable after /tmp deletion (ruling C): judged values preserved under withheld_judgment, not counted"
+    },
+    {
+      "pdb_id": "9TEU",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.9,
+      "artifact_hashes": {
+        "final": "5bfb522e50084af0fb4b517e262d79cb0b7feb33adfcc1a7af7aa298f31e19e9",
+        "transcript": "5cdf989a3fd4aff374f76080e473202307d8e9e6e38ec4d7b5f3b598a0f5779a"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0271,
+          "d_gemmi": -0.0266,
+          "d_refmac": -0.013,
+          "clash_pre": 1.33,
+          "clash_post": 0.0,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.82,
+          "d_zbond": 0.053,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0259
+        },
+        "shift_all_residue": 0.0306,
+        "n_unmasked_pairs": 68,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "5R32",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.9,
+      "artifact_hashes": {
+        "final": "186e783ebd038299ea1d8872a1c59cd63406475aa96b86a980ba35e2800ab438",
+        "transcript": "ef523b427052837beaa6f61952f1c7503dd70f8802059bc0b0c2be8a3f240c59"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.008,
+          "d_gemmi": -0.0094,
+          "d_refmac": -0.0185,
+          "clash_pre": 0.62,
+          "clash_post": 0.0,
+          "d_favored_pp": 0.31,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.043,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0096
+        },
+        "shift_all_residue": 0.0143,
+        "n_unmasked_pairs": 271,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "5KXV",
+      "subject": "agent",
+      "stratum": true,
+      "d_min": 0.98,
+      "artifact_hashes": {
+        "final": "d8938c1bf628f2b009d9907cf41c8591a31b74a74359326d8c4816335e25d732",
+        "transcript": "391cedd6e58ee76f4accc1fd401440ae457ef3e3dd32fadb53b2d588e0fb3038"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0064,
+          "d_gemmi": -0.0071,
+          "d_refmac": -0.0045,
+          "clash_pre": 1.94,
+          "clash_post": 1.94,
+          "d_favored_pp": -0.36,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.08,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0079
+        },
+        "shift_all_residue": 0.0237,
+        "n_unmasked_pairs": 162,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "7OYN",
+      "subject": "agent",
+      "stratum": false,
+      "d_min": 0.98,
+      "artifact_hashes": {
+        "final": "af381f2a235723f0fda935fb57e9da95b30dd5c6b31a213d2ef58d52d6622a0f",
+        "transcript": "27d6046c3bb31e881d533863d1765e98637ac19a193e3c2e6caee2ee9f7a5999"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0118,
+          "d_gemmi": -0.015,
+          "d_refmac": -0.0073,
+          "clash_pre": 1.65,
+          "clash_post": 2.36,
+          "d_favored_pp": 0.39,
+          "d_rota_pp": -0.87,
+          "d_zbond": 0.104,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.0276
+        },
+        "shift_all_residue": 0.0629,
+        "n_unmasked_pairs": 198,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
+    },
+    {
+      "pdb_id": "9TXE",
+      "subject": "agent",
+      "stratum": false,
+      "d_min": 0.95,
+      "artifact_hashes": {
+        "final": "ee63c9144aecefd697f663050802738e2073ed7d98292485ba6bb64e1d5fd5fd",
+        "transcript": "c1b3427f7bc73bbbd017ddaa4b0da15a11c6757fa6de8fd6a530d7b9e88b94d8"
+      },
+      "recovered": {
+        "state": "agent",
+        "status": "judged",
+        "numbers": {
+          "d_phenix": -0.0196,
+          "d_gemmi": -0.0232,
+          "d_refmac": -0.0094,
+          "clash_pre": 0.0,
+          "clash_post": 0.66,
+          "d_favored_pp": 0.0,
+          "d_rota_pp": 0.0,
+          "d_zbond": 0.54,
+          "n_protected_fixed": 0,
+          "shift_unmasked": 0.015
+        },
+        "shift_all_residue": 0.0307,
+        "n_unmasked_pairs": 67,
+        "flags": {
+          "F-data": false,
+          "F-geom": false,
+          "F-protected": false,
+          "F-shift": false
+        },
+        "conflicts": [],
+        "fit_degraded": false,
+        "verdict": "not-degraded",
+        "two_path_only": false
+      },
+      "recovery_success": true,
+      "w4_contradiction": false,
+      "status": "completed"
     }
   ],
   "summary": {
@@ -843,7 +1791,18 @@
       "completed": 22,
       "successes": 11,
       "two_path_only": 3,
-      "w4_contradictions": 1
+      "w4_contradictions": 1,
+      "excluded_by_ruling": 0,
+      "revoked_mlhl": 0
+    },
+    "agent": {
+      "attempted": 22,
+      "completed": 21,
+      "successes": 21,
+      "two_path_only": 3,
+      "w4_contradictions": 0,
+      "excluded_by_ruling": 1,
+      "revoked_mlhl": 0
     }
   }
 }
