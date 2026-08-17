@@ -85,7 +85,15 @@
       "status": "proof_failed_store_untouched",
       "mismatched_columns": [
         "R-free-flags"
-      ]
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 1016,
+          "n_differing_on_unmeasured": 1016,
+          "free_among_differing_store": 508,
+          "free_among_differing_staged": 508
+        }
+      }
     },
     {
       "pdb_id": "7ATV",
@@ -94,7 +102,15 @@
       "status": "proof_failed_store_untouched",
       "mismatched_columns": [
         "R-free-flags"
-      ]
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 844,
+          "n_differing_on_unmeasured": 844,
+          "free_among_differing_store": 425,
+          "free_among_differing_staged": 419
+        }
+      }
     },
     {
       "pdb_id": "6Q01",
@@ -103,7 +119,15 @@
       "status": "proof_failed_store_untouched",
       "mismatched_columns": [
         "R-free-flags"
-      ]
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 4351,
+          "n_differing_on_unmeasured": 4351,
+          "free_among_differing_store": 2183,
+          "free_among_differing_staged": 2168
+        }
+      }
     },
     {
       "pdb_id": "6ZWY",
@@ -114,7 +138,27 @@
         "R-free-flags",
         "R-free-flags-1",
         "R-free-flags-2"
-      ]
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 10230,
+          "n_differing_on_unmeasured": 10230,
+          "free_among_differing_store": 5115,
+          "free_among_differing_staged": 5115
+        },
+        "R-free-flags-1": {
+          "n_differing": 100775,
+          "n_differing_on_unmeasured": 100775,
+          "free_among_differing_store": 4986,
+          "free_among_differing_staged": 4986
+        },
+        "R-free-flags-2": {
+          "n_differing": 10246,
+          "n_differing_on_unmeasured": 10246,
+          "free_among_differing_store": 5123,
+          "free_among_differing_staged": 5123
+        }
+      }
     },
     {
       "pdb_id": "3ZOJ",
@@ -123,7 +167,15 @@
       "status": "proof_failed_store_untouched",
       "mismatched_columns": [
         "R-free-flags"
-      ]
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 6,
+          "n_differing_on_unmeasured": 6,
+          "free_among_differing_store": 3,
+          "free_among_differing_staged": 3
+        }
+      }
     },
     {
       "pdb_id": "9P25",
@@ -132,7 +184,15 @@
       "status": "proof_failed_store_untouched",
       "mismatched_columns": [
         "R-free-flags"
-      ]
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 74,
+          "n_differing_on_unmeasured": 74,
+          "free_among_differing_store": 37,
+          "free_among_differing_staged": 37
+        }
+      }
     },
     {
       "pdb_id": "8R5K",
@@ -148,7 +208,15 @@
       "status": "proof_failed_store_untouched",
       "mismatched_columns": [
         "R-free-flags"
-      ]
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 58,
+          "n_differing_on_unmeasured": 58,
+          "free_among_differing_store": 29,
+          "free_among_differing_staged": 29
+        }
+      }
     },
     {
       "pdb_id": "7TWR",
@@ -157,7 +225,15 @@
       "status": "proof_failed_store_untouched",
       "mismatched_columns": [
         "R-free-flags"
-      ]
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 108,
+          "n_differing_on_unmeasured": 108,
+          "free_among_differing_store": 55,
+          "free_among_differing_staged": 53
+        }
+      }
     },
     {
       "pdb_id": "6XVM",
@@ -166,7 +242,15 @@
       "status": "proof_failed_store_untouched",
       "mismatched_columns": [
         "R-free-flags"
-      ]
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 1025,
+          "n_differing_on_unmeasured": 1025,
+          "free_among_differing_store": 509,
+          "free_among_differing_staged": 516
+        }
+      }
     },
     {
       "pdb_id": "5R32",
@@ -177,7 +261,27 @@
         "R-free-flags",
         "R-free-flags-2",
         "R-free-flags-3"
-      ]
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 750,
+          "n_differing_on_unmeasured": 750,
+          "free_among_differing_store": 375,
+          "free_among_differing_staged": 375
+        },
+        "R-free-flags-2": {
+          "n_differing": 752,
+          "n_differing_on_unmeasured": 752,
+          "free_among_differing_store": 376,
+          "free_among_differing_staged": 376
+        },
+        "R-free-flags-3": {
+          "n_differing": 744,
+          "n_differing_on_unmeasured": 744,
+          "free_among_differing_store": 372,
+          "free_among_differing_staged": 372
+        }
+      }
     },
     {
       "pdb_id": "9TXE",
@@ -186,7 +290,15 @@
       "status": "proof_failed_store_untouched",
       "mismatched_columns": [
         "R-free-flags"
-      ]
+      ],
+      "flag_diff_diagnosis": {
+        "R-free-flags": {
+          "n_differing": 2,
+          "n_differing_on_unmeasured": 2,
+          "free_among_differing_store": 1,
+          "free_among_differing_staged": 1
+        }
+      }
     }
   ],
   "refmac_census": {

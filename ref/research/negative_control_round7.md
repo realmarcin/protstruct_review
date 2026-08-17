@@ -72,16 +72,18 @@ lands on the registered fallback branch: **21/22**.
 ## H4/V4 — FALSIFIED: byte-reproducible refetch is impossible for 11 of 12.
 
 The proof gate produced a finding rather than a remediation. On 11 of 12
-entries the staged re-fetch differs from the store on exactly one column —
-`R-free-flags` — and on 7R2H every one of the 1 016 differing positions is
-a reflection with **no measured amplitude** (FOBS = NaN; free/work totals
-identical at 508/508). The converter **generates random free flags for
-unmeasured reflections on every fetch**, so the per-column fingerprint can
-never match across fetches for entries with incomplete observations.
-Measured-data identity holds everywhere it was tested; the registered
-instrument is stricter than measurement-relevant identity, and per the
-registered gate all 11 stores were left untouched (wavelength still 0.0,
-staged wavelengths recorded per entry: 0.65–1.0).
+entries the staged re-fetch differs from the store **only on free-flag
+columns** (one column on nine entries; three flag sets on 6ZWY and 5R32),
+and the recorded per-entry diagnosis shows that **every differing
+position — across all 16 mismatched columns, from 2 (9TXE) to 100 775
+(6ZWY's second flag set) — sits on a reflection with no measured
+observation**. The converter **generates random free flags for unmeasured
+reflections on every fetch**, so the per-column fingerprint can never
+match across fetches for entries with incomplete observations.
+Measured-data identity therefore holds on all 11, measured per entry, not
+asserted; the registered instrument is stricter than measurement-relevant
+identity, and per the registered gate all 11 stores were left untouched
+(wavelength still 0.0, staged wavelengths recorded per entry: 0.65–1.0).
 
 **8R5K alone passed the full proof** (fingerprints identical, staged
 wavelength 0.85). Its store write did NOT happen: the session's permission

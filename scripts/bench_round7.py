@@ -302,6 +302,35 @@ def h3_9ygw(durable: Path, work: Path) -> dict:
 
 # --- H4: store remediation behind the proof gate ------------------------------------
 
+def _diagnose_flag_diff(store_mtz: Path, staged_mtz: Path,
+                        cols: list[str]) -> dict:
+    """Per mismatched flag column: how many positions differ, how many of
+    those sit on reflections with NO measured amplitude/intensity, and the
+    free-assignment count among the differing positions in each file."""
+    import gemmi
+    import numpy as np
+    out = {}
+    ms = gemmi.read_mtz_file(str(store_mtz))
+    mt = gemmi.read_mtz_file(str(staged_mtz))
+    ds, dt = np.array(ms, copy=True), np.array(mt, copy=True)
+    labels_s = [c.label for c in ms.columns]
+    labels_t = [c.label for c in mt.columns]
+    obs_idx = [i for i, c in enumerate(ms.columns)
+               if c.type in ("F", "J")]
+    obs_nan = np.all(np.isnan(ds[:, obs_idx]), axis=1) if obs_idx else \
+        np.zeros(ds.shape[0], dtype=bool)
+    for col in cols:
+        i_s, i_t = labels_s.index(col), labels_t.index(col)
+        diff = ds[:, i_s] != dt[:, i_t]
+        out[col] = {
+            "n_differing": int(diff.sum()),
+            "n_differing_on_unmeasured": int((diff & obs_nan).sum()),
+            "free_among_differing_store": int((ds[diff, i_s] == 0).sum()),
+            "free_among_differing_staged": int((dt[diff, i_t] == 0).sum()),
+        }
+    return out
+
+
 def remediate_entry(pdb_id: str, durable: Path, staging: Path,
                     write: bool = False) -> dict:
     """One entry through the H4 gate. With write=False (the default) this
@@ -332,6 +361,13 @@ def remediate_entry(pdb_id: str, durable: Path, staging: Path,
         rec["mismatched_columns"] = sorted(
             k for k in set(store_fp) | set(staged_fp)
             if store_fp.get(k) != staged_fp.get(k))
+        # #368: when only flag columns mismatch, diagnose — are the
+        # differing assignments confined to unmeasured reflections (the
+        # converter's random fill), leaving measured-data identity intact?
+        if all(("free" in c.lower() or "flag" in c.lower())
+               for c in rec["mismatched_columns"]):
+            rec["flag_diff_diagnosis"] = _diagnose_flag_diff(
+                store_mtz, mtz, rec["mismatched_columns"])
         return rec
     if wl <= 0.0:
         rec["status"] = "wavelength_still_zero_store_untouched"
