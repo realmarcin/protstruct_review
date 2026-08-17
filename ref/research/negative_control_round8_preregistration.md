@@ -37,12 +37,15 @@ rolls random free flags on unmeasured reflections), so the remediation is
 an **in-place dataset-metadata edit** of each store MTZ. **The primary
 value source is the deposition mmCIF's
 `_diffrn_radiation_wavelength.wavelength`** (#374); the round-7 staged
-value is a cross-check only. Disclosed sweep (2026-08-17): 9 of 11 agree
-(7R2H 0.8265, 7ATV 0.9184, 6ZWY 0.7653, 3ZOJ 0.65, 9P25 0.7872, 7TWR
-0.7749, 6XVM 0.9793, 5R32 0.827, 9TXE 0.7749), and **two staged values
-are converter placeholders** — 6Q01 (staged 1.0, deposition **0.8211**)
-and 6F1O (staged 1.0, deposition **0.97926**); the deposition values are
-what gets written. Observation and flag bytes are untouched.
+value is a cross-check only. **Agreement is registered as
+|staged − deposition| < 1e-3** (#375). Disclosed sweep (2026-08-17): 9 of
+11 agree under that tolerance (7R2H 0.8265, 7ATV 0.9184, 6ZWY 0.7653,
+3ZOJ 0.65, 9P25 0.7872, 7TWR 0.7749, 6XVM 0.9793, 5R32 0.827, and 9TXE —
+staged 0.77488 vs deposition 0.7749, a 2e-5 rounding difference, named
+here so it cannot later be disputed into a divergence), and **two staged
+values are converter placeholders** — 6Q01 (staged 1.0, deposition
+**0.8211**) and 6F1O (staged 1.0, deposition **0.97926**); the deposition
+values are what gets written. Observation and flag bytes are untouched.
 
 Proof obligation per entry, recorded before any sidecar re-baseline:
 
