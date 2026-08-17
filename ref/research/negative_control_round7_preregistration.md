@@ -22,7 +22,11 @@ C1 table for all future verdicts:
 | d_refmac | 0.00540 | **0.00560** |
 
 Same definition as C1 (median_null + 3·MAD_null per tool; S_FLOOR and the
-E1 fit rule unchanged). **Registered disclosure obligation:** every
+E1 fit rule unchanged). **Population disclosure (#364):** the phenix and
+gemmi recomputes are true substitutions at n = 22, but 8R5K had no round-3
+REFMAC null (it was unmeasurable), so its clean null (+0.0060) is a NEW
+observation and the REFMAC population grows 19 → 20 — that growth, not a
+substitution, is what moves d_refmac. **Registered disclosure obligation:** every
 committed verdict from rounds 3–5 is recomputed under the new table and any
 verdict that would flip is DISCLOSED by entry and round in the round-7 doc.
 Committed rounds are not re-judged — the disclosure names what the old
@@ -53,11 +57,14 @@ run in this order and one change at a time:
      deposited model is still aniso-located but the defect is in how each
      tool consumes the records — attributed to the same term, finer-grained.
    - If the spread survives unchanged, aniso is refuted; proceed.
-2. **Hydrogen treatment.** REFMAC restores riding hydrogens by default
-   ("Hydrogens will be restored in their riding positions"); at 0.82 Å the
-   H contribution to F_calc is not negligible. Discriminating experiment:
-   REFMAC with `MAKE HYDR N` vs default, against phenix.model_vs_data's
-   hydrogen policy read from its own output — one keyword, one comparison.
+2. **Hydrogen treatment (demoted, #365).** Disclosed check (2026-08-17):
+   the deposited model contains 0 explicit H among its 2511 atoms, and
+   REFMAC restores riding hydrogens by default. Direction argument: adding
+   riding H at 0.82 Å should LOWER REFMAC's R relative to an H-free
+   calculation, so differential H treatment cannot CAUSE the +0.07 excess
+   — it can only partially mask a larger divergence. The experiment stays
+   registered because it is one keyword and bounds the H term: REFMAC with
+   `MAKE HYDR N` vs default; a null result is expected, not surprising.
 3. **Resolution-cutoff handling.** Cheap log audit first: the exact
    resolution ranges each tool used in round 6, from their existing logs;
    then REFMAC re-run with `RESO` forced to the phenix range if they
