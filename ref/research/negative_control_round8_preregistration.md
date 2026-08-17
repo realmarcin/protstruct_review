@@ -34,11 +34,15 @@ conventions inside one comparison would corrupt the verdict it feeds.
 
 Round 7 proved refetch cannot reproduce these 11 files (the converter
 rolls random free flags on unmeasured reflections), so the remediation is
-an **in-place dataset-metadata edit** of each store MTZ: set the dataset
-wavelength to the value recorded in the round-7 record's staged proof
-(committed, per entry: 7R2H 0.8265, 7ATV 0.9184, 6Q01 1.0, 6ZWY 0.7653,
-3ZOJ 0.65, 9P25 0.7872, 6F1O 1.0, 7TWR 0.7749, 6XVM 0.9793, 5R32 0.827,
-9TXE 0.77488). Observation and flag bytes are untouched.
+an **in-place dataset-metadata edit** of each store MTZ. **The primary
+value source is the deposition mmCIF's
+`_diffrn_radiation_wavelength.wavelength`** (#374); the round-7 staged
+value is a cross-check only. Disclosed sweep (2026-08-17): 9 of 11 agree
+(7R2H 0.8265, 7ATV 0.9184, 6ZWY 0.7653, 3ZOJ 0.65, 9P25 0.7872, 7TWR
+0.7749, 6XVM 0.9793, 5R32 0.827, 9TXE 0.7749), and **two staged values
+are converter placeholders** — 6Q01 (staged 1.0, deposition **0.8211**)
+and 6F1O (staged 1.0, deposition **0.97926**); the deposition values are
+what gets written. Observation and flag bytes are untouched.
 
 Proof obligation per entry, recorded before any sidecar re-baseline:
 
@@ -46,7 +50,8 @@ Proof obligation per entry, recorded before any sidecar re-baseline:
    and after the edit;
 2. the only change is dataset metadata (wavelength, and nothing else the
    fingerprint does not already cover);
-3. the new wavelength equals the committed round-7 staged value.
+3. the new wavelength equals the deposition mmCIF value, with the staged
+   cross-check's agreement or named divergence recorded per entry.
 
 A failed proof on any entry leaves that file untouched and is recorded as
 a named defect. **Write gating, registered from the round-7 precedent:**
@@ -91,7 +96,8 @@ mixing would corrupt verdicts and the no-mixing rule is load-bearing, not
 ceremonial.
 
 **W3** — all 11 wavelength patches pass the full proof obligation
-(fingerprints identical, wavelength equal to the committed staged value).
+(fingerprints identical, wavelength equal to the deposition value; the
+two named placeholders are the only staged divergences encountered).
 
 **W4** — the PDB form unlocks REFMAC on 9YGW (the positional join cannot
 collide without a comp label), completing the census at 22/22.
