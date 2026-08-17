@@ -117,12 +117,16 @@ def refmac_pass(model: Path, mtz: Path, work: Path, tag: str,
         labin = f"LABIN FP={pair[0]} SIGFP={pair[1]}"
         if flag is not None:
             labin += f" FREE={flag}"
+        # Round-6 G5: NEWLIGAND CONTINUE — 8R5K's unmeasurability was a
+        # ligand-library gap (Y6Z), not its columns; safe for NCYC 0
+        # measurement. REFMAC's default free convention (flag 0 = free)
+        # matches every enrolled entry (round-6 G4 step-1 census).
         subprocess.run(
             ["bash", "-c",
              f"source {CCP4_SETUP} 2>/dev/null && cd {work} && "
              f"refmac5 XYZIN {model} HKLIN {mtz} "
              f"XYZOUT ref_{tag}.pdb HKLOUT ref_{tag}.mtz > {log} 2>&1 <<'EOF'\n"
-             f"{labin}\nNCYC 0\nEND\nEOF"],
+             f"MAKE NEWLIGAND CONTINUE\n{labin}\nNCYC 0\nEND\nEOF"],
             capture_output=True, text=True, timeout=1800, env=dict(os.environ))
     if not log.exists():
         return None
@@ -270,6 +274,9 @@ def bench_entry(entry: dict, subject: str, cache: Path, work: Path,
         row["status"], row["reason"] = "data_defect", "no registered obs labels"
         return row
     row["array_selection"] = {"obs": list(pair), "free_flag": flag}
+    # Round-6 G1 (#349): input identity in EVERY row type.
+    row["input_hashes"] = {"model": _scr.sha256_file(model),
+                           "mtz": _scr.sha256_file(mtz)}
 
     r_stats: dict = {}
     if subject == "null":
@@ -351,7 +358,8 @@ def _residue_verdict(residues: dict, key: tuple) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--cache", default="/tmp/nc_round1_cache")
+    ap.add_argument("--cache",
+                    default=str(Path.home() / "protstruct_bench_inputs"))
     ap.add_argument("--work", default="/tmp/nc_round1_work")
     ap.add_argument("--subjects", default="null,sa")
     ap.add_argument("--canary", action="store_true", help="first entry only")

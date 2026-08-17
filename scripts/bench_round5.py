@@ -112,6 +112,9 @@ def run_entry(entry: dict, subject: str, cache: Path, work: Path,
     if pair is None:
         row["status"], row["reason"] = "data_defect", "no registered obs labels"
         return row
+    # Round-6 G1 (#349): input identity in EVERY row type.
+    row["input_hashes"] = {"model": _scr.sha256_file(model),
+                           "mtz": _scr.sha256_file(mtz)}
 
     perturbed = work / f"r4p_{model.stem}.pdb"
     if not perturbed.exists():
@@ -170,7 +173,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--subject", choices=("osol", "agent"), required=True)
-    ap.add_argument("--cache", default="/tmp/nc_round1_cache")
+    ap.add_argument("--cache",
+                    default=str(Path.home() / "protstruct_bench_inputs"))
     ap.add_argument("--work", default="/tmp/nc_round1_work")
     ap.add_argument("--canary", action="store_true")
     ap.add_argument("--only", default="")
