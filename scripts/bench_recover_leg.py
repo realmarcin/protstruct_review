@@ -34,10 +34,14 @@ ENROLLED_JSON = REPO / SET_RECORD
 R3_BENCH_JSON = REPO / "ref/research/data/negative_control_round3_bench.json"
 OUT_JSON = REPO / "ref/research/data/negative_control_round4_recover.json"
 
-# The registered C1 table (negative_control_round4_preregistration.md) —
-# asserted against a fresh computation from the round-3 record at startup.
-REGISTERED_FIT_THRESHOLDS = {"d_phenix": 0.01220, "d_gemmi": 0.01090,
-                             "d_refmac": 0.00540}
+# The registered C1 table — round-7 H1 (negative_control_round7_preregistration.md)
+# supersedes the round-4 table after the round-6 U3 falsification. Clean-null
+# recompute: 8R5K's round-6 null SUBSTITUTED on the phenix/gemmi paths (n=22)
+# and ADDED on the REFMAC path (8R5K had no round-3 REFMAC null; 19 -> 20).
+# The round-4 values 0.01220/0.01090/0.00540 are retired history.
+REGISTERED_FIT_THRESHOLDS = {"d_phenix": 0.01200, "d_gemmi": 0.01025,
+                             "d_refmac": 0.00560}
+R6_HYGIENE_JSON_NAME = "ref/research/data/negative_control_round6_hygiene.json"
 MAD_FLOOR = 0.0005
 SHIFT_BAND_A = 0.12          # §4 stay-band, cited via the prereg
 STOP_AT_DIFF = 0.5
@@ -61,15 +65,22 @@ _gold = _load("gold_mask")
 
 
 def fit_thresholds_from_record() -> dict:
-    """C1: median + 3·MAD per tool over the round-3 null deltas, floors
-    applied — recomputed, then verified against the registered table."""
+    """C1 as re-registered (round-7 H1): median + 3·MAD per tool over the
+    round-3 null deltas with 8R5K's clean round-6 null substituted (phenix,
+    gemmi) and added (REFMAC), floors applied — recomputed, then verified
+    against the registered table."""
     d = json.loads(R3_BENCH_JSON.read_text())
+    clean = json.loads((REPO / R6_HYGIENE_JSON_NAME).read_text())[
+        "g3_8r5k_rescreen"]["clean_null_deltas"]
     nulls = [r for r in d["rows"] if r["subject"] == "null"
              and r["status"] == "benched"]
     out = {}
     for tool in ("d_phenix", "d_gemmi", "d_refmac"):
-        vals = [r["numbers"][tool] for r in nulls
-                if r["numbers"][tool] is not None]
+        vals = []
+        for r in nulls:
+            v = clean[tool] if r["pdb_id"] == "8R5K" else r["numbers"][tool]
+            if v is not None:
+                vals.append(v)
         med = statistics.median(vals)
         mad = max(statistics.median(abs(v - med) for v in vals), MAD_FLOOR)
         out[tool] = round(med + 3 * mad, 5)

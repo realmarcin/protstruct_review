@@ -237,7 +237,9 @@ def investigate_2vxn(durable: Path, work: Path) -> dict:
         capture_output=True, text=True, timeout=3600, env=dict(os.environ))
     stext = slog.read_text(errors="ignore") if slog.exists() else ""
     import re
-    sm = re.findall(r"R_?free[^\d]*([\d.]+)", stext)
+    # `Rwork = ... Rfree = ...` is the summary line; a loose last-match
+    # regex lands on the stats table's Ncyc row and reads 0 (round-7 find).
+    sm = re.findall(r"Rfree\s*=\s*([\d.]+)", stext)
     rec["step3_servalcat_r_free"] = float(sm[-1]) if sm else None
     rec["step3_log_tail"] = stext.strip().splitlines()[-3:] if stext else []
     return rec
