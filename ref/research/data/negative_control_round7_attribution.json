@@ -389,5 +389,14 @@
       "measurable": true,
       "r_free": 0.203
     }
+  },
+  "h4_8r5k_authorized_write": {
+    "date": "2026-08-17",
+    "authorization": "the user's explicit in-conversation instruction ('write the 8R5K store file'), the named go-ahead the session's permission layer required beyond the merged H4 registration",
+    "pre_write_store_hash": "5691c67bcc4ff4a384c982b0d72b548e0f5629d8d851b3739201d68e572073a4",
+    "post_write_store_hash": "1f72255b54b6ece04779dae7303a5b8a92880061e5378548358011f369965cad",
+    "proof": "KEEP-column fingerprints identical store vs staged (7 columns), re-verified after the write; wavelength restored 0.0 -> 0.85; array selection unchanged (FOBS/SIGFOBS, R-free-flags)",
+    "sidecar": "re-baselined to the post-write hash, citing prereg H4 and this authorization",
+    "note": "the h4_remediation row for 8R5K keeps its execution-time status (proof_ok_awaiting_user_go_ahead) as history; this event is the go-ahead's discharge"
   }
 }

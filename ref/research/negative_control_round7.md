@@ -110,4 +110,9 @@ exposure), which needs its own registered ruling.
 2. The 11-entry **wavelength patch ruling** (in-place metadata edit).
 3. 9YGW: whether a REFMAC-side aniso positional-join workaround exists
    that is not a model edit (or 9YGW stays two-path permanently).
-4. The 8R5K store write, if and when the user gives the explicit go-ahead.
+4. ~~The 8R5K store write~~ — **done 2026-08-17** on the user's explicit
+   go-ahead ("write the 8R5K store file"): store hash `5691c67b…` →
+   `1f72255b…`, sidecar re-baselined, wavelength 0.0 → 0.85, KEEP
+   fingerprints re-verified identical after the write. The event is
+   recorded in the round record (`h4_8r5k_authorized_write`); the
+   execution-time proof row keeps its awaiting status as history.
