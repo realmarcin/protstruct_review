@@ -158,4 +158,44 @@ with tempfile.TemporaryDirectory() as _tmp:
           round(_g.read_mtz_file(str(durable / "zzzz.mtz"))
                 .datasets[-1].wavelength, 2), 0.98)
 
+# --- #369: the flag-diff diagnosis's NaN and asymmetry behavior ---------------------
+
+
+def _make_flag_mtz(path: Path, flags):
+    import gemmi
+    import numpy as np
+    m = gemmi.Mtz(with_base=True)
+    m.spacegroup = gemmi.find_spacegroup_by_name("P 1")
+    m.set_cell_for_all(gemmi.UnitCell(10, 10, 10, 90, 90, 90))
+    m.add_dataset("d")
+    for lab, typ in (("FOBS", "F"), ("SIGFOBS", "Q"), ("R-free-flags", "I")):
+        m.add_column(lab, typ)
+    # rows: h, k, l, FOBS, SIGFOBS, flag — FOBS is NaN on rows 3 and 4
+    rows = []
+    for h in range(1, 6):
+        fobs = float("nan") if h >= 3 else 10.0 + h
+        rows.append([h, 0, 0, fobs, 1.0, flags[h - 1]])
+    import numpy as np
+    m.set_data(np.array(rows, dtype=np.float32))
+    m.write_to_file(str(path))
+
+
+with tempfile.TemporaryDirectory() as _tmp:
+    nan = float("nan")
+    a = Path(_tmp) / "a.mtz"
+    b = Path(_tmp) / "b.mtz"
+    # rows 1,2 measured and identical; row 3 unmeasured and differing;
+    # rows 4,5: flag NaN in BOTH files (4) and flag differing on a measured
+    # row is impossible here (5 identical) — so n_differing must be exactly 1
+    _make_flag_mtz(a, [0.0, 1.0, 1.0, nan, 1.0])
+    _make_flag_mtz(b, [0.0, 1.0, 0.0, nan, 1.0])
+    diag = b7._diagnose_flag_diff(a, b, ["R-free-flags"])
+    check("#369: both-NaN positions are identical, not differing",
+          diag["R-free-flags"]["n_differing"], 1)
+    check("#369:   and the one real diff sits on the unmeasured row",
+          diag["R-free-flags"]["n_differing_on_unmeasured"], 1)
+    diag2 = b7._diagnose_flag_diff(a, b, ["R-free-flags-9"])
+    check("#369: a column absent from both joins is named, not a crash",
+          "asymmetry" in diag2["R-free-flags-9"], True)
+
 print(f"\n{PASSED} checks passed")

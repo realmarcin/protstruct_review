@@ -320,8 +320,16 @@ def _diagnose_flag_diff(store_mtz: Path, staged_mtz: Path,
     obs_nan = np.all(np.isnan(ds[:, obs_idx]), axis=1) if obs_idx else \
         np.zeros(ds.shape[0], dtype=bool)
     for col in cols:
+        # #369: a column present in only one file is named, not a crash.
+        if col not in labels_s or col not in labels_t:
+            out[col] = {"asymmetry": "only_in_store" if col in labels_s
+                        else "only_in_staged"}
+            continue
         i_s, i_t = labels_s.index(col), labels_t.index(col)
-        diff = ds[:, i_s] != dt[:, i_t]
+        # #369: NaN != NaN is True — a position absent in BOTH files is
+        # identical, not differing.
+        both_nan = np.isnan(ds[:, i_s]) & np.isnan(dt[:, i_t])
+        diff = (ds[:, i_s] != dt[:, i_t]) & ~both_nan
         out[col] = {
             "n_differing": int(diff.sum()),
             "n_differing_on_unmeasured": int((diff & obs_nan).sum()),
