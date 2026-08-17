@@ -3,11 +3,48 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-06** (round 42; the "Open" section below was reconciled against rounds 37–42 and the Codex review). Rounds 17–18 merged as
-[#69](https://github.com/realmarcin/protstruct_review/pull/69); rounds 19 and 20 followed in
-[#82](https://github.com/realmarcin/protstruct_review/pull/82) and its successor. **Check the issue
-tracker for open issues; this file does not mirror it in real time.** There is no CI in this
-repo — `bash scripts/validate.sh` is the gate, and it must exit 0 before a merge.
+**Last reconciled: 2026-08-17** (through the negative-control track, rounds NC-0…NC-5, PRs
+#294–#352; the tolerance-series "Open" section below was last reconciled 2026-08-06 against
+rounds 37–42). **Check the issue tracker for open issues; this file does not mirror it in real
+time.** There is no CI in this repo — `bash scripts/validate.sh` is the gate, and it must exit 0
+before a merge.
+
+## The negative-control track (2026-08-08 → 2026-08-17) — NEW since the last reconciliation
+
+A second benchmark series, planned from a deep-research run and executed in five preregistered
+rounds: gold-standard sub-Å structures as **negative tests** for refinement. Full plan:
+`ref/research/negative_control_benchmark_plan.md`; tracking issue
+[#295](https://github.com/realmarcin/protstruct_review/issues/295); round docs
+`ref/research/negative_control_round<N>.md`; records under `ref/research/data/`.
+
+| Milestone | PR | Outcome |
+|---|---|---|
+| Plan (from deep research) | [#294](https://github.com/realmarcin/protstruct_review/pull/294) (2026-08-08) | curation, prior art, confound handling, metric families registered as a phased plan |
+| Phase 0 feasibility + phase 1 masks | #299, #305 | every window viable (≤1.0 Å strict: 254 entries/116 clusters); residue-level masks with post-mask outlier protection |
+| gemmi R path promoted + hardened | #300, #326 | non-cctbx R oracle in `scripts/`; work-only scale fit (free-set leakage removed, offset ≤1e-5) |
+| Codex external review remediation | #313, #326, #328, #330, #332 | all 10 findings resolved: trust invariant ENFORCED with waivers (validate 3c), record-reconciliation guard (3b), unified array selection, null-centered statistics, provenance + hash-verified caches |
+| Rounds NC-1/NC-2: enrollment | #307/#310, #313/#334 | NC-1 stopped at its registered finding (the preregistration working); NC-2 enrolled **22 gold standards** |
+| Round NC-3: the bench | #336/#339 | Q1: **0/22 false verdicts on nulls**; SA's sub-Å signature measured (fit destruction, geometry preserved) |
+| Round NC-4: perturb-recover | #340/#343 | the anti-gaming arch closes: do-nothing fails NC-4 (22/22 flagged), damage fails NC-3; plain recovery = coordinates yes, fit no (3/22) |
+| Round NC-5: **first agent subjects** | #346/#352 (2026-08-17) | ladder measured: protocol 3/22 → solvent 11/22 → **blinded agents 21/21 certified, 14 better than the depositions**; 22/22 transcripts audit-compliant; an agent subject discovered a benchmark flaw (MLHL, #350) |
+
+**Open queue for round NC-6 (all with designs on their issues):**
+
+- [ ] **[#350](https://github.com/realmarcin/protstruct_review/issues/350)** — strip phase-bearing
+      columns from converted MTZs at fetch time; re-screen 8R5K clean under a registered change
+      (its protocol legs ran MLHL-contaminated; the agent's run is the only clean one).
+- [ ] **[#349](https://github.com/realmarcin/protstruct_review/issues/349)** — input hashes in
+      every per-entry row type (bench/recover/agent rows lack them; the 6XVM /tmp-deletion had no
+      committed arbiter, and its agent judgment is withheld under provenance ruling C).
+- [ ] **[#338](https://github.com/realmarcin/protstruct_review/issues/338)** — extend the
+      record-reconciliation guard to bench and recover records (currently screen records only).
+- [ ] **[#321](https://github.com/realmarcin/protstruct_review/issues/321)** — mask-constrained D6
+      criterion (registered-change candidate; first calibration datum on record: 2DDX at 0.229
+      mask fraction).
+- [ ] **2VXN REFMAC anomaly** — three-for-three across rounds (two-path vs REFMAC sign conflict);
+      needs its own registered investigation (data pathology vs REFMAC handling). No issue yet.
+- [ ] **Agent-leg infrastructure** — per-entry sandboxes (two mutual `pkill` incidents, both
+      disclosed), durable input storage (the /tmp reaper deleted three inputs mid-leg). No issue yet.
 
 ## Where the tolerance work stands
 
@@ -182,18 +219,19 @@ was "state as of round 27" — a menu of three candidates — has resolved into 
   at −6 pp, re-justified as ~98 % coverage), resolving the "most expensive partial record." **#225/#269
   closed.**
 
-**What is open now** is the Codex conceptual-review action plan
-([`ref/research/codex_review_action_plan.md`](ref/research/codex_review_action_plan.md)): **P1** — the
-registry→consumer drift gate — shipped (#271); **P2** is this reconciliation; **P3** is a preregistered
-**cross-version reproducibility round** (pinned `phenix-2.0-5936` vs a newer build), a **triage of the
-remaining `⚠ partial record` rows** (done — every resolvable one resolved), and **shoring up the small-n
-load-bearing fits**: round 42's n = 44 lognormal is now **guarded not assumed** — a Filliben PPCC
-normality test recomputed every run (`analyze_xray_band_coverage.py`) and gated by
-`test_xray_band_coverage.py`, so the lognormal assumption cannot silently rot as entries accrue (P3c);
-round 40's n = 19 determinacy correlation is a rank correlation, not a distributional fit, and is already
-mitigated by that round's leave-one-out and partial-correlation robustness checks, so it needs no GoF
-guard (growing it toward the ~300 a nonparametric bound wants remains the only further lever). **P4** is
-explicit stopping/consolidation criteria for the round cadence and its gate machinery.
+**What is open in the tolerance series** (reconciled 2026-08-17) is the tail of the Codex
+conceptual-review action plan
+([`ref/research/codex_review_action_plan.md`](ref/research/codex_review_action_plan.md)): **P1**
+shipped (#271); **P2** done (#272); **P3a** registered but execution-blocked on a second PHENIX
+build (#273); **P3b** done through round 48 (every resolvable partial record resolved); **P3c**
+done (#291 — the round-42 lognormal is guarded, not assumed). **Open: P4** —
+[#292](https://github.com/realmarcin/protstruct_review/issues/292) (explicit
+stopping/consolidation criteria for the round cadence) and
+[#293](https://github.com/realmarcin/protstruct_review/issues/293) (consolidate the literal-based
+gates behind fewer machine-readable representations). A **second, code-level Codex review
+(2026-08-12) was fully remediated** in the negative-control track above (PRs #313–#332), including
+two invariants the whole repo now enforces: the trust model as a gate (validate 3c) and
+negative-control record reconciliation (3b).
 
 The one **unbounded** option that persists from the old menu: **another `scripts/` audit pass with a
 new lens** — it has found defects every time (12, then 2, then 5), the lens must differ each pass, and
