@@ -76,8 +76,8 @@ round-2/3 records and corrected before commit.
   hashes.
 - The `round_figures` findings snapshot went stale mid-round (the track
   filed ~35 issues since its last refresh) and tripped its own gate;
-  refreshed. A staleness this large is the round-26 known mechanic at
-  unusual scale.
+  refreshed. A staleness this large is the snapshot-drift mechanic the
+  tolerance track recorded in its round 26, at unusual scale.
 
 ## Round-7 inheritance
 

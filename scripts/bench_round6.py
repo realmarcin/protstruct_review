@@ -231,7 +231,7 @@ def investigate_2vxn(durable: Path, work: Path) -> dict:
     subprocess.run(
         ["bash", "-c",
          f"source {CCP4_SETUP} 2>/dev/null && cd {work} && "
-         f"servalcat refine_xtal_norefmac --model {cif} --hklin {mtz} "
+         f"servalcat refine_xtal_norefmac -s xray --model {cif} --hklin {mtz} "
          f"--labin '{pair[0]},{pair[1]},{flag}' --ncycle 0 "
          f"-o serval_2vxn > {slog} 2>&1"],
         capture_output=True, text=True, timeout=3600, env=dict(os.environ))

@@ -225,7 +225,8 @@ import tempfile as _tf
 _m = _gemmi.Mtz(with_base=True)
 _m.spacegroup = _gemmi.find_spacegroup_by_name("P 1")
 _m.set_cell_for_all(_gemmi.UnitCell(10, 10, 10, 90, 90, 90))
-_m.add_dataset("d")
+_ds = _m.add_dataset("d")
+_ds.wavelength = 0.9795
 for lab, typ in (("R-free-flags", "I"), ("FOBS", "F"), ("SIGFOBS", "Q"),
                  ("FC", "F"), ("PHIFC", "P"), ("HLA", "A"), ("FWT", "F")):
     _m.add_column(lab, typ)
@@ -245,6 +246,8 @@ with _tf.TemporaryDirectory() as _tmp:
     _a = _np.array(_back, copy=False)
     check("G2: observation values preserved",
           bool(_np.array_equal(_a[:, 4], _rows[:, 4])), True)
+    check("G2: dataset wavelength survives the strip (#361)",
+          round(_back.datasets[-1].wavelength, 4), 0.9795)
     check("G2: clean file untouched", scr.strip_mtz(_pth), [])
 
 # --- mad ---------------------------------------------------------------------------

@@ -127,7 +127,14 @@ def strip_mtz(path: Path) -> list[str]:
     out = gemmi.Mtz(with_base=False)
     out.spacegroup = m.spacegroup
     out.set_cell_for_all(m.cell)
-    out.add_dataset("stripped")
+    # #361: the rebuilt file keeps the source dataset's identity — wavelength
+    # feeds f'/f'' downstream; dropping it to 0.0 is a silent data defect.
+    src = m.datasets[-1] if m.datasets else None
+    ds = out.add_dataset(src.dataset_name if src else "stripped")
+    if src is not None:
+        ds.project_name = src.project_name
+        ds.crystal_name = src.crystal_name
+        ds.wavelength = src.wavelength
     for i in keep_idx:
         out.add_column(m.columns[i].label, m.columns[i].type)
     data = np.array(m, copy=False)
