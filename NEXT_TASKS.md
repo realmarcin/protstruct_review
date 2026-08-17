@@ -41,10 +41,12 @@ rounds: gold-standard sub-Å structures as **negative tests** for refinement. Fu
 - [ ] **[#321](https://github.com/realmarcin/protstruct_review/issues/321)** — mask-constrained D6
       criterion (registered-change candidate; first calibration datum on record: 2DDX at 0.229
       mask fraction).
-- [ ] **2VXN REFMAC anomaly** — three-for-three across rounds (two-path vs REFMAC sign conflict);
-      needs its own registered investigation (data pathology vs REFMAC handling). No issue yet.
-- [ ] **Agent-leg infrastructure** — per-entry sandboxes (two mutual `pkill` incidents, both
-      disclosed), durable input storage (the /tmp reaper deleted three inputs mid-leg). No issue yet.
+- [ ] **[#355](https://github.com/realmarcin/protstruct_review/issues/355)** — 2VXN REFMAC
+      anomaly: three-for-three across rounds (two-path vs REFMAC sign conflict); registered
+      investigation needed (data pathology vs REFMAC handling).
+- [ ] **[#356](https://github.com/realmarcin/protstruct_review/issues/356)** — agent-leg
+      infrastructure: per-entry sandboxes (two mutual `pkill` incidents, both disclosed) and
+      durable input storage (the /tmp reaper deleted three inputs mid-leg); pairs with #349.
 
 ## Where the tolerance work stands
 
