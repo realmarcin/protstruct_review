@@ -127,16 +127,22 @@ def run_entry(entry: dict, subject: str, cache: Path, work: Path,
             row["reason"] = r_stats.get("failure_reason", "recovery failed")
             return row
     else:                                     # agent
-        recovered = AGENT_DIR / pdb_id / "final.pdb"
-        if not recovered.exists():
+        artifact = AGENT_DIR / pdb_id / "final.pdb"
+        if not artifact.exists():
             row["status"] = "artifact_missing"
-            row["reason"] = f"no committed agent artifact at {recovered}"
+            row["reason"] = f"no committed agent artifact at {artifact}"
             return row
         transcript = AGENT_DIR / pdb_id / "transcript.md"
         row["artifact_hashes"] = {
-            "final": _scr.sha256_file(recovered),
+            "final": _scr.sha256_file(artifact),
             "transcript": _scr.sha256_file(transcript)
             if transcript.exists() else None}
+        # Stage under a unique stem: every artifact is named final.pdb, so
+        # judging in place collides every post-measurement cache across
+        # entries (the #314 class, resurrected — W4 caught it as 18
+        # certifications contradicting their own evidence).
+        recovered = work / f"r5a_{pdb_id.lower()}.pdb"
+        recovered.write_bytes(artifact.read_bytes())
 
     pre_m = _bnc.measure_model(model, mtz, work, "pre", pair, flag,
                                deposited_for_refmac=(cache / f"{pdb_id.lower()}.cif")
