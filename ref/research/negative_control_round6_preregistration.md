@@ -27,10 +27,28 @@ quoted below were run 2026-08-17.
 
 ## G2 — fetch-time stripping of phase-bearing derived columns (#350)
 
-After `phenix.fetch_pdb` conversion, MTZs are stripped of
-`FC, PHIFC, HLA–HLD, FWT/PHWT, DELFWT/PHDELWT, FOM` and map-coefficient
-variants (`2FOFCWT/…`). Observations (amplitude and intensity pairs,
-anomalous pairs) and all free-flag columns are KEPT byte-identically.
+After `phenix.fetch_pdb` conversion, MTZs pass a **three-class column rule**
+(review r1: a bare drop list would silently pass an unrecognized derived
+label on a future entry):
+
+- **KEEP** (enumerated experimental families, byte-identical): H K L; the
+  amplitude/intensity observation pairs and their `-1`-suffixed second
+  datasets; anomalous families `DANO/SIGDANO`, `F(+)/SIGF(+)/F(−)/SIGF(−)`,
+  `I(+)/SIGI(+)/I(−)/SIGI(−)`; all free-flag columns including numbered
+  variants.
+- **DROP** (enumerated model-derived): `FC, PHIFC, HLA–HLD, FWT/PHWT,
+  DELFWT/PHDELWT, FOM`, map-coefficient variants (`2FOFCWT/…`), and
+  `F-model/PHIF-model`.
+- **UNKNOWN → named fetch-time error**: any label matching neither class
+  refuses loudly; it is classified by a registered change, never passed
+  through.
+
+**Disclosed census (all 22 cached inputs, 2026-08-17):** anomalous families
+on 8 entries (4M7G, 8ERE, 9YGW, 7TVL, 9TEU, 6F1O, 6XVM, 7OYN); second
+observation datasets + extra flag sets on 6ZWY and 5R32
+(`FOBS-1/SIGFOBS-1`, `R-free-flags-2/-3`); model-derived columns on 8R5K
+only. The KEEP/DROP enumerations cover every label in the population; the
+UNKNOWN branch exists for entries not yet seen.
 
 **Disclosed canary (8R5K, the one entry with HL columns):** stripping
 removed exactly the 11 derived columns, `FOBS` verified byte-identical, and
