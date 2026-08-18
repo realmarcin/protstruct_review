@@ -22,7 +22,7 @@ conventions:
   of the REFMAC null distribution, as registered.
 
 The set-wide reading: the third-opinion tool has been grading every gold
-standard with its anisotropy discarded — a ~0.02–0.06 systematic level
+standard with its anisotropy discarded — a ~0.01–0.06 systematic level
 error that never corrupted a verdict only because both sides of every
 committed delta shared the convention.
 
