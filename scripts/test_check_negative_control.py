@@ -249,4 +249,26 @@ with tempfile.TemporaryDirectory() as tmp:
     check("#338: bench round doc without the Q1 headline fails", code, 1)
     check("#338:   and cites the #311 class", "#311" in out, True)
 
+# #382: the FLAT (round-4-style) summary branch, tested synthetically.
+FLAT_RECOVER = {"run": {"run_mode": "full"},
+                "rows": [dict(recover_row("1AAA"), subject=None),
+                         dict(recover_row("2BBB", success=False),
+                              subject=None)],
+                "summary": {"attempted": 2, "completed": 2,
+                            "v2_recovery_success": 1}}
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    make_br_tree(root, recover=FLAT_RECOVER)
+    code, out = run_guard(root)
+    check("#382: clean flat-summary recover record passes", code, 0)
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    bad = json.loads(json.dumps(FLAT_RECOVER))
+    bad["summary"]["v2_recovery_success"] = 2
+    make_br_tree(root, recover=bad)
+    code, out = run_guard(root)
+    check("#382: flat-summary v2 miscount fails", code, 1)
+
 print(f"\n{PASSED} checks passed")
