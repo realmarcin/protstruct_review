@@ -83,8 +83,12 @@ median |delta_anis| < 0.01 and `d_refmac_anis` lands in [0.002, 0.012]
 widen the null noise).
 
 **X3** — REFMAC direction-agreement with the two paths does not degrade
-under ANIS: the count of null entries whose REFMAC delta sign matches the
-two-path sign is ≥ the ISOT count on the same regenerated models.
+under ANIS. Population (#380): the null entries whose two path deltas
+share a sign (an entry where d_phenix and d_gemmi disagree in sign has no
+"two-path sign" and is excluded, with the excluded count reported). On
+that population, the count of entries whose REFMAC delta sign matches the
+shared two-path sign under ANIS is ≥ the count under ISOT, both measured
+on the same regenerated models.
 
 ## Outputs and scope
 
