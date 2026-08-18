@@ -1,0 +1,271 @@
+{
+  "run": {
+    "preregistration": "negative_control_round8_preregistration.md",
+    "round": 8,
+    "durable_store": "/Users/marcin/protstruct_bench_inputs",
+    "tools": {
+      "phenix_bin": "/Users/marcin/phenix-2.0-5936/phenix_bin",
+      "gemmi_cli": "/opt/homebrew/bin/gemmi",
+      "gemmi_cli_version": "gemmi 0.7.5",
+      "gemmi_python": "0.7.5",
+      "python": "3.13.12"
+    }
+  },
+  "i3_9ygw_pdb_form": {
+    "input_form": "deposited PDB (ANISOU carries no comp join)",
+    "input_hashes": {
+      "model": "e56874e596758d862c2e2f6137921e4c4d18c1093fe81a6c3fe9e7a385f16c71",
+      "mtz": "f097f00b834f2c8ed2383438df3fcfce59cda0b341cc91b2bbf806ac441a9705"
+    },
+    "refmac_isot_r_free": null,
+    "measurable": false,
+    "diagnostic_lines": [
+      "ERROR: in chain A residue: 106",
+      "There is an error in the input coordinate file",
+      "Check above to see error",
+      "===> Error: Problem with coordinate file",
+      "Refmac:  Problem with coordinate file",
+      "Refmac:  Problem with coordinate file"
+    ],
+    "outcome": "STOOD DOWN to permanent two-path status by the round-8 registration \u2014 no further repair attempts without a new registered mechanism"
+  },
+  "i1_census": {
+    "4M7G": {
+      "r_free_isot": 0.1738,
+      "r_free_anis": 0.1193,
+      "delta_anis_minus_isot": -0.0545
+    },
+    "7R2H": {
+      "r_free_isot": 0.1676,
+      "r_free_anis": 0.1576,
+      "delta_anis_minus_isot": -0.01
+    },
+    "2VXN": {
+      "r_free_isot": 0.1712,
+      "r_free_anis": 0.1371,
+      "delta_anis_minus_isot": -0.0341
+    },
+    "7ATV": {
+      "r_free_isot": 0.175,
+      "r_free_anis": 0.1431,
+      "delta_anis_minus_isot": -0.0319
+    },
+    "6Q01": {
+      "r_free_isot": 0.1642,
+      "r_free_anis": 0.1162,
+      "delta_anis_minus_isot": -0.048
+    },
+    "6ZWY": {
+      "r_free_isot": 0.1665,
+      "r_free_anis": 0.1462,
+      "delta_anis_minus_isot": -0.0203
+    },
+    "5XS6": {
+      "r_free_isot": 0.1711,
+      "r_free_anis": 0.1609,
+      "delta_anis_minus_isot": -0.0102
+    },
+    "8ERE": {
+      "r_free_isot": 0.1602,
+      "r_free_anis": 0.1293,
+      "delta_anis_minus_isot": -0.0309
+    },
+    "3ZOJ": {
+      "r_free_isot": 0.1608,
+      "r_free_anis": 0.1043,
+      "delta_anis_minus_isot": -0.0565
+    },
+    "9YGW": {
+      "census": "excluded (I3 did not unlock)"
+    },
+    "9P25": {
+      "r_free_isot": 0.1673,
+      "r_free_anis": 0.1455,
+      "delta_anis_minus_isot": -0.0218
+    },
+    "8R5K": {
+      "r_free_isot": 0.1837,
+      "r_free_anis": 0.1508,
+      "delta_anis_minus_isot": -0.0329
+    },
+    "7TVL": {
+      "r_free_isot": 0.1469,
+      "r_free_anis": 0.1235,
+      "delta_anis_minus_isot": -0.0234
+    },
+    "8QXQ": {
+      "r_free_isot": 0.1955,
+      "r_free_anis": 0.1599,
+      "delta_anis_minus_isot": -0.0356
+    },
+    "6F1O": {
+      "r_free_isot": 0.1846,
+      "r_free_anis": 0.1468,
+      "delta_anis_minus_isot": -0.0378
+    },
+    "7TWR": {
+      "r_free_isot": 0.164,
+      "r_free_anis": 0.1204,
+      "delta_anis_minus_isot": -0.0436
+    },
+    "6XVM": {
+      "r_free_isot": 0.1523,
+      "r_free_anis": 0.1119,
+      "delta_anis_minus_isot": -0.0404
+    },
+    "9TEU": {
+      "r_free_isot": 0.1829,
+      "r_free_anis": 0.1623,
+      "delta_anis_minus_isot": -0.0206
+    },
+    "5R32": {
+      "r_free_isot": 0.1814,
+      "r_free_anis": 0.1509,
+      "delta_anis_minus_isot": -0.0305
+    },
+    "5KXV": {
+      "r_free_isot": 0.1663,
+      "r_free_anis": 0.1154,
+      "delta_anis_minus_isot": -0.0509
+    },
+    "7OYN": {
+      "r_free_isot": 0.1704,
+      "r_free_anis": 0.1374,
+      "delta_anis_minus_isot": -0.033
+    },
+    "9TXE": {
+      "r_free_isot": 0.203,
+      "r_free_anis": 0.1745,
+      "delta_anis_minus_isot": -0.0285
+    }
+  },
+  "i1_summary": {
+    "n_census": 21,
+    "n_anis_lower": 21,
+    "median_delta": -0.0329,
+    "n_abs_delta_over_d_refmac": 21
+  },
+  "i2_patch_proofs": [
+    {
+      "pdb_id": "3ZOJ",
+      "deposition_wavelength": 0.65,
+      "staged_crosscheck": {
+        "staged": 0.65,
+        "agrees": true
+      },
+      "fingerprints_identical": true,
+      "patched_wavelength": 0.65,
+      "status": "proof_ok_awaiting_user_go_ahead"
+    },
+    {
+      "pdb_id": "5R32",
+      "deposition_wavelength": 0.827,
+      "staged_crosscheck": {
+        "staged": 0.827,
+        "agrees": true
+      },
+      "fingerprints_identical": true,
+      "patched_wavelength": 0.827,
+      "status": "proof_ok_awaiting_user_go_ahead"
+    },
+    {
+      "pdb_id": "6F1O",
+      "deposition_wavelength": 0.97926,
+      "staged_crosscheck": {
+        "staged": 1.0,
+        "agrees": false
+      },
+      "fingerprints_identical": true,
+      "patched_wavelength": 0.97926,
+      "status": "proof_ok_awaiting_user_go_ahead"
+    },
+    {
+      "pdb_id": "6Q01",
+      "deposition_wavelength": 0.8211,
+      "staged_crosscheck": {
+        "staged": 1.0,
+        "agrees": false
+      },
+      "fingerprints_identical": true,
+      "patched_wavelength": 0.8211,
+      "status": "proof_ok_awaiting_user_go_ahead"
+    },
+    {
+      "pdb_id": "6XVM",
+      "deposition_wavelength": 0.9793,
+      "staged_crosscheck": {
+        "staged": 0.9793,
+        "agrees": true
+      },
+      "fingerprints_identical": true,
+      "patched_wavelength": 0.9793,
+      "status": "proof_ok_awaiting_user_go_ahead"
+    },
+    {
+      "pdb_id": "6ZWY",
+      "deposition_wavelength": 0.7653,
+      "staged_crosscheck": {
+        "staged": 0.7653,
+        "agrees": true
+      },
+      "fingerprints_identical": true,
+      "patched_wavelength": 0.7653,
+      "status": "proof_ok_awaiting_user_go_ahead"
+    },
+    {
+      "pdb_id": "7ATV",
+      "deposition_wavelength": 0.9184,
+      "staged_crosscheck": {
+        "staged": 0.9184,
+        "agrees": true
+      },
+      "fingerprints_identical": true,
+      "patched_wavelength": 0.9184,
+      "status": "proof_ok_awaiting_user_go_ahead"
+    },
+    {
+      "pdb_id": "7R2H",
+      "deposition_wavelength": 0.8265,
+      "staged_crosscheck": {
+        "staged": 0.8265,
+        "agrees": true
+      },
+      "fingerprints_identical": true,
+      "patched_wavelength": 0.8265,
+      "status": "proof_ok_awaiting_user_go_ahead"
+    },
+    {
+      "pdb_id": "7TWR",
+      "deposition_wavelength": 0.7749,
+      "staged_crosscheck": {
+        "staged": 0.7749,
+        "agrees": true
+      },
+      "fingerprints_identical": true,
+      "patched_wavelength": 0.7749,
+      "status": "proof_ok_awaiting_user_go_ahead"
+    },
+    {
+      "pdb_id": "9P25",
+      "deposition_wavelength": 0.7872,
+      "staged_crosscheck": {
+        "staged": 0.7872,
+        "agrees": true
+      },
+      "fingerprints_identical": true,
+      "patched_wavelength": 0.7872,
+      "status": "proof_ok_awaiting_user_go_ahead"
+    },
+    {
+      "pdb_id": "9TXE",
+      "deposition_wavelength": 0.7749,
+      "staged_crosscheck": {
+        "staged": 0.77488,
+        "agrees": true
+      },
+      "fingerprints_identical": true,
+      "patched_wavelength": 0.7749,
+      "status": "proof_ok_awaiting_user_go_ahead"
+    }
+  ]
+}
