@@ -134,4 +134,141 @@ with tempfile.TemporaryDirectory() as tmp:
           "malformed" in out, True)
     check("no traceback leaks", "Traceback" in out, False)
 
+# --- #338: bench and recover records join the gate ----------------------------------
+
+FLAGS_CLEAN = {"F-data": False, "F-geom": False, "F-protected": False,
+               "F-shift": False}
+FLAGS_TWO = {"F-data": True, "F-geom": True, "F-protected": False,
+             "F-shift": False}
+
+
+def bench_row(pdb_id, subject="null", flags=None, verdict="not-degraded"):
+    return {"pdb_id": pdb_id, "subject": subject, "status": "benched",
+            "flags": dict(flags or FLAGS_CLEAN),
+            "numbers": {"d_phenix": 0.001, "d_gemmi": 0.001,
+                        "d_refmac": None, "n_protected_fixed": 0},
+            "conflicts": [], "verdict": verdict}
+
+
+def recover_row(pdb_id, subject="osol", verdict="not-degraded",
+                fit=False, flags=None, success=True, refmac=0.001):
+    return {"pdb_id": pdb_id, "subject": subject, "status": "completed",
+            "recovery_success": success, "w4_contradiction": False,
+            "recovered": {"status": "judged", "flags": dict(flags or FLAGS_CLEAN),
+                          "fit_degraded": fit, "verdict": verdict,
+                          "two_path_only": refmac is None,
+                          "numbers": {"d_phenix": 0.001, "d_gemmi": 0.001,
+                                      "d_refmac": refmac}}}
+
+
+def make_br_tree(root, bench=None, recover=None, doc=None):
+    data = root / "ref" / "research" / "data"
+    data.mkdir(parents=True, exist_ok=True)
+    if bench is not None:
+        (data / "negative_control_round9_bench.json").write_text(
+            json.dumps(bench))
+    if recover is not None:
+        (data / "negative_control_round9_recover.json").write_text(
+            json.dumps(recover))
+    if doc is not None:
+        (root / "ref" / "research" / "negative_control_round9.md").write_text(doc)
+
+
+CLEAN_BENCH = {"run": {"run_mode": "full"},
+               "rows": [bench_row("1AAA"),
+                        bench_row("2BBB", "sa", FLAGS_TWO, "DEGRADED")],
+               "summary": {"null": {"attempted": 1, "benched": 1,
+                                    "degraded": 0, "conflicts": 0,
+                                    "protected_fixes": 0},
+                           "sa": {"attempted": 1, "benched": 1, "degraded": 1,
+                                  "conflicts": 0, "protected_fixes": 0}}}
+CLEAN_RECOVER = {"run": {"run_mode": "full"},
+                 "rows": [recover_row("1AAA"),
+                          recover_row("2BBB", verdict="FIT-DEGRADED",
+                                      fit=True, success=False)],
+                 "summary": {"osol": {"attempted": 2, "completed": 2,
+                                      "successes": 1, "two_path_only": 0,
+                                      "w4_contradictions": 0,
+                                      "excluded_by_ruling": 0}}}
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    make_br_tree(root, bench=CLEAN_BENCH, recover=CLEAN_RECOVER,
+                 doc="Q1: 0/1 false verdicts on nulls.")
+    code, out = run_guard(root)
+    check("#338: clean bench+recover tree passes", code, 0)
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    bad = {**CLEAN_BENCH,
+           "rows": [bench_row("1AAA", flags=FLAGS_TWO)] + CLEAN_BENCH["rows"][1:]}
+    make_br_tree(root, bench=bad, doc="Q1: 0/1 false verdicts on nulls.")
+    code, out = run_guard(root)
+    check("#338: bench verdict contradicting its flags fails", code, 1)
+    check("#338:   and names the registered rule", "registered rule" in out, True)
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    bad = json.loads(json.dumps(CLEAN_BENCH))
+    bad["summary"]["null"]["degraded"] = 3
+    make_br_tree(root, bench=bad, doc="Q1: 0/1 false verdicts on nulls.")
+    code, out = run_guard(root)
+    check("#338: bench summary miscount fails", code, 1)
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    bad = json.loads(json.dumps(CLEAN_RECOVER))
+    bad["rows"][1]["recovered"]["verdict"] = "not-degraded"   # fit says otherwise
+    bad["summary"]["osol"]["successes"] = 1
+    make_br_tree(root, recover=bad)
+    code, out = run_guard(root)
+    check("#338: recover verdict contradicting precedence fails", code, 1)
+    check("#338:   and names the precedence", "precedence" in out, True)
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    bad = json.loads(json.dumps(CLEAN_RECOVER))
+    bad["rows"][0]["recovered"]["two_path_only"] = True   # d_refmac present
+    make_br_tree(root, recover=bad)
+    code, out = run_guard(root)
+    check("#338: two_path_only contradicting d_refmac fails", code, 1)
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    bad = json.loads(json.dumps(CLEAN_RECOVER))
+    bad["summary"]["osol"]["w4_contradictions"] = 2
+    make_br_tree(root, recover=bad)
+    code, out = run_guard(root)
+    check("#338: recover per-subject summary miscount fails", code, 1)
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    make_br_tree(root, bench=CLEAN_BENCH,
+                 doc="A round doc that never states the Q1 figure.")
+    code, out = run_guard(root)
+    check("#338: bench round doc without the Q1 headline fails", code, 1)
+    check("#338:   and cites the #311 class", "#311" in out, True)
+
+# #382: the FLAT (round-4-style) summary branch, tested synthetically.
+FLAT_RECOVER = {"run": {"run_mode": "full"},
+                "rows": [dict(recover_row("1AAA"), subject=None),
+                         dict(recover_row("2BBB", success=False),
+                              subject=None)],
+                "summary": {"attempted": 2, "completed": 2,
+                            "v2_recovery_success": 1}}
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    make_br_tree(root, recover=FLAT_RECOVER)
+    code, out = run_guard(root)
+    check("#382: clean flat-summary recover record passes", code, 0)
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    bad = json.loads(json.dumps(FLAT_RECOVER))
+    bad["summary"]["v2_recovery_success"] = 2
+    make_br_tree(root, recover=bad)
+    code, out = run_guard(root)
+    check("#382: flat-summary v2 miscount fails", code, 1)
+
 print(f"\n{PASSED} checks passed")
