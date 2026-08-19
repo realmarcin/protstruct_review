@@ -267,5 +267,188 @@
       "patched_wavelength": 0.7749,
       "status": "proof_ok_awaiting_user_go_ahead"
     }
-  ]
+  ],
+  "i2_authorized_writes": {
+    "date": "2026-08-18",
+    "authorization": "the user's explicit in-conversation instruction naming the patch ('work on 1. The 11 wavelength writes ... patch the 11 wavelengths')",
+    "note": "the i2_patch_proofs rows keep their execution-time proof_ok_awaiting_user_go_ahead status as history; these events are the go-ahead's discharge, canary (7R2H) first, each verified after the write",
+    "events": [
+      {
+        "pdb_id": "3ZOJ",
+        "deposition_wavelength": 0.65,
+        "staged_crosscheck": {
+          "staged": 0.65,
+          "agrees": true
+        },
+        "fingerprints_identical": true,
+        "patched_wavelength": 0.65,
+        "rebaseline_ruling": "negative_control_round8_preregistration.md I2 + the user's explicit in-conversation go-ahead; proof: KEEP fingerprints identical, deposition wavelength",
+        "input_hashes": {
+          "mtz": "f44408607b7e41a8b3c5942ef114b362097e4d808b0945bcaa115b452cfd4e88"
+        },
+        "status": "patched",
+        "pre_write_hash": "9c65bd9c514360cc775029de3622a9f696f04fd7b75d8f7076da2f5cf50d120e"
+      },
+      {
+        "pdb_id": "5R32",
+        "deposition_wavelength": 0.827,
+        "staged_crosscheck": {
+          "staged": 0.827,
+          "agrees": true
+        },
+        "fingerprints_identical": true,
+        "patched_wavelength": 0.827,
+        "rebaseline_ruling": "negative_control_round8_preregistration.md I2 + the user's explicit in-conversation go-ahead; proof: KEEP fingerprints identical, deposition wavelength",
+        "input_hashes": {
+          "mtz": "2c768aa7746ce984f8ece5635f2b4fbe4716a0b3661fb6d7f85d41a1b5b14f03"
+        },
+        "status": "patched",
+        "pre_write_hash": "88ea97c25f1a1562259bdd56b61623c13da3c99ee2a2deffe5ecb6d3e59b3d35"
+      },
+      {
+        "pdb_id": "6F1O",
+        "deposition_wavelength": 0.97926,
+        "staged_crosscheck": {
+          "staged": 1.0,
+          "agrees": false
+        },
+        "fingerprints_identical": true,
+        "patched_wavelength": 0.97926,
+        "rebaseline_ruling": "negative_control_round8_preregistration.md I2 + the user's explicit in-conversation go-ahead; proof: KEEP fingerprints identical, deposition wavelength",
+        "input_hashes": {
+          "mtz": "712fb348692e9b91602ee3cba743cfbfac2a0324bc9a27c6c4c3399ae18f2711"
+        },
+        "status": "patched",
+        "pre_write_hash": "00fb8eabdc65373964c0fcf54ceb30268d7b0729b59b797ece79ab17ba18e6aa"
+      },
+      {
+        "pdb_id": "6Q01",
+        "deposition_wavelength": 0.8211,
+        "staged_crosscheck": {
+          "staged": 1.0,
+          "agrees": false
+        },
+        "fingerprints_identical": true,
+        "patched_wavelength": 0.8211,
+        "rebaseline_ruling": "negative_control_round8_preregistration.md I2 + the user's explicit in-conversation go-ahead; proof: KEEP fingerprints identical, deposition wavelength",
+        "input_hashes": {
+          "mtz": "4eb2de8b3e0e9c005e61b6ced6dd57474d0ac9ac6b8f861bccc8933affd0623c"
+        },
+        "status": "patched",
+        "pre_write_hash": "b51181cc96eb89aff3f062da35aee59387ad58c22ae0f870e01727cf9008aef4"
+      },
+      {
+        "pdb_id": "6XVM",
+        "deposition_wavelength": 0.9793,
+        "staged_crosscheck": {
+          "staged": 0.9793,
+          "agrees": true
+        },
+        "fingerprints_identical": true,
+        "patched_wavelength": 0.9793,
+        "rebaseline_ruling": "negative_control_round8_preregistration.md I2 + the user's explicit in-conversation go-ahead; proof: KEEP fingerprints identical, deposition wavelength",
+        "input_hashes": {
+          "mtz": "74f4c53c0e402fc6ea51fab570f00103915ed46a54a258ca66e76508ddeff713"
+        },
+        "status": "patched",
+        "pre_write_hash": "720c01205b23c953e58489b5aea28d92b7f5229297f8b5eaedaed88dbd82b67d"
+      },
+      {
+        "pdb_id": "6ZWY",
+        "deposition_wavelength": 0.7653,
+        "staged_crosscheck": {
+          "staged": 0.7653,
+          "agrees": true
+        },
+        "fingerprints_identical": true,
+        "patched_wavelength": 0.7653,
+        "rebaseline_ruling": "negative_control_round8_preregistration.md I2 + the user's explicit in-conversation go-ahead; proof: KEEP fingerprints identical, deposition wavelength",
+        "input_hashes": {
+          "mtz": "d270095289c6b8308670ed07525fd30364ca0d00c3826be2b5f60a9d59cdee5a"
+        },
+        "status": "patched",
+        "pre_write_hash": "5a058862f91d2977e1f05d2c0f81365ccf38b7dbd498e9ca58a6d6619094a9d3"
+      },
+      {
+        "pdb_id": "7ATV",
+        "deposition_wavelength": 0.9184,
+        "staged_crosscheck": {
+          "staged": 0.9184,
+          "agrees": true
+        },
+        "fingerprints_identical": true,
+        "patched_wavelength": 0.9184,
+        "rebaseline_ruling": "negative_control_round8_preregistration.md I2 + the user's explicit in-conversation go-ahead; proof: KEEP fingerprints identical, deposition wavelength",
+        "input_hashes": {
+          "mtz": "eec43eb3722db7717a35a7b78ad1569e288072dac4d217a4da990d27c92ce0a8"
+        },
+        "status": "patched",
+        "pre_write_hash": "d6e57b222519fd06b10df0dda5b5ed0163b7ea5f99e413e13f4f2ff09cc02a38"
+      },
+      {
+        "pdb_id": "7R2H",
+        "deposition_wavelength": 0.8265,
+        "staged_crosscheck": {
+          "staged": 0.8265,
+          "agrees": true
+        },
+        "fingerprints_identical": true,
+        "patched_wavelength": 0.8265,
+        "rebaseline_ruling": "negative_control_round8_preregistration.md I2 + the user's explicit in-conversation go-ahead; proof: KEEP fingerprints identical, deposition wavelength",
+        "input_hashes": {
+          "mtz": "c4e84836698ce14e6d89af49f77416ae59f6c274c433d90cbb048df20ff1804e"
+        },
+        "status": "patched",
+        "pre_write_hash": "59291a9837e83691ce9c99c4d452b3ac24f845d1bbfe9bd3289d9557fbd27e02"
+      },
+      {
+        "pdb_id": "7TWR",
+        "deposition_wavelength": 0.7749,
+        "staged_crosscheck": {
+          "staged": 0.7749,
+          "agrees": true
+        },
+        "fingerprints_identical": true,
+        "patched_wavelength": 0.7749,
+        "rebaseline_ruling": "negative_control_round8_preregistration.md I2 + the user's explicit in-conversation go-ahead; proof: KEEP fingerprints identical, deposition wavelength",
+        "input_hashes": {
+          "mtz": "e53baa5484d05e1814a8c6ba1d2723aee2c9b7ca1b48210466b077a2bbbffa93"
+        },
+        "status": "patched",
+        "pre_write_hash": "bf0d675c681c5f3162f58dc7d53d4043f2da772d7f6c1bc089c39c52f7d289a1"
+      },
+      {
+        "pdb_id": "9P25",
+        "deposition_wavelength": 0.7872,
+        "staged_crosscheck": {
+          "staged": 0.7872,
+          "agrees": true
+        },
+        "fingerprints_identical": true,
+        "patched_wavelength": 0.7872,
+        "rebaseline_ruling": "negative_control_round8_preregistration.md I2 + the user's explicit in-conversation go-ahead; proof: KEEP fingerprints identical, deposition wavelength",
+        "input_hashes": {
+          "mtz": "28e14bf932322d3c73e12554fb760de04db8b9fe175fcd9bee9f52dbc78d71a7"
+        },
+        "status": "patched",
+        "pre_write_hash": "12a610d1e161b39676abec2687226655b0c7023af1f05af0799fca59547778d9"
+      },
+      {
+        "pdb_id": "9TXE",
+        "deposition_wavelength": 0.7749,
+        "staged_crosscheck": {
+          "staged": 0.77488,
+          "agrees": true
+        },
+        "fingerprints_identical": true,
+        "patched_wavelength": 0.7749,
+        "rebaseline_ruling": "negative_control_round8_preregistration.md I2 + the user's explicit in-conversation go-ahead; proof: KEEP fingerprints identical, deposition wavelength",
+        "input_hashes": {
+          "mtz": "d1b0e7c3d674738008da78eb6428fb3d27cb0d582fa9a072c9f309f2412b4a04"
+        },
+        "status": "patched",
+        "pre_write_hash": "3d4b8934aa481719c510b14bc16f06c4585644c24584b5335e3e69ed01693942"
+      }
+    ]
+  }
 }

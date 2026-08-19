@@ -61,5 +61,11 @@ gate caught it — `patched_wavelength: 0.0` — before anything mattered.
    the REFMAC null legs under `REFI BREF ANIS`, re-derive `d_refmac`, and
    register the convention switch — after which the third opinion grades
    gold standards with their anisotropy applied.
-2. **The 11 wavelength writes**, whenever the user names them.
+2. ~~The 11 wavelength writes~~ — **done 2026-08-18** on the user's
+   explicit instruction naming the patch: canary (7R2H) first and verified,
+   then the other 10; every write fingerprint-proved before and verified
+   after (deposition wavelengths applied, incl. the two placeholder
+   corrections 6Q01 → 0.8211 and 6F1O → 0.97926); all 22 store files now
+   carry nonzero wavelengths with sidecar-consistent hashes. Events with
+   pre/post hashes: `i2_authorized_writes` in the round record.
 3. Agent sandboxes (#356) with the next agent leg; #338, #321.
