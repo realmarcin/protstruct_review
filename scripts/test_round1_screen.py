@@ -155,6 +155,56 @@ check("D6: jointly small-negative delta survives the floor",
 check("D6: jointly past-floor delta is excluded",
       next(r for r in rows4 if r["pdb_id"] == "PAST")["enrolled"], False)
 
+# --- #321: the mask-constrained D6 criterion ----------------------------------------
+# Ten worsening entries give a clean per-path S; three both-path improvers
+# differ only in their unmasked-shift corroboration.
+
+
+def m_row(pdb_id, d, shift=...):
+    r = row(pdb_id, d, d)
+    if shift is not ...:
+        r["shift_unmasked"] = shift
+    return r
+
+
+rows_m = [row(f"W{i}", 0.001 * i, 0.0012 * i) for i in range(10)]
+rows_m += [m_row("CORR", -0.05, shift=0.30),    # corroborated: real headroom
+           m_row("MASKY", -0.05, shift=0.01),   # uncorroborated: mask-attributed
+           m_row("NODAT", -0.05)]               # no instrument: conservative
+stats_m = scr.d6_statistics(rows_m, min_unmasked_shift=0.05)
+check("#321: corroborated improver is excluded",
+      next(r for r in rows_m if r["pdb_id"] == "CORR")["enrolled"], False)
+check("#321: mask-attributed improver ENROLLS, named",
+      (next(r for r in rows_m if r["pdb_id"] == "MASKY")["enrolled"],
+       next(r for r in rows_m if r["pdb_id"] == "MASKY")
+       .get("headroom_mask_attributed")), (True, True))
+check("#321: missing instrument excludes conservatively, named",
+      (next(r for r in rows_m if r["pdb_id"] == "NODAT")["enrolled"],
+       next(r for r in rows_m if r["pdb_id"] == "NODAT")
+       .get("headroom_unmasked_shift_missing")), (False, True))
+check("#321: stats count the mask-attributed class",
+      stats_m["n_mask_attributed"], 1)
+check("#390: a mask-attributed both-path improver is NOT a one-path improver",
+      next(r for r in rows_m if r["pdb_id"] == "MASKY")
+      ["headroom_one_path_only"], [])
+check("#321: exclusion count holds the corroborated + conservative pair",
+      stats_m["n_excluded_headroom"], 2)
+
+# And OFF (None) reproduces the historical rule on freshly built rows —
+# and on ANNOTATED rows from a prior pass (re-annotation must be
+# deterministic, not cumulative).
+for label, rows_off in (("fresh", [row(f"W{i}", 0.001 * i, 0.0012 * i)
+                                   for i in range(10)]
+                         + [m_row("CORR", -0.05, shift=0.30),
+                            m_row("MASKY", -0.05, shift=0.01),
+                            m_row("NODAT", -0.05)]),
+                        ("reused", rows_m)):
+    stats_off = scr.d6_statistics(rows_off)
+    check(f"#321: None reproduces rounds-1..2 behavior ({label} rows)",
+          stats_off["n_excluded_headroom"], 3)
+    check(f"#321:   and marks nothing mask-attributed ({label} rows)",
+          stats_off["n_mask_attributed"], 0)
+
 # --- round-2 observation-label rule ------------------------------------------------
 
 check("labels: amplitude pair preferred over intensities",
