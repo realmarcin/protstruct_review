@@ -69,7 +69,11 @@ import subprocess
 proc = subprocess.run([sys.executable,
                        str(REPO / "scripts/test_bench_recover.py")],
                       capture_output=True, text=True)
+# The count is a floor, not a pin — an exact literal goes stale the moment
+# the recover suite legitimately grows (it did in round 9: 9 -> 12).
+import re as _re
+_m = _re.search(r"(\d+) checks passed", proc.stdout)
 check("round-4 suite still green under the fit_fn parameterization",
-      proc.returncode == 0 and "9 checks passed" in proc.stdout, True)
+      proc.returncode == 0 and _m is not None and int(_m.group(1)) >= 9, True)
 
 print(f"\n{PASSED} checks passed")

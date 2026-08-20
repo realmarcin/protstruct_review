@@ -42,6 +42,15 @@ OUT_JSON = REPO / "ref/research/data/negative_control_round4_recover.json"
 REGISTERED_FIT_THRESHOLDS = {"d_phenix": 0.01200, "d_gemmi": 0.01025,
                              "d_refmac": 0.00560}
 R6_HYGIENE_JSON_NAME = "ref/research/data/negative_control_round6_hygiene.json"
+# Round-9 J3: the ANIS-convention table. The two-path values are the H1
+# values (unchanged by REFMAC's ADP convention); d_refmac is re-derived
+# from the round-9 ANIS null distribution (REFI BREF ANIS on both sides of
+# every delta). Verdict-bearing drivers from round 9 on use THIS table with
+# refmac_pass(anis=True); the ISOT table above is retained so rounds 3-8
+# reproduce. The two conventions are never mixed inside one comparison.
+REGISTERED_FIT_THRESHOLDS_ANIS = {"d_phenix": 0.01200, "d_gemmi": 0.01025,
+                                  "d_refmac": 0.01150}
+R9_ANIS_JSON_NAME = "ref/research/data/negative_control_round9_anis.json"
 MAD_FLOOR = 0.0005
 SHIFT_BAND_A = 0.12          # §4 stay-band, cited via the prereg
 STOP_AT_DIFF = 0.5
@@ -88,6 +97,29 @@ def fit_thresholds_from_record() -> dict:
         raise SystemExit(
             f"bench_recover: recomputed C1 thresholds {out} != registered "
             f"{REGISTERED_FIT_THRESHOLDS} — record and registration disagree")
+    return out
+
+
+def anis_thresholds_from_record() -> dict:
+    """Round-9 J3: the ANIS table, re-derived — two paths from the same
+    record route as fit_thresholds_from_record (conventions do not touch
+    them), d_refmac from the round-9 ANIS null distribution — then verified
+    against the registered table."""
+    isot = fit_thresholds_from_record()
+    d = json.loads((REPO / R9_ANIS_JSON_NAME).read_text())
+    deltas = [r["refmac"]["anis"]["delta"] for r in d["rows"]
+              if isinstance(r.get("refmac"), dict)
+              and isinstance(r["refmac"].get("anis"), dict)
+              and r["refmac"]["anis"]["delta"] is not None]
+    med = statistics.median(deltas)
+    mad = max(statistics.median(abs(v - med) for v in deltas), MAD_FLOOR)
+    out = {"d_phenix": isot["d_phenix"], "d_gemmi": isot["d_gemmi"],
+           "d_refmac": round(med + 3 * mad, 5)}
+    if out != REGISTERED_FIT_THRESHOLDS_ANIS:
+        raise SystemExit(
+            f"bench_recover: recomputed ANIS thresholds {out} != registered "
+            f"{REGISTERED_FIT_THRESHOLDS_ANIS} — record and registration "
+            f"disagree")
     return out
 
 

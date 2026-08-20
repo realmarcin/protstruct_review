@@ -1,0 +1,1108 @@
+{
+  "run": {
+    "preregistration": "negative_control_round9_preregistration.md",
+    "round": 9,
+    "durable_store": "/Users/marcin/protstruct_bench_inputs",
+    "tools": {
+      "phenix_bin": "/Users/marcin/phenix-2.0-5936/phenix_bin",
+      "gemmi_cli": "/opt/homebrew/bin/gemmi",
+      "gemmi_cli_version": "gemmi 0.7.5",
+      "gemmi_python": "0.7.5",
+      "python": "3.13.12"
+    }
+  },
+  "rows": [
+    {
+      "pdb_id": "4M7G",
+      "input_hashes": {
+        "model": "e94b951321c791fef757e407640e4e3c1d36e605b8ec19761de2157075bf2b31",
+        "mtz": "f6824a5b756b807d236bdcdfa75c1a8babf7c157fd9634c4a166fc96ce1c336b"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1209,
+          "post": 0.1292,
+          "delta": 0.0083
+        },
+        "gemmi": {
+          "pre": 0.1205,
+          "post": 0.1295,
+          "delta": 0.009
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1738,
+          "post": 0.1783,
+          "delta": 0.0045
+        },
+        "anis": {
+          "pre": 0.1193,
+          "post": 0.1287,
+          "delta": 0.0094
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "7R2H",
+      "input_hashes": {
+        "model": "a166df0a2539dd441cc9382e0dd229fdc2236dacf336fb319b2e41d23c74e783",
+        "mtz": "c4e84836698ce14e6d89af49f77416ae59f6c274c433d90cbb048df20ff1804e"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1545,
+          "post": 0.1494,
+          "delta": -0.0051
+        },
+        "gemmi": {
+          "pre": 0.1577,
+          "post": 0.1523,
+          "delta": -0.0054
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1676,
+          "post": 0.1638,
+          "delta": -0.0038
+        },
+        "anis": {
+          "pre": 0.1576,
+          "post": 0.1524,
+          "delta": -0.0052
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "2VXN",
+      "input_hashes": {
+        "model": "63cd65e6b6c11aa4d96c30cd01e3352e5c1cec0137db4888524ff8bf3ba7519f",
+        "mtz": "1ce4b08130d6183b9aab0fa85d4abbc0e3b0a7195aeba1be8262715ee76e227f"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1043,
+          "post": 0.1257,
+          "delta": 0.0214
+        },
+        "gemmi": {
+          "pre": 0.1059,
+          "post": 0.1279,
+          "delta": 0.022
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1712,
+          "post": 0.159,
+          "delta": -0.0122
+        },
+        "anis": {
+          "pre": 0.1371,
+          "post": 0.1501,
+          "delta": 0.013
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "7ATV",
+      "input_hashes": {
+        "model": "2059afd7eb1004c18460ac66501cb822bffa098a11d87fc5be6cbacfc718e9f9",
+        "mtz": "eec43eb3722db7717a35a7b78ad1569e288072dac4d217a4da990d27c92ce0a8"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1407,
+          "post": 0.1455,
+          "delta": 0.0048
+        },
+        "gemmi": {
+          "pre": 0.1448,
+          "post": 0.1502,
+          "delta": 0.0054
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.175,
+          "post": 0.178,
+          "delta": 0.003
+        },
+        "anis": {
+          "pre": 0.1431,
+          "post": 0.1482,
+          "delta": 0.0051
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "6Q01",
+      "input_hashes": {
+        "model": "2fa8a027a1678ce20690b88f686635d351362d9652563917fbc9a5b4607cf85b",
+        "mtz": "4eb2de8b3e0e9c005e61b6ced6dd57474d0ac9ac6b8f861bccc8933affd0623c"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1142,
+          "post": 0.1261,
+          "delta": 0.0119
+        },
+        "gemmi": {
+          "pre": 0.117,
+          "post": 0.1284,
+          "delta": 0.0114
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1642,
+          "post": 0.1698,
+          "delta": 0.0056
+        },
+        "anis": {
+          "pre": 0.1162,
+          "post": 0.1281,
+          "delta": 0.0119
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "6ZWY",
+      "input_hashes": {
+        "model": "1edcb8619d3c951a90b22c29a078517314a09f205ab38c75f1ceeb85ef0fcb82",
+        "mtz": "d270095289c6b8308670ed07525fd30364ca0d00c3826be2b5f60a9d59cdee5a"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1511,
+          "post": 0.1498,
+          "delta": -0.0013
+        },
+        "gemmi": {
+          "pre": 0.1531,
+          "post": 0.1526,
+          "delta": -0.0005
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1665,
+          "post": 0.1675,
+          "delta": 0.001
+        },
+        "anis": {
+          "pre": 0.1462,
+          "post": 0.1468,
+          "delta": 0.0006
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "5XS6",
+      "input_hashes": {
+        "model": "18a0aba6813a2b9c2fd489086628c3f321760376e858c3424c5bec2f6e765239",
+        "mtz": "9a9b7247826fff85c0baa893af0a75b741ddff4966b1f24fed414adc5c6a93a3"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1666,
+          "post": 0.1704,
+          "delta": 0.0038
+        },
+        "gemmi": {
+          "pre": 0.1712,
+          "post": 0.174,
+          "delta": 0.0028
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1711,
+          "post": 0.1731,
+          "delta": 0.002
+        },
+        "anis": {
+          "pre": 0.1609,
+          "post": 0.1646,
+          "delta": 0.0037
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "8ERE",
+      "input_hashes": {
+        "model": "9ecfb9999f6e5228052dc298145f17839a9e681f53fc6ca6b24a2074f38d9423",
+        "mtz": "35f5f3e12c555f25b8ed416a354f79f9f7f9eb410cb9faa0850ece24bdd80e52"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1307,
+          "post": 0.137,
+          "delta": 0.0063
+        },
+        "gemmi": {
+          "pre": 0.1338,
+          "post": 0.1393,
+          "delta": 0.0055
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1602,
+          "post": 0.1635,
+          "delta": 0.0033
+        },
+        "anis": {
+          "pre": 0.1293,
+          "post": 0.1371,
+          "delta": 0.0078
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "3ZOJ",
+      "input_hashes": {
+        "model": "5c7b8268d6852b7499cc75695bb5a1fda71fb83386d8721c87fb66748e64b750",
+        "mtz": "f44408607b7e41a8b3c5942ef114b362097e4d808b0945bcaa115b452cfd4e88"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.0997,
+          "post": 0.1076,
+          "delta": 0.0079
+        },
+        "gemmi": {
+          "pre": 0.1041,
+          "post": 0.1115,
+          "delta": 0.0074
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1608,
+          "post": 0.1634,
+          "delta": 0.0026
+        },
+        "anis": {
+          "pre": 0.1043,
+          "post": 0.1104,
+          "delta": 0.0061
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "9YGW",
+      "input_hashes": {
+        "model": "e56874e596758d862c2e2f6137921e4c4d18c1093fe81a6c3fe9e7a385f16c71",
+        "mtz": "f097f00b834f2c8ed2383438df3fcfce59cda0b341cc91b2bbf806ac441a9705"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1274,
+          "post": 0.1339,
+          "delta": 0.0065
+        },
+        "gemmi": {
+          "pre": 0.1286,
+          "post": 0.1351,
+          "delta": 0.0065
+        }
+      },
+      "refmac": {
+        "standing": "two-path permanent (round-8 stand-down)"
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "9P25",
+      "input_hashes": {
+        "model": "63b30af0f3e24146f06fe3ede114003ac0a55b14ef7e396d00df928f28577437",
+        "mtz": "28e14bf932322d3c73e12554fb760de04db8b9fe175fcd9bee9f52dbc78d71a7"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1529,
+          "post": 0.1538,
+          "delta": 0.0009
+        },
+        "gemmi": {
+          "pre": 0.1585,
+          "post": 0.1605,
+          "delta": 0.002
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1673,
+          "post": 0.1674,
+          "delta": 0.0001
+        },
+        "anis": {
+          "pre": 0.1455,
+          "post": 0.147,
+          "delta": 0.0015
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "8R5K",
+      "input_hashes": {
+        "model": "89b06927f2fd2cb0d8506277d6cc7b9dfd2a804cfbccf95fe31bc4fef75dcf2c",
+        "mtz": "1f72255b54b6ece04779dae7303a5b8a92880061e5378548358011f369965cad"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1563,
+          "post": 0.1597,
+          "delta": 0.0034
+        },
+        "gemmi": {
+          "pre": 0.1584,
+          "post": 0.1627,
+          "delta": 0.0043
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1837,
+          "post": 0.1897,
+          "delta": 0.006
+        },
+        "anis": {
+          "pre": 0.1508,
+          "post": 0.159,
+          "delta": 0.0082
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "7TVL",
+      "input_hashes": {
+        "model": "e288d4c5472d172e53f05aa0296e7bb50d9d4d4c0c3ef8000de338600a7c1d55",
+        "mtz": "2e453c18154ccef983c4dd09805bf578bcbde67becdec6774ffe3f9d064d31b1"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1322,
+          "post": 0.1321,
+          "delta": -0.0001
+        },
+        "gemmi": {
+          "pre": 0.1342,
+          "post": 0.1339,
+          "delta": -0.0003
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1469,
+          "post": 0.1482,
+          "delta": 0.0013
+        },
+        "anis": {
+          "pre": 0.1235,
+          "post": 0.1233,
+          "delta": -0.0002
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "8QXQ",
+      "input_hashes": {
+        "model": "864bc500d73a49e49f0539139348646d8b2e2abfc86a89d0fedf56bf3d7c38ed",
+        "mtz": "e193f767ad16111a3ef53f62fd0936afb47f4d17059c2a4313d8f1575ce6d58e"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1495,
+          "post": 0.1523,
+          "delta": 0.0028
+        },
+        "gemmi": {
+          "pre": 0.1582,
+          "post": 0.16,
+          "delta": 0.0018
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1955,
+          "post": 0.1956,
+          "delta": 0.0001
+        },
+        "anis": {
+          "pre": 0.1599,
+          "post": 0.1619,
+          "delta": 0.002
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "6F1O",
+      "input_hashes": {
+        "model": "cad2051362b564e16fde6317a7957cd2ce0d97c3967aa80860b10492be8246f3",
+        "mtz": "712fb348692e9b91602ee3cba743cfbfac2a0324bc9a27c6c4c3399ae18f2711"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1435,
+          "post": 0.1463,
+          "delta": 0.0028
+        },
+        "gemmi": {
+          "pre": 0.1484,
+          "post": 0.1531,
+          "delta": 0.0047
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1846,
+          "post": 0.1859,
+          "delta": 0.0013
+        },
+        "anis": {
+          "pre": 0.1468,
+          "post": 0.1498,
+          "delta": 0.003
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "7TWR",
+      "input_hashes": {
+        "model": "f3e1d1d078b88c13c24b40dad39b1f31029b67d25c9e3bff04e48af23b090223",
+        "mtz": "e53baa5484d05e1814a8c6ba1d2723aee2c9b7ca1b48210466b077a2bbbffa93"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1212,
+          "post": 0.1244,
+          "delta": 0.0032
+        },
+        "gemmi": {
+          "pre": 0.1211,
+          "post": 0.1241,
+          "delta": 0.003
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.164,
+          "post": 0.1664,
+          "delta": 0.0024
+        },
+        "anis": {
+          "pre": 0.1204,
+          "post": 0.1235,
+          "delta": 0.0031
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "6XVM",
+      "input_hashes": {
+        "model": "d5b7a11630f05a3c38e306cc8a16596e45189ab527f2b2af52b71c351fc289c0",
+        "mtz": "74f4c53c0e402fc6ea51fab570f00103915ed46a54a258ca66e76508ddeff713"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1435,
+          "post": 0.1596,
+          "delta": 0.0161
+        },
+        "gemmi": {
+          "pre": 0.1127,
+          "post": 0.1283,
+          "delta": 0.0156
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1523,
+          "post": 0.1594,
+          "delta": 0.0071
+        },
+        "anis": {
+          "pre": 0.1119,
+          "post": 0.1273,
+          "delta": 0.0154
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "9TEU",
+      "input_hashes": {
+        "model": "ae8cd7f299d7c9adc9fbc9be3ec3b73686da18c5d492c0918ab0f02191d1d646",
+        "mtz": "f8cd3dd344a8337fd610ebe753c0286552af9a1fc766776742c288aa34dd504e"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1681,
+          "post": 0.1653,
+          "delta": -0.0028
+        },
+        "gemmi": {
+          "pre": 0.1686,
+          "post": 0.1666,
+          "delta": -0.002
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1829,
+          "post": 0.1835,
+          "delta": 0.0006
+        },
+        "anis": {
+          "pre": 0.1623,
+          "post": 0.1617,
+          "delta": -0.0006
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "5R32",
+      "input_hashes": {
+        "model": "269f36c4005cdda4aa6f01182f53503868fc0f1dde7fa7c84266d8190b6c0670",
+        "mtz": "2c768aa7746ce984f8ece5635f2b4fbe4716a0b3661fb6d7f85d41a1b5b14f03"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1359,
+          "post": 0.1399,
+          "delta": 0.004
+        },
+        "gemmi": {
+          "pre": 0.1469,
+          "post": 0.1519,
+          "delta": 0.005
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1814,
+          "post": 0.1832,
+          "delta": 0.0018
+        },
+        "anis": {
+          "pre": 0.1509,
+          "post": 0.1572,
+          "delta": 0.0063
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "5KXV",
+      "input_hashes": {
+        "model": "fd0ef7d5265a8037c94143677517c9cbffc0bcc2ddc6273c79d16d56fba7855e",
+        "mtz": "c35df96ef84bcec4efb69884a615342c07e54bff4b44b61e862f1ce732a5ea47"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1142,
+          "post": 0.1152,
+          "delta": 0.001
+        },
+        "gemmi": {
+          "pre": 0.1158,
+          "post": 0.1169,
+          "delta": 0.0011
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1663,
+          "post": 0.1669,
+          "delta": 0.0006
+        },
+        "anis": {
+          "pre": 0.1154,
+          "post": 0.1167,
+          "delta": 0.0013
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "7OYN",
+      "input_hashes": {
+        "model": "f2a6948b0a7b56f7d2dac5fdb18ef251a2fd5c4f88a0ed04816f791b82f477a9",
+        "mtz": "8809cac8fefe21166e94f60b7a6204669f8fc2664f23ba721075ca446c65b4e1"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1476,
+          "post": 0.1481,
+          "delta": 0.0005
+        },
+        "gemmi": {
+          "pre": 0.1475,
+          "post": 0.1496,
+          "delta": 0.0021
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.1704,
+          "post": 0.1742,
+          "delta": 0.0038
+        },
+        "anis": {
+          "pre": 0.1374,
+          "post": 0.1437,
+          "delta": 0.0063
+        }
+      },
+      "status": "regenerated"
+    },
+    {
+      "pdb_id": "9TXE",
+      "input_hashes": {
+        "model": "a599a7216f99165eecee94d99cc91d31a90cbbb3fd49aacd80f6db118fb4300c",
+        "mtz": "d1b0e7c3d674738008da78eb6428fb3d27cb0d582fa9a072c9f309f2412b4a04"
+      },
+      "array_selection": {
+        "obs": [
+          "FOBS",
+          "SIGFOBS"
+        ],
+        "free_flag": "R-free-flags"
+      },
+      "refined_has_aniso": true,
+      "paths": {
+        "phenix": {
+          "pre": 0.1796,
+          "post": 0.1805,
+          "delta": 0.0009
+        },
+        "gemmi": {
+          "pre": 0.1844,
+          "post": 0.1866,
+          "delta": 0.0022
+        }
+      },
+      "refmac": {
+        "isot": {
+          "pre": 0.203,
+          "post": 0.2045,
+          "delta": 0.0015
+        },
+        "anis": {
+          "pre": 0.1745,
+          "post": 0.1766,
+          "delta": 0.0021
+        }
+      },
+      "status": "regenerated"
+    }
+  ],
+  "x1_reproduction": {
+    "entries": [
+      {
+        "pdb_id": "4M7G",
+        "d_phenix_regen": 0.0083,
+        "d_phenix_committed": 0.0083,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.009,
+        "d_gemmi_committed": 0.009,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "7R2H",
+        "d_phenix_regen": -0.0051,
+        "d_phenix_committed": -0.0051,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": -0.0054,
+        "d_gemmi_committed": -0.0054,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "2VXN",
+        "d_phenix_regen": 0.0214,
+        "d_phenix_committed": 0.0214,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.022,
+        "d_gemmi_committed": 0.022,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "7ATV",
+        "d_phenix_regen": 0.0048,
+        "d_phenix_committed": 0.0048,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0054,
+        "d_gemmi_committed": 0.0054,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "6Q01",
+        "d_phenix_regen": 0.0119,
+        "d_phenix_committed": 0.0119,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0114,
+        "d_gemmi_committed": 0.0114,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "6ZWY",
+        "d_phenix_regen": -0.0013,
+        "d_phenix_committed": -0.0013,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": -0.0005,
+        "d_gemmi_committed": -0.0005,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "5XS6",
+        "d_phenix_regen": 0.0038,
+        "d_phenix_committed": 0.0038,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0028,
+        "d_gemmi_committed": 0.0028,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "8ERE",
+        "d_phenix_regen": 0.0063,
+        "d_phenix_committed": 0.0063,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0055,
+        "d_gemmi_committed": 0.0055,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "3ZOJ",
+        "d_phenix_regen": 0.0079,
+        "d_phenix_committed": 0.0079,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0074,
+        "d_gemmi_committed": 0.0074,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "9YGW",
+        "d_phenix_regen": 0.0065,
+        "d_phenix_committed": 0.0065,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0065,
+        "d_gemmi_committed": 0.0065,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "9P25",
+        "d_phenix_regen": 0.0009,
+        "d_phenix_committed": 0.0009,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.002,
+        "d_gemmi_committed": 0.002,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "8R5K",
+        "d_phenix_regen": 0.0034,
+        "d_phenix_committed": 0.004,
+        "d_phenix_absdiff": 0.0006,
+        "d_gemmi_regen": 0.0043,
+        "d_gemmi_committed": 0.0047,
+        "d_gemmi_absdiff": 0.0004
+      },
+      {
+        "pdb_id": "7TVL",
+        "d_phenix_regen": -0.0001,
+        "d_phenix_committed": -0.0001,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": -0.0003,
+        "d_gemmi_committed": -0.0003,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "8QXQ",
+        "d_phenix_regen": 0.0028,
+        "d_phenix_committed": 0.0028,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0018,
+        "d_gemmi_committed": 0.0018,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "6F1O",
+        "d_phenix_regen": 0.0028,
+        "d_phenix_committed": 0.0028,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0047,
+        "d_gemmi_committed": 0.0047,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "7TWR",
+        "d_phenix_regen": 0.0032,
+        "d_phenix_committed": 0.0032,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.003,
+        "d_gemmi_committed": 0.003,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "6XVM",
+        "d_phenix_regen": 0.0161,
+        "d_phenix_committed": 0.0161,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0156,
+        "d_gemmi_committed": 0.0156,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "9TEU",
+        "d_phenix_regen": -0.0028,
+        "d_phenix_committed": -0.0028,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": -0.002,
+        "d_gemmi_committed": -0.002,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "5R32",
+        "d_phenix_regen": 0.004,
+        "d_phenix_committed": 0.004,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.005,
+        "d_gemmi_committed": 0.005,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "5KXV",
+        "d_phenix_regen": 0.001,
+        "d_phenix_committed": 0.001,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0011,
+        "d_gemmi_committed": 0.0011,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "7OYN",
+        "d_phenix_regen": 0.0005,
+        "d_phenix_committed": 0.0005,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0021,
+        "d_gemmi_committed": 0.0021,
+        "d_gemmi_absdiff": 0.0
+      },
+      {
+        "pdb_id": "9TXE",
+        "d_phenix_regen": 0.0009,
+        "d_phenix_committed": 0.0009,
+        "d_phenix_absdiff": 0.0,
+        "d_gemmi_regen": 0.0022,
+        "d_gemmi_committed": 0.0022,
+        "d_gemmi_absdiff": 0.0
+      }
+    ],
+    "n_within_0p002_both_paths": 22
+  },
+  "j2_anis": {
+    "n": 21,
+    "median_abs_delta": 0.0051,
+    "d_refmac_anis": 0.0115,
+    "isot_rederived_for_comparison_only": 0.0054
+  },
+  "x3_direction_agreement": {
+    "anis": {
+      "agree": 20,
+      "population": 21,
+      "excluded_sign_split": 0
+    },
+    "isot": {
+      "agree": 17,
+      "population": 21,
+      "excluded_sign_split": 0
+    }
+  }
+}
