@@ -101,4 +101,14 @@ check("verdict-key reconciliation handles icodes",
       b._residue_verdict({("B", 5, "A"): {"rota": "OUTLIER"}}, ("B", "5A")),
       {"rota": "OUTLIER"})
 
+# Round-9 J3: the ADP-convention switch, history-faithful by default.
+check("refmac keywords: ISOT default reproduces the rounds-3..8 block",
+      b.refmac_keywords(("FOBS", "SIGFOBS"), "R-free-flags"),
+      "MAKE NEWLIGAND CONTINUE\nLABIN FP=FOBS SIGFP=SIGFOBS "
+      "FREE=R-free-flags\nNCYC 0\nEND\n")
+check("refmac keywords: anis adds exactly REFI BREF ANIS",
+      b.refmac_keywords(("FP", "SIGFP"), None, anis=True),
+      "MAKE NEWLIGAND CONTINUE\nREFI BREF ANIS\nLABIN FP=FP SIGFP=SIGFP\n"
+      "NCYC 0\nEND\n")
+
 print(f"\n{PASSED} checks passed")

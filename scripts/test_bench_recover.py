@@ -70,4 +70,16 @@ check("precedence: REFMAC-unmeasurable + one family -> not-degraded",
       b.combined_verdict(flags1, {"d_phenix": 0.3, "d_gemmi": 0.3,
                                   "d_refmac": None}, T), "not-degraded")
 
+# Round-9 J3: the ANIS table re-derives from the round-9 record and matches
+# its registered values; the two-path components are the H1 values exactly.
+anis = b.anis_thresholds_from_record()
+check("ANIS table re-derives and matches its registration",
+      anis, b.REGISTERED_FIT_THRESHOLDS_ANIS)
+check("ANIS two-path components are the H1 values",
+      (anis["d_phenix"], anis["d_gemmi"]),
+      (b.REGISTERED_FIT_THRESHOLDS["d_phenix"],
+       b.REGISTERED_FIT_THRESHOLDS["d_gemmi"]))
+check("the conventions differ where the convention acts",
+      anis["d_refmac"] != b.REGISTERED_FIT_THRESHOLDS["d_refmac"], True)
+
 print(f"\n{PASSED} checks passed")

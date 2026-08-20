@@ -107,16 +107,30 @@ def refine_sa(model: Path, mtz: Path, work: Path,
     return out, {}
 
 
+def refmac_keywords(pair: tuple[str, str], flag: str | None,
+                    anis: bool = False) -> str:
+    """The NCYC-0 keyword block. `anis` is the round-9 J3 ADP-convention
+    switch: REFI BREF ANIS makes REFMAC apply deposited/refined aniso ADPs
+    instead of collapsing them to isotropic equivalents (rounds 7-8). The
+    ISOT default keeps committed history (rounds 3-8) reproducible."""
+    labin = f"LABIN FP={pair[0]} SIGFP={pair[1]}"
+    if flag is not None:
+        labin += f" FREE={flag}"
+    kw = "MAKE NEWLIGAND CONTINUE\n"
+    if anis:
+        kw += "REFI BREF ANIS\n"
+    return f"{kw}{labin}\nNCYC 0\nEND\n"
+
+
 def refmac_pass(model: Path, mtz: Path, work: Path, tag: str,
-                pair: tuple[str, str], flag: str | None) -> dict | None:
+                pair: tuple[str, str], flag: str | None,
+                anis: bool = False) -> dict | None:
     """REFMAC5 NCYC 0: the fully non-cctbx R + geometry opinion (B2 families
     1 and 2). Input rule per the disclosed canary: deposited models go in as
-    mmCIF, refined models as the phenix PDB."""
+    mmCIF, refined models as the phenix PDB. `anis` per refmac_keywords —
+    verdict-bearing drivers from round 9 on pass it by name."""
     log = work / f"refmac_{tag}.log"
     if not (log.exists() and _REFMAC_FREE.search(log.read_text(errors="ignore"))):
-        labin = f"LABIN FP={pair[0]} SIGFP={pair[1]}"
-        if flag is not None:
-            labin += f" FREE={flag}"
         # Round-6 G5: NEWLIGAND CONTINUE — 8R5K's unmeasurability was a
         # ligand-library gap (Y6Z), not its columns; safe for NCYC 0
         # measurement. REFMAC's default free convention (flag 0 = free)
@@ -126,7 +140,7 @@ def refmac_pass(model: Path, mtz: Path, work: Path, tag: str,
              f"source {CCP4_SETUP} 2>/dev/null && cd {work} && "
              f"refmac5 XYZIN {model} HKLIN {mtz} "
              f"XYZOUT ref_{tag}.pdb HKLOUT ref_{tag}.mtz > {log} 2>&1 <<'EOF'\n"
-             f"MAKE NEWLIGAND CONTINUE\n{labin}\nNCYC 0\nEND\nEOF"],
+             f"{refmac_keywords(pair, flag, anis)}EOF"],
             capture_output=True, text=True, timeout=1800, env=dict(os.environ))
     if not log.exists():
         return None
