@@ -460,7 +460,8 @@ def mad(values: list[float]) -> float:
     return statistics.median(abs(v - med) for v in values)
 
 
-def d6_statistics(rows: list[dict]) -> dict:
+def d6_statistics(rows: list[dict],
+                  min_unmasked_shift: float | None = None) -> dict:
     """Noise scales, the registered fallback, and per-entry exclusion verdicts.
 
     #318 discipline: the two paths measure the SAME structure with the same
@@ -469,6 +470,21 @@ def d6_statistics(rows: list[dict]) -> dict:
     UNIQUE structures, deltas enter at full precision, and the noise scale has
     a registered floor (S_FLOOR) so a degenerate sample cannot produce a
     zero-width tolerance.
+
+    #321 — the mask-constrained criterion (Codex-7): the global ΔR-free is
+    blind to WHERE an improvement lives, so a change confined to masked
+    altconf/lattice/poor-density residues can register as headroom and
+    exclude an otherwise suitable control. With `min_unmasked_shift` set, a
+    both-path improver is EXCLUDED only when corroborated by unmasked-region
+    movement (`row["shift_unmasked"] > min_unmasked_shift`); an
+    uncorroborated improver ENROLLS with `headroom_mask_attributed=True`
+    (named, never silent), and an improver whose row carries no
+    `shift_unmasked` is excluded conservatively with
+    `headroom_unmasked_shift_missing=True`. The parameter has NO default
+    value on purpose — the threshold is a registered quantity, bound by the
+    screen round's preregistration that turns this on (first calibration
+    datum on record: 2DDX at 0.229 mask fraction). `None` reproduces the
+    rounds-1–2 behavior exactly.
     """
     screened = [r for r in rows if r["status"] == "screened"]
     stats: dict = {"n_screened": len(screened)}
@@ -501,15 +517,33 @@ def d6_statistics(rows: list[dict]) -> dict:
     stats["noise_scale"] = {k: round(v, 6) for k, v in s.items()}
     stats["s_floor_applied"] = any(v < S_FLOOR for v in raw_s.values())
     for r in screened:
-        excluded = all(r["paths"][p]["delta"] < -SIGMA_FACTOR * s[p]
+        # Deterministic re-annotation: a row re-screened after an earlier
+        # pass must not inherit that pass's #321 verdicts.
+        r.pop("headroom_mask_attributed", None)
+        r.pop("headroom_unmasked_shift_missing", None)
+        improver = all(r["paths"][p]["delta"] < -SIGMA_FACTOR * s[p]
                        for p in ("phenix", "gemmi"))
         one_path = [p for p in ("phenix", "gemmi")
                     if r["paths"][p]["delta"] < -SIGMA_FACTOR * s[p]]
+        excluded = improver
+        if improver and min_unmasked_shift is not None:
+            shift = r.get("shift_unmasked")
+            if shift is None:
+                # No corroboration data at all: exclude conservatively, by
+                # name — a missing instrument must not widen enrollment.
+                r["headroom_unmasked_shift_missing"] = True
+            elif shift <= min_unmasked_shift:
+                # The improvement is not corroborated by unmasked movement:
+                # mask-attributed, so the entry stays (#321).
+                excluded = False
+                r["headroom_mask_attributed"] = True
         r["headroom_both_paths"] = excluded
         r["headroom_one_path_only"] = one_path if not excluded and one_path else []
         r["enrolled"] = not excluded
     stats["n_excluded_headroom"] = sum(1 for r in screened
                                        if r["headroom_both_paths"])
+    stats["n_mask_attributed"] = sum(1 for r in screened
+                                     if r.get("headroom_mask_attributed"))
     stats["n_enrolled"] = sum(1 for r in screened if r.get("enrolled"))
     return stats
 
