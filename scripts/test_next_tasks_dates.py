@@ -70,6 +70,14 @@ check("all PR refs collected", rows[1]["prs"], [373, 376, 378])
 check("undated rows are skipped",
       any(299 in r["prs"] for r in rows), False)
 
+# #391: a short-form range crossing a month boundary rolls forward.
+rows_mb = g.parse_rows(g.nc_section(
+    "## The negative-control track (x)\n\n"
+    "| E | #400 (merged 2026-08-30→2) | month boundary |\n\n## Next\n"))
+check("short-form range crosses the month boundary",
+      (rows_mb[0]["start"], rows_mb[0]["end"]),
+      (dt.date(2026, 8, 30), dt.date(2026, 9, 2)))
+
 d = dt.date(2026, 8, 18)
 check("inside the range passes", g.within(d, d, d), True)
 check("one-day skew passes", g.within(d, dt.date(2026, 8, 19),

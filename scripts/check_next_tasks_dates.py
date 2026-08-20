@@ -74,7 +74,14 @@ def parse_rows(text: str) -> list[dict]:
         if span.group("b"):
             b = dt.date.fromisoformat(span.group("b"))
         elif span.group("bday"):
-            b = a.replace(day=int(span.group("bday")))
+            day = int(span.group("bday"))
+            # #391: a short-form range crossing a month boundary
+            # ("2026-08-30→2") ends in the NEXT month.
+            if day >= a.day:
+                b = a.replace(day=day)
+            else:
+                nxt = (a.replace(day=1) + dt.timedelta(days=32)).replace(day=1)
+                b = nxt.replace(day=day)
         else:
             b = a
         out.append({"line": line.strip()[:60], "prs": prs,
