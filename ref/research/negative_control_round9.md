@@ -10,7 +10,11 @@ All 22 null legs regenerated (`r9n_`) under the registered protocol from
 the durable store. Every entry's two-path deltas reproduce the committed
 round-3 values within the registered 0.002 — and the worst absolute
 difference across all 44 comparisons is **0.0006** (8R5K), an order
-tighter than the allowance. The reproduction confirms in one sweep: the
+tighter than the allowance. The 8R5K comparison deserves its footnote
+(#384): its round-3 baseline is the MLHL-contaminated null flagged in
+round 6, so the 0.0006/0.0004 match there is more than reproduction — it
+quantifies that the contamination's effect on the *two-path deltas* was
+negligible (the R levels were contaminated; the deltas barely were). The reproduction confirms in one sweep: the
 round-6 strip and round-8 wavelength patch preserved measurement-relevant
 data identity, and the refinement protocol is deterministic enough to
 regenerate history from clean inputs. Every regenerated model carries
