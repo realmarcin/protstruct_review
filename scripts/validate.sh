@@ -108,6 +108,14 @@ if ! python3 "${REPO_ROOT}/scripts/check_qds_trust_invariant.py"; then
   fail "QDS trust invariant"
 fi
 
+# 3d. NEXT_TASKS NC-table dates match the git merge trail — the
+#     date/attribution class recurred in consecutive reconciliations
+#     (#372, #386), and the repo's rule is to build the guard on the
+#     second recurrence, not keep catching it by hand.
+if ! python3 "${REPO_ROOT}/scripts/check_next_tasks_dates.py"; then
+  fail "NEXT_TASKS dates out of step with the merge trail"
+fi
+
 # 4. QDS emitter regression tests (geometry-slot completeness, site/ligand/
 #    per-residue/pairwise/tool-recs builder coverage, fail-hard negative test)
 if ! python3 "${REPO_ROOT}/scripts/test_qds_emit.py"; then
