@@ -538,7 +538,11 @@ def d6_statistics(rows: list[dict],
                 excluded = False
                 r["headroom_mask_attributed"] = True
         r["headroom_both_paths"] = excluded
-        r["headroom_one_path_only"] = one_path if not excluded and one_path else []
+        # #390: a mask-attributed BOTH-path improver must not masquerade as
+        # a one-path improver — the field is only for genuine single-path
+        # improvement.
+        r["headroom_one_path_only"] = (one_path if not improver and one_path
+                                       else [])
         r["enrolled"] = not excluded
     stats["n_excluded_headroom"] = sum(1 for r in screened
                                        if r["headroom_both_paths"])

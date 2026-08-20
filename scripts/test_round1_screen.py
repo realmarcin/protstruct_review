@@ -184,6 +184,9 @@ check("#321: missing instrument excludes conservatively, named",
        .get("headroom_unmasked_shift_missing")), (False, True))
 check("#321: stats count the mask-attributed class",
       stats_m["n_mask_attributed"], 1)
+check("#390: a mask-attributed both-path improver is NOT a one-path improver",
+      next(r for r in rows_m if r["pdb_id"] == "MASKY")
+      ["headroom_one_path_only"], [])
 check("#321: exclusion count holds the corroborated + conservative pair",
       stats_m["n_excluded_headroom"], 2)
 
