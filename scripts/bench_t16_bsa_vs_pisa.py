@@ -281,6 +281,9 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*", default=None, help="PDB IDs (default: built-in set)")
     ap.add_argument("--cache", default=None, help="download cache directory")

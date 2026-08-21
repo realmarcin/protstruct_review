@@ -298,6 +298,9 @@ def run_entry(entry: dict, cache: Path, work: Path, thresholds: dict,
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--cache",

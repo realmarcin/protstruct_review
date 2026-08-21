@@ -189,6 +189,9 @@ def patch_entry(pdb_id: str, durable: Path, work: Path,
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--durable",
                     default=str(Path.home() / "protstruct_bench_inputs"))

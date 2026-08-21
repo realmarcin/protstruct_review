@@ -289,6 +289,9 @@ SET_SHORTFALL = "12 of 17 -- the 5 models with ZERO flip disagreements were neve
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
     ap.add_argument("--ids-file")

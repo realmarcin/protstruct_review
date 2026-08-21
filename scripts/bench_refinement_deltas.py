@@ -431,6 +431,9 @@ SET_SHORTFALL = ("16 of 37 -- the ~11 low-resolution entries that produce BOTH q
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
     ap.add_argument("--cache", required=True,

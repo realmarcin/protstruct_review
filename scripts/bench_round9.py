@@ -127,6 +127,9 @@ def derive_threshold(deltas: list[float]) -> float:
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--durable",
                     default=str(Path.home() / "protstruct_bench_inputs"))

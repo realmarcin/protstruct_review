@@ -175,6 +175,9 @@ SET_NOT_RUNNABLE = "no id argument exists; the set is whatever the cache holds"
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--cache", required=True,
                     help="directory holding xt_*.log / ct_*.log from bench_t13_wilson_b.py")

@@ -483,6 +483,9 @@ def _report_superseded(superseded: list[tuple[str, list[str], list[str]]],
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--cache", required=True)
     ap.add_argument("--entries", help="JSON: [{pdb_id, resolution}, ...]; default <cache>/entries.json")

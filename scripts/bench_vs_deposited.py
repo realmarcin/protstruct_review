@@ -632,6 +632,9 @@ SET_SHORTFALL = "11 of 17 -- the Ramachandran/rotamer figures ran on 17 entries,
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
     ap.add_argument("--ids-file")

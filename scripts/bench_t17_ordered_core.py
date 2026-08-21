@@ -151,6 +151,9 @@ SET_NOT_RUNNABLE = "takes model files rather than PDB ids"
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("models", nargs="+", type=Path)
     ap.add_argument("--json", dest="json_out")

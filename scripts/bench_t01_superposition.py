@@ -231,6 +231,9 @@ def parse_pairs(tokens: list[str]) -> list[tuple[str, str]]:
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pairs", nargs="*", help="FIXED:MOVING tokens (default: built-in set)")
     ap.add_argument("--pairs-file", help="JSON file: [[fixed, moving], ...]")

@@ -170,6 +170,9 @@ def run_entry(entry: dict, subject: str, cache: Path, work: Path,
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--subject", choices=("osol", "agent"), required=True)

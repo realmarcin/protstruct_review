@@ -236,12 +236,15 @@ fi
 
 # The schema is canonical and models.py is generated. Regenerate through the
 # selected interpreter so drift cannot be hidden by a mismatched global CLI.
-if ! "${PYTHON}" -c '
+if ! (
+  cd "${REPO_ROOT}"
+  "${PYTHON}" -c '
 from linkml.generators.pydanticgen import PydanticGenerator
 from pathlib import Path
 import sys
 Path(sys.argv[2]).write_text(PydanticGenerator(sys.argv[1]).serialize())
-' "${SCHEMA}" "${MODEL_REGEN}"; then
+' "schemas/protstruct_review.yaml" "${MODEL_REGEN}"
+); then
   fail "protstruct_review/models.py could not be regenerated"
 fi
 if ! diff -q "${REPO_ROOT}/protstruct_review/models.py" "${MODEL_REGEN}" >/dev/null; then
