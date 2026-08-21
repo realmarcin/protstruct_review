@@ -11,7 +11,7 @@
   <rect x="80" y="180" width="1760" height="160" rx="10" fill="#dff0e1" stroke="#1f7a3f" stroke-width="2"/>
   <text x="100" y="230" font-size="32" font-weight="700" fill="#1f7a3f">Modelling decisions are defensible</text>
   <text x="100" y="278" font-size="20" fill="#1a1a2e">Structure · geometry · ion identity (Mg²⁺ excluded) · water placement (143 / 146 well-supported) · disulfide bonds.</text>
-  <text x="100" y="312" font-size="18" fill="#5a6071">1SAR refinement is a real and substantial improvement over the deposited starting model.</text>
+  <text x="100" y="312" font-size="18" fill="#5a6071">1SAR refinement is a real and substantial improvement over the tutorial-derived starting model.</text>
   <rect x="80" y="380" width="417" height="220" rx="10" fill="#ffffff" stroke="#a8201a" stroke-width="2"/>
   <circle cx="110" cy="414" r="22" fill="#a8201a"/>
   <text x="110" y="422" font-size="22" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>

@@ -327,7 +327,7 @@ def slide_03_verdict():
     )
     body.append(
         f'  <text x="120" y="240" font-size="32" font-weight="700" fill="{INK}">'
-        f'1SAR is a real and substantial improvement over the deposited starting model.</text>'
+        f'1SAR is a real and substantial improvement over the tutorial-derived starting model.</text>'
     )
     body.append(
         f'  <text x="120" y="278" font-size="22" fill="{MUTED}">'
@@ -1484,7 +1484,7 @@ def slide_15_net():
     )
     body.append(
         f'  <text x="100" y="312" font-size="18" fill="{MUTED}">'
-        f'1SAR refinement is a real and substantial improvement over the deposited starting model.</text>'
+        f'1SAR refinement is a real and substantial improvement over the tutorial-derived starting model.</text>'
     )
 
     # Four issues as numbered cards

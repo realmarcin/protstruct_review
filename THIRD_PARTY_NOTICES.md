@@ -3,22 +3,17 @@
 This file records provenance and upstream reuse constraints; it is not a repository-wide license
 and grants no additional rights. The repository does not currently have a root `LICENSE` file.
 
-## PHENIX documentation mirror
+## PHENIX documentation
 
-`ref/phenix_docs/phenix-online.org/documentation/` is an offline mirror created from
-<https://phenix-online.org/documentation/> by `ref/download_phenix_docs.sh`. The original commit
-does not record a retrieval date, upstream revision, checksum manifest, or separate permission to
-redistribute the mirror.
+No PHENIX documentation mirror is included in the repository. `ref/download_phenix_docs.sh` can
+create an ignored local cache from <https://phenix-online.org/documentation/> for users who are
+authorized to do so. The cache is deliberately excluded from version control and release contents.
 
 PHENIX publishes license terms at <https://phenix-online.org/license>. Those terms treat associated
 online or electronic documentation as part of the licensed software and restrict distribution.
-Consequently, the mirror must not be assumed to be covered by any license later chosen for this
-repository. Verify written authorization or replace the mirror with links/reproducible local
-download instructions before publishing or redistributing it. Preserve all upstream copyright and
-proprietary notices.
-
-Resolution is tracked in
-[#401](https://github.com/realmarcin/protstruct_review/issues/401).
+Consequently, a locally created cache must not be assumed to be covered by any license later chosen
+for this repository and must not be published or redistributed without appropriate authorization.
+Preserve all upstream copyright and proprietary notices.
 
 ## wwPDB archive materials
 
@@ -28,12 +23,10 @@ to the original structure authors. RCSB PDB gives entry-level citation guidance 
 <https://www.rcsb.org/pages/policies>.
 
 CC0 applies only when a committed artifact can be traced to the PDB archive. It must not be used as
-a blanket conclusion for files whose source has not been recorded, transformed agent outputs, or
-third-party examples bundled with software. See `data/README.md` for the current file-level record
-and known gaps.
-
-Legacy fixture provenance remediation is tracked in
-[#400](https://github.com/realmarcin/protstruct_review/issues/400).
+a blanket conclusion for transformed agent outputs or third-party examples bundled with software.
+See `data/README.md` and the machine-checked `data/pdb_mtz/fixture_provenance.yaml` for the current
+file-level record. Rights-unknown legacy fixtures were removed rather than being assigned an
+inferred license.
 
 ## Tool outputs and publications
 

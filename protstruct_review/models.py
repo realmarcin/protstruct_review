@@ -605,7 +605,7 @@ class CatalogTask(ConfiguredBaseModel):
                        'SiteQuality']} })
     task_name: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask']} })
     phenix_tool_refs: Optional[list[str]] = Field(default=[], description="""PHENIX tools that primarily implement this task.""", json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask']} })
-    phenix_doc_paths: Optional[list[str]] = Field(default=[], description="""Doc paths under ref/phenix_docs/phenix-online.org/documentation/.""", json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask']} })
+    phenix_doc_paths: Optional[list[str]] = Field(default=[], description="""Upstream PHENIX documentation routes, resolvable online or in the optional ignored local cache created by ref/download_phenix_docs.sh.""", json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask']} })
     oracle_tool_refs: Optional[list[str]] = Field(default=[], description="""Independent (typically non-cctbx) oracles the harness uses to grade this task.""", json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask']} })
     metric_definition_refs: Optional[list[str]] = Field(default=[], description="""Metrics this task is expected to produce.""", json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask']} })
     inputs_description: Optional[str] = Field(default=None, description="""Human prose describing typical inputs (file types, optional flags).""", json_schema_extra = { "linkml_meta": {'domain_of': ['CatalogTask']} })

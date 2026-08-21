@@ -8,8 +8,7 @@ This directory holds offline reference material and the key **task × evaluation
 
 | File / dir | What it is |
 |---|---|
-| `phenix_docs/` | Mirrored PHENIX documentation (HTML, offline). Populated by `download_phenix_docs.sh`. |
-| `download_phenix_docs.sh` | Re-runnable `wget` mirror script for the PHENIX docs. |
+| `download_phenix_docs.sh` | Opt-in `wget` script for an ignored, local-only PHENIX documentation cache. No mirror is distributed with the repository. |
 | `tasks_and_evaluations.md` | **Key doc.** 17-row catalog of rote structural-biology tasks, each paired with PHENIX tool(s), independent-oracle tool(s), inputs, evaluation metrics, gold standard, and an example dataset. Hand-written prose; `scripts/validate.sh` checks that every catalog task has a section here. |
 | `tasks_and_evaluations.tsv` | Machine-loadable version of the same table (pipe-separated lists within tab-separated columns). **Generated** from `catalog.yaml`; `scripts/validate.sh` fails if it drifts. |
 | `driving_example.md` | Worked end-to-end example (**compare → refine → RMSD**) that exercises tasks T01 + T04 + T05 + T06 together. Template for the per-task driving examples. |
@@ -24,13 +23,18 @@ This directory holds offline reference material and the key **task × evaluation
 | `protein_structure_quality_refinement_indicators.md` | Survey of quality/refinement indicators behind the T15–T17 tasks and the newer QDS summary blocks (classification, interface, prediction-ensemble, NMR). |
 | `quality_reporting.md` | Synthesis of community consensus on the smallest defensible quality report (single-structure, X-ray / cryo-EM / predicted) and pair-of-structures (TM-score, lDDT, GDT-TS, RMSD, Δ model-vs-data). Evidence base for the QualityDataSheet schema. ~18 citations. |
 
-## Regenerating the PHENIX docs mirror
+## Creating a local PHENIX docs cache
+
+Review the [PHENIX license terms](https://phenix-online.org/license) before running this opt-in
+command. The result is ignored by Git and is not part of this repository or its releases:
 
 ```bash
 bash ref/download_phenix_docs.sh
 ```
 
-Output lands in `ref/phenix_docs/phenix-online.org/documentation/`. Re-runs are idempotent — `wget --mirror` only re-downloads changed files. Expected footprint: ~50 MB, 550+ files (of which ~250 are HTML reference pages; the rest are images, CSS, and index assets).
+Output lands in `ref/phenix_docs/phenix-online.org/documentation/`. Re-runs are idempotent —
+`wget --mirror` only re-downloads changed files. Do not commit or redistribute this cache without
+appropriate upstream authorization.
 
 Sanity check after a run:
 

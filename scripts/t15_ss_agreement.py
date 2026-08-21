@@ -20,7 +20,7 @@ Degrades loudly: if `mkdssp` is not on PATH, or biotite is not importable, exits
 non-zero with a clear message rather than fabricating a number.
 
 Usage:
-    python3 scripts/t15_ss_agreement.py data/pdb_mtz/1sar.pdb --eval-id EVAL_1sar_...
+    python3 scripts/t15_ss_agreement.py data/pdb_mtz/1sar_deposited.pdb --eval-id EVAL_1sar_...
 """
 from __future__ import annotations
 

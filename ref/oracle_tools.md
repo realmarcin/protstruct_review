@@ -125,17 +125,17 @@ model and reports the three-state (H/E/C) agreement fraction:
 - **DSSP** (`mkdssp` 4.6.1, `brew install brewsci/bio/dssp`) — Kabsch & Sander H-bond energetics.
 - **biotite P-SEA** (`pip install biotite`, 1.7.1) — Labesse Cα-geometry method; a different
   algorithm family, so agreement is informative rather than tautological. Stands in for STRIDE,
-  which Homebrew no longer ships. Demonstrated: DSSP vs biotite on `data/pdb_mtz/1sar.pdb` →
-  0.86 agreement over 191 residues.
+  which Homebrew no longer ships. Demonstrated: DSSP vs biotite on the verified archive download
+  `data/pdb_mtz/1sar_deposited.pdb` → 0.8646 agreement over 192 residues.
 
 **T16 is fully runnable.** `scripts/t16_interface_quality.py` emits all three metrics:
 
 - `T16_interface_buried_surface_area` — always, from the model alone, via **biotite** Shrake-Rupley
   SASA (ΣSASA(chains) − SASA(complex); an installable stand-in for the PISA web service).
-  Demonstrated: `1sar` A/B → 437.2 Å².
+  Demonstrated: deposited `1sar` A/B → 442.1 Å².
 - `T16_interface_dockq_score` + `T16_capri_interface_quality_class` — when a `--native` reference is
   given, via **DockQ** (2.1.3), CAPRI class derived from the score (Basu & Wallner 2016 bands).
-  Identity calibration on `1sar` A/B → DockQ 1.000, class High.
+  Identity calibration on deposited `1sar` A/B → DockQ 1.000, class High.
 
 PISA/PDBePISA stays the `top_considered` oracle for buried surface area (the deposition-grade
 reference); biotite SASA is the installed `top_performing` stand-in. The two have now been

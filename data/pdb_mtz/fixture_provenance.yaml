@@ -1,0 +1,25 @@
+version: 1
+source_policy: https://www.wwpdb.org/about/usage-policies
+fixtures:
+  - path: 1d3z.pdb
+    identifier: PDB:1D3Z
+    source_url: https://files.rcsb.org/download/1D3Z.pdb
+    citation_url: https://doi.org/10.2210/pdb1D3Z/pdb
+    retrieved_on: 2026-08-21
+    sha256: 21099cb88231455fdfab4095dddfadcc85cc4213e105cf5f9cfff2ca21993378
+    transformations: []
+  - path: 1sar_deposited.pdb
+    identifier: PDB:1SAR
+    source_url: https://files.rcsb.org/download/1SAR.pdb
+    citation_url: https://doi.org/10.2210/pdb1SAR/pdb
+    retrieved_on: 2026-08-21
+    sha256: e60e5db6c7eb554a3ac4e184bdf7cbb7d69b682e287579bdcf5f8bf279d51f86
+    transformations: []
+  - path: 2n54_validation.xml.gz
+    identifier: PDB:2N54
+    source_url: https://files.rcsb.org/pub/pdb/validation_reports/n5/2n54/2n54_validation.xml.gz
+    citation_url: https://doi.org/10.2210/pdb2N54/pdb
+    retrieved_on: 2026-08-21
+    sha256: c3327daa4e2c380b3514b8b03f3f4dcccfe155fbf6f0c22224d650bb9fba62eb
+    content_sha256: 061dae8c3ee9694143930ff9402ade214506116cb3018095fea28fffb8ba8a96
+    transformations: []
