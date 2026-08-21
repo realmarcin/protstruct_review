@@ -6,9 +6,10 @@ carries the execution detail. Keep in sync — close a GitHub issue and check th
 **Last reconciled: 2026-08-19** (through the negative-control track, rounds NC-0…NC-9
 including the ANIS adoption and the completed store remediation, PRs #294–#383; the
 tolerance-series "Open" section below was last reconciled 2026-08-06 against rounds 37–42). **Check the issue tracker for open issues; this file does not mirror it in real
-time.** GitHub Actions runs the hermetic gate on Linux and macOS. The matching local command is
-`uv run --locked -- bash scripts/validate.sh`, and it must exit 0 before a merge. External-tool and
-online benchmarks remain manual.
+time.** A GitHub Actions workflow configures the hermetic gate on Linux and macOS; [#410](https://github.com/realmarcin/protstruct_review/issues/410)
+tracks the current GitHub-side startup failure if those checks are absent. The matching local
+command is `uv run --locked -- bash scripts/validate.sh`, and it must exit 0 before a merge.
+External-tool and online benchmarks remain manual.
 
 ## The negative-control track (2026-08-08 → 2026-08-19)
 

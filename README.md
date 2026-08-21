@@ -73,5 +73,7 @@ and [`data/README.md`](data/README.md) before redistributing the documentation m
 fixtures. Authoritative `CITATION.cff` metadata is tracked in
 [#402](https://github.com/realmarcin/protstruct_review/issues/402).
 
-The hermetic gate runs in GitHub Actions on Linux and macOS. PHENIX/CCP4 and online benchmarks
-remain deliberate, manual workflows.
+The repository configures the hermetic gate in GitHub Actions on Linux and macOS. If those checks
+are absent, consult [#410](https://github.com/realmarcin/protstruct_review/issues/410), which tracks
+a GitHub-side startup failure reproduced by a minimal workflow. The locked local gate remains the
+required fallback evidence. PHENIX/CCP4 and online benchmarks remain deliberate, manual workflows.
