@@ -175,7 +175,6 @@ def _make_flag_mtz(path: Path, flags):
     for h in range(1, 6):
         fobs = float("nan") if h >= 3 else 10.0 + h
         rows.append([h, 0, 0, fobs, 1.0, flags[h - 1]])
-    import numpy as np
     m.set_data(np.array(rows, dtype=np.float32))
     m.write_to_file(str(path))
 

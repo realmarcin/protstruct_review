@@ -60,3 +60,16 @@ its required binaries, data downloads, and command line.
 
 See [`ref/README.md`](ref/README.md) for the reference-material map and [`schemas/README.md`](schemas/README.md)
 for schema authoring and regeneration details.
+
+## Reuse, provenance, and citation
+
+This repository does not yet declare a repository-wide license. Do not infer one from the
+CC-BY-4.0 declaration inside the LinkML schema; the intended scope is tracked in
+[#399](https://github.com/realmarcin/protstruct_review/issues/399).
+Third-party materials retain their upstream terms. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)
+and [`data/README.md`](data/README.md) before redistributing the documentation mirror or data
+fixtures. Authoritative `CITATION.cff` metadata is tracked in
+[#402](https://github.com/realmarcin/protstruct_review/issues/402).
+
+The hermetic gate runs in GitHub Actions on Linux and macOS. PHENIX/CCP4 and online benchmarks
+remain deliberate, manual workflows.

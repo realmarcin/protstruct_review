@@ -30,3 +30,16 @@ dev = [
 [tool.uv]
 default-groups = ["dev"]
 package = false
+
+[tool.ruff]
+target-version = "py311"
+extend-exclude = [
+  "data",
+  "protstruct_review/models.py",
+  "ref/phenix_docs",
+]
+
+[tool.ruff.lint]
+# Start with correctness-oriented checks. Formatting and modernization rules
+# remain opt-in until the historical scripts are brought under the gate.
+select = ["E9", "F"]

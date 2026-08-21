@@ -32,7 +32,7 @@ fi
 
 if ! dependency_error="$("${PYTHON}" -c '
 import importlib
-required = ("gemmi", "linkml", "numpy", "pydantic", "scipy", "yaml")
+required = ("gemmi", "linkml", "numpy", "pydantic", "ruff", "scipy", "yaml")
 missing = []
 for name in required:
     try:
@@ -441,4 +441,14 @@ if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_driver_thresholds.py" > /dev/null 2
 fi
 if [[ "${QUIET}" == "0" ]]; then
   echo "driver/docstring thresholds match the registry"
+fi
+
+# Keep the initial lint boundary intentionally narrow: syntax/runtime-name
+# failures and Pyflakes correctness checks. Generated models and committed
+# research artifacts are excluded in pyproject.toml (#397).
+if ! "${PYTHON}" -m ruff check "${REPO_ROOT}"; then
+  fail "Ruff correctness checks"
+fi
+if [[ "${QUIET}" == "0" ]]; then
+  echo "Ruff correctness checks passed"
 fi

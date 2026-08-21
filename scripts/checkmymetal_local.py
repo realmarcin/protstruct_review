@@ -22,7 +22,6 @@ over high-resolution non-redundant structures):
 Score: per-element Z-score on observed mean bond length, plus
 boolean checks on CN range. Lowest |Z| and CN-in-range = best fit.
 """
-import math
 import statistics
 import gemmi
 
@@ -109,7 +108,7 @@ def analyse(struct_path, chain_id, resname):
     b = metal_at.b_iso
 
     print(f"\nObserved: mean d = {mean_d:.3f} Å (range {min_d:.3f}-{max_d:.3f}), CN = {cn}, B = {b:.2f}")
-    print(f"\nCheckMyMetal-style scoring:")
+    print("\nCheckMyMetal-style scoring:")
     print(f"{'Element':>8} {'|Z| bond':>10} {'CN range':>12} {'B range':>12} {'verdict':>20}")
     rows = []
     for el in CANONICAL:
