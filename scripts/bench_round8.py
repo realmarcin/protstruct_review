@@ -23,19 +23,19 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import os
 import re
-import subprocess
 import sys
 from pathlib import Path
+
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain import run_refmac
 
 REPO = Path(__file__).resolve().parent.parent
 SET_RECORD = "ref/research/data/negative_control_round2_enrolled.json"
 ENROLLED_JSON = REPO / SET_RECORD
 R7_JSON = REPO / "ref/research/data/negative_control_round7_attribution.json"
 OUT_JSON = REPO / "ref/research/data/negative_control_round8_closeout.json"
-
-CCP4_SETUP = "/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/bin/ccp4.setup-sh"
 
 # I2, registered: |staged - deposition| < 1e-3 is agreement (#375).
 WL_AGREE_TOL = 1e-3
@@ -61,15 +61,11 @@ def refmac_conv(model: Path, mtz: Path, work: Path, tag: str,
     if not (log.exists()
             and _bnc._REFMAC_FREE.search(log.read_text(errors="ignore"))):
         kw = "REFI BREF ANIS\n" if anis else ""
-        subprocess.run(
-            ["bash", "-c",
-             f"source {CCP4_SETUP} 2>/dev/null && cd {work} && "
-             f"refmac5 XYZIN {model} HKLIN {mtz} XYZOUT rc_{tag}.pdb "
-             f"HKLOUT rc_{tag}.mtz > {log} 2>&1 <<EOF\n"
-             f"MAKE NEWLIGAND CONTINUE\n{kw}"
-             f"LABIN FP={pair[0]} SIGFP={pair[1]} FREE={flag}\n"
-             f"NCYC 0\nEND\nEOF"],
-            capture_output=True, text=True, timeout=1800, env=dict(os.environ))
+        keywords = (f"MAKE NEWLIGAND CONTINUE\n{kw}"
+                    f"LABIN FP={pair[0]} SIGFP={pair[1]} FREE={flag}\n"
+                    "NCYC 0\nEND\n")
+        run_refmac(model, mtz, f"rc_{tag}.pdb", f"rc_{tag}.mtz", log,
+                   keywords, cwd=work)
     text = log.read_text(errors="ignore") if log.exists() else ""
     m = _bnc._REFMAC_FREE.search(text)
     return float(m.group(1)) if m else None
@@ -189,6 +185,9 @@ def patch_entry(pdb_id: str, durable: Path, work: Path,
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--durable",
                     default=str(Path.home() / "protstruct_bench_inputs"))

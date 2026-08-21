@@ -1,5 +1,7 @@
 # Coding standards — protstruct_review
 
+<!-- catalog-state: tasks=T01–T17; count=17; drivers=17 -->
+
 Repo-specific rules a reviewer can cite as **hard violations**, not judgement calls. These are
 the invariants of *this* harness — they sit on top of, and override, the generic code-smell
 baseline any review already carries. Generic style (naming, dead code, error handling) is not
@@ -42,12 +44,11 @@ Where this file and the handbook overlap, they must agree; if they drift, that i
    *agreement between two independent labellers* as a number
    (e.g. `T15_secondary_structure_agreement` = three-state DSSP-vs-STRIDE concordance).
 10. **Pass thresholds do not live in the catalog** — the catalog is metric-shape, not thresholds.
-    They live in per-task `driving_example_T<NN>.md` files (present for T01, T05, T13; the rest are
-    tracked in issue #2). Every numeric threshold is defined once in
+    They live in per-task `driving_example_T<NN>.md` files, present for all 17 catalog tasks
+    (T01–T17). Every numeric threshold is defined once in
     `ref/thresholds_and_standards.md` with a `[provenance]` tag naming its source; drivers cite it
     rather than restating values, and a new threshold without an admissible provenance is not
-    admissible. For a task that has no driver yet, state the threshold you used in the eval `notes:`
-    rather than implying a documented one exists.
+    admissible.
 
 ## QDS emitter (`scripts/qds_emit.py`)
 
@@ -90,6 +91,11 @@ Where this file and the handbook overlap, they must agree; if they drift, that i
     yielding an empty list that passes silently.
 19. **Scripts derive `REPO_ROOT` from their own location** (`__file__` / `BASH_SOURCE`), never a
     hardcoded absolute path. No `/Users/...` in any `.py`, `.sh`, schema, or doc.
+19b. **Benchmark tool execution is shell-free.** Pass paths and arguments as a list through
+    `scripts/toolchain.py`; use `cwd` and log file handles for redirection. Only the audited CCP4
+    adapter may source a vendor setup script. PHENIX, CCP4, TM-align, DSSP, probe, and reduce paths
+    and pinned versions are defined once in that module and overridden only with `PROTSTRUCT_*`
+    environment variables.
 
 ## The gate
 

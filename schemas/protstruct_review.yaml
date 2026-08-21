@@ -1,10 +1,11 @@
+# catalog-state: tasks=T01–T17; count=17; drivers=17
 id: https://w3id.org/protstruct-review/schema
 name: protstruct_review
 title: Protein Structure Review — oracles, measurements, evaluations, quality data sheets
 description: >-
   LinkML schema for the protstruct_review harness. Models the cross-tool oracle
   trust framework used to evaluate agentically refined or generated protein
-  structures: a static catalog of routine structural-biology tasks (T01..T14),
+  structures: a static catalog of routine structural-biology tasks (T01..T17),
   the tools that perform them, the metrics those tools report, the per-artifact
   evaluation runs that record each tool's reading, and the per-structure
   Quality Data Sheet that snapshots the cross-tool findings as a citable record.
@@ -431,7 +432,7 @@ classes:
   # -------------------------------------------------------------- catalog
 
   CatalogTask:
-    description: One row in the T01..T14 task catalog.
+    description: One row in the T01..T17 task catalog.
     attributes:
       id:
         identifier: true
@@ -668,7 +669,9 @@ classes:
           `ligand`, this is a free-text selector identifying what was
           measured (e.g. "chain A residues 30-45", "active site 1",
           "Asn A 39"). Site / residue selectors should also have a
-          structured ResidueRef / Site reference where appropriate.
+          structured ResidueRef / Site reference where appropriate. For `site`
+          and `ligand` scope this value is the exact declared Site or Ligand id;
+          put comparison qualifiers and human-readable detail in `notes`.
       metric_definition_ref:
       oracle_tool_ref:
       oracle_family:
@@ -1994,6 +1997,13 @@ classes:
         range: TypedMeasurementValue
         inlined: true
         description: RMSD of the ligand pose to a deposited reference complex.
+      element_identity:
+        range: TypedMeasurementValue
+        inlined: true
+        description: >-
+          Oracle assessment of the modelled chemical element. Candidate-specific
+          numeric evidence remains in the source EvaluationRun; this field carries
+          the citable ligand-level conclusion.
 
   Assumption:
     description: >-

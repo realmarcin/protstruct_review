@@ -25,13 +25,16 @@ import argparse
 import itertools
 import json
 import statistics
-import subprocess
 import sys
 import tempfile
 import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
+
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain import run_capture
 
 RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 
@@ -103,11 +106,10 @@ def run_dockq(model: Path, mapping: tuple[str, str], cache: Path) -> float | Non
     tag = f"{model.stem}_{mapping[0]}_{mapping[1]}"
     out = cache / f"dq_{tag}.json"
     if not out.exists():
-        subprocess.run(
-            ["bash", "-c",
-             f"DockQ {model} {model} --mapping {mapping[0]}:{mapping[1]} "
-             f"--json {out} > /dev/null 2>&1"],
-            capture_output=True, text=True, timeout=3600)
+        run_capture(
+            ["DockQ", model, model, "--mapping", f"{mapping[0]}:{mapping[1]}", "--json", out],
+            timeout=3600,
+        )
     if not out.exists() or not out.stat().st_size:
         return None
     try:
@@ -171,6 +173,9 @@ def summarize(rows: list[dict]) -> dict[str, Any]:
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
     ap.add_argument("--cache")

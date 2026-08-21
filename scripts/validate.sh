@@ -5,11 +5,16 @@
 # Usage:
 #   bash scripts/validate.sh
 #   bash scripts/validate.sh --quiet   # suppress per-file "OK" lines
+#
+# This gate is hermetic: it does not use the network or invoke PHENIX/CCP4.
+# Select its interpreter with PYTHON=/path/to/python3. All Python dependencies,
+# including LinkML validation, are imported from that same interpreter.
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCHEMA="${REPO_ROOT}/schemas/protstruct_review.yaml"
+PYTHON="${PYTHON:-python3}"
 
 QUIET=0
 if [[ "${1:-}" == "--quiet" ]]; then
@@ -21,9 +26,33 @@ fail() {
   exit 1
 }
 
+if ! command -v "${PYTHON}" >/dev/null 2>&1; then
+  fail "Python interpreter '${PYTHON}' was not found. Bootstrap the development environment as documented in README.md, or set PYTHON=/path/to/python3."
+fi
+
+if ! dependency_error="$("${PYTHON}" -c '
+import importlib
+required = ("gemmi", "linkml", "numpy", "pydantic", "ruff", "scipy", "yaml")
+missing = []
+for name in required:
+    try:
+        importlib.import_module(name)
+    except Exception as exc:
+        missing.append(f"{name}: {exc}")
+if missing:
+    raise SystemExit("; ".join(missing))
+' 2>&1)"; then
+  fail "Python dependency preflight failed for ${PYTHON}: ${dependency_error}. Bootstrap the development environment as documented in README.md."
+fi
+
+# Calling the LinkML CLI through the selected interpreter prevents the common
+# split-environment failure where `linkml-validate` and `python3` come from
+# different installations (#398).
+LINKML_VALIDATE=("${PYTHON}" -c "from linkml.validator.cli import cli; cli()")
+
 validate_one() {
   local path="$1"
-  if ! out="$(linkml-validate --schema "${SCHEMA}" "${path}" 2>&1)"; then
+  if ! out="$("${LINKML_VALIDATE[@]}" --schema "${SCHEMA}" "${path}" 2>&1)"; then
     echo "${out}"
     fail "${path}"
   fi
@@ -42,7 +71,7 @@ validate_one "${REPO_ROOT}/ref/tool_recommendations.yaml"
 validate_one "${REPO_ROOT}/ref/tool_assumptions.yaml"
 
 # 1b. Structural-criteria registry against its own schema (separate schema).
-if ! out="$(linkml-validate --schema "${REPO_ROOT}/schemas/structural_criteria.yaml" \
+if ! out="$("${LINKML_VALIDATE[@]}" --schema "${REPO_ROOT}/schemas/structural_criteria.yaml" \
                             "${REPO_ROOT}/ref/structural_criteria.yaml" 2>&1)"; then
   echo "${out}"; fail "ref/structural_criteria.yaml"
 fi
@@ -53,34 +82,30 @@ if [[ "${QUIET}" == "0" ]]; then echo "OK   ref/structural_criteria.yaml (struct
 #    (data/examples/) and real per-artefact evals + QDS in
 #    data/<provider>/<system>/.
 #
-#    The provider is globbed, not hardcoded. This loop used to name `coscientists`
+#    The provider is discovered, not hardcoded. This loop used to name `coscientists`
 #    while the comment above promised `data/<provider>/<system>/`, so records under any
-#    other provider would never have been schema-checked -- silently, because
-#    `nullglob` makes a glob that matches nothing contribute no iterations rather than
-#    an error. The count is asserted below for the same reason: zero files validated
-#    used to be indistinguishable from all files valid (#123).
-shopt -s nullglob globstar
-# The generic provider globs also match data/examples/{eval,qds}/, so the list is
-# deduplicated before validating rather than schema-checking those files twice.
-record_globs=( "${REPO_ROOT}"/data/examples/eval/*.yaml
-               "${REPO_ROOT}"/data/examples/qds/*.yaml
-               "${REPO_ROOT}"/data/examples/catalog/*.yaml
-               "${REPO_ROOT}"/data/*/**/EVAL_*.yaml
-               "${REPO_ROOT}"/data/*/**/QDS_*.yaml )
-# Deduplicated in-loop rather than by piping through `sort -u`: a crash in the
-# producer of a `< <(...)` process substitution is invisible to `set -e`, which is the
-# trap this script already documents at the catalog-id enumeration below.
+#    other provider would never have been schema-checked. The count is asserted below
+#    for the same reason: zero files validated used to be indistinguishable from all
+#    files valid (#123).
+# Capture discovery before consuming it so a `find`/`sort` failure is visible to
+# `set -e`. This is Bash 3.2-compatible; `globstar` made the documented command
+# fail on the default macOS shell before the first record was checked (#398).
+if ! RECORD_FILES="$(find "${REPO_ROOT}/data" -type f \
+    \( -name 'EVAL_*.yaml' -o -name 'QDS_*.yaml' \
+       -o \( -path '*/data/examples/catalog/*' -name '*.yaml' \) \) \
+    -print | LC_ALL=C sort)"; then
+  fail "could not enumerate schema-governed records under data/"
+fi
+
 n_records=0
-seen_records=""
-for f in "${record_globs[@]+"${record_globs[@]}"}"; do
-  case " ${seen_records} " in *" ${f} "*) continue ;; esac
-  seen_records="${seen_records} ${f}"
+while IFS= read -r f; do
+  [[ -z "${f}" ]] && continue
   validate_one "${f}"
   n_records=$((n_records + 1))
-done
+done <<< "${RECORD_FILES}"
 
 if [[ "${n_records}" -eq 0 ]]; then
-  fail "no records matched under data/ — the record globs found nothing, which is a
+  fail "no records matched under data/ — record discovery found nothing, which is a
         gate failure, not a pass. Check data/ has not been moved or renamed."
 fi
 
@@ -90,21 +115,27 @@ fi
 
 # 3. Referential integrity (metric_definition_ref / oracle_tool_ref /
 #    catalog_task_ref must resolve in ref/catalog.yaml)
-if ! python3 "${REPO_ROOT}/scripts/check_referential_integrity.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_referential_integrity.py"; then
   fail "referential integrity"
+fi
+
+# 3a. Catalog-derived task range, driver inventory, and runnable-wrapper claims
+#     must agree across the authoritative documentation (#395).
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_documentation_state.py"; then
+  fail "catalog-derived documentation state"
 fi
 
 # 3b. Negative-control series records reconcile (#312): screen/enrolled/reps
 #     internal consistency, full-run manifests only in committed records
 #     (#319), and round-doc headline figures matching the record (#311 class).
-if ! python3 "${REPO_ROOT}/scripts/check_negative_control_records.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_negative_control_records.py"; then
   fail "negative-control record reconciliation"
 fi
 
 # 3c. Trust invariant on committed QDS files (#315): no gradeable task rests
 #     on cctbx-only or unclassifiable evidence without a named waiver;
 #     pre-cutover history is grandfathered BY NAME, never silently.
-if ! python3 "${REPO_ROOT}/scripts/check_qds_trust_invariant.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_qds_trust_invariant.py"; then
   fail "QDS trust invariant"
 fi
 
@@ -112,43 +143,43 @@ fi
 #     date/attribution class recurred in consecutive reconciliations
 #     (#372, #386), and the repo's rule is to build the guard on the
 #     second recurrence, not keep catching it by hand.
-if ! python3 "${REPO_ROOT}/scripts/check_next_tasks_dates.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_next_tasks_dates.py"; then
   fail "NEXT_TASKS dates out of step with the merge trail"
 fi
 
 # 4. QDS emitter regression tests (geometry-slot completeness, site/ligand/
 #    per-residue/pairwise/tool-recs builder coverage, fail-hard negative test)
-if ! python3 "${REPO_ROOT}/scripts/test_qds_emit.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_qds_emit.py"; then
   fail "qds_emit regression"
 fi
 
 # 4b. T15 SS-agreement pure-logic unit tests (parsing/collapse/agreement; no
 #     mkdssp/biotite needed, so safe to run anywhere).
-if ! python3 "${REPO_ROOT}/scripts/test_t15_ss_agreement.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_t15_ss_agreement.py"; then
   fail "t15_ss_agreement unit tests"
 fi
 
 # 4c. T16 interface-quality pure-logic unit tests (CAPRI bands / DockQ-JSON
 #     extraction; no DockQ binary needed, so safe to run anywhere).
-if ! python3 "${REPO_ROOT}/scripts/test_t16_interface_quality.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_t16_interface_quality.py"; then
   fail "t16_interface_quality unit tests"
 fi
 
 # 4d. T17 NMR ensemble-precision pure-logic unit tests (mean-RMSF arithmetic;
 #     no biotite/ensemble needed, so safe to run anywhere).
-if ! python3 "${REPO_ROOT}/scripts/test_t17_nmr_ensemble.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_t17_nmr_ensemble.py"; then
   fail "t17_nmr_ensemble unit tests"
 fi
 
 # 4e. T17 restraint-summary pure-logic unit tests (wwPDB-report parsing;
 #     no network / real report needed, so safe to run anywhere).
-if ! python3 "${REPO_ROOT}/scripts/test_t17_restraint_summary.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_t17_restraint_summary.py"; then
   fail "t17_restraint_summary unit tests"
 fi
 
 # 4f. Tolerance-benchmark pure-logic unit tests (summary statistics + xtriage /
 #     ctruncate log parsing; no network, PISA, PHENIX or CCP4 needed).
-if ! python3 "${REPO_ROOT}/scripts/test_bench_tolerances.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_bench_tolerances.py"; then
   fail "bench tolerance unit tests"
 fi
 
@@ -157,12 +188,12 @@ fi
 #     shipped with a hole (#116, #118) — one comparing four counts it derived itself
 #     and never reading the registry, the other promising a structure_ref check in its
 #     docstring that was never written. A guard needs a guard.
-if ! python3 "${REPO_ROOT}/scripts/test_guards.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_guards.py"; then
   fail "guard unit tests"
 fi
 
 # 4h. Record-tool parsing tests (ctruncate twin operators, TSV unit conversion).
-if ! python3 "${REPO_ROOT}/scripts/test_record_tools.py"; then
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_record_tools.py"; then
   fail "record tool unit tests"
 fi
 
@@ -178,7 +209,7 @@ for _suite in "${REPO_ROOT}"/scripts/test_*.py; do
     test_t17_nmr_ensemble.py|test_t17_restraint_summary.py|test_bench_tolerances.py| \
     test_guards.py|test_record_tools.py|test_summary_coverage.py) continue ;;
   esac
-  if ! python3 "${_suite}"; then
+  if ! "${PYTHON}" "${_suite}"; then
     fail "$(basename "${_suite}" .py)"
   fi
 done
@@ -191,15 +222,34 @@ done
 TSV="${REPO_ROOT}/ref/tasks_and_evaluations.tsv"
 MD="${REPO_ROOT}/ref/tasks_and_evaluations.md"
 TSV_REGEN="$(mktemp)"
-trap 'rm -f "${TSV_REGEN}"' EXIT
+MODEL_REGEN="$(mktemp)"
+trap 'rm -f "${TSV_REGEN}" "${MODEL_REGEN}"' EXIT
 
-if ! python3 "${REPO_ROOT}/scripts/records_to_tsv.py" \
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/records_to_tsv.py" \
        "${REPO_ROOT}/ref/catalog.yaml" --kind catalog -o "${TSV_REGEN}" >/dev/null; then
   fail "tasks_and_evaluations.tsv could not be regenerated"
 fi
 if ! diff -q "${TSV}" "${TSV_REGEN}" >/dev/null; then
   diff "${TSV}" "${TSV_REGEN}" >&2 || true
-  fail "ref/tasks_and_evaluations.tsv is stale — regenerate with: python3 scripts/records_to_tsv.py ref/catalog.yaml --kind catalog -o ref/tasks_and_evaluations.tsv"
+  fail "ref/tasks_and_evaluations.tsv is stale — regenerate with: ${PYTHON} scripts/records_to_tsv.py ref/catalog.yaml --kind catalog -o ref/tasks_and_evaluations.tsv"
+fi
+
+# The schema is canonical and models.py is generated. Regenerate through the
+# selected interpreter so drift cannot be hidden by a mismatched global CLI.
+if ! (
+  cd "${REPO_ROOT}"
+  "${PYTHON}" -c '
+from linkml.generators.pydanticgen import PydanticGenerator
+from pathlib import Path
+import sys
+Path(sys.argv[2]).write_text(PydanticGenerator(sys.argv[1]).serialize())
+' "schemas/protstruct_review.yaml" "${MODEL_REGEN}"
+); then
+  fail "protstruct_review/models.py could not be regenerated"
+fi
+if ! diff -q "${REPO_ROOT}/protstruct_review/models.py" "${MODEL_REGEN}" >/dev/null; then
+  diff "${REPO_ROOT}/protstruct_review/models.py" "${MODEL_REGEN}" >&2 || true
+  fail "protstruct_review/models.py is stale — regenerate with the pinned LinkML environment"
 fi
 
 # Enumerate task ids into a variable BEFORE the loop. A crash inside a
@@ -207,7 +257,7 @@ fi
 # so reading the ids inline would let a malformed catalog yield zero ids and
 # pass silently — the very drift this section guards against. Capturing first,
 # with an explicit status check, makes an enumeration failure loud.
-if ! TASK_IDS="$(python3 -c '
+if ! TASK_IDS="$("${PYTHON}" -c '
 import sys, yaml
 doc = yaml.safe_load(open(sys.argv[1]))
 tasks = doc.get("catalog_tasks", [])
@@ -238,12 +288,12 @@ fi
 # `| ... |` line anywhere in the file, so an unrelated table or a fenced example row
 # silently satisfied coverage for a round that was genuinely missing. They now live in a
 # script with unit tests.
-if ! python3 "${REPO_ROOT}/scripts/test_summary_coverage.py" > /dev/null; then
-  python3 "${REPO_ROOT}/scripts/test_summary_coverage.py" >&2 || true
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_summary_coverage.py" > /dev/null; then
+  "${PYTHON}" "${REPO_ROOT}/scripts/test_summary_coverage.py" >&2 || true
   fail "summary coverage unit tests"
 fi
-if ! python3 "${REPO_ROOT}/scripts/check_summary_coverage.py" > /dev/null 2>&1; then
-  python3 "${REPO_ROOT}/scripts/check_summary_coverage.py" >&2 || true
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_summary_coverage.py" > /dev/null 2>&1; then
+  "${PYTHON}" "${REPO_ROOT}/scripts/check_summary_coverage.py" >&2 || true
   fail "summary files do not cover every round, or quote a count the record contradicts"
 fi
 if [[ "${QUIET}" == "0" ]]; then
@@ -261,7 +311,7 @@ fi
 # This checks a set is DECLARED, not that it is complete: several are knowingly partial
 # and say so via SET_IS_COMPLETE = False. A declared-but-incomplete set is the honest
 # state and passes; an undeclared one does not.
-if ! setless="$(python3 -c '
+if ! setless="$("${PYTHON}" -c '
 import ast, pathlib, re, sys
 
 repo = pathlib.Path(sys.argv[1])
@@ -320,45 +370,9 @@ if [[ "${QUIET}" == "0" ]]; then
   echo "every bench_*.py commits its entry set"
 fi
 
-# The external tool paths are written independently in nine files -- PHENIX_BIN in five,
-# CCP4_SETUP in four (#140). A PHENIX or CCP4 upgrade updates whichever script the author
-# is touching and not the others, which is the class this repo already recorded in #105:
-# "Round 21 fixed exactly this ... and did not check the sibling script."
-#
-# The bad case is the quiet one. If the old install is REMOVED the stale scripts crash,
-# which is harmless. If it is left on disk -- installers do not remove the previous
-# version -- they keep running against an older build, and benchmark numbers get computed
-# with mismatched tool versions with nothing to say so. §4 claims same-binary
-# reproducibility against `phenix-2.0-5936` pinned since round 5; that pin is only as
-# good as its nine copies agreeing.
-#
-# Gated rather than refactored: these are standalone scripts run as `python3 scripts/x.py`
-# from the repo root, so `scripts/` is not on sys.path and sharing a constant would need
-# importlib in nine files -- more machinery than the risk warrants.
-if ! divergent="$(python3 -c '
-import pathlib, re, sys
-
-repo = pathlib.Path(sys.argv[1])
-problems = []
-for const in ("PHENIX_BIN", "CCP4_SETUP"):
-    seen = {}
-    for script in sorted((repo / "scripts").glob("*.py")):
-        m = re.search("^" + const + r"\s*=\s*(.+)$", script.read_text(), re.M)
-        if m:
-            seen.setdefault(m.group(1).strip(), []).append(script.name)
-    if len(seen) > 1:
-        for value, files in sorted(seen.items()):
-            problems.append(const + " = " + value + "  <- " + ", ".join(files))
-print(" | ".join(problems))
-' "${REPO_ROOT}")"; then
-  fail "could not check external tool paths"
-fi
-if [[ -n "${divergent// /}" ]]; then
-  fail "external tool paths disagree between scripts: ${divergent}"
-fi
-if [[ "${QUIET}" == "0" ]]; then
-  echo "external tool paths agree across scripts"
-fi
+# `test_toolchain.py`, discovered by the generic unit-suite loop above, enforces
+# that tool paths exist only in scripts/toolchain.py and that no runner grows a
+# new shell-interpolated subprocess boundary (#394).
 
 # The registry quotes figures computed from ref/research/data/em_refinement_deltas.tsv,
 # and that file grows every round -- so those figures age silently. Three instances were
@@ -368,8 +382,8 @@ fi
 # This recomputes each one and fails if the registry's text no longer matches. It also
 # fails if the quoted literal has been REWORDED, because a gate that only compares
 # numbers is defeated by a rewrite -- which is exactly how a figure escapes notice.
-if ! python3 "${REPO_ROOT}/scripts/check_registry_figures.py" > /dev/null 2>&1; then
-  python3 "${REPO_ROOT}/scripts/check_registry_figures.py" >&2 || true
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_registry_figures.py" > /dev/null 2>&1; then
+  "${PYTHON}" "${REPO_ROOT}/scripts/check_registry_figures.py" >&2 || true
   fail "registry figures no longer match ref/research/data/em_refinement_deltas.tsv"
 fi
 if [[ "${QUIET}" == "0" ]]; then
@@ -384,9 +398,9 @@ fi
 # The findings themselves live in a committed TSV rather than being fetched at gate
 # time: `gh` is not available or authenticated everywhere, and a check that silently
 # skips is a guard that does not guard. Refresh it deliberately with
-# `python3 scripts/check_round_figures.py --refresh`.
-if ! python3 "${REPO_ROOT}/scripts/check_round_figures.py" > /dev/null 2>&1; then
-  python3 "${REPO_ROOT}/scripts/check_round_figures.py" >&2 || true
+# `${PYTHON} scripts/check_round_figures.py --refresh`.
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_round_figures.py" > /dev/null 2>&1; then
+  "${PYTHON}" "${REPO_ROOT}/scripts/check_round_figures.py" >&2 || true
   fail "a round document's figures no longer match ref/research/data/round_findings.tsv"
 fi
 if [[ "${QUIET}" == "0" ]]; then
@@ -399,12 +413,12 @@ fi
 # against its own artefact -- and nothing reconciled the two files, so the gate passed
 # for the whole life of round 37 (#261). The check is one-directional: selection may
 # hold MORE ids than the deltas (fetch rejects), never fewer.
-if ! python3 "${REPO_ROOT}/scripts/test_selection_deltas.py" > /dev/null; then
-  python3 "${REPO_ROOT}/scripts/test_selection_deltas.py" >&2 || true
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_selection_deltas.py" > /dev/null; then
+  "${PYTHON}" "${REPO_ROOT}/scripts/test_selection_deltas.py" >&2 || true
   fail "selection/deltas guard unit tests"
 fi
-if ! python3 "${REPO_ROOT}/scripts/check_selection_deltas.py" > /dev/null 2>&1; then
-  python3 "${REPO_ROOT}/scripts/check_selection_deltas.py" >&2 || true
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_selection_deltas.py" > /dev/null 2>&1; then
+  "${PYTHON}" "${REPO_ROOT}/scripts/check_selection_deltas.py" >&2 || true
   fail "a round refined an entry its selection record does not list"
 fi
 if [[ "${QUIET}" == "0" ]]; then
@@ -417,14 +431,24 @@ fi
 # bench_*.py docstrings, with nothing reconciling the registry against its consumers. The
 # check re-derives each value from the registry (so a future §-change fails here too) and
 # flags retired literals stated as current.
-if ! python3 "${REPO_ROOT}/scripts/test_driver_thresholds.py" > /dev/null; then
-  python3 "${REPO_ROOT}/scripts/test_driver_thresholds.py" >&2 || true
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_driver_thresholds.py" > /dev/null; then
+  "${PYTHON}" "${REPO_ROOT}/scripts/test_driver_thresholds.py" >&2 || true
   fail "driver-threshold guard unit tests"
 fi
-if ! python3 "${REPO_ROOT}/scripts/check_driver_thresholds.py" > /dev/null 2>&1; then
-  python3 "${REPO_ROOT}/scripts/check_driver_thresholds.py" >&2 || true
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_driver_thresholds.py" > /dev/null 2>&1; then
+  "${PYTHON}" "${REPO_ROOT}/scripts/check_driver_thresholds.py" >&2 || true
   fail "a driving example or benchmark docstring restates a retired registry threshold"
 fi
 if [[ "${QUIET}" == "0" ]]; then
   echo "driver/docstring thresholds match the registry"
+fi
+
+# Keep the initial lint boundary intentionally narrow: syntax/runtime-name
+# failures and Pyflakes correctness checks. Generated models and committed
+# research artifacts are excluded in pyproject.toml (#397).
+if ! "${PYTHON}" -m ruff check "${REPO_ROOT}"; then
+  fail "Ruff correctness checks"
+fi
+if [[ "${QUIET}" == "0" ]]; then
+  echo "Ruff correctness checks passed"
 fi

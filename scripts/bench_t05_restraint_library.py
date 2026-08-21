@@ -28,10 +28,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import statistics
-import subprocess
 import sys
 import tempfile
 import urllib.error
@@ -39,10 +37,11 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
-MODEL_STATISTICS = str(Path.home() / "phenix-2.0-5936" / "phenix_bin" / "phenix.model_statistics")
-CCP4_SETUP = "/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/bin/ccp4.setup-sh"
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain import phenix, run_logged
 
+RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 _PHENIX_BOND = re.compile(r"covalent geometry\s*:\s*bond\s+([\d.]+)\s*\(\s*(\d+)\)")
 _PHENIX_ANGLE = re.compile(r"covalent geometry\s*:\s*angle\s+([\d.]+)\s*\(\s*(\d+)\)")
 _GEMMI_RMSD = re.compile(r"Model rmsD:\s*bond:\s*([\d.]+),\s*angle:\s*([\d.]+)")
@@ -67,11 +66,16 @@ def run_phenix(model: Path, work: Path, cdl: bool) -> dict[str, Any] | None:
     tag = "cdl" if cdl else "eh"
     log = work / f"ms_{tag}_{model.stem}.log"
     if not log.exists() or not _PHENIX_BOND.search(log.read_text(errors="ignore")):
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && {MODEL_STATISTICS} {model} "
-             f"pdb_interpretation.restraints_library.cdl={cdl} > {log} 2>&1"],
-            capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+        run_logged(
+            [
+                phenix("phenix.model_statistics"),
+                model,
+                f"pdb_interpretation.restraints_library.cdl={cdl}",
+            ],
+            log,
+            cwd=work,
+            timeout=3600,
+        )
     if not log.exists():
         return None
     text = log.read_text(errors="ignore")
@@ -86,10 +90,7 @@ def run_gemmi(model: Path, work: Path) -> dict[str, Any] | None:
     """Bond and angle rmsD from gemmi against the CCP4 monomer library."""
     log = work / f"rmsz_{model.stem}.log"
     if not log.exists() or not _GEMMI_RMSD.search(log.read_text(errors="ignore")):
-        subprocess.run(
-            ["bash", "-c",
-             f"source {CCP4_SETUP} >/dev/null 2>&1; gemmi rmsz -q {model} > {log} 2>&1"],
-            capture_output=True, text=True, timeout=3600)
+        run_logged(["gemmi", "rmsz", "-q", model], log, timeout=3600, ccp4=True)
     if not log.exists():
         return None
     match = _GEMMI_RMSD.search(log.read_text(errors="ignore"))
@@ -182,6 +183,9 @@ SET_IS_COMPLETE = True
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
     ap.add_argument("--ids-file")

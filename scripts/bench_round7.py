@@ -26,11 +26,13 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import os
 import re
-import subprocess
 import sys
 from pathlib import Path
+
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain import run_logged, run_refmac
 
 REPO = Path(__file__).resolve().parent.parent
 SET_RECORD = "ref/research/data/negative_control_round2_enrolled.json"
@@ -39,8 +41,6 @@ R4_JSON = REPO / "ref/research/data/negative_control_round4_recover.json"
 R5_JSON = REPO / "ref/research/data/negative_control_round5_recover.json"
 R6_JSON = REPO / "ref/research/data/negative_control_round6_hygiene.json"
 OUT_JSON = REPO / "ref/research/data/negative_control_round7_attribution.json"
-
-CCP4_SETUP = "/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/bin/ccp4.setup-sh"
 
 # The superseded round-4 table, kept here ONLY as the sweep's "old" side —
 # 0.01220/0.01090/0.00540 were the registered values before round-7 H1.
@@ -142,13 +142,12 @@ def measure_four_tools(model: Path, mtz: Path, work: Path, tag: str,
     ref = _bnc.refmac_pass(model, mtz, work, f"refmac_{tag}", pair, flag)
     out["refmac"] = ref["r_free"] if ref else None
     slog = work / f"servalcat_{tag}.log"
-    subprocess.run(
-        ["bash", "-c",
-         f"source {CCP4_SETUP} 2>/dev/null && cd {work} && "
-         f"servalcat refine_xtal_norefmac -s xray --model {model} "
-         f"--hklin {mtz} --labin '{pair[0]},{pair[1]},{flag}' --ncycle 0 "
-         f"-o serval_{tag} > {slog} 2>&1"],
-        capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+    run_logged(
+        ["servalcat", "refine_xtal_norefmac", "-s", "xray", "--model", model,
+         "--hklin", mtz, "--labin", f"{pair[0]},{pair[1]},{flag}",
+         "--ncycle", "0", "-o", f"serval_{tag}"],
+        slog, cwd=work, timeout=3600, ccp4=True,
+    )
     stext = slog.read_text(errors="ignore") if slog.exists() else ""
     # The summary line is `Rwork = 0.1435 Rfree = 0.1473`; a loose
     # last-match regex lands on the stats table's Ncyc row and reads 0.
@@ -196,15 +195,12 @@ def ladder_2vxn(durable: Path, work: Path) -> dict:
     rec["exp2_resolution_audit"] = resolution_audit(work)
     # Experiment 3: the demoted hydrogen bound.
     hlog = work / "refmac_2vxn_hydr_n.log"
-    subprocess.run(
-        ["bash", "-c",
-         f"source {CCP4_SETUP} 2>/dev/null && cd {work} && "
-         f"refmac5 XYZIN {cif} HKLIN {mtz} XYZOUT rh_2vxn.pdb "
-         f"HKLOUT rh_2vxn.mtz > {hlog} 2>&1 <<EOF\n"
-         f"MAKE NEWLIGAND CONTINUE\nMAKE HYDR N\n"
-         f"LABIN FP={pair[0]} SIGFP={pair[1]} FREE={flag}\n"
-         f"NCYC 0\nEND\nEOF"],
-        capture_output=True, text=True, timeout=1800, env=dict(os.environ))
+    run_refmac(
+        cif, mtz, "rh_2vxn.pdb", "rh_2vxn.mtz", hlog,
+        ("MAKE NEWLIGAND CONTINUE\nMAKE HYDR N\n"
+         f"LABIN FP={pair[0]} SIGFP={pair[1]} FREE={flag}\nNCYC 0\nEND\n"),
+        cwd=work,
+    )
     htext = hlog.read_text(errors="ignore") if hlog.exists() else ""
     m = _bnc._REFMAC_FREE.search(htext)
     rec["exp3_refmac_hydr_n_r_free"] = float(m.group(1)) if m else None
@@ -213,15 +209,12 @@ def ladder_2vxn(durable: Path, work: Path) -> dict:
     # even at NCYC 0; REFI BREF ANIS keeps them. If this closes the gap
     # toward the two paths, it is the registered protocol amendment.
     alog = work / "refmac_2vxn_bref_anis.log"
-    subprocess.run(
-        ["bash", "-c",
-         f"source {CCP4_SETUP} 2>/dev/null && cd {work} && "
-         f"refmac5 XYZIN {cif} HKLIN {mtz} XYZOUT ra_2vxn.pdb "
-         f"HKLOUT ra_2vxn.mtz > {alog} 2>&1 <<EOF\n"
-         f"MAKE NEWLIGAND CONTINUE\nREFI BREF ANIS\n"
-         f"LABIN FP={pair[0]} SIGFP={pair[1]} FREE={flag}\n"
-         f"NCYC 0\nEND\nEOF"],
-        capture_output=True, text=True, timeout=1800, env=dict(os.environ))
+    run_refmac(
+        cif, mtz, "ra_2vxn.pdb", "ra_2vxn.mtz", alog,
+        ("MAKE NEWLIGAND CONTINUE\nREFI BREF ANIS\n"
+         f"LABIN FP={pair[0]} SIGFP={pair[1]} FREE={flag}\nNCYC 0\nEND\n"),
+        cwd=work,
+    )
     atext = alog.read_text(errors="ignore") if alog.exists() else ""
     m = _bnc._REFMAC_FREE.search(atext)
     rec["closing_invocation_refmac_bref_anis_r_free"] = \
@@ -234,14 +227,12 @@ def ladder_2vxn(durable: Path, work: Path) -> dict:
     # invariance alone.
     xlog = work / "servalcat_2vxn_adpaniso.log"
     if not xlog.exists():
-        subprocess.run(
-            ["bash", "-c",
-             f"source {CCP4_SETUP} 2>/dev/null && cd {work} && "
-             f"servalcat refine_xtal_norefmac -s xray --model {cif} "
-             f"--hklin {mtz} --labin '{pair[0]},{pair[1]},{flag}' "
-             f"--ncycle 0 --adp aniso -o serval_2vxn_adpaniso "
-             f"> {xlog} 2>&1"],
-            capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+        run_logged(
+            ["servalcat", "refine_xtal_norefmac", "-s", "xray", "--model", cif,
+             "--hklin", mtz, "--labin", f"{pair[0]},{pair[1]},{flag}",
+             "--ncycle", "0", "--adp", "aniso", "-o", "serval_2vxn_adpaniso"],
+            xlog, cwd=work, timeout=3600, ccp4=True,
+        )
     xtext = xlog.read_text(errors="ignore") if xlog.exists() else ""
     xm = re.findall(r"Rfree\s*=\s*([\d.]+)", xtext)
     rec["disclosed_extension_servalcat_adp_aniso_r_free"] = \
@@ -414,6 +405,9 @@ def refmac_census(durable: Path, work: Path, derived_9ygw: Path | None) -> dict:
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--durable",
                     default=str(Path.home() / "protstruct_bench_inputs"))

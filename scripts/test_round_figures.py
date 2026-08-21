@@ -106,7 +106,15 @@ rf._sibling = _saved_sibling
 
 # --- #199: the annotation must claim only what was checked --------------------------
 
-_never = rf.issues("9990-9995")
+# Real issue classification is the one deliberately online operation in
+# round_figures.py. This suite promises to be network-free, so inject an empty
+# classifier result rather than allowing an unrecorded range to reach GitHub (#398).
+_saved_real_issue_numbers = rf._real_issue_numbers
+rf._real_issue_numbers = lambda _lo, _hi: set()
+try:
+    _never = rf.issues("9990-9995")
+finally:
+    rf._real_issue_numbers = _saved_real_issue_numbers
 check("numbers that were never issued are not asserted to be PRs",
       any("filed since the last --refresh" in l for l in _never), False)
 check("  and the count is still 0", _never[0].rstrip().endswith(": 0   ()"), True)

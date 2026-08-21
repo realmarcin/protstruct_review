@@ -11,7 +11,6 @@ Run directly: `python3 scripts/test_xray_band_coverage.py` (no network, no scipy
 from __future__ import annotations
 
 import math
-import statistics
 import sys
 from pathlib import Path
 

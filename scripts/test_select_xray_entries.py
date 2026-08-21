@@ -83,7 +83,6 @@ class _FakeResponse:
 
 
 def _fake_urlopen(url, timeout=0):
-    import json
     pdb_id = url.rstrip("/").split("/")[-1]
     if pdb_id not in _ENTRIES:
         raise sx.urllib.error.HTTPError(url, 404, "not found", None, None)

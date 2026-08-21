@@ -31,10 +31,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import statistics
-import subprocess
 import sys
 import tempfile
 import urllib.error
@@ -42,10 +40,11 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
-SUPERPOSE = str(Path.home() / "phenix-2.0-5936" / "phenix_bin" / "phenix.superpose_models")
-TMALIGN = str(Path.home() / "tools" / "tmalign" / "TMalign")
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain import TMALIGN, phenix, run_logged
 
+RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 _TM = re.compile(r"Aligned length=\s*(\d+),\s*RMSD=\s*([\d.]+)")
 _TM_SCORE = re.compile(r"TM-score=\s*([\d.]+)\s*\(if normalized by length of Chain_2")
 _PHENIX_FINAL = re.compile(r"Final\s+\S+\s+RMSD:\s*([\d.]+)\s+N:\s*(\d+)\s+of\s+(\d+)")
@@ -107,9 +106,10 @@ def run_tmalign(fixed: Path, moving: Path, work: Path, all_chains: bool) -> dict
     suffix = "all" if all_chains else "first"
     log = work / f"tm_{fixed.stem}_{moving.stem}_{suffix}.log"
     if not log.exists() or not _TM.search(log.read_text(errors="ignore")):
-        flags = " -ter 0" if all_chains else ""
-        subprocess.run(["bash", "-c", f"{TMALIGN} {fixed} {moving}{flags} > {log} 2>&1"],
-                       capture_output=True, text=True, timeout=1800)
+        arguments = [TMALIGN, fixed, moving]
+        if all_chains:
+            arguments.extend(["-ter", "0"])
+        run_logged(arguments, log, timeout=1800)
     if not log.exists():
         return None
     text = log.read_text(errors="ignore")
@@ -128,10 +128,12 @@ def run_phenix(fixed: Path, moving: Path, work: Path) -> dict[str, Any] | None:
     """PHENIX superposition RMSD over its matched residues (no morph, no trim)."""
     log = work / f"sp_{fixed.stem}_{moving.stem}.log"
     if not log.exists() or not _PHENIX_FINAL.search(log.read_text(errors="ignore")):
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && {SUPERPOSE} {fixed} {moving} morph=False trim=False > {log} 2>&1"],
-            capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+        run_logged(
+            [phenix("phenix.superpose_models"), fixed, moving, "morph=False", "trim=False"],
+            log,
+            cwd=work,
+            timeout=3600,
+        )
     if not log.exists():
         return None
     match = _PHENIX_FINAL.search(log.read_text(errors="ignore"))
@@ -231,6 +233,9 @@ def parse_pairs(tokens: list[str]) -> list[tuple[str, str]]:
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pairs", nargs="*", help="FIXED:MOVING tokens (default: built-in set)")
     ap.add_argument("--pairs-file", help="JSON file: [[fixed, moving], ...]")

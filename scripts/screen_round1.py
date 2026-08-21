@@ -36,12 +36,14 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import os
 import re
 import statistics
-import subprocess
 import sys
 from pathlib import Path
+
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain import PHENIX_BIN, phenix, run_capture, run_logged
 
 REPO = Path(__file__).resolve().parent.parent
 # Round-2 outputs (#314): the round-1 record is committed history and a
@@ -72,10 +74,6 @@ def _load(name: str):
 _bench = _load("bench_refinement_deltas")     # refine protocol
 _gold = _load("gold_mask")                    # phase-1 masks
 _gr = _load("gemmi_rfactor")                  # independent R path
-# Same literal as every other PHENIX-calling script — the validate.sh tool-path
-# guard compares the assignment text across scripts, so an alias through another
-# module would hide a divergence from it.
-PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
 
 
 # --- Round-6 G2: the three-class column rule (registered in
@@ -178,8 +176,9 @@ def tool_versions() -> dict:
     hardcode; PHENIX is already path-pinned."""
     import shutil
     gemmi_cli = shutil.which("gemmi")
-    ver = subprocess.run(["bash", "-c", "gemmi --version 2>/dev/null | head -1"],
-                         capture_output=True, text=True).stdout.strip()
+    version_run = run_capture(["gemmi", "--version"])
+    version_text = (version_run.stdout or version_run.stderr).strip()
+    ver = version_text.splitlines()[0] if version_text else ""
     import gemmi as gemmi_py
     return {"phenix_bin": str(PHENIX_BIN),
             "gemmi_cli": gemmi_cli, "gemmi_cli_version": ver or None,
@@ -200,11 +199,15 @@ def fetch_pair(pdb_id: str, cache: Path) -> tuple[Path | None, Path | None, str]
     # --overwrite, since partial files are then present) is cheap insurance
     # against pure network noise; a second failure is a real data defect.
     for attempt, extra in enumerate(("", "--overwrite")):
-        subprocess.run(
-            ["bash", "-c", f"cd {cache} && {PHENIX_BIN / 'phenix.fetch_pdb'} "
-             f"{pdb_id} action=model+data fetch.convert_to_mtz=True {extra} "
-             f"> fetch_{pdb_id}.log 2>&1"],
-            capture_output=True, text=True, timeout=1800, env=dict(os.environ))
+        arguments = [
+            phenix("phenix.fetch_pdb"),
+            pdb_id,
+            "action=model+data",
+            "fetch.convert_to_mtz=True",
+        ]
+        if extra:
+            arguments.append(extra)
+        run_logged(arguments, cache / f"fetch_{pdb_id}.log", cwd=cache, timeout=1800)
         if model.exists() and mtz.exists():
             break
     if not model.exists() or not mtz.exists():
@@ -287,20 +290,27 @@ def refine_null(model: Path, mtz: Path, work: Path,
     # miller_array.labels.name — the exact phil the refusal message names
     # (refinement.input.xray_data.labels parses but is ignored; canaried on
     # 9YGW). One selector per ambiguous array kind.
-    selectors = f"\"miller_array.labels.name={pair[0]},{pair[1]}\""
+    selectors = [f"miller_array.labels.name={pair[0]},{pair[1]}"]
     if flag is not None:
-        selectors += f" \"miller_array.labels.name={flag}\""
+        selectors.append(f"miller_array.labels.name={flag}")
     prefix = f"r2n_{model.stem}"
     out = work / f"{prefix}_001.pdb"
     log = work / f"refine_{prefix}.log"
     if not out.exists():
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && {PHENIX_BIN / 'phenix.refine'} {model} {mtz} "
-             f"main.number_of_macro_cycles={_bench.MACRO_CYCLES} "
-             f"{selectors} "
-             f"output.prefix={prefix} --overwrite > {log} 2>&1"],
-            capture_output=True, text=True, timeout=7200, env=dict(os.environ))
+        run_logged(
+            [
+                phenix("phenix.refine"),
+                model,
+                mtz,
+                f"main.number_of_macro_cycles={_bench.MACRO_CYCLES}",
+                *selectors,
+                f"output.prefix={prefix}",
+                "--overwrite",
+            ],
+            log,
+            cwd=work,
+            timeout=7200,
+        )
     if not out.exists():
         return None, {"failure_reason": _bench.refine_failure_reason(log)}
     r_values = _bench._R_WORK.findall(log.read_text(errors="ignore")) \
@@ -320,15 +330,17 @@ def model_vs_data_rfree(model: Path, mtz: Path, work: Path, tag: str,
     the refinement, passed in from select_arrays — mvd's selectors are its own
     f_obs_label / r_free_flags_label params (the round-2 canary caught mvd
     failing on the identical ambiguity after the refine selector was fixed)."""
-    selectors = f"f_obs_label=\"{pair[0]}\""
+    selectors = [f"f_obs_label={pair[0]}"]
     if flag is not None:
-        selectors += f" r_free_flags_label=\"{flag}\""
+        selectors.append(f"r_free_flags_label={flag}")
     log = work / f"mvd_{tag}.log"
     if not log.exists() or not MVD_RFREE.search(log.read_text(errors="ignore")):
-        subprocess.run(
-            ["bash", "-c", f"cd {work} && {PHENIX_BIN / 'phenix.model_vs_data'} "
-             f"{model} {mtz} {selectors} > {log} 2>&1"],
-            capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+        run_logged(
+            [phenix("phenix.model_vs_data"), model, mtz, *selectors],
+            log,
+            cwd=work,
+            timeout=3600,
+        )
     if not log.exists():
         return None
     match = MVD_RFREE.search(log.read_text(errors="ignore"))
@@ -350,12 +362,19 @@ def gemmi_rfree(model: Path, obs_mtz: Path, work: Path, tag: str,
     calc = work / f"calc_{tag}.mtz"
     log = work / f"sfcalc_{tag}.log"
     if not calc.exists():
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && gemmi sfcalc --dmin={d_min:.3f} "
-             f"--scale-to={obs_mtz}:{f_label}:{sig_label} "
-             f"--to-mtz={calc} {model} > {log} 2>&1"],
-            capture_output=True, text=True, timeout=1800, env=dict(os.environ))
+        run_logged(
+            [
+                "gemmi",
+                "sfcalc",
+                f"--dmin={d_min:.3f}",
+                f"--scale-to={obs_mtz}:{f_label}:{sig_label}",
+                f"--to-mtz={calc}",
+                model,
+            ],
+            log,
+            cwd=work,
+            timeout=1800,
+        )
     if not calc.exists():
         return None
     try:

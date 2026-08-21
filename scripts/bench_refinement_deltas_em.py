@@ -31,15 +31,15 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import statistics
-import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
-PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain import phenix, run_logged
 
 _CC_MASK = re.compile(r"CC_mask\s*:\s*([\d.]+)")
 # mtriage prints masked and unmasked columns; FSC=0.143 is the conventional model-map
@@ -102,11 +102,10 @@ def d_fsc_from_curve(rows: list[tuple[float, float]], threshold: float = FSC_THR
     return None
 
 
-def run(cmd: str, log: Path, pattern: re.Pattern, work: Path) -> str | None:
-    """Run a command in `work`, caching on the log containing `pattern`."""
+def run(arguments: list[str | Path], log: Path, pattern: re.Pattern, work: Path) -> str | None:
+    """Run an argument vector in `work`, caching on a parseable log."""
     if not log.exists() or not pattern.search(log.read_text(errors="ignore")):
-        subprocess.run(["bash", "-c", f"cd {work} && {cmd} > {log} 2>&1"],
-                       capture_output=True, text=True, timeout=7200, env=dict(os.environ))
+        run_logged(arguments, log, cwd=work, timeout=7200)
     return log.read_text(errors="ignore") if log.exists() else None
 
 
@@ -135,15 +134,23 @@ def measure(model: Path, map_file: Path, resolution: float, work: Path,
     """CC_mask and masked d_FSC_model(0.143) for one model against one map."""
     tag = cache_key(tag, resolution)
     cc_log = work / f"mc_{tag}.log"
-    cc_text = run(f"{PHENIX_BIN / 'phenix.map_correlations'} {model} {map_file} "
-                  f"resolution={resolution}", cc_log, _CC_MASK, work)
+    cc_text = run(
+        [phenix("phenix.map_correlations"), model, map_file, f"resolution={resolution}"],
+        cc_log,
+        _CC_MASK,
+        work,
+    )
     # mtriage writes its FSC curve into the working directory under a fixed name, so
     # each measurement gets its own directory or they overwrite one another.
     mt_dir = work / f"mt_{tag}"
     mt_dir.mkdir(parents=True, exist_ok=True)
     mt_log = mt_dir / "mtriage.log"
-    run(f"{PHENIX_BIN / 'phenix.mtriage'} {model} {map_file} resolution={resolution}",
-        mt_log, _D_FSC_MODEL, mt_dir)
+    run(
+        [phenix("phenix.mtriage"), model, map_file, f"resolution={resolution}"],
+        mt_log,
+        _D_FSC_MODEL,
+        mt_dir,
+    )
     curve_path = mt_dir / FSC_CURVE
     d_value = (d_fsc_from_curve(read_fsc_curve(curve_path)) if curve_path.exists() else None)
     cc = _CC_MASK.search(cc_text) if cc_text else None
@@ -230,12 +237,19 @@ def refine(model: Path, map_file: Path, resolution: float, work: Path,
     if cached:                       # real_space_refine takes minutes; do not repeat it
         return cached[-1], None
     log = work / f"rsr_{tag}.log"
-    subprocess.run(
-        ["bash", "-c",
-         f"cd {work} && {PHENIX_BIN / 'phenix.real_space_refine'} {model} {map_file} "
-         f"resolution={resolution} output.prefix={prefix} --overwrite "
-         f"> {log} 2>&1"],
-        capture_output=True, text=True, timeout=14400, env=dict(os.environ))
+    run_logged(
+        [
+            phenix("phenix.real_space_refine"),
+            model,
+            map_file,
+            f"resolution={resolution}",
+            f"output.prefix={prefix}",
+            "--overwrite",
+        ],
+        log,
+        cwd=work,
+        timeout=14400,
+    )
     hits = sorted(work.glob(f"{prefix}_real_space_refined_*.cif"))
     if hits:
         return hits[-1], None
@@ -483,6 +497,9 @@ def _report_superseded(superseded: list[tuple[str, list[str], list[str]]],
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--cache", required=True)
     ap.add_argument("--entries", help="JSON: [{pdb_id, resolution}, ...]; default <cache>/entries.json")

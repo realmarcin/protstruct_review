@@ -29,10 +29,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import statistics
-import subprocess
 import sys
 import tempfile
 import urllib.error
@@ -40,12 +38,11 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
-PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
-TOOLS = Path.home() / "tools"
-REDUCE = TOOLS / "reduce-src" / "build" / "reduce_src" / "reduce"
-PROBE = TOOLS / "probe-src" / "probe"
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain import PROBE, REDUCE, phenix, run_logged, run_to_file
 
+RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 _CLASHSCORE = re.compile(r"clashscore\s*=\s*([\d.]+)")
 
 # MolProbity's clash criterion: a "serious" clash is an overlap of at least 0.4 Å.
@@ -82,9 +79,7 @@ def run_phenix_clashscore(model: Path, work: Path) -> float | None:
     """cctbx clashscore (hydrogens built internally)."""
     log = work / f"pcs_{model.stem}.log"
     if not log.exists() or not _CLASHSCORE.search(log.read_text(errors="ignore")):
-        subprocess.run(["bash", "-c",
-                        f"cd {work} && {PHENIX_BIN / 'phenix.clashscore'} {model} > {log} 2>&1"],
-                       capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+        run_logged([phenix("phenix.clashscore"), model], log, cwd=work, timeout=3600)
     if not log.exists():
         return None
     match = _CLASHSCORE.search(log.read_text(errors="ignore"))
@@ -96,11 +91,13 @@ def run_reduce(model: Path, work: Path, nuclear: bool) -> Path | None:
     suffix = "nuc" if nuclear else "ec"
     out = work / f"{model.stem}_h_{suffix}.pdb"
     if not out.exists() or not out.stat().st_size:
-        flags = "-build -nuclear" if nuclear else "-build"
-        proc = subprocess.run(["bash", "-c", f"{REDUCE} -quiet {flags} {model} > {out} 2>/dev/null"],
-                              capture_output=True, text=True, timeout=3600)
+        arguments = [REDUCE, "-quiet", "-build"]
+        if nuclear:
+            arguments.append("-nuclear")
+        arguments.append(model)
+        proc = run_to_file(arguments, out, timeout=3600)
         if not out.exists() or not out.stat().st_size:
-            print(f"  ! reduce failed ({suffix}): {proc.stderr[-200:]}", file=sys.stderr)
+            print(f"  ! reduce failed ({suffix}), exit {proc.returncode}", file=sys.stderr)
             return None
     return out
 
@@ -109,9 +106,11 @@ def run_probe_clashscore(model_h: Path, work: Path) -> float | None:
     """MolProbity clashscore from standalone `probe`: serious clashes per 1000 atoms."""
     out = work / f"probe_{model_h.stem}.txt"
     if not out.exists():
-        cmd = (f'{PROBE} -u -q -mc -het -once "ogt33 not water" "ogt33" '
-               f'{model_h} > {out} 2>/dev/null')
-        subprocess.run(["bash", "-c", cmd], capture_output=True, text=True, timeout=3600)
+        run_to_file(
+            [PROBE, "-u", "-q", "-mc", "-het", "-once", "ogt33 not water", "ogt33", model_h],
+            out,
+            timeout=3600,
+        )
     if not out.exists():
         return None
     pairs = set()
@@ -220,6 +219,9 @@ SET_IS_COMPLETE = True
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
     ap.add_argument("--ids-file")

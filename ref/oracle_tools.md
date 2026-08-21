@@ -1,5 +1,7 @@
 # Independent oracle tools — install status and per-metric recommendations
 
+<!-- catalog-state: tasks=T01–T17; count=17; drivers=17 -->
+
 The protstruct_review trust model requires that PHENIX outputs be cross-checked by **at least one non-cctbx tool** per task (see `tasks_and_evaluations.md` philosophy section). This page records which oracles are installed locally on this machine and how to invoke them. The **canonical per-metric recommendations** live in `ref/tool_recommendations.yaml` (LinkML-validated, schema-class `ToolRecommendation`).
 
 ## Recommendations vocabulary
@@ -61,6 +63,14 @@ For **T13** the practical layering is: **aimless** is the canonical recommendati
 
 ## Quick activation snippets
 
+All benchmark runners consume the shared configuration in `scripts/toolchain.py`. The defaults below
+match the pinned macOS installation; on another machine set `PROTSTRUCT_PHENIX_BIN`,
+`PROTSTRUCT_CCP4_SETUP`, `PROTSTRUCT_TMALIGN`, `PROTSTRUCT_DSSP`, `PROTSTRUCT_PROBE`, or
+`PROTSTRUCT_REDUCE`. Do not edit individual runners. Each benchmark emits expected versions,
+resolved paths, measured version output, separately labeled configured-path hints, and a
+`version_divergence` flag before measurements begin. An override that does not match the registered
+version is therefore explicit in the benchmark record.
+
 **Crystallography oracle env (Servalcat):**
 ```bash
 source /opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh
@@ -100,11 +110,13 @@ conda activate cryst-oracles && servalcat --version  # 0.4.131
 | T12 | `phenix.mtriage` | `servalcat fsc`, `servalcat localcc` | RELION postprocess, ResMap |
 | T13 | `phenix.model_vs_data` (completeness, resolution range) | CCP4 ctruncate (Wilson B, L-test twinning, ΔB aniso, tNCS, ice rings); CCP4 aimless when unmerged intensities exist; wrapper `scripts/t13_data_quality.py` | (CC½ / ⟨I/σ⟩ / Rmerge require unmerged intensities — gap when artefact ships merged-only) |
 | T14 | `phenix.reduce` | standalone `reduce` (Richardson lab — same binary, different build) | propka3, OpenBabel |
-| T15 | *(none — PHENIX has no fold/domain classifier)* | *(none installed)* | DSSP, STRIDE (secondary structure); CATH, SCOPe, ECOD (domain/fold) |
+| T15 | *(none — PHENIX has no fold/domain classifier)* | DSSP + biotite (`scripts/t15_ss_agreement.py`) | STRIDE (optional); CATH, SCOPe, ECOD (domain/fold) |
 | T16 | *(none — no PHENIX interface scorer)* | DockQ (interface score + CAPRI class), biotite SASA (buried surface area) | PISA/PDBePISA (deposition-grade BSA reference) |
-| T17 | *(none — no PHENIX NMR restraint validator)* | *(none installed)* | wwPDB NMR validation, PROCHECK-NMR, RPF |
+| T17 | *(none — no PHENIX NMR restraint validator)* | biotite ensemble precision (`scripts/t17_nmr_ensemble.py`); wwPDB report parser (`scripts/t17_restraint_summary.py`) | PROCHECK-NMR, RPF |
 
-Every task that has an installed oracle is cross-checked by at least one **non-cctbx** tool, so the trust model holds for T01–T14. CCP4/REFMAC hardens T03/T06.
+Runnable independent-oracle coverage now spans T01–T17. CCP4/REFMAC hardens T03/T06, while
+the metric-specific gaps listed below remain explicit rather than being filled by a cctbx-only
+substitute.
 
 **T15 is now runnable** for its gradeable metric (`T15_secondary_structure_agreement`).
 `scripts/t15_ss_agreement.py` runs two independent, non-cctbx secondary-structure assigners on a

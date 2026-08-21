@@ -1,5 +1,7 @@
 # `ref/` — reference material for the protstruct-review harness
 
+<!-- catalog-state: tasks=T01–T17; count=17; drivers=17 -->
+
 This directory holds offline reference material and the key **task × evaluation** catalog that defines what the harness grades agents on.
 
 ## Contents

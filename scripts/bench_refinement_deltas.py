@@ -39,16 +39,15 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import statistics
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from typing import Any
 
-PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain import phenix, run_logged, split_args
 
 _CLASHSCORE = re.compile(r"clashscore\s*=\s*([\d.]+)")
 _RAMA_FAV = re.compile(r"SUMMARY:\s*([\d.]+)%\s*favored")
@@ -91,8 +90,7 @@ def run_tool(exe: str, model: Path, work: Path, tag: str, pattern: re.Pattern) -
     """Run a PHENIX validation tool on `model` and pull one number out of its log."""
     log = work / f"{tag}_{model.stem}.log"
     if not log.exists() or not pattern.search(log.read_text(errors="ignore")):
-        subprocess.run(["bash", "-c", f"cd {work} && {PHENIX_BIN / exe} {model} > {log} 2>&1"],
-                       capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+        run_logged([phenix(exe), model], log, cwd=work, timeout=3600)
     if not log.exists():
         return None
     match = pattern.search(log.read_text(errors="ignore"))
@@ -215,13 +213,16 @@ def refine(model: Path, mtz: Path, work: Path,
     out = work / f"{prefix}_001.pdb"
     log = work / f"refine_{refine_prefix(model.stem, restraints)}.log"
     if not out.exists():
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && {PHENIX_BIN / 'phenix.refine'} {model} {mtz} "
-             f"main.number_of_macro_cycles={MACRO_CYCLES} "
-             f"{LOW_RES_RESTRAINTS if restraints else ''} output.prefix={prefix} "
-             f"--overwrite > {log} 2>&1"],
-            capture_output=True, text=True, timeout=7200, env=dict(os.environ))
+        arguments = [
+            phenix("phenix.refine"),
+            model,
+            mtz,
+            f"main.number_of_macro_cycles={MACRO_CYCLES}",
+        ]
+        if restraints:
+            arguments.extend(split_args(LOW_RES_RESTRAINTS))
+        arguments.extend([f"output.prefix={prefix}", "--overwrite"])
+        run_logged(arguments, log, cwd=work, timeout=7200)
     if not out.exists():
         return None, {"failure_reason": refine_failure_reason(log)}
     r_values = _R_WORK.findall(log.read_text(errors="ignore")) if log.exists() else []
@@ -431,6 +432,9 @@ SET_SHORTFALL = ("16 of 37 -- the ~11 low-resolution entries that produce BOTH q
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
     ap.add_argument("--cache", required=True,

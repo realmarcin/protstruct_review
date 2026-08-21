@@ -33,7 +33,6 @@ import argparse
 import json
 import re
 import statistics
-import subprocess
 import sys
 import tempfile
 import urllib.error
@@ -41,12 +40,11 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
-PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
-PHENIX_REDUCE = str(PHENIX_BIN / "phenix.reduce")
-REDUCE = str(Path.home() / "tools" / "reduce-src" / "build" / "reduce_src" / "reduce")
-REDUCE2 = str(PHENIX_BIN / "mmtbx.reduce2")
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain import REDUCE, phenix as phenix_executable, run_logged, run_to_file
 
+RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 # reduce2 reports each flippable group's final pose in its .txt report, e.g.
 #   AmideFlip at chain A GLN 2 NE2 Initial score: 13.30 ... pose Unflipped
 #   HisFlip   at chain A HIS 55 ... pose Flipped
@@ -95,10 +93,9 @@ def build(model: Path, cache: Path, phenix: bool) -> Path | None:
     """Add hydrogens with one of the two builders; returns the output PDB."""
     tag = "phx" if phenix else "std"
     out = cache / f"{model.stem}_h_{tag}.pdb"
-    exe = PHENIX_REDUCE if phenix else REDUCE
+    executable = phenix_executable("phenix.reduce") if phenix else REDUCE
     if not out.exists() or not out.stat().st_size:
-        subprocess.run(["bash", "-c", f"{exe} -quiet -build {model} > {out} 2>/dev/null"],
-                       capture_output=True, text=True, timeout=3600)
+        run_to_file([executable, "-quiet", "-build", model], out, timeout=3600)
         if not out.exists() or not out.stat().st_size:
             return None
     return out
@@ -114,11 +111,12 @@ def reduce2_flip_calls(model: Path, cache: Path) -> dict[tuple[str, int, str], t
     """
     report = cache / f"{model.stem}FH.txt"
     if not report.exists() or not _REDUCE2_FLIP.search(report.read_text(errors="ignore")):
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {cache} && {REDUCE2} {model.name} approach=add add_flip_movers=True "
-             f"> {cache / f'r2_{model.stem}.log'} 2>&1"],
-            capture_output=True, text=True, timeout=7200)
+        run_logged(
+            [phenix_executable("mmtbx.reduce2"), model.name, "approach=add", "add_flip_movers=True"],
+            cache / f"r2_{model.stem}.log",
+            cwd=cache,
+            timeout=7200,
+        )
     if not report.exists():
         return None
     calls = {}
@@ -289,6 +287,9 @@ SET_SHORTFALL = "12 of 17 -- the 5 models with ZERO flip disagreements were neve
 
 
 def main() -> int:
+    from benchmark_environment import announce_benchmark_environment
+
+    announce_benchmark_environment()
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("pdb_ids", nargs="*")
     ap.add_argument("--ids-file")

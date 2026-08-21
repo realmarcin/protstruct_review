@@ -195,7 +195,7 @@ def round25_checks(rows: list[dict]) -> list[tuple[str, str, str]]:
     high = [r for r in p1 if r["severity"] == "high"]
     return [
         ("pass-1 finding count",
-         f"Twelve defects, filed as #116–#127.",
+         "Twelve defects, filed as #116–#127.",
          f"{_word(len(p1))} defects, filed as #{min(int(r['issue']) for r in p1)}–"
          f"#{max(int(r['issue']) for r in p1)}."),
         ("pass-1 high count",

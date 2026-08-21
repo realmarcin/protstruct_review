@@ -1,8 +1,10 @@
 # `schemas/` — LinkML schema for protstruct_review
 
+<!-- catalog-state: tasks=T01–T17; count=17; drivers=17 -->
+
 This directory holds the LinkML schema that describes every machine-loadable record produced by the harness:
 
-- the **catalog** of T01–T14 structural-biology tasks (`ref/catalog.yaml`),
+- the **catalog** of T01–T17 structural-biology tasks (`ref/catalog.yaml`),
 - the **EvaluationRun** records that capture per-artifact measurements and headline findings (`data/examples/eval/EVAL_*.yaml`),
 - the **QualityDataSheet** snapshot per structure (`data/examples/qds/QDS_*.yaml`).
 
