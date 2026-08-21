@@ -83,7 +83,7 @@ linkml_meta = LinkMLMeta({'default_prefix': 'protstruct',
      'description': 'LinkML schema for the protstruct_review harness. Models the '
                     'cross-tool oracle trust framework used to evaluate '
                     'agentically refined or generated protein structures: a static '
-                    'catalog of routine structural-biology tasks (T01..T14), the '
+                    'catalog of routine structural-biology tasks (T01..T17), the '
                     'tools that perform them, the metrics those tools report, the '
                     "per-artifact evaluation runs that record each tool's reading, "
                     'and the per-structure Quality Data Sheet that snapshots the '
@@ -554,7 +554,7 @@ class Finding(ConfiguredBaseModel):
 
 class CatalogTask(ConfiguredBaseModel):
     """
-    One row in the T01..T14 task catalog.
+    One row in the T01..T17 task catalog.
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/protstruct-review/schema'})
 

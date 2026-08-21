@@ -5,6 +5,8 @@ description: Conventions for the protstruct_review harness — the task × evalu
 
 # Protstruct Eval Skill
 
+<!-- catalog-state: tasks=T01–T17; count=17; drivers=17 -->
+
 Support work on the **protstruct_review** harness — a quality-assessment framework for agentically refined or generated protein structures, built around PHENIX with cross-tool oracles for trust.
 
 ## Usage
@@ -178,9 +180,9 @@ shipped in `catalog.yaml` alone and the published views went stale without anyth
 plus the combined `ref/driving_example.md` (T01+T04+T05+T06). Each per-task driver grades **cross-tool
 agreement**, not an absolute quality bar, and tags every rubric threshold with its provenance
 (`[schema]` / `[MolProbity]` / `[literature]` / `[catalog]` / `[template]` / `[calibration]`) so a
-domain reviewer can audit it. The T15/T16/T17 drivers correspond to the now-runnable wrappers (`scripts/t1{5,6,7}_*.py`). Until a task has one, state the threshold you used explicitly in the eval
-`notes:` rather than implying a documented one exists. T15–T17 drivers wait on those tasks becoming
-runnable (issue #3).
+domain reviewer can audit it. The T15/T16/T17 drivers correspond to the runnable wrappers
+`scripts/t15_ss_agreement.py`, `scripts/t16_interface_quality.py`,
+`scripts/t17_nmr_ensemble.py`, and `scripts/t17_restraint_summary.py`.
 
 ## Existing tasks (don't reinvent these — extend them)
 
@@ -204,10 +206,10 @@ runnable (issue #3).
 | T16 | Interface and assembly quality (oracle-only — no PHENIX tool) |
 | T17 | NMR ensemble/restraint validation (oracle-only — no PHENIX tool) |
 
-T15–T17 have **no PHENIX implementation and no oracle installed yet** (see `ref/oracle_tools.md`).
-They are declared-but-not-yet-runnable: the schema, catalog, and emitter routing are in place and
-exercised by a synthetic fixture, but no real measurement path exists until DSSP/STRIDE, DockQ/PISA,
-or the wwPDB NMR validation route is installed.
+T15–T17 deliberately have **no PHENIX implementation**, but their gradeable metrics are runnable
+through independent oracle paths: DSSP + biotite for T15, DockQ + biotite for T16, and biotite plus
+deposited wwPDB validation reports for T17. See `ref/oracle_tools.md` for versions, limitations, and
+the exact wrappers.
 
 ## Driving-example convention
 

@@ -119,6 +119,12 @@ if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_referential_integrity.py"; then
   fail "referential integrity"
 fi
 
+# 3a. Catalog-derived task range, driver inventory, and runnable-wrapper claims
+#     must agree across the authoritative documentation (#395).
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_documentation_state.py"; then
+  fail "catalog-derived documentation state"
+fi
+
 # 3b. Negative-control series records reconcile (#312): screen/enrolled/reps
 #     internal consistency, full-run manifests only in committed records
 #     (#319), and round-doc headline figures matching the record (#311 class).
@@ -216,7 +222,8 @@ done
 TSV="${REPO_ROOT}/ref/tasks_and_evaluations.tsv"
 MD="${REPO_ROOT}/ref/tasks_and_evaluations.md"
 TSV_REGEN="$(mktemp)"
-trap 'rm -f "${TSV_REGEN}"' EXIT
+MODEL_REGEN="$(mktemp)"
+trap 'rm -f "${TSV_REGEN}" "${MODEL_REGEN}"' EXIT
 
 if ! "${PYTHON}" "${REPO_ROOT}/scripts/records_to_tsv.py" \
        "${REPO_ROOT}/ref/catalog.yaml" --kind catalog -o "${TSV_REGEN}" >/dev/null; then
@@ -225,6 +232,21 @@ fi
 if ! diff -q "${TSV}" "${TSV_REGEN}" >/dev/null; then
   diff "${TSV}" "${TSV_REGEN}" >&2 || true
   fail "ref/tasks_and_evaluations.tsv is stale — regenerate with: ${PYTHON} scripts/records_to_tsv.py ref/catalog.yaml --kind catalog -o ref/tasks_and_evaluations.tsv"
+fi
+
+# The schema is canonical and models.py is generated. Regenerate through the
+# selected interpreter so drift cannot be hidden by a mismatched global CLI.
+if ! "${PYTHON}" -c '
+from linkml.generators.pydanticgen import PydanticGenerator
+from pathlib import Path
+import sys
+Path(sys.argv[2]).write_text(PydanticGenerator(sys.argv[1]).serialize())
+' "${SCHEMA}" "${MODEL_REGEN}"; then
+  fail "protstruct_review/models.py could not be regenerated"
+fi
+if ! diff -q "${REPO_ROOT}/protstruct_review/models.py" "${MODEL_REGEN}" >/dev/null; then
+  diff "${REPO_ROOT}/protstruct_review/models.py" "${MODEL_REGEN}" >&2 || true
+  fail "protstruct_review/models.py is stale — regenerate with the pinned LinkML environment"
 fi
 
 # Enumerate task ids into a variable BEFORE the loop. A crash inside a

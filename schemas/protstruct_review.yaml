@@ -1,10 +1,11 @@
+# catalog-state: tasks=T01–T17; count=17; drivers=17
 id: https://w3id.org/protstruct-review/schema
 name: protstruct_review
 title: Protein Structure Review — oracles, measurements, evaluations, quality data sheets
 description: >-
   LinkML schema for the protstruct_review harness. Models the cross-tool oracle
   trust framework used to evaluate agentically refined or generated protein
-  structures: a static catalog of routine structural-biology tasks (T01..T14),
+  structures: a static catalog of routine structural-biology tasks (T01..T17),
   the tools that perform them, the metrics those tools report, the per-artifact
   evaluation runs that record each tool's reading, and the per-structure
   Quality Data Sheet that snapshots the cross-tool findings as a citable record.
@@ -431,7 +432,7 @@ classes:
   # -------------------------------------------------------------- catalog
 
   CatalogTask:
-    description: One row in the T01..T14 task catalog.
+    description: One row in the T01..T17 task catalog.
     attributes:
       id:
         identifier: true
