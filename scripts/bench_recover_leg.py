@@ -21,11 +21,11 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import os
 import statistics
-import subprocess
 import sys
 from pathlib import Path
+
+from toolchain import phenix, run_logged
 
 REPO = Path(__file__).resolve().parent.parent
 # Round-18 gate: the committed enrollment record is the entry set.
@@ -55,9 +55,6 @@ MAD_FLOOR = 0.0005
 SHIFT_BAND_A = 0.12          # §4 stay-band, cited via the prereg
 STOP_AT_DIFF = 0.5
 RANDOM_SEED = 42
-
-PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
-
 
 def _load(name: str):
     spec = importlib.util.spec_from_file_location(name, REPO / "scripts" / f"{name}.py")
@@ -147,12 +144,12 @@ def perturb(model: Path, work: Path) -> tuple[Path | None, str]:
     out = work / f"r4p_{model.stem}.pdb"
     log = work / f"dynamics_{model.stem}.log"
     if not out.exists():
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && {PHENIX_BIN / 'phenix.dynamics'} {model} "
-             f"stop_at_diff={STOP_AT_DIFF} random_seed={RANDOM_SEED} "
-             f"output_file_name_prefix=r4p_{model.stem} > {log} 2>&1"],
-            capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+        run_logged(
+            [phenix("phenix.dynamics"), model, f"stop_at_diff={STOP_AT_DIFF}",
+             f"random_seed={RANDOM_SEED}",
+             f"output_file_name_prefix=r4p_{model.stem}"],
+            log, cwd=work, timeout=3600,
+        )
     if not out.exists():
         tail = log.read_text(errors="ignore").strip().splitlines()[-2:] \
             if log.exists() else []
@@ -164,19 +161,19 @@ def refine_recover(perturbed: Path, mtz: Path, work: Path,
                    pair, flag) -> tuple[Path | None, dict]:
     """The registered null protocol, input = the perturbed model, own
     prefix (#124)."""
-    selectors = f"\"miller_array.labels.name={pair[0]},{pair[1]}\""
+    selectors = [f"miller_array.labels.name={pair[0]},{pair[1]}"]
     if flag is not None:
-        selectors += f" \"miller_array.labels.name={flag}\""
+        selectors.append(f"miller_array.labels.name={flag}")
     prefix = f"r4r_{perturbed.stem}"
     out = work / f"{prefix}_001.pdb"
     log = work / f"refine_{prefix}.log"
     if not out.exists():
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && {PHENIX_BIN / 'phenix.refine'} {perturbed} {mtz} "
-             f"main.number_of_macro_cycles={_bench.MACRO_CYCLES} {selectors} "
-             f"output.prefix={prefix} --overwrite > {log} 2>&1"],
-            capture_output=True, text=True, timeout=10800, env=dict(os.environ))
+        run_logged(
+            [phenix("phenix.refine"), perturbed, mtz,
+             f"main.number_of_macro_cycles={_bench.MACRO_CYCLES}", *selectors,
+             f"output.prefix={prefix}", "--overwrite"],
+            log, cwd=work, timeout=10800,
+        )
     if not out.exists():
         return None, {"failure_reason": _bench.refine_failure_reason(log)}
     return out, {}

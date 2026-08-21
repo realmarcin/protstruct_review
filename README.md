@@ -23,6 +23,22 @@ uv sync --locked --extra benchmark
 PHENIX and CCP4 are separate licensed installations and are not installed by `uv`; see
 [`ref/oracle_tools.md`](ref/oracle_tools.md) for pinned versions and activation rules.
 
+External-tool discovery is centralized in `scripts/toolchain.py`. Its defaults preserve the pinned
+macOS toolchain; override them without editing runners:
+
+| Variable | Meaning |
+|---|---|
+| `PROTSTRUCT_PHENIX_BIN` | directory containing the PHENIX entry points |
+| `PROTSTRUCT_CCP4_SETUP` | CCP4 `ccp4.setup-sh` file |
+| `PROTSTRUCT_TMALIGN` | TM-align executable |
+| `PROTSTRUCT_DSSP` | `mkdssp` executable |
+| `PROTSTRUCT_PROBE` | Richardson-lab `probe` executable |
+| `PROTSTRUCT_REDUCE` | Richardson-lab `reduce` executable |
+
+Benchmark runners emit the resolved paths and version evidence as their first stderr JSON record.
+Only the fixed CCP4 environment adapter sources a vendor shell file; model/data paths and all tool
+arguments are passed directly as subprocess argument vectors.
+
 ## Validation
 
 The hermetic gate needs no network, PHENIX, or CCP4:

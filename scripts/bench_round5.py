@@ -27,19 +27,16 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import os
-import subprocess
 import sys
 from pathlib import Path
+
+from toolchain import phenix, run_logged
 
 REPO = Path(__file__).resolve().parent.parent
 SET_RECORD = "ref/research/data/negative_control_round2_enrolled.json"
 ENROLLED_JSON = REPO / SET_RECORD
 OUT_JSON = REPO / "ref/research/data/negative_control_round5_recover.json"
 AGENT_DIR = REPO / "data/agents/round5"
-
-PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
-
 
 def _load(name: str):
     spec = importlib.util.spec_from_file_location(name, REPO / "scripts" / f"{name}.py")
@@ -79,20 +76,20 @@ def w4_contradiction(row_state: dict, thresholds: dict, success: bool) -> bool:
 def refine_osol(perturbed: Path, mtz: Path, work: Path,
                 pair, flag) -> tuple[Path | None, dict]:
     """S-osol: the null protocol + ordered_solvent=True, own prefix."""
-    selectors = f"\"miller_array.labels.name={pair[0]},{pair[1]}\""
+    selectors = [f"miller_array.labels.name={pair[0]},{pair[1]}"]
     if flag is not None:
-        selectors += f" \"miller_array.labels.name={flag}\""
+        selectors.append(f"miller_array.labels.name={flag}")
     prefix = f"r5o_{perturbed.stem}"
     out = work / f"{prefix}_001.pdb"
     log = work / f"refine_{prefix}.log"
     if not out.exists():
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && {PHENIX_BIN / 'phenix.refine'} {perturbed} {mtz} "
-             f"main.number_of_macro_cycles={_bench.MACRO_CYCLES} "
-             f"ordered_solvent=True {selectors} "
-             f"output.prefix={prefix} --overwrite > {log} 2>&1"],
-            capture_output=True, text=True, timeout=10800, env=dict(os.environ))
+        run_logged(
+            [phenix("phenix.refine"), perturbed, mtz,
+             f"main.number_of_macro_cycles={_bench.MACRO_CYCLES}",
+             "ordered_solvent=True", *selectors,
+             f"output.prefix={prefix}", "--overwrite"],
+            log, cwd=work, timeout=10800,
+        )
     if not out.exists():
         return None, {"failure_reason": _bench.refine_failure_reason(log)}
     return out, {}

@@ -27,32 +27,21 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import statistics
-import subprocess
 import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
 
-RCSB_SF = "https://files.rcsb.org/download/{pdb_id}-sf.cif"
-CCP4_SETUP = "/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/bin/ccp4.setup-sh"
-XTRIAGE = str(Path.home() / "phenix-2.0-5936" / "phenix_bin" / "phenix.xtriage")
+from toolchain import phenix, run_capture, run_logged
 
+RCSB_SF = "https://files.rcsb.org/download/{pdb_id}-sf.cif"
 _XT_WILSON = re.compile(r"ML estimate of overall B value:\s*\n\s*([-\d.]+)\s*A\*\*2")
 _XT_RESO = re.compile(r"Resolution range:\s*([\d.]+)\s+([\d.]+)")
 _XT_EIGEN = re.compile(r"\|\s*[123]\s*\|\s*([-\d.]+)\s*\|\s*\(")
 _CT_WILSON = re.compile(r"Estimate of Wilson B factor:\s*([-\d.]+)\s*A\^\(-2\)")
-
-
-def sh(cmd: str, timeout: int = 3600) -> subprocess.CompletedProcess:
-    """Run `cmd` under bash with the CCP4 environment sourced."""
-    return subprocess.run(
-        ["bash", "-c", f"source {CCP4_SETUP} >/dev/null 2>&1; {cmd}"],
-        capture_output=True, text=True, timeout=timeout,
-    )
 
 
 def fetch_sf(pdb_id: str, cache: Path) -> Path | None:
@@ -112,11 +101,20 @@ def to_mtz(sf: Path, work: Path) -> tuple[Path, str] | None:
     """cif2mtz the sf file and return (mtz, colin_spec) for the merged intensities."""
     mtz = work / (sf.stem.replace("-sf", "") + ".mtz")
     if not mtz.exists():
-        proc = sh(f"cd {work} && cif2mtz hklin {sf} hklout {mtz} <<'EOF'\nEND\nEOF")
+        proc = run_capture(
+            ["cif2mtz", "hklin", sf, "hklout", mtz],
+            cwd=work,
+            timeout=3600,
+            ccp4=True,
+            input_text="END\n",
+        )
         if not mtz.exists():
-            print(f"  ! cif2mtz failed: {proc.stdout[-400:]}", file=sys.stderr)
+            diagnosis = (proc.stdout + proc.stderr)[-400:]
+            print(f"  ! cif2mtz failed: {diagnosis}", file=sys.stderr)
             return None
-    dump = sh(f"mtzdump hklin {mtz} <<'EOF'\nEND\nEOF")
+    dump = run_capture(
+        ["mtzdump", "hklin", mtz], timeout=3600, ccp4=True, input_text="END\n"
+    )
     labels = ""
     lines = dump.stdout.splitlines()
     for i, line in enumerate(lines):
@@ -135,8 +133,21 @@ def run_ctruncate(mtz: Path, labels: str, work: Path) -> float | None:
     """Classic Wilson-plot B from ctruncate, on the `labels` intensity columns."""
     log = work / f"ct_{mtz.stem}.log"
     if not log.exists() or not _CT_WILSON.search(log.read_text(errors="ignore")):
-        sh(f"cd {work} && ctruncate -hklin {mtz} -hklout {work}/ct_{mtz.stem}.mtz "
-           f"-colin '/*/*/[{labels}]' > {log} 2>&1")
+        run_logged(
+            [
+                "ctruncate",
+                "-hklin",
+                mtz,
+                "-hklout",
+                work / f"ct_{mtz.stem}.mtz",
+                "-colin",
+                f"/*/*/[{labels}]",
+            ],
+            log,
+            cwd=work,
+            timeout=3600,
+            ccp4=True,
+        )
     match = _CT_WILSON.search(log.read_text(errors="ignore"))
     return float(match.group(1)) if match else None
 
@@ -150,9 +161,11 @@ def run_xtriage(mtz: Path, labels: str, work: Path) -> dict[str, Any] | None:
     """
     log = work / f"xt_{mtz.stem}.log"
     if not log.exists() or not _XT_WILSON.search(log.read_text(errors="ignore")):
-        subprocess.run(
-            ["bash", "-c", f"cd {work} && {XTRIAGE} {mtz} obs_labels='{labels}' > {log} 2>&1"],
-            capture_output=True, text=True, timeout=3600, env=dict(os.environ),
+        run_logged(
+            [phenix("phenix.xtriage"), mtz, f"obs_labels={labels}"],
+            log,
+            cwd=work,
+            timeout=3600,
         )
     if not log.exists():
         return None

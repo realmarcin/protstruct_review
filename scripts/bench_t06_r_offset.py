@@ -32,10 +32,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import statistics
-import subprocess
 import sys
 import tempfile
 import urllib.error
@@ -43,11 +41,11 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+from toolchain import phenix, run_capture, run_logged
+
 RCSB_SF = "https://files.rcsb.org/download/{pdb_id}-sf.cif"
 RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 RCSB_CIF = "https://files.rcsb.org/download/{pdb_id}.cif"
-MODEL_VS_DATA = str(Path.home() / "phenix-2.0-5936" / "phenix_bin" / "phenix.model_vs_data")
-
 _R_WORK = re.compile(r"^\s*r_work:\s*([\d.]+)\s*$", re.M)
 _R_FREE = re.compile(r"^\s*r_free:\s*([\d.]+)\s*$", re.M)
 _RESO = re.compile(r"Resolution range:\s*([\d.]+)\s+([\d.]+)")
@@ -99,10 +97,10 @@ def to_mtz(sf: Path, work: Path) -> tuple[Path, tuple[str, str], str] | None:
     """
     mtz = work / (sf.stem.replace("-sf", "") + "_g.mtz")
     if not mtz.exists():
-        proc = subprocess.run(["bash", "-c", f"cd {work} && gemmi cif2mtz {sf} {mtz} 2>&1"],
-                              capture_output=True, text=True, timeout=1800)
+        proc = run_capture(["gemmi", "cif2mtz", sf, mtz], cwd=work, timeout=1800)
         if not mtz.exists():
-            print(f"  ! gemmi cif2mtz failed: {proc.stdout[-200:]}", file=sys.stderr)
+            diagnosis = (proc.stdout + proc.stderr)[-200:]
+            print(f"  ! gemmi cif2mtz failed: {diagnosis}", file=sys.stderr)
             return None
     import gemmi
     import numpy as np
@@ -150,8 +148,7 @@ def run_model_vs_data(model: Path, mtz: Path, work: Path) -> dict[str, Any] | No
     """
     log = work / f"mvd_{model.stem}.log"
     if not log.exists() or not _R_WORK.search(log.read_text(errors="ignore")):
-        subprocess.run(["bash", "-c", f"cd {work} && {MODEL_VS_DATA} {model} {mtz} > {log} 2>&1"],
-                       capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+        run_logged([phenix("phenix.model_vs_data"), model, mtz], log, cwd=work, timeout=3600)
     if not log.exists():
         return None
     text = log.read_text(errors="ignore")
@@ -209,13 +206,22 @@ def run_gemmi_r(model: Path, mtz: Path, labels: tuple[str, str], free_label: str
 
     calc = work / f"gemmi_{model.stem}_{radii_set}.mtz"
     if not calc.exists():
-        proc = subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && gemmi sfcalc --dmin={d_min:.4f} --radii-set={radii_set} "
-             f"--scale-to={mtz}:{labels[0]}:{labels[1]} --to-mtz={calc} {model} 2>&1"],
-            capture_output=True, text=True, timeout=3600)
+        proc = run_capture(
+            [
+                "gemmi",
+                "sfcalc",
+                f"--dmin={d_min:.4f}",
+                f"--radii-set={radii_set}",
+                f"--scale-to={mtz}:{labels[0]}:{labels[1]}",
+                f"--to-mtz={calc}",
+                model,
+            ],
+            cwd=work,
+            timeout=3600,
+        )
         if not calc.exists():
-            print(f"  ! gemmi sfcalc failed: {proc.stdout[-200:]}", file=sys.stderr)
+            diagnosis = (proc.stdout + proc.stderr)[-200:]
+            print(f"  ! gemmi sfcalc failed: {diagnosis}", file=sys.stderr)
             return None
 
     obs, fcalc = gemmi.read_mtz_file(str(mtz)), gemmi.read_mtz_file(str(calc))

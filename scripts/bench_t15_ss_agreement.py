@@ -21,13 +21,14 @@ import argparse
 import json
 import re
 import statistics
-import subprocess
 import sys
 import tempfile
 import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
+
+from toolchain import run_logged
 
 RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 REPO = Path(__file__).resolve().parent.parent
@@ -88,10 +89,11 @@ def run_t15(model: Path, cache: Path) -> dict[str, Any] | None:
     """Run the harness's own T15 script and read back its agreement value."""
     log = cache / f"t15_{model.stem}.log"
     if not log.exists() or not _AGREEMENT.search(log.read_text(errors="ignore")):
-        subprocess.run(
-            ["bash", "-c",
-             f"python3 {T15} {model} --eval-id EVAL_BENCH > {log} 2>&1"],
-            capture_output=True, text=True, timeout=3600)
+        run_logged(
+            [sys.executable, T15, model, "--eval-id", "EVAL_BENCH"],
+            log,
+            timeout=3600,
+        )
     if not log.exists():
         return None
     text = log.read_text(errors="ignore")

@@ -27,11 +27,11 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import os
 import re
-import subprocess
 import sys
 from pathlib import Path
+
+from toolchain import phenix, run_logged, run_refmac
 
 REPO = Path(__file__).resolve().parent.parent
 # The round-18 gate: the entry set this bench runs on is the committed round-2
@@ -41,8 +41,6 @@ SET_RECORD = "ref/research/data/negative_control_round2_enrolled.json"
 ENROLLED_JSON = REPO / SET_RECORD
 SCREEN_R2_JSON = REPO / "ref/research/data/negative_control_round2_screen.json"
 BENCH_JSON = REPO / "ref/research/data/negative_control_round3_bench.json"
-
-CCP4_SETUP = "/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/bin/ccp4.setup-sh"
 
 # B3 citations that are fixed numbers in the registry (section-4 d_min < 2.5
 # branch; section-2 absolute bar). Values restated here carry their rows'
@@ -81,27 +79,24 @@ def _load(name: str):
 _scr = _load("screen_round1")      # select_arrays, R paths, fetch, hashing, atomic IO
 _bench = _load("bench_refinement_deltas")
 _gold = _load("gold_mask")
-PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
-
-
 def refine_sa(model: Path, mtz: Path, work: Path,
               pair: tuple[str, str], flag: str | None) -> tuple[Path | None, dict]:
     """S-SA: the registered subject — null protocol + simulated_annealing=True,
     own prefix per the #124 argument."""
-    selectors = f"\"miller_array.labels.name={pair[0]},{pair[1]}\""
+    selectors = [f"miller_array.labels.name={pair[0]},{pair[1]}"]
     if flag is not None:
-        selectors += f" \"miller_array.labels.name={flag}\""
+        selectors.append(f"miller_array.labels.name={flag}")
     prefix = f"r3sa_{model.stem}"
     out = work / f"{prefix}_001.pdb"
     log = work / f"refine_{prefix}.log"
     if not out.exists():
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && {PHENIX_BIN / 'phenix.refine'} {model} {mtz} "
-             f"main.number_of_macro_cycles={_bench.MACRO_CYCLES} "
-             f"simulated_annealing=True {selectors} "
-             f"output.prefix={prefix} --overwrite > {log} 2>&1"],
-            capture_output=True, text=True, timeout=10800, env=dict(os.environ))
+        run_logged(
+            [phenix("phenix.refine"), model, mtz,
+             f"main.number_of_macro_cycles={_bench.MACRO_CYCLES}",
+             "simulated_annealing=True", *selectors,
+             f"output.prefix={prefix}", "--overwrite"],
+            log, cwd=work, timeout=10800,
+        )
     if not out.exists():
         return None, {"failure_reason": _bench.refine_failure_reason(log)}
     return out, {}
@@ -135,13 +130,8 @@ def refmac_pass(model: Path, mtz: Path, work: Path, tag: str,
         # ligand-library gap (Y6Z), not its columns; safe for NCYC 0
         # measurement. REFMAC's default free convention (flag 0 = free)
         # matches every enrolled entry (round-6 G4 step-1 census).
-        subprocess.run(
-            ["bash", "-c",
-             f"source {CCP4_SETUP} 2>/dev/null && cd {work} && "
-             f"refmac5 XYZIN {model} HKLIN {mtz} "
-             f"XYZOUT ref_{tag}.pdb HKLOUT ref_{tag}.mtz > {log} 2>&1 <<'EOF'\n"
-             f"{refmac_keywords(pair, flag, anis)}EOF"],
-            capture_output=True, text=True, timeout=1800, env=dict(os.environ))
+        run_refmac(model, mtz, f"ref_{tag}.pdb", f"ref_{tag}.mtz", log,
+                   refmac_keywords(pair, flag, anis), cwd=work)
     if not log.exists():
         return None
     text = log.read_text(errors="ignore")
@@ -161,10 +151,7 @@ def per_residue_verdicts(model: Path, work: Path, tag: str) -> dict:
                                ("phenix.rotalyze", _ROTA_LINE, "rota")):
         log = work / f"{key}res_{tag}.log"
         if not log.exists() or log.stat().st_size == 0:
-            subprocess.run(["bash", "-c",
-                            f"cd {work} && {PHENIX_BIN / tool} {model} > {log} 2>&1"],
-                           capture_output=True, text=True, timeout=3600,
-                           env=dict(os.environ))
+            run_logged([phenix(tool), model], log, cwd=work, timeout=3600)
         for m in pattern.finditer(log.read_text(errors="ignore")):
             k = (m.group("chain"), int(m.group("resseq")),
                  (m.group("icode") or "").strip())

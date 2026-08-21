@@ -24,11 +24,11 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import os
 import statistics
-import subprocess
 import sys
 from pathlib import Path
+
+from toolchain import phenix, run_logged
 
 REPO = Path(__file__).resolve().parent.parent
 SET_RECORD = "ref/research/data/negative_control_round2_enrolled.json"
@@ -36,7 +36,6 @@ ENROLLED_JSON = REPO / SET_RECORD
 R3_BENCH_JSON = REPO / "ref/research/data/negative_control_round3_bench.json"
 OUT_JSON = REPO / "ref/research/data/negative_control_round9_anis.json"
 
-PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
 MAD_FLOOR = 0.0005
 
 
@@ -73,16 +72,15 @@ def regen_null(pdb_id: str, durable: Path, work: Path) -> dict:
     prefix = f"r9n_{lid}"
     out = work / f"{prefix}_001.pdb"
     log = work / f"refine_{prefix}.log"
-    selectors = f"\"miller_array.labels.name={pair[0]},{pair[1]}\""
+    selectors = [f"miller_array.labels.name={pair[0]},{pair[1]}"]
     if flag is not None:
-        selectors += f" \"miller_array.labels.name={flag}\""
+        selectors.append(f"miller_array.labels.name={flag}")
     if not out.exists():
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && {PHENIX_BIN / 'phenix.refine'} {model} {mtz} "
-             f"main.number_of_macro_cycles=3 {selectors} "
-             f"output.prefix={prefix} --overwrite > {log} 2>&1"],
-            capture_output=True, text=True, timeout=10800, env=dict(os.environ))
+        run_logged(
+            [phenix("phenix.refine"), model, mtz, "main.number_of_macro_cycles=3",
+             *selectors, f"output.prefix={prefix}", "--overwrite"],
+            log, cwd=work, timeout=10800,
+        )
     if not out.exists():
         tail = log.read_text(errors="ignore").strip().splitlines()[-3:] \
             if log.exists() else []

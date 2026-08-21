@@ -23,11 +23,11 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import os
 import statistics
-import subprocess
 import sys
 from pathlib import Path
+
+from toolchain import phenix, run_logged, run_refmac
 
 REPO = Path(__file__).resolve().parent.parent
 SET_RECORD = "ref/research/data/negative_control_round2_enrolled.json"
@@ -36,10 +36,6 @@ R3_BENCH_JSON = REPO / "ref/research/data/negative_control_round3_bench.json"
 OUT_JSON = REPO / "ref/research/data/negative_control_round6_hygiene.json"
 
 OLD_CACHE = Path("/tmp/nc_round1_cache")
-CCP4_SETUP = "/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/bin/ccp4.setup-sh"
-PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
-
-
 def _load(name: str):
     spec = importlib.util.spec_from_file_location(name, REPO / "scripts" / f"{name}.py")
     m = importlib.util.module_from_spec(spec)
@@ -110,16 +106,15 @@ def rescreen_8r5k(durable: Path, work: Path, thresholds: dict) -> dict:
     prefix = "r6n_8r5k"
     out = work / f"{prefix}_001.pdb"
     log = work / f"refine_{prefix}.log"
-    selectors = f"\"miller_array.labels.name={pair[0]},{pair[1]}\""
+    selectors = [f"miller_array.labels.name={pair[0]},{pair[1]}"]
     if flag is not None:
-        selectors += f" \"miller_array.labels.name={flag}\""
+        selectors.append(f"miller_array.labels.name={flag}")
     if not out.exists():
-        subprocess.run(
-            ["bash", "-c",
-             f"cd {work} && {PHENIX_BIN / 'phenix.refine'} {model} {mtz} "
-             f"main.number_of_macro_cycles=3 {selectors} "
-             f"output.prefix={prefix} --overwrite > {log} 2>&1"],
-            capture_output=True, text=True, timeout=10800, env=dict(os.environ))
+        run_logged(
+            [phenix("phenix.refine"), model, mtz, "main.number_of_macro_cycles=3",
+             *selectors, f"output.prefix={prefix}", "--overwrite"],
+            log, cwd=work, timeout=10800,
+        )
     if not out.exists():
         return {"status": "refine_failed"}
     rec: dict = {"status": "screened", "array_selection": {"obs": list(pair),
@@ -213,28 +208,23 @@ def investigate_2vxn(durable: Path, work: Path) -> dict:
     step2 = {}
     for name, extra in variants.items():
         log = work / f"refmac_2vxn_{name}.log"
-        subprocess.run(
-            ["bash", "-c",
-             f"source {CCP4_SETUP} 2>/dev/null && cd {work} && "
-             f"refmac5 XYZIN {cif} HKLIN {mtz} "
-             f"XYZOUT rv_{name}.pdb HKLOUT rv_{name}.mtz > {log} 2>&1 <<EOF\n"
-             f"MAKE NEWLIGAND CONTINUE\n{extra}"
-             f"LABIN FP={pair[0]} SIGFP={pair[1]} FREE={flag}\n"
-             f"NCYC 0\nEND\nEOF"],
-            capture_output=True, text=True, timeout=1800, env=dict(os.environ))
+        keywords = (f"MAKE NEWLIGAND CONTINUE\n{extra}"
+                    f"LABIN FP={pair[0]} SIGFP={pair[1]} FREE={flag}\n"
+                    "NCYC 0\nEND\n")
+        run_refmac(cif, mtz, f"rv_{name}.pdb", f"rv_{name}.mtz", log,
+                   keywords, cwd=work)
         text = log.read_text(errors="ignore") if log.exists() else ""
         m = _bnc._REFMAC_FREE.search(text)
         step2[name] = float(m.group(1)) if m else None
     rec["step2_refmac_variants_r_free"] = step2
     # step 3: Servalcat discriminator, NCYC 0 equivalent
     slog = work / "servalcat_2vxn.log"
-    subprocess.run(
-        ["bash", "-c",
-         f"source {CCP4_SETUP} 2>/dev/null && cd {work} && "
-         f"servalcat refine_xtal_norefmac -s xray --model {cif} --hklin {mtz} "
-         f"--labin '{pair[0]},{pair[1]},{flag}' --ncycle 0 "
-         f"-o serval_2vxn > {slog} 2>&1"],
-        capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+    run_logged(
+        ["servalcat", "refine_xtal_norefmac", "-s", "xray", "--model", cif,
+         "--hklin", mtz, "--labin", f"{pair[0]},{pair[1]},{flag}",
+         "--ncycle", "0", "-o", "serval_2vxn"],
+        slog, cwd=work, timeout=3600, ccp4=True,
+    )
     stext = slog.read_text(errors="ignore") if slog.exists() else ""
     import re
     # `Rwork = ... Rfree = ...` is the summary line; a loose last-match

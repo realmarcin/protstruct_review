@@ -30,10 +30,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import statistics
-import subprocess
 import sys
 import tempfile
 import urllib.error
@@ -41,10 +39,9 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
-MODEL_STATISTICS = str(Path.home() / "phenix-2.0-5936" / "phenix_bin" / "phenix.model_statistics")
-CCP4_SETUP = "/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/bin/ccp4.setup-sh"
+from toolchain import phenix, run_logged
 
+RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 _PHENIX_COVALENT_BOND = re.compile(r"covalent geometry\s*:\s*bond\s+([\d.]+)\s*\(\s*(\d+)\)")
 _PHENIX_TOTAL_BOND = re.compile(r"^\s*Bond\s*:\s*([\d.]+)\s+[\d.]+\s+(\d+)", re.M)
 _GEMMI_RMSD = re.compile(r"Model rmsD:\s*bond:\s*([\d.]+)")
@@ -69,8 +66,7 @@ def run_phenix(model: Path, work: Path) -> dict[str, Any] | None:
     """Covalent-geometry bond RMSD (Å) and restraint count from PHENIX."""
     log = work / f"ms_{model.stem}.log"
     if not log.exists() or not _PHENIX_COVALENT_BOND.search(log.read_text(errors="ignore")):
-        subprocess.run(["bash", "-c", f"cd {work} && {MODEL_STATISTICS} {model} > {log} 2>&1"],
-                       capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+        run_logged([phenix("phenix.model_statistics"), model], log, cwd=work, timeout=3600)
     if not log.exists():
         return None
     text = log.read_text(errors="ignore")
@@ -90,10 +86,7 @@ def run_gemmi(model: Path, work: Path) -> dict[str, Any] | None:
     """Bond rmsD (Å) and restraint count from gemmi against the CCP4 monomer library."""
     log = work / f"rmsz_{model.stem}.log"
     if not log.exists() or not _GEMMI_RMSD.search(log.read_text(errors="ignore")):
-        subprocess.run(
-            ["bash", "-c",
-             f"source {CCP4_SETUP} >/dev/null 2>&1; gemmi rmsz -q {model} > {log} 2>&1"],
-            capture_output=True, text=True, timeout=3600)
+        run_logged(["gemmi", "rmsz", "-q", model], log, timeout=3600, ccp4=True)
     if not log.exists():
         return None
     text = log.read_text(errors="ignore")

@@ -91,6 +91,11 @@ Where this file and the handbook overlap, they must agree; if they drift, that i
     yielding an empty list that passes silently.
 19. **Scripts derive `REPO_ROOT` from their own location** (`__file__` / `BASH_SOURCE`), never a
     hardcoded absolute path. No `/Users/...` in any `.py`, `.sh`, schema, or doc.
+19b. **Benchmark tool execution is shell-free.** Pass paths and arguments as a list through
+    `scripts/toolchain.py`; use `cwd` and log file handles for redirection. Only the audited CCP4
+    adapter may source a vendor setup script. PHENIX, CCP4, TM-align, DSSP, probe, and reduce paths
+    and pinned versions are defined once in that module and overridden only with `PROTSTRUCT_*`
+    environment variables.
 
 ## The gate
 

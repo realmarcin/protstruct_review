@@ -35,10 +35,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import statistics
-import subprocess
 import sys
 import tempfile
 import urllib.error
@@ -46,12 +44,11 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+from toolchain import phenix, run_logged
+
 RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 VALIDATION_XML = "https://www.ebi.ac.uk/pdbe/entry-files/download/{pdb_id}_validation.xml"
 KEY_STATS = "https://www.ebi.ac.uk/pdbe/api/validation/key_validation_stats/entry/{pdb_id}"
-PHENIX_BIN = Path.home() / "phenix-2.0-5936" / "phenix_bin"
-CCP4_SETUP = "/Applications/ccp4-9.0.015-shelx-arpwarp-macosarm/ccp4-9/bin/ccp4.setup-sh"
-
 _RAMA_OUT = re.compile(r"SUMMARY:\s*([\d.]+)%\s*outliers")
 _RAMA_FAV = re.compile(r"SUMMARY:\s*([\d.]+)%\s*favored")
 _ROTA_OUT = re.compile(r"SUMMARY:\s*([\d.]+)%\s*outliers")
@@ -282,10 +279,9 @@ def sidechain_torsion_z(model: Path) -> dict[tuple[str, int, str], float]:
     """
     log = model.with_suffix(".rmsz.log")
     if not log.exists() or "torsion" not in log.read_text(errors="ignore"):
-        subprocess.run(
-            ["bash", "-c",
-             f"source {CCP4_SETUP} >/dev/null 2>&1; gemmi rmsz --cutoff=0 {model} > {log} 2>&1"],
-            capture_output=True, text=True, timeout=3600)
+        run_logged(
+            ["gemmi", "rmsz", "--cutoff=0", model], log, timeout=3600, ccp4=True
+        )
     if not log.exists():
         return {}
     worst: dict[tuple[str, int, str], float] = {}
@@ -442,8 +438,7 @@ def run_tool(exe: str, model: Path, work: Path, tag: str, pattern: re.Pattern) -
     """Run a PHENIX validation tool and return its log text (cached)."""
     log = work / f"{tag}_{model.stem}.log"
     if not log.exists() or not pattern.search(log.read_text(errors="ignore")):
-        subprocess.run(["bash", "-c", f"cd {work} && {PHENIX_BIN / exe} {model} > {log} 2>&1"],
-                       capture_output=True, text=True, timeout=3600, env=dict(os.environ))
+        run_logged([phenix(exe), model], log, cwd=work, timeout=3600)
     return log.read_text(errors="ignore") if log.exists() else None
 
 

@@ -23,7 +23,8 @@ uv sync --locked
 
 Use `uv sync --locked --extra benchmark` for the open-source Python benchmark tools. PHENIX 2.0-5936
 and CCP4 9.0.015 are separate licensed installations; their configuration and oracle-specific tools
-are documented in `ref/oracle_tools.md`.
+are documented in `ref/oracle_tools.md`. Configure them through the `PROTSTRUCT_*` variables routed
+by `scripts/toolchain.py`; do not add per-runner path constants.
 
 ## Sources of truth
 
