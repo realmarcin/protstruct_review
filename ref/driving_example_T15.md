@@ -20,8 +20,9 @@ harness independently re-assigns secondary structure with two non-cctbx tools an
 - **Primary:** PDB `1AKE` (adenylate kinase, multi-domain, CATH-classified) — exercises both SS and
   domain assignment.
 - **Single-domain control:** PDB `2LYZ` (hen lysozyme).
-- **Demonstrated calibration:** `data/pdb_mtz/1sar.pdb` A/B → DSSP-vs-biotite three-state agreement
-  **0.86** over 191 residues (`scripts/t15_ss_agreement.py`).
+- **Demonstrated calibration:** verified RCSB download `data/pdb_mtz/1sar_deposited.pdb` A/B →
+  DSSP-vs-biotite three-state agreement **0.8646** over 192 residues
+  (`scripts/t15_ss_agreement.py`).
 
 ## What the agent must do
 

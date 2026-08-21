@@ -12,6 +12,7 @@ bench_cache_t16/
 .bench_cache_t13/
 bench_cache_t13/
 schemas/json-schema/
+/ref/phenix_docs/
 .claude/scheduled_tasks.lock
 .claude/*.lock
 

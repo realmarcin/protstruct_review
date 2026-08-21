@@ -18,8 +18,9 @@ score against the reference, and its CAPRI class.
 
 - **Primary:** PDB `1BRS` (barnase–barstar, a canonical tight complex).
 - **Second complex:** PDB `2SIC` (subtilisin–SSI).
-- **Demonstrated calibration:** identity DockQ on `data/pdb_mtz/1sar.pdb` A/B → **1.000, class High**;
-  its interface buries **437.2 Å²** (`scripts/t16_interface_quality.py`).
+- **Demonstrated calibration:** identity DockQ on the verified RCSB download
+  `data/pdb_mtz/1sar_deposited.pdb` A/B → **1.000, class High**; its interface buries
+  **442.1 Å²** (`scripts/t16_interface_quality.py`).
 
 ## What the agent must do
 

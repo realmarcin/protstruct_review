@@ -6,7 +6,9 @@ This is the **key reference table** for the protstruct-review harness. Each row 
 - **Independent oracle tool(s)** used by the harness to evaluate whether the agent's output is correct (cross-tool agreement is the primary trust signal — we do not grade PHENIX output with PHENIX alone).
 - Typical inputs, concrete evaluation metrics, a gold-standard source, and an example dataset for reproducibility.
 
-Local PHENIX docs are mirrored in `ref/phenix_docs/`; doc paths below assume that mirror. TSV form with the same rows: `ref/tasks_and_evaluations.tsv`.
+PHENIX documentation paths below are upstream routes. The repository does not distribute a mirror;
+`ref/download_phenix_docs.sh` can create an ignored local cache after the user reviews the upstream
+terms. TSV form with the same rows: `ref/tasks_and_evaluations.tsv`.
 
 ## Legend
 

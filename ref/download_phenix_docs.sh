@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-# Mirror the PHENIX documentation into ref/phenix_docs/ for offline reference.
+# Create an ignored, local-only PHENIX documentation cache in ref/phenix_docs/.
+#
+# Review https://phenix-online.org/license before use. The downloaded documentation
+# is not part of this repository and must not be committed or redistributed without
+# appropriate upstream authorization.
 #
 # Re-runnable: wget --mirror will skip unchanged files on subsequent runs.
 # Polite: 1s base wait + --random-wait to avoid hammering the server.

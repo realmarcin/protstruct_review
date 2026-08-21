@@ -125,6 +125,12 @@ if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_documentation_state.py"; then
   fail "catalog-derived documentation state"
 fi
 
+# 3aa. Every distributed scientific fixture has an exact archive URL and
+#      checksum, and no PHENIX documentation mirror is tracked (#400, #401).
+if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_fixture_provenance.py"; then
+  fail "fixture provenance and publication boundary"
+fi
+
 # 3b. Negative-control series records reconcile (#312): screen/enrolled/reps
 #     internal consistency, full-run manifests only in committed records
 #     (#319), and round-doc headline figures matching the record (#311 class).

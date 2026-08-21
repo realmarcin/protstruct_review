@@ -445,7 +445,7 @@ classes:
         range: Tool
         multivalued: true
       phenix_doc_paths:
-        description: Doc paths under ref/phenix_docs/phenix-online.org/documentation/.
+        description: Upstream PHENIX documentation routes, resolvable online or in the optional ignored local cache created by ref/download_phenix_docs.sh.
         range: string
         multivalued: true
       oracle_tool_refs:

@@ -1061,8 +1061,8 @@ quality_data_sheets:
   - id: EVAL_1sar_cdba2c07_2026-04-24_assum_prosmart_reference_dependent_for_asn39
     kind: explicit
     scope: measurement
-    title: ProSMART score is relative to the deposited starting model
-    description: This measurement compared 1sar_final.pdb to the deposited 1sar.pdb.
+    title: ProSMART score is relative to the tutorial-derived starting model
+    description: This measurement compared 1sar_final.pdb to the tutorial-derived 1sar.pdb.
       The Procrustes score is a relative measure of local-fragment geometric divergence
       from that specific reference.
     consequences: If we used a different reference (e.g. an ultra-high-res SNase structure),

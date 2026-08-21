@@ -6,15 +6,34 @@ applies to every file. `THIRD_PARTY_NOTICES.md` records the applicable upstream 
 
 ## `pdb_mtz/` fixtures
 
-| Files | Recorded provenance | Status for reuse |
-|---|---|---|
-| `1d3z.pdb` | Added as the deposited 1D3Z NMR ensemble for T17; commit history does not record the retrieval URL/date or checksum. | Re-fetch from the wwPDB archive and cite PDB ID 1D3Z before redistribution. |
-| `2n54_validation.xml.gz` | Added as the deposited wwPDB validation report for PDB ID 2N54; retrieval URL/date and checksum were not recorded. | Verify against the current wwPDB report and cite PDB ID 2N54. |
-| `1sar.pdb`, `1sar.mtz` | Added as X-ray example inputs. PDB ID 1SAR is named, but the exact source, retrieval date, and transformations were not recorded. | Provenance must be reconstructed before asserting wwPDB CC0. |
-| `porin.pdb`, `porin.mtz` | Added as X-ray example inputs without an accession, source URL, retrieval date, or license record. | Provenance and redistribution rights are unresolved. |
+`pdb_mtz/fixture_provenance.yaml` is the machine-readable source of truth. The hermetic gate checks
+that every fixture is listed, every listed file exists, and both file and decompressed-content
+checksums match. The retained files were verified on 2026-08-21:
 
-For future deposited fixtures, record the archive URL, PDB/EMDB identifier, retrieval date,
-SHA-256 checksum, source license, and any transformations in this file in the same commit.
+| File | Archive identity | Verification and reuse status |
+|---|---|---|
+| `1d3z.pdb` | PDB 1D3Z NMR ensemble, `https://files.rcsb.org/download/1D3Z.pdb` | Byte-for-byte equal to the current RCSB download; cite PDB 1D3Z and its depositors. |
+| `1sar_deposited.pdb` | PDB 1SAR deposited coordinate model, `https://files.rcsb.org/download/1SAR.pdb` | Byte-for-byte equal to the current RCSB download; used for current T15/T16 runnable calibrations, not as a substitute for the removed historical agent input. Cite PDB 1SAR and its depositors. |
+| `2n54_validation.xml.gz` | PDB 2N54 wwPDB validation XML, `https://files.rcsb.org/pub/pdb/validation_reports/n5/2n54/2n54_validation.xml.gz` | Replaced with the current archive gzip. Its decompressed XML is byte-for-byte equal to the prior fixture, so T17 parser evidence is unchanged. Cite PDB 2N54 and its depositors. |
+
+The wwPDB usage policy linked from `THIRD_PARTY_NOTICES.md` places archive data files under CC0 and
+encourages attribution. The manifest records the exact URL, retrieval date, SHA-256, identifier,
+and transformation status for each retained file.
+
+### Removed legacy fixtures
+
+- `1sar.pdb` and `1sar.mtz` were the transformed starting inputs in the historical
+  `cdba2c07-daff-4f60-ae96-12452b3a5fbb` agent artifact. Their filenames, unit cell, and former
+  mirrored documentation identify the PHENIX ribonuclease-Sa refinement tutorial lineage, but the
+  exact upstream package/version and transformations were not recorded. They were removed rather
+  than incorrectly relabeled as exact archive downloads. Historical evaluation records and logs
+  retain their original paths as evidence of what was run.
+- `porin.pdb` and `porin.mtz` matched the PHENIX twinning tutorial identity and unit cell, had no
+  repository consumers, and had no recorded redistribution permission. They were removed with the
+  tracked PHENIX documentation mirror.
+
+For future fixtures, add the file and its complete manifest entry in the same commit. Do not reuse a
+historical path for different bytes: that would silently invalidate the evaluation lineage.
 
 ## Agent and benchmark outputs
 
@@ -27,6 +46,3 @@ binary artifacts do not yet carry a complete source URL/checksum trail.
 New benchmark records must begin with the environment/tool version record emitted by
 `scripts/benchmark_environment.py`, and new externally sourced artifacts must carry the provenance
 fields listed above.
-
-The legacy backfill is tracked in
-[#400](https://github.com/realmarcin/protstruct_review/issues/400).

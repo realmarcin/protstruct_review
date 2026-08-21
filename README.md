@@ -69,8 +69,11 @@ This repository does not yet declare a repository-wide license. Do not infer one
 CC-BY-4.0 declaration inside the LinkML schema; the intended scope is tracked in
 [#399](https://github.com/realmarcin/protstruct_review/issues/399).
 Third-party materials retain their upstream terms. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)
-and [`data/README.md`](data/README.md) before redistributing the documentation mirror or data
-fixtures. Authoritative `CITATION.cff` metadata is tracked in
+and [`data/README.md`](data/README.md) before redistributing data fixtures. The repository does not
+ship a PHENIX documentation mirror; `ref/download_phenix_docs.sh` creates an ignored, opt-in local
+cache after the user reviews the upstream terms. Retained deposited fixtures are source- and
+checksum-pinned in `data/pdb_mtz/fixture_provenance.yaml`, and the hermetic gate rejects inventory
+or checksum drift. Authoritative `CITATION.cff` metadata is tracked in
 [#402](https://github.com/realmarcin/protstruct_review/issues/402).
 
 The repository configures the hermetic gate in GitHub Actions on Linux and macOS. If those checks
