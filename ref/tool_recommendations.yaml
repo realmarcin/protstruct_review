@@ -986,6 +986,20 @@ tool_recommendations:
     justification: Independent superposition to a reference/deposited pose for RMSD and translation/rotation
       error.
     as_of_date: '2026-07-21'
+  - id: REC_T10_ligand_element_identity_z_top_considered
+    metric_definition_ref: T10_ligand_element_identity_z
+    tool_ref: CheckMyMetal
+    role: top_considered
+    rank: 1
+    justification: Independent coordination-geometry comparison against candidate-element reference distributions.
+    as_of_date: '2026-08-20'
+  - id: REC_T10_ligand_element_identity_top_considered
+    metric_definition_ref: T10_ligand_element_identity
+    tool_ref: CheckMyMetal
+    role: top_considered
+    rank: 1
+    justification: Independent ligand-element assessment from coordination geometry when anomalous evidence is unavailable.
+    as_of_date: '2026-08-20'
   - id: REC_T11_loop_rscc_top_considered
     metric_definition_ref: T11_loop_rscc
     tool_ref: edstats

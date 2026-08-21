@@ -400,26 +400,6 @@ def build_site_qualities(
     Ligand-scoped measurements via the bound ligand populate
     ligand_quality.
     """
-    sites: list[dict[str, Any]] = [s for r in eval_runs for s in (r.get("sites") or [])]
-    ligands: dict[str, dict[str, Any]] = {
-        lig["id"]: lig for r in eval_runs for lig in (r.get("ligands") or [])
-    }
-
-    if not sites:
-        return []
-
-    # Index measurements by (scope, scope_selector or referenced site id).
-    site_measurements: dict[str, list[dict[str, Any]]] = {}
-    ligand_measurements: dict[str, list[dict[str, Any]]] = {}
-    for r in eval_runs:
-        for m in r.get("measurements", []):
-            scope = m.get("scope")
-            sel = m.get("scope_selector") or ""
-            if scope == "site":
-                site_measurements.setdefault(sel, []).append(m)
-            elif scope == "ligand":
-                ligand_measurements.setdefault(sel, []).append(m)
-
     site_metric_to_slot: dict[str, str] = {
         "T05_clashscore": "site_clashscore",
         "T05_ramachandran_outlier": "site_ramachandran_outlier_count",
@@ -432,7 +412,94 @@ def build_site_qualities(
         "T10_ligand_b_vs_surroundings":     "ligand_b_factor_vs_surroundings",
         "T10_protein-ligand_hbond_count":   "protein_ligand_hbond_count",
         "T10_rmsd_to_deposited_ligand_pose": "pose_rmsd_to_deposited_a",
+        "T10_ligand_element_identity":       "element_identity",
     }
+
+    sites: list[dict[str, Any]] = [s for r in eval_runs for s in (r.get("sites") or [])]
+    ligand_rows: list[dict[str, Any]] = [
+        lig for r in eval_runs for lig in (r.get("ligands") or [])
+    ]
+    errors: list[str] = []
+
+    def index_unique(rows: list[dict[str, Any]], kind: str) -> dict[str, dict[str, Any]]:
+        indexed: dict[str, dict[str, Any]] = {}
+        for row in rows:
+            row_id = row.get("id")
+            if not row_id:
+                errors.append(f"{kind} declaration has no id")
+                continue
+            if row_id in indexed:
+                errors.append(f"duplicate {kind} id {row_id!r}")
+                continue
+            indexed[row_id] = row
+        return indexed
+
+    site_index = index_unique(sites, "Site")
+    ligand_index = index_unique(ligand_rows, "Ligand")
+    ligand_to_sites: dict[str, list[str]] = {}
+    for site in sites:
+        lig_ref = site.get("ligand_ref")
+        if not lig_ref:
+            continue
+        if lig_ref not in ligand_index:
+            errors.append(
+                f"Site {site.get('id')!r} has ligand_ref {lig_ref!r}, but that Ligand is not declared"
+            )
+        ligand_to_sites.setdefault(lig_ref, []).append(site.get("id") or "<missing id>")
+
+    # Index and validate every local-scope measurement before emitting any block.
+    # This is deliberately selector-specific: the old completeness check only
+    # proved that *some* SiteQuality/LigandQuality existed, allowing a sibling
+    # measurement with a bad selector to disappear silently (#392).
+    site_measurements: dict[str, list[dict[str, Any]]] = {}
+    ligand_measurements: dict[str, list[dict[str, Any]]] = {}
+    for r in eval_runs:
+        for m in r.get("measurements", []) or []:
+            scope = m.get("scope")
+            if scope not in ("site", "ligand"):
+                continue
+            selector = m.get("scope_selector") or ""
+            measurement_id = m.get("id") or "<missing id>"
+            metric_id = m.get("metric_definition_ref") or "<missing metric>"
+            if scope == "site":
+                if selector not in site_index:
+                    errors.append(
+                        f"measurement {measurement_id!r} has scope=site selector "
+                        f"{selector!r}, which does not resolve to a declared Site"
+                    )
+                if metric_id not in site_metric_to_slot:
+                    errors.append(
+                        f"unconsumed scope=site measurement {measurement_id!r}: "
+                        f"metric {metric_id!r} has no SiteQuality slot"
+                    )
+                site_measurements.setdefault(selector, []).append(m)
+                continue
+
+            if selector not in ligand_index:
+                errors.append(
+                    f"measurement {measurement_id!r} has scope=ligand selector "
+                    f"{selector!r}, which does not resolve to a declared Ligand"
+                )
+            bound_sites = ligand_to_sites.get(selector, [])
+            if len(bound_sites) != 1:
+                errors.append(
+                    f"measurement {measurement_id!r} selects Ligand {selector!r}, "
+                    f"which must be bound to exactly one Site; found {bound_sites!r}"
+                )
+            if metric_id not in ligand_metric_to_slot:
+                errors.append(
+                    f"unconsumed scope=ligand measurement {measurement_id!r}: "
+                    f"metric {metric_id!r} has no LigandQuality slot"
+                )
+            ligand_measurements.setdefault(selector, []).append(m)
+
+    if errors:
+        raise QdsCompletenessError(
+            "QDS scoped-measurement integrity failed:\n  - " + "\n  - ".join(errors)
+        )
+
+    if not sites:
+        return []
 
     out: list[dict[str, Any]] = []
     for site in sites:
@@ -448,6 +515,11 @@ def build_site_qualities(
                 v = _wrap_value(m)
                 if v:
                     sq[slot] = v
+                else:
+                    raise QdsCompletenessError(
+                        f"QDS scoped-measurement integrity failed: site measurement "
+                        f"{m.get('id')!r} has no value to emit"
+                    )
 
         # Ligand quality (when the site has a bound ligand).
         lig_ref = site.get("ligand_ref")
@@ -463,6 +535,11 @@ def build_site_qualities(
                     v = _wrap_value(m)
                     if v:
                         lq[slot] = v
+                    else:
+                        raise QdsCompletenessError(
+                            f"QDS scoped-measurement integrity failed: ligand measurement "
+                            f"{m.get('id')!r} has no value to emit"
+                        )
             if len(lq) > 2:  # more than just id + ligand_ref
                 sq["ligand_quality"] = lq
 

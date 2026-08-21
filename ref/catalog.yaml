@@ -286,6 +286,8 @@ catalog_tasks:
   - T10_ligand_b_vs_surroundings
   - T10_protein-ligand_hbond_count
   - T10_rmsd_to_deposited_ligand_pose
+  - T10_ligand_element_identity_z
+  - T10_ligand_element_identity
   inputs_description: apo model|map/MTZ|ligand SMILES or coordinates
   gold_standard: deposited holo co-crystal structure
   example_dataset: PDB 1OYT (factor Xa + inhibitor); PHENIX ligandfit tutorial
@@ -1287,6 +1289,23 @@ metric_definitions:
   name: RMSD to deposited ligand pose
   applicable_task_refs:
   - T10
+- id: T10_ligand_element_identity_z
+  name: ligand element-identity candidate Z-score
+  description: >-
+    Absolute Z-score of observed coordination geometry against one candidate
+    element's canonical bond-length distribution. Candidate and interpretation
+    are named in the measurement notes.
+  applicable_task_refs:
+  - T10
+  scope: atom
+- id: T10_ligand_element_identity
+  name: ligand element-identity assessment
+  description: >-
+    Ligand-level oracle conclusion about the modelled element after comparing
+    candidate-element geometry and any available anomalous evidence.
+  applicable_task_refs:
+  - T10
+  scope: ligand
 - id: T11_loop_rscc
   name: loop RSCC
   applicable_task_refs:

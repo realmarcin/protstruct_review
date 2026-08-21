@@ -92,6 +92,19 @@ def test_1sar_geometry_slots_all_present() -> None:
         f"1SAR geometry_summary missing slots: {sorted(missing)}. "
         f"Codex regression — substring matching dropped these silently.",
     )
+    ca_site = next(
+        sq for sq in qds.get("site_qualities", [])
+        if sq.get("site_ref") == "1sar_ca_active_site"
+    )
+    ca_ligand = ca_site.get("ligand_quality") or {}
+    _check(
+        (ca_ligand.get("rscc") or {}).get("value_numeric") == 0.9716,
+        "Ca ligand RSCC was overwritten or dropped by another ligand measurement",
+    )
+    _check(
+        "Ca²⁺ — consistent" in (ca_ligand.get("element_identity") or {}).get("value_text", ""),
+        "Ca element-identity summary missing from LigandQuality",
+    )
     print(f"PASS  test_1sar_geometry_slots_all_present  ({len(present)} slots populated)")
 
 
@@ -143,10 +156,92 @@ def test_negative_site_scope_without_site_decl_fails() -> None:
             lambda: qds_emit.emit_qds(
                 [bad_path], qds_id="QDS_bad_test", structure_id="synth1"
             ),
-            ["scope=site", "site_qualities"],
+            ["scope=site", "declared Site"],
             "site-scope measurement had no Site declared",
         )
     print("PASS  test_negative_site_scope_without_site_decl_fails")
+
+
+def _emit_mutated_synth(mutator: Callable[[dict], None], name: str) -> None:
+    """Write one mutated synthetic eval and attempt to emit it."""
+    doc = copy.deepcopy(yaml.safe_load(EVAL_SYNTH.read_text()))
+    mutator(doc["evaluation_runs"][0])
+    with tempfile.TemporaryDirectory() as tmpdir:
+        bad_path = Path(tmpdir) / f"{name}.yaml"
+        bad_path.write_text(yaml.safe_dump(doc, sort_keys=False, allow_unicode=True))
+        qds_emit.emit_qds([bad_path], qds_id=f"QDS_{name}", structure_id="synth1")
+
+
+def test_negative_unknown_site_selector_fails() -> None:
+    def mutate(run: dict) -> None:
+        site_measurement = next(m for m in run["measurements"] if m.get("scope") == "site")
+        site_measurement["scope_selector"] = "site_missing"
+
+    assert_raises_completeness(
+        lambda: _emit_mutated_synth(mutate, "unknown_site"),
+        ["scope=site", "site_missing", "declared Site"],
+        "a site measurement selected an unknown Site",
+    )
+    print("PASS  test_negative_unknown_site_selector_fails")
+
+
+def test_negative_unknown_ligand_selector_fails() -> None:
+    def mutate(run: dict) -> None:
+        ligand_measurement = next(
+            m for m in run["measurements"] if m.get("scope") == "ligand"
+        )
+        ligand_measurement["scope_selector"] = "ligand_missing"
+
+    assert_raises_completeness(
+        lambda: _emit_mutated_synth(mutate, "unknown_ligand"),
+        ["scope=ligand", "ligand_missing", "declared Ligand"],
+        "a ligand measurement selected an unknown Ligand",
+    )
+    print("PASS  test_negative_unknown_ligand_selector_fails")
+
+
+def test_negative_missing_ligand_declaration_fails() -> None:
+    def mutate(run: dict) -> None:
+        run["ligands"] = []
+
+    assert_raises_completeness(
+        lambda: _emit_mutated_synth(mutate, "missing_ligand"),
+        ["ligand_ref", "synth1:A:CA33", "not declared"],
+        "a Site referred to an undeclared Ligand",
+    )
+    print("PASS  test_negative_missing_ligand_declaration_fails")
+
+
+def test_negative_duplicate_site_and_ligand_ids_fail() -> None:
+    for key, label in (("sites", "Site"), ("ligands", "Ligand")):
+        def mutate(run: dict, rows_key: str = key) -> None:
+            run[rows_key].append(copy.deepcopy(run[rows_key][0]))
+
+        assert_raises_completeness(
+            lambda mutate=mutate, key=key: _emit_mutated_synth(
+                mutate, f"duplicate_{key}"
+            ),
+            ["duplicate", label, "id"],
+            f"duplicate {label} ids were declared",
+        )
+    print("PASS  test_negative_duplicate_site_and_ligand_ids_fail")
+
+
+def test_negative_mixed_valid_and_unconsumed_scoped_measurements_fail() -> None:
+    def mutate(run: dict) -> None:
+        extra = copy.deepcopy(
+            next(m for m in run["measurements"] if m.get("scope") == "site")
+        )
+        extra["id"] = "EVAL_synth_active_site_unconsumed"
+        extra["scope_selector"] = "site_missing_among_valid_measurements"
+        run["measurements"].append(extra)
+
+    assert_raises_completeness(
+        lambda: _emit_mutated_synth(mutate, "unconsumed_site_measurement"),
+        ["EVAL_synth_active_site_unconsumed", "scope=site", "site_missing_among_valid_measurements"],
+        "one of several otherwise-valid scoped measurements selected no Site",
+    )
+    print("PASS  test_negative_mixed_valid_and_unconsumed_scoped_measurements_fail")
 
 
 def test_quality_indicator_extensions_present() -> None:
@@ -308,6 +403,11 @@ def main() -> int:
     test_1sar_geometry_slots_all_present()
     test_synth_local_blocks_present()
     test_negative_site_scope_without_site_decl_fails()
+    test_negative_unknown_site_selector_fails()
+    test_negative_unknown_ligand_selector_fails()
+    test_negative_missing_ligand_declaration_fails()
+    test_negative_duplicate_site_and_ligand_ids_fail()
+    test_negative_mixed_valid_and_unconsumed_scoped_measurements_fail()
     test_quality_indicator_extensions_present()
     test_negative_structured_scopes_without_rows_fail()
     test_trust_invariant_waiver_mechanics()

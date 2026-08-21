@@ -1160,9 +1160,9 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_ca_identity_z_mg
     catalog_task_ref: T10
     stage: final
-    scope: ligand
+    scope: atom
     scope_selector: 1sar:A:CA98 vs Mg²⁺ canonical
-    metric_definition_ref: T10_ligand_rscc
+    metric_definition_ref: T10_ligand_element_identity_z
     oracle_tool_ref: CheckMyMetal
     oracle_family: non_cctbx
     agent_claim:
@@ -1180,9 +1180,9 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_ca_identity_z_ca
     catalog_task_ref: T10
     stage: final
-    scope: ligand
+    scope: atom
     scope_selector: 1sar:A:CA98 vs Ca²⁺ canonical
-    metric_definition_ref: T10_ligand_rscc
+    metric_definition_ref: T10_ligand_element_identity_z
     oracle_tool_ref: CheckMyMetal
     oracle_family: non_cctbx
     agent_claim:
@@ -1202,7 +1202,7 @@ evaluation_runs:
     stage: final
     scope: ligand
     scope_selector: 1sar:A:CA98
-    metric_definition_ref: T10_ligand_rscc
+    metric_definition_ref: T10_ligand_element_identity
     oracle_tool_ref: CheckMyMetal
     oracle_family: non_cctbx
     agent_claim:
@@ -1222,9 +1222,9 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_na_identity_z_mg
     catalog_task_ref: T10
     stage: final
-    scope: ligand
+    scope: atom
     scope_selector: 1sar:B:NA98 vs Mg²⁺ canonical
-    metric_definition_ref: T10_ligand_rscc
+    metric_definition_ref: T10_ligand_element_identity_z
     oracle_tool_ref: CheckMyMetal
     oracle_family: non_cctbx
     agent_claim:
@@ -1239,9 +1239,9 @@ evaluation_runs:
   - id: EVAL_1sar_cdba2c07_2026-04-24_M_na_identity_z_na
     catalog_task_ref: T10
     stage: final
-    scope: ligand
+    scope: atom
     scope_selector: 1sar:B:NA98 vs Na⁺ canonical
-    metric_definition_ref: T10_ligand_rscc
+    metric_definition_ref: T10_ligand_element_identity_z
     oracle_tool_ref: CheckMyMetal
     oracle_family: non_cctbx
     agent_claim:
@@ -1260,7 +1260,7 @@ evaluation_runs:
     stage: final
     scope: ligand
     scope_selector: 1sar:B:NA98
-    metric_definition_ref: T10_ligand_rscc
+    metric_definition_ref: T10_ligand_element_identity
     oracle_tool_ref: CheckMyMetal
     oracle_family: non_cctbx
     agent_claim:
