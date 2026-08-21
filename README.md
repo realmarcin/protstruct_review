@@ -36,6 +36,8 @@ macOS toolchain; override them without editing runners:
 | `PROTSTRUCT_REDUCE` | Richardson-lab `reduce` executable |
 
 Benchmark runners emit the resolved paths and version evidence as their first stderr JSON record.
+Measured version output, weaker configured-path hints, and any `version_divergence` are separate
+fields; an override never masquerades as measured version evidence.
 Only the fixed CCP4 environment adapter sources a vendor shell file; model/data paths and all tool
 arguments are passed directly as subprocess argument vectors.
 

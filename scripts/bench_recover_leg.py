@@ -25,6 +25,8 @@ import statistics
 import sys
 from pathlib import Path
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
 from toolchain import phenix, run_logged
 
 REPO = Path(__file__).resolve().parent.parent

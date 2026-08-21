@@ -39,6 +39,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
 from toolchain import phenix, run_logged
 
 RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"

@@ -45,6 +45,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
 from toolchain import phenix, run_logged, split_args
 
 _CLASHSCORE = re.compile(r"clashscore\s*=\s*([\d.]+)")

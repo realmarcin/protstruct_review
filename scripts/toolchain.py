@@ -65,6 +65,7 @@ EXTERNAL_TOOL_SPECS = {
         "configured_path": CCP4_SETUP,
         "executables": ("refmac5", "ctruncate"),
         "version_args": None,
+        "availability_probe": "configured_file",
     },
     "TM-align": {
         "expected_version": TMALIGN_VERSION,
@@ -102,14 +103,21 @@ def _discover_executable(
     configured_path: Path, executable_names: tuple[str, ...]
 ) -> Path | None:
     candidates = []
-    if configured_path.is_dir():
-        candidates.extend(configured_path / name for name in executable_names)
-    elif configured_path.is_file() and os.access(configured_path, os.X_OK):
-        candidates.append(configured_path)
-    for candidate in candidates:
-        if candidate.is_file() and os.access(candidate, os.X_OK):
-            return candidate
-    for name in executable_names:
+    is_bare_name = not configured_path.is_absolute() and configured_path.parent == Path(".")
+    if not is_bare_name:
+        if configured_path.is_dir():
+            candidates.extend(configured_path / name for name in executable_names)
+        elif configured_path.is_file() and os.access(configured_path, os.X_OK):
+            candidates.append(configured_path)
+        for candidate in candidates:
+            if candidate.is_file() and os.access(candidate, os.X_OK):
+                return candidate
+    path_names = (
+        (configured_path.name, *executable_names)
+        if is_bare_name and configured_path.name not in executable_names
+        else executable_names
+    )
+    for name in path_names:
         if discovered := shutil.which(name):
             return Path(discovered)
     return None
@@ -131,7 +139,14 @@ def _version_output(executable: Path, arguments: tuple[str, ...]) -> str | None:
 
 
 def external_tool_report() -> dict[str, dict[str, str | bool | None]]:
-    """Return centralized configured paths, discovery, and version evidence."""
+    """Return configured paths and provenance-labeled version evidence.
+
+    ``reported_version`` is reserved for output measured from an executable.
+    Tools without a reliable version command may carry a weaker
+    ``configured_path_version_hint``.  ``version_divergence`` makes a mismatch
+    explicit in every benchmark environment record instead of silently
+    treating an override as equivalent to the registered binary.
+    """
     report: dict[str, dict[str, str | bool | None]] = {}
     for name, specification in EXTERNAL_TOOL_SPECS.items():
         configured = specification["configured_path"]
@@ -142,14 +157,32 @@ def external_tool_report() -> dict[str, dict[str, str | bool | None]]:
             if executable is not None and version_args is not None
             else None
         )
-        if reported_version is None and specification["expected_version"] in str(configured):
-            reported_version = specification["expected_version"]
+        expected_version = specification["expected_version"]
+        path_version_hint = (
+            expected_version if expected_version in str(configured) else None
+        )
+        availability_probe = specification.get("availability_probe", "executable")
+        available = (
+            configured.is_file()
+            if availability_probe == "configured_file"
+            else executable is not None
+        )
+        if not available:
+            version_divergence = None
+        elif reported_version is not None:
+            version_divergence = expected_version not in reported_version
+        else:
+            version_divergence = path_version_hint is None
         report[name] = {
-            "expected_version": specification["expected_version"],
+            "expected_version": expected_version,
             "configured_path": str(configured),
+            "availability_probe": availability_probe,
             "discovered_executable": str(executable) if executable else None,
             "reported_version": reported_version,
-            "available": executable is not None or configured.exists(),
+            "reported_version_source": "command_output" if reported_version else None,
+            "configured_path_version_hint": path_version_hint,
+            "version_divergence": version_divergence,
+            "available": available,
         }
     return report
 

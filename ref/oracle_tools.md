@@ -66,8 +66,10 @@ For **T13** the practical layering is: **aimless** is the canonical recommendati
 All benchmark runners consume the shared configuration in `scripts/toolchain.py`. The defaults below
 match the pinned macOS installation; on another machine set `PROTSTRUCT_PHENIX_BIN`,
 `PROTSTRUCT_CCP4_SETUP`, `PROTSTRUCT_TMALIGN`, `PROTSTRUCT_DSSP`, `PROTSTRUCT_PROBE`, or
-`PROTSTRUCT_REDUCE`. Do not edit individual runners. Each benchmark emits its resolved paths,
-expected versions, and available version output before measurements begin.
+`PROTSTRUCT_REDUCE`. Do not edit individual runners. Each benchmark emits expected versions,
+resolved paths, measured version output, separately labeled configured-path hints, and a
+`version_divergence` flag before measurements begin. An override that does not match the registered
+version is therefore explicit in the benchmark record.
 
 **Crystallography oracle env (Servalcat):**
 ```bash

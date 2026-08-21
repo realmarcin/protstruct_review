@@ -6,6 +6,7 @@ from __future__ import annotations
 import ast
 import importlib.util
 import json
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -70,6 +71,102 @@ with tempfile.TemporaryDirectory(prefix="ccp4 setup ; ") as tmp:
     check(
         "CCP4 setup path and exported metacharacters remain literal",
         environment["PROTSTRUCT_ADAPTER_TEST"] == "literal ; $() value",
+    )
+
+with tempfile.TemporaryDirectory(prefix="tool version evidence ") as tmp:
+    root = Path(tmp)
+    expected_dir = root / "suite-1.2.3"
+    expected_dir.mkdir()
+    lying_tool = expected_dir / "tool-version"
+    lying_tool.write_text("#!/bin/sh\necho 'tool version 9.9.9'\n")
+    lying_tool.chmod(0o755)
+    setup_file = expected_dir / "ccp4.setup-sh"
+    setup_file.write_text("export CCP4='configured'\n")
+    original_specs = toolchain.EXTERNAL_TOOL_SPECS
+    try:
+        toolchain.EXTERNAL_TOOL_SPECS = {
+            "measured": {
+                "expected_version": "1.2.3",
+                "configured_path": lying_tool,
+                "executables": ("tool-version",),
+                "version_args": (),
+            },
+            "empty-directory": {
+                "expected_version": "1.2.3",
+                "configured_path": expected_dir,
+                "executables": ("missing-tool",),
+                "version_args": None,
+            },
+            "configured-artifact": {
+                "expected_version": "1.2.3",
+                "configured_path": setup_file,
+                "executables": ("missing-until-setup",),
+                "version_args": None,
+                "availability_probe": "configured_file",
+            },
+        }
+        report = toolchain.external_tool_report()
+    finally:
+        toolchain.EXTERNAL_TOOL_SPECS = original_specs
+    check(
+        "measured version output is never replaced by the configured path",
+        report["measured"]["reported_version"] == "tool version 9.9.9",
+    )
+    check(
+        "measured version provenance is labeled",
+        report["measured"]["reported_version_source"] == "command_output",
+    )
+    check(
+        "measured mismatch overrides a matching path hint",
+        report["measured"]["version_divergence"] is True,
+    )
+    check(
+        "empty expected-version directory is not an available tool",
+        report["empty-directory"]["available"] is False,
+    )
+    check(
+        "configured-file availability is an explicit CCP4-style exception",
+        report["configured-artifact"]["available"] is True
+        and report["configured-artifact"]["availability_probe"] == "configured_file",
+    )
+    check(
+        "configured-file path inference is kept out of reported_version",
+        report["configured-artifact"]["reported_version"] is None
+        and report["configured-artifact"]["configured_path_version_hint"] == "1.2.3",
+    )
+
+with tempfile.TemporaryDirectory(prefix="bare executable cwd trap ") as tmp:
+    root = Path(tmp)
+    cwd_tool = root / "mkdssp"
+    cwd_tool.write_text("#!/bin/sh\necho wrong-cwd-tool\n")
+    cwd_tool.chmod(0o755)
+    old_cwd = Path.cwd()
+    old_path = os.environ.get("PATH", "")
+    try:
+        os.chdir(root)
+        os.environ["PATH"] = ""
+        discovered = toolchain._discover_executable(Path("mkdssp"), ("mkdssp",))
+    finally:
+        os.chdir(old_cwd)
+        os.environ["PATH"] = old_path
+    check("bare configured names are PATH-only, never cwd files", discovered is None)
+
+with tempfile.TemporaryDirectory(prefix="foreign import cwd ") as tmp:
+    root = Path(tmp)
+    driver = Path(__file__).with_name("bench_t01_superposition.py")
+    import_probe = (
+        "import importlib.util, pathlib, sys; "
+        "p=pathlib.Path(sys.argv[1]); "
+        "s=importlib.util.spec_from_file_location('foreign_driver', p); "
+        "m=importlib.util.module_from_spec(s); s.loader.exec_module(m); "
+        "print(m.__name__)"
+    )
+    loaded = toolchain.run_capture(
+        [sys.executable, "-I", "-c", import_probe, driver], cwd=root, timeout=10
+    )
+    check(
+        "driver imports toolchain from an isolated foreign cwd",
+        loaded.returncode == 0 and loaded.stdout.strip() == "foreign_driver",
     )
 
 scripts_dir = Path(__file__).resolve().parent

@@ -8,8 +8,11 @@ import json
 import platform
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import TextIO
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
 from toolchain import external_tool_report
 
 
