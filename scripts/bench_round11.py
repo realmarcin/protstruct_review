@@ -24,7 +24,6 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -44,14 +43,6 @@ R10_JSON = REPO / "ref/research/data/negative_control_round10_recover.json"
 OUT_JSON = REPO / "ref/research/data/negative_control_round11_echo.json"
 
 # The committed ANIS baselines the decomposition is anchored to (round 9).
-PRE_PATHS = {"phenix": 0.1043, "gemmi": 0.1059}
-PRE_REFMAC_ANIS = 0.1371
-PRE_GAP = round(PRE_REFMAC_ANIS - PRE_PATHS["phenix"], 4)   # 0.0328
-POST_AGREEMENT_TOL = 0.01150                                 # d_refmac_anis
-
-_REFMAC_FREE = re.compile(r"R free\s+=?\s*([\d.]+)|Free R factor\s*=\s*([\d.]+)")
-
-
 def _load(name: str):
     spec = importlib.util.spec_from_file_location(name, REPO / "scripts" / f"{name}.py")
     m = importlib.util.module_from_spec(spec)
@@ -62,6 +53,23 @@ def _load(name: str):
 
 _scr = _load("screen_round1")
 _bnc = _load("bench_negative_control")
+_brl = _load("bench_recover_leg")
+
+# The registered anchors, derived from their records at import and asserted
+# against the values the preregistration states (#425) — a restated literal
+# with no cross-check is the class the C1/H1 discipline exists to prevent.
+_r9_2vxn = next(r for r in json.loads(R9_JSON.read_text())["rows"]
+                if r["pdb_id"] == "2VXN")
+PRE_PATHS = {p: _r9_2vxn["paths"][p]["pre"] for p in ("phenix", "gemmi")}
+PRE_REFMAC_ANIS = _r9_2vxn["refmac"]["anis"]["pre"]
+if (PRE_PATHS != {"phenix": 0.1043, "gemmi": 0.1059}
+        or PRE_REFMAC_ANIS != 0.1371):
+    raise SystemExit(
+        f"bench_round11: round-9 record anchors {PRE_PATHS}/{PRE_REFMAC_ANIS} "
+        f"!= the preregistration's stated values — record and registration "
+        f"disagree")
+PRE_GAP = round(PRE_REFMAC_ANIS - PRE_PATHS["phenix"], 4)   # 0.0328
+POST_AGREEMENT_TOL = _brl.REGISTERED_FIT_THRESHOLDS_ANIS["d_refmac"]
 
 
 def refmac_variant(sandbox: EntrySandbox, model: Path, mtz: Path,
@@ -146,7 +154,7 @@ def l1_decomposition(durable: Path, work: Path) -> dict:
         rec["z2_bar"] = round(0.75 * PRE_GAP, 4)
         rec["z2_holds"] = rec["z2_terms_sum_abs"] >= rec["z2_bar"]
         rec["z2_residual"] = round(PRE_GAP - rec["z2_terms_sum_abs"], 4)
-    rec["sandbox"] = sandbox.entry_id if hasattr(sandbox, "entry_id") else "2VXN"
+    rec["sandbox"] = sandbox.path.name
     rec["sandbox_files"] = sandbox.inventory()
     return rec
 
