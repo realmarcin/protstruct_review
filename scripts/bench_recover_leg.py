@@ -191,10 +191,10 @@ def s_r2_from_record() -> dict:
 
 def judge_state(state: str, post: Path, model: Path, mtz: Path, work: Path,
                 pair, flag, mask, pre_m, thresholds: dict,
-                s_r2: dict, fit_fn=None) -> dict:
+                s_r2: dict, fit_fn=None, anis: bool = False) -> dict:
     """Bench judgment of one state (perturbed or recovered) vs the deposited
     start, with C1 layered on the round-3 families."""
-    post_m = _bnc.measure_model(post, mtz, work, state, pair, flag)
+    post_m = _bnc.measure_model(post, mtz, work, state, pair, flag, anis=anis)
     protected = _bnc.mask_key_set(mask, "protected")
     fixed = 0
     for key in protected:

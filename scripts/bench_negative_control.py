@@ -245,7 +245,8 @@ def verdict(flags: dict) -> str:
 
 
 def measure_model(model: Path, mtz: Path, work: Path, tag: str,
-                  pair, flag, deposited_for_refmac: Path | None = None) -> dict:
+                  pair, flag, deposited_for_refmac: Path | None = None,
+                  anis: bool = False) -> dict:
     """All per-model measurements for one subject state. `deposited_for_refmac`
     substitutes the mmCIF for REFMAC when measuring a deposited PDB (the
     canaried input rule)."""
@@ -256,7 +257,7 @@ def measure_model(model: Path, mtz: Path, work: Path, tag: str,
         "rfree_gemmi": _scr.gemmi_rfree(model, mtz, work,
                                         f"gemmi_{model.stem}", pair, flag),
         "refmac": refmac_pass(refmac_in, mtz, work, f"{tag}_{model.stem}",
-                              pair, flag),
+                              pair, flag, anis=anis),
         "geometry": _bench.measure(model, work, f"b3_{tag}"),
         "residues": per_residue_verdicts(model, work, f"{tag}_{model.stem}"),
     }

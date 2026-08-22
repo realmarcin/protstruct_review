@@ -161,6 +161,32 @@ def recover_row(pdb_id, subject="osol", verdict="not-degraded",
                                       "d_refmac": refmac}}}
 
 
+def sandbox_recover_row(pdb_id, pgid):
+    row = recover_row(pdb_id, subject="osol_h")
+    row.update({
+        "sandbox": pdb_id,
+        "pgid": pgid,
+        "refmac_convention": "ANIS",
+        "refinement_terminated_by_signal": False,
+        "store_unchanged": True,
+        "processes": {"refine": {
+            "pgid": pgid, "returncode": 0, "start_new_session": True,
+            "termination_signal": None,
+        }},
+        "achieved_shift_unmasked": 0.2,
+        "achieved_shift_all": 0.25,
+        "perturbation_reproduction": {
+            "committed_unmasked": 0.19,
+            "regenerated_unmasked": 0.2,
+            "absdiff_unmasked": 0.01,
+            "committed_all": 0.24,
+            "regenerated_all": 0.25,
+            "absdiff_all": 0.01,
+        },
+    })
+    return row
+
+
 def make_br_tree(root, bench=None, recover=None, doc=None):
     data = root / "ref" / "research" / "data"
     data.mkdir(parents=True, exist_ok=True)
@@ -270,5 +296,98 @@ with tempfile.TemporaryDirectory() as tmp:
     make_br_tree(root, recover=bad)
     code, out = run_guard(root)
     check("#382: flat-summary v2 miscount fails", code, 1)
+
+# #356: a sandbox declaration is evidence-bearing, not decorative.  The
+# guard checks the row/process join, uniqueness, normal exits, ANIS, and the
+# byte-unchanged durable-store claim.
+SANDBOX_RECOVER = {
+    "run": {"run_mode": "full", "refmac_convention": "ANIS",
+            "sandbox_protocol": "per-entry-process-group-v1",
+            "set_record": "ref/research/data/negative_control_round2_enrolled.json",
+            "perturbation_record":
+                "ref/research/data/round4_perturbation_fixture.json"},
+    "rows": [sandbox_recover_row("1AAA", 1001),
+             sandbox_recover_row("2BBB", 1002)],
+    "summary": {
+        "osol_h": {"attempted": 2, "completed": 2, "successes": 2,
+                   "two_path_only": 0, "w4_contradictions": 0,
+                   "excluded_by_ruling": 0},
+        "sandbox_verification": {"distinct_sandboxes": 2,
+                                 "distinct_pgids": 2,
+                                 "signal_terminated": 0,
+                                 "store_mutations": 0},
+        "perturbation_reproduction": {"n": 2,
+                                      "max_absdiff_unmasked": 0.01,
+                                      "max_absdiff_all": 0.01},
+    },
+}
+
+
+def make_sandbox_tree(root, record):
+    make_br_tree(root, recover=record)
+    enrolled = root / "ref/research/data/negative_control_round2_enrolled.json"
+    enrolled.write_text(json.dumps({
+        "n_enrolled": 2,
+        "entries": [{"pdb_id": "1AAA"}, {"pdb_id": "2BBB"}],
+    }))
+    perturbation = root / "ref/research/data/round4_perturbation_fixture.json"
+    perturbation.write_text(json.dumps({
+        "rows": [
+            {"pdb_id": "1AAA", "achieved_shift_unmasked": 0.19,
+             "achieved_shift_all": 0.24},
+            {"pdb_id": "2BBB", "achieved_shift_unmasked": 0.19,
+             "achieved_shift_all": 0.24},
+        ]
+    }))
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    make_sandbox_tree(root, SANDBOX_RECOVER)
+    code, out = run_guard(root)
+    check("#356: clean sandbox process evidence passes", code, 0)
+
+for label, mutate, expected in (
+    ("duplicate pgids", lambda d: d["rows"][1].update(
+        {"pgid": 1001, "processes": {"refine": {
+            "pgid": 1001, "returncode": 0, "start_new_session": True,
+            "termination_signal": None}}}), "not unique"),
+    ("wrong entry directory", lambda d: d["rows"][0].update(
+        {"sandbox": "2BBB"}), "entry directory"),
+    ("non-session refine", lambda d: d["rows"][0]["processes"]["refine"].update(
+        {"start_new_session": False}), "start_new_session"),
+    ("signal-terminated refine", lambda d: d["rows"][0].update(
+        {"refinement_terminated_by_signal": True}), "signal-terminated"),
+    ("durable-store mutation", lambda d: d["rows"][0].update(
+        {"store_unchanged": False}), "byte-unchanged"),
+    ("mixed REFMAC convention", lambda d: d["rows"][0].update(
+        {"refmac_convention": "ISOT"}), "ANIS"),
+    ("drifted perturbation disclosure", lambda d: d["rows"][0]
+     ["perturbation_reproduction"].update({"absdiff_all": 0.0}),
+     "perturbation reproduction"),
+):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        bad = json.loads(json.dumps(SANDBOX_RECOVER))
+        mutate(bad)
+        make_sandbox_tree(root, bad)
+        code, out = run_guard(root)
+        check(f"#356: {label} fails", code, 1)
+        check(f"#356: {label} is named", expected in out, True)
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    partial = json.loads(json.dumps(SANDBOX_RECOVER))
+    partial["rows"] = partial["rows"][:1]
+    partial["summary"]["osol_h"].update(
+        {"attempted": 1, "completed": 1, "successes": 1}
+    )
+    partial["summary"]["sandbox_verification"].update(
+        {"distinct_sandboxes": 1, "distinct_pgids": 1}
+    )
+    make_sandbox_tree(root, partial)
+    code, out = run_guard(root)
+    check("#356: interrupted full record fails enrollment completeness", code, 1)
+    check("#356: interrupted record names the missing enrollment id",
+          "2BBB" in out and "does not exactly match" in out, True)
 
 print(f"\n{PASSED} checks passed")

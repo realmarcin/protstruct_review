@@ -163,6 +163,72 @@ def check_bench(path: Path, failures: list[str]) -> dict | None:
 def check_recover(path: Path, failures: list[str]) -> None:
     doc = json.loads(path.read_text())
     rows = doc.get("rows", [])
+    sandboxed = (doc.get("run") or {}).get("sandbox_protocol") == \
+        "per-entry-process-group-v1"
+    if sandboxed:
+        run = doc.get("run") or {}
+        set_record = run.get("set_record")
+        if (not isinstance(set_record, str) or Path(set_record).is_absolute()
+                or ".." in Path(set_record).parts):
+            fail(f"{path.name}: sandboxed run has unsafe or missing "
+                 f"set_record {set_record!r}", failures)
+        else:
+            root = path.parents[3]
+            enrolled_path = root / set_record
+            if not enrolled_path.is_file():
+                fail(f"{path.name}: set_record does not exist: {set_record}",
+                     failures)
+            elif run.get("run_mode") == "full":
+                enrolled = json.loads(enrolled_path.read_text())
+                expected_ids = [e["pdb_id"].upper()
+                                for e in enrolled.get("entries", [])]
+                actual_ids = [r["pdb_id"].upper() for r in rows]
+                if actual_ids != expected_ids:
+                    missing = sorted(set(expected_ids) - set(actual_ids))
+                    extra = sorted(set(actual_ids) - set(expected_ids))
+                    fail(f"{path.name}: full sandboxed run does not exactly "
+                         f"match {set_record} (missing={missing}, extra={extra})",
+                         failures)
+        perturb_record = run.get("perturbation_record")
+        if (not isinstance(perturb_record, str)
+                or Path(perturb_record).is_absolute()
+                or ".." in Path(perturb_record).parts):
+            fail(f"{path.name}: sandboxed run has unsafe or missing "
+                 f"perturbation_record {perturb_record!r}", failures)
+        else:
+            perturb_path = path.parents[3] / perturb_record
+            if not perturb_path.is_file():
+                fail(f"{path.name}: perturbation_record does not exist: "
+                     f"{perturb_record}", failures)
+            else:
+                old_rows = json.loads(perturb_path.read_text()).get("rows", [])
+                old_by_id = {r["pdb_id"].upper(): r for r in old_rows}
+                for row in rows:
+                    if row.get("status") != "completed":
+                        continue
+                    who = f"{row['pdb_id']}/{row.get('subject')}"
+                    old = old_by_id.get(row["pdb_id"].upper())
+                    reproduction = row.get("perturbation_reproduction") or {}
+                    if old is None:
+                        fail(f"{path.name}: {who} absent from "
+                             f"{perturb_record}", failures)
+                        continue
+                    expected = {
+                        "committed_unmasked": old.get("achieved_shift_unmasked"),
+                        "regenerated_unmasked": row.get(
+                            "achieved_shift_unmasked"),
+                        "absdiff_unmasked": round(abs(
+                            row["achieved_shift_unmasked"]
+                            - old["achieved_shift_unmasked"]), 4),
+                        "committed_all": old.get("achieved_shift_all"),
+                        "regenerated_all": row.get("achieved_shift_all"),
+                        "absdiff_all": round(abs(
+                            row["achieved_shift_all"]
+                            - old["achieved_shift_all"]), 4),
+                    }
+                    if reproduction != expected:
+                        fail(f"{path.name}: {who} perturbation reproduction "
+                             f"does not match {perturb_record}", failures)
     keys = [(r["pdb_id"], r.get("subject")) for r in rows]
     if len(keys) != len(set(keys)):
         fail(f"{path.name}: duplicate (pdb_id, subject) rows", failures)
@@ -201,6 +267,36 @@ def check_recover(path: Path, failures: list[str]) -> None:
                 fail(f"{path.name}: {who} two_path_only={rec['two_path_only']}"
                      f" but d_refmac is "
                      f"{'absent' if want_tp else 'present'}", failures)
+        if sandboxed:
+            sandbox = r.get("sandbox")
+            expected_sandbox = r["pdb_id"].upper()
+            if sandbox != expected_sandbox:
+                fail(f"{path.name}: {who} sandbox {sandbox!r} is not its "
+                     f"entry directory {expected_sandbox!r}", failures)
+            pgid = r.get("pgid")
+            refine = (r.get("processes") or {}).get("refine") or {}
+            if not isinstance(pgid, int) or pgid <= 0:
+                fail(f"{path.name}: {who} has no positive recorded pgid",
+                     failures)
+            if refine.get("pgid") != pgid:
+                fail(f"{path.name}: {who} row pgid {pgid!r} disagrees with "
+                     f"its refine process {refine.get('pgid')!r}", failures)
+            if refine.get("start_new_session") is not True:
+                fail(f"{path.name}: {who} refine did not record "
+                     f"start_new_session=True", failures)
+            if refine.get("returncode") != 0:
+                fail(f"{path.name}: {who} refine returncode is "
+                     f"{refine.get('returncode')!r}, not a normal exit",
+                     failures)
+            if r.get("refinement_terminated_by_signal") is not False:
+                fail(f"{path.name}: {who} refinement was signal-terminated",
+                     failures)
+            if r.get("store_unchanged") is not True:
+                fail(f"{path.name}: {who} did not prove the shared store "
+                     f"byte-unchanged", failures)
+            if r.get("refmac_convention") != "ANIS":
+                fail(f"{path.name}: {who} mixes or omits the ANIS REFMAC "
+                     f"convention", failures)
     summary = doc.get("summary") or {}
     groups = ({None: summary} if "attempted" in summary
               else {subj: s for subj, s in summary.items()})
@@ -225,6 +321,50 @@ def check_recover(path: Path, failures: list[str]) -> None:
             if k in s and s[k] != want:
                 fail(f"{path.name}: {label}.{k}={s[k]} but rows hold {want}",
                      failures)
+    if sandboxed:
+        completed = [r for r in rows if r.get("status") == "completed"]
+        sandboxes = [r.get("sandbox") for r in completed]
+        pgids = [r.get("pgid") for r in completed]
+        if len(sandboxes) != len(set(sandboxes)):
+            fail(f"{path.name}: sandbox directories are not unique", failures)
+        if len(pgids) != len(set(pgids)):
+            fail(f"{path.name}: recorded process groups are not unique",
+                 failures)
+        verification = (doc.get("summary") or {}).get("sandbox_verification") or {}
+        derived = {
+            "distinct_sandboxes": len(set(sandboxes)),
+            "distinct_pgids": len(set(pgids)),
+            "signal_terminated": sum(
+                1 for r in completed if r.get("refinement_terminated_by_signal")
+            ),
+            "store_mutations": sum(
+                1 for r in completed if not r.get("store_unchanged")
+            ),
+        }
+        for key, want in derived.items():
+            if verification.get(key) != want:
+                fail(f"{path.name}: sandbox_verification.{key}="
+                     f"{verification.get(key)!r} but rows hold {want}", failures)
+        reproductions = [r.get("perturbation_reproduction") or {}
+                         for r in completed]
+        perturb_summary = (doc.get("summary") or {}).get(
+            "perturbation_reproduction") or {}
+        perturb_derived = {
+            "n": len(reproductions),
+            "max_absdiff_unmasked": max(
+                (r.get("absdiff_unmasked") for r in reproductions),
+                default=None),
+            "max_absdiff_all": max(
+                (r.get("absdiff_all") for r in reproductions), default=None),
+        }
+        if perturb_summary != perturb_derived:
+            fail(f"{path.name}: perturbation_reproduction summary "
+                 f"{perturb_summary!r} but rows derive {perturb_derived!r}",
+                 failures)
+        run = doc.get("run") or {}
+        if run.get("refmac_convention") != "ANIS":
+            fail(f"{path.name}: sandboxed run does not declare ANIS REFMAC",
+                 failures)
     _check_full_run(doc, path.name, failures)
 
 
