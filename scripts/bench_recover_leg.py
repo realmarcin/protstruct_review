@@ -53,6 +53,13 @@ R6_HYGIENE_JSON_NAME = "ref/research/data/negative_control_round6_hygiene.json"
 REGISTERED_FIT_THRESHOLDS_ANIS = {"d_phenix": 0.01200, "d_gemmi": 0.01025,
                                   "d_refmac": 0.01150}
 R9_ANIS_JSON_NAME = "ref/research/data/negative_control_round9_anis.json"
+# Round-11 L2 else-branch (negative_control_round11_preregistration.md):
+# entries whose deposited baseline carries a registered cross-family
+# conflict contribute NO third opinion on candidate legs — their
+# pre-anchored REFMAC deltas are incommensurable (the round-11 echo), and
+# the post-agreement amendment was REFUSED by its own L3 safety sweep
+# (54 rule flips). Rows for these entries are two-path and say so.
+CANDIDATE_LEG_THIRD_OPINION_STANDDOWN = {"2VXN"}
 MAD_FLOOR = 0.0005
 SHIFT_BAND_A = 0.12          # §4 stay-band, cited via the prereg
 STOP_AT_DIFF = 0.5
