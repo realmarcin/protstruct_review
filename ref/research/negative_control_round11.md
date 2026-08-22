@@ -41,13 +41,17 @@ the families already agreed — fails in two distinct ways:
   comparison across that era is invalid by construction. The registration
   swept those rows and demanded zero change without era-scoping; the
   demand was right and the rule failed it.
-- **The ANIS era is subtler**: 2VXN dissolves exactly as predicted
-  (post-gap 0.0009 vs the delta-sign conflict), and five other entries
-  (6ZWY, 5XS6, 7TVL, 7OYN, 9TXE; post-gaps 0.0004–0.0027) show the same
-  shape — their delta-sign "disagreements" are noise-scale sign flips the
-  posts reveal as agreement. But **6XVM flips the other way** (post-gap
-  0.0166 > the tolerance): a real level difference the rule would turn
-  from agreement into conflict.
+- **The ANIS era is subtler**: 2VXN's round-10 contradiction dissolves
+  (post-gap 0.0009 vs the delta-sign conflict) — but Z3's 2VXN clause
+  itself only **half**-holds (#424): the round-5 contradiction does NOT
+  dissolve (ISOT post-gap 0.0251, the same era category error as the
+  other 46 ISOT flips). Five other ANIS entries (6ZWY, 5XS6, 7TVL, 7OYN,
+  9TXE; post-gaps 0.0004–0.0027) show the round-10 shape — their
+  delta-sign "disagreements" are noise-scale sign flips (|Δ_refmac|
+  0.0001–0.0073, all inside the 0.01150 null threshold) the posts reveal
+  as agreement. But **6XVM flips the other way** (post-gap 0.0166,
+  |Δ_refmac| 0.0253): a real level difference the rule would turn from
+  agreement into conflict.
 
 Per the registration there is no third outcome: the decomposition
 attributed the gap, but the amendment's own safety clause failed, so the
