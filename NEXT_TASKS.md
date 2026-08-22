@@ -3,8 +3,8 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-21** (through the negative-control track, rounds NC-0…NC-10
-including the ANIS adoption and the completed store remediation, PRs #294–#383; the
+**Last reconciled: 2026-08-22** (through the negative-control track, rounds NC-0…NC-10
+including the ANIS adoption, the completed store remediation, and the NC-10 sandbox round, PRs #294–#415; the
 tolerance-series "Open" section below was last reconciled 2026-08-06 against rounds 37–42). **Check the issue tracker for open issues; this file does not mirror it in real
 time.** A GitHub Actions workflow configures the hermetic gate on Linux and macOS; [#410](https://github.com/realmarcin/protstruct_review/issues/410)
 tracks the current GitHub-side startup failure if those checks are absent. The matching local
