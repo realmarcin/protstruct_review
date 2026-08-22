@@ -82,4 +82,9 @@ check("ANIS two-path components are the H1 values",
 check("the conventions differ where the convention acts",
       anis["d_refmac"] != b.REGISTERED_FIT_THRESHOLDS["d_refmac"], True)
 
+# Round-11 L2 else-branch: the candidate-leg stand-down list exists, names
+# exactly 2VXN, and stays a set (drivers test membership, never equality).
+check("candidate-leg stand-down names exactly 2VXN",
+      b.CANDIDATE_LEG_THIRD_OPINION_STANDDOWN, {"2VXN"})
+
 print(f"\n{PASSED} checks passed")
