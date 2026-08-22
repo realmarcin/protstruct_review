@@ -3,7 +3,7 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-19** (through the negative-control track, rounds NC-0…NC-9
+**Last reconciled: 2026-08-21** (through the negative-control track, rounds NC-0…NC-10
 including the ANIS adoption and the completed store remediation, PRs #294–#383; the
 tolerance-series "Open" section below was last reconciled 2026-08-06 against rounds 37–42). **Check the issue tracker for open issues; this file does not mirror it in real
 time.** A GitHub Actions workflow configures the hermetic gate on Linux and macOS; [#410](https://github.com/realmarcin/protstruct_review/issues/410)
@@ -11,9 +11,9 @@ tracks the current GitHub-side startup failure if those checks are absent. The m
 command is `uv run --locked -- bash scripts/validate.sh`, and it must exit 0 before a merge.
 External-tool and online benchmarks remain manual.
 
-## The negative-control track (2026-08-08 → 2026-08-19)
+## The negative-control track (2026-08-08 → 2026-08-21)
 
-A second benchmark series, planned from a deep-research run and executed in nine preregistered
+A second benchmark series, planned from a deep-research run and executed in ten preregistered
 rounds: gold-standard sub-Å structures as **negative tests** for refinement. Full plan:
 `ref/research/negative_control_benchmark_plan.md`; tracking issue
 [#295](https://github.com/realmarcin/protstruct_review/issues/295); round docs
@@ -33,21 +33,14 @@ rounds: gold-standard sub-Å structures as **negative tests** for refinement. Fu
 | Round NC-7: attribution | #363/#367/#370 (2026-08-17) | **2VXN attributed (#355 closed): the Murshudov family never applied the deposited aniso ADPs** — iso-only model moves both R paths +0.051, REFMAC/Servalcat 0.000; closing invocation `REFI BREF ANIS` (0.1712→0.1371) registered as the third-opinion amendment. H1 flip sweep: 66 rows, zero verdict flips. **V3 falsified** (9YGW's aniso block is internally consistent — CYS-altA/CSO-altB microheterogeneity; stays named-unmeasurable, census 21/22). **V4 falsified with mechanism** (the converter rolls random free flags on unmeasured reflections — refetch is provably non-reproducible for 11/12); 8R5K remediated end-to-end on the user's explicit go-ahead (#370) |
 | Round NC-8: closeout | #373/#376/#378 (merged 2026-08-17→19) | **the aniso tax is set-wide: 21/21 entries drop under `REFI BREF ANIS`** (median −0.033, all ~6× beyond `d_refmac` — the no-mixing rule proved structural). **W4 falsified terminally**: 9YGW's PDB form fails at the same CYS/CSO position — **stood down to permanent two-path status**. All 11 wavelength patches proof-verified, then written on the user's named go-ahead (#378, deposition values incl. two converter-placeholder corrections); the store is complete, 22/22 nonzero-wavelength and sidecar-consistent (**#361 closed**) |
 | Round NC-9: **the ANIS adoption** | #379/#383 (merged 2026-08-19→20 UTC) | first falsification-free round — **X1/X2/X3 all hold**: 22 nulls regenerated, reproducing committed deltas at worst gap 0.0006 (8R5K's match also quantifies the MLHL contamination's delta impact as negligible); **`d_refmac_anis` = 0.01150** registered with record cross-check; direction agreement 20/21 vs 17/21 — 2VXN's null flips −0.0122 → +0.0130, so **the #355 sign conflict was manufactured by iso-collapse**. From round 10, the third opinion grades gold standards with their anisotropy applied; ISOT retained as history |
+| Round NC-10: **`osol_h` + per-entry sandboxes** | [#415](https://github.com/realmarcin/protstruct_review/pull/415) | **Y1 holds: 15/22 recoveries**, four above `osol` with no old success lost. **Y3 holds exactly:** 22 distinct sandboxes/PGIDs, zero signal-terminated refinements or store mutations; #356's remaining half ships. ANIS is measurable 21/21 with zero convention mixing, but **Y2 is falsified** by 2VXN's one W4 contradiction; the driver preserves all 22 rows then exits nonzero. Perturbations regenerated with maximum round-4 reproduction gaps 0.0214 Å unmasked / 0.0181 Å all-residue. |
 
 Also landed alongside NC-8/9: the record-reconciliation guard now covers **bench and
 recover records** with verdicts recomputed from their own evidence (**#338 closed**, #381).
 
-**Open queue for round NC-10:**
-
-- [ ] **First verdict-bearing round under ANIS** — any new subject leg uses `anis=True` and
-      `REGISTERED_FIT_THRESHOLDS_ANIS` (0.01200/0.01025/0.01150); no comparison may mix
-      conventions.
-- [ ] **[#356](https://github.com/realmarcin/protstruct_review/issues/356)** (remaining half) —
-      per-entry agent sandboxes (two mutual `pkill` incidents, both disclosed); load-bearing for
-      the next agent leg, which is where it ships; the durable-storage half shipped in NC-6.
-- [ ] **[#321](https://github.com/realmarcin/protstruct_review/issues/321)** — mask-constrained D6
-      criterion (registered-change candidate for the next screen registration; first calibration
-      datum on record: 2DDX at 0.229 mask fraction).
+**NC-10 closeout:** the first verdict-bearing ANIS round and #356's remaining sandbox half are
+complete. The mask-constrained D6 criterion from #321 landed before this round and remains bound to
+the next screen registration; it was correctly outside NC-10's recover-leg scope.
 
 ## Where the tolerance work stands
 

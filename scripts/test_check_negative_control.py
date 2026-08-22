@@ -161,6 +161,42 @@ def recover_row(pdb_id, subject="osol", verdict="not-degraded",
                                       "d_refmac": refmac}}}
 
 
+def sandbox_recover_row(pdb_id, pgid):
+    row = recover_row(pdb_id, subject="osol_h")
+    process = {
+        "returncode": 0, "start_new_session": True,
+        "termination_signal": None,
+        "cache_input_hashes": {"input": "a" * 64},
+        "output_sha256": "b" * 64,
+    }
+    row.update({
+        "sandbox": pdb_id,
+        "pgid": pgid,
+        "refmac_convention": "ANIS",
+        "refinement_terminated_by_signal": False,
+        "store_unchanged": True,
+        "processes": {
+            "dynamics": dict(process, pgid=pgid - 20),
+            "ready_set": dict(process, pgid=pgid - 10),
+            "refine": dict(process, pgid=pgid),
+            "hydrogen_count_ready": 100,
+            "hydrogen_count_refined": 100,
+        },
+        "anis_log_verification": {"checked": 2, "with_anis": 2},
+        "achieved_shift_unmasked": 0.2,
+        "achieved_shift_all": 0.25,
+        "perturbation_reproduction": {
+            "committed_unmasked": 0.19,
+            "regenerated_unmasked": 0.2,
+            "absdiff_unmasked": 0.01,
+            "committed_all": 0.24,
+            "regenerated_all": 0.25,
+            "absdiff_all": 0.01,
+        },
+    })
+    return row
+
+
 def make_br_tree(root, bench=None, recover=None, doc=None):
     data = root / "ref" / "research" / "data"
     data.mkdir(parents=True, exist_ok=True)
@@ -270,5 +306,161 @@ with tempfile.TemporaryDirectory() as tmp:
     make_br_tree(root, recover=bad)
     code, out = run_guard(root)
     check("#382: flat-summary v2 miscount fails", code, 1)
+
+# #356: a sandbox declaration is evidence-bearing, not decorative.  The
+# guard checks the row/process join, uniqueness, normal exits, ANIS, and the
+# byte-unchanged durable-store claim.
+SANDBOX_RECOVER = {
+    "run": {"run_mode": "full", "refmac_convention": "ANIS",
+            "sandbox_protocol": "per-entry-process-group-v1",
+            "set_record": "ref/research/data/negative_control_round2_enrolled.json",
+            "perturbation_record":
+                "ref/research/data/round4_perturbation_fixture.json",
+            "comparison_record":
+                "ref/research/data/round5_comparison_fixture.json"},
+    "rows": [sandbox_recover_row("1AAA", 1001),
+             sandbox_recover_row("2BBB", 1002)],
+    "summary": {
+        "osol_h": {"attempted": 2, "completed": 2, "successes": 2,
+                   "two_path_only": 0, "w4_contradictions": 0,
+                   "excluded_by_ruling": 0},
+        "sandbox_verification": {"distinct_sandboxes": 2,
+                                 "distinct_pgids": 2,
+                                 "signal_terminated": 0,
+                                 "store_mutations": 0},
+        "anis_verification": {"measurable": 2,
+                              "mixed_convention_rows": 0,
+                              "logs_checked": 4,
+                              "logs_with_anis": 4},
+        "hydrogen_verification": {"models": 2,
+                                  "minimum_ready": 100,
+                                  "maximum_ready": 100,
+                                  "retained_equal": 2},
+        "comparison_with_osol": {
+            "record": "ref/research/data/round5_comparison_fixture.json",
+            "osol_attempted": 2,
+            "osol_successes": 1,
+            "osol_h_attempted": 2,
+            "osol_h_successes": 2,
+            "gained": ["2BBB"],
+            "lost": [],
+        },
+        "perturbation_reproduction": {"n": 2,
+                                      "max_absdiff_unmasked": 0.01,
+                                      "max_absdiff_all": 0.01},
+    },
+}
+
+
+def make_sandbox_tree(root, record):
+    make_br_tree(root, recover=record)
+    enrolled = root / "ref/research/data/negative_control_round2_enrolled.json"
+    enrolled.write_text(json.dumps({
+        "n_enrolled": 2,
+        "entries": [{"pdb_id": "1AAA"}, {"pdb_id": "2BBB"}],
+    }))
+    perturbation = root / "ref/research/data/round4_perturbation_fixture.json"
+    perturbation.write_text(json.dumps({
+        "rows": [
+            {"pdb_id": "1AAA", "achieved_shift_unmasked": 0.19,
+             "achieved_shift_all": 0.24},
+            {"pdb_id": "2BBB", "achieved_shift_unmasked": 0.19,
+             "achieved_shift_all": 0.24},
+        ]
+    }))
+    comparison = root / "ref/research/data/round5_comparison_fixture.json"
+    comparison.write_text(json.dumps({
+        "rows": [
+            recover_row("1AAA", subject="osol", success=True),
+            recover_row("2BBB", subject="osol", success=False),
+        ]
+    }))
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    make_sandbox_tree(root, SANDBOX_RECOVER)
+    code, out = run_guard(root)
+    check("#356: clean sandbox process evidence passes", code, 0)
+
+for label, mutate, expected in (
+    ("duplicate pgids", lambda d: d["rows"][1].update(
+        {"pgid": 1001, "processes": {"refine": {
+            "pgid": 1001, "returncode": 0, "start_new_session": True,
+            "termination_signal": None}}}), "not unique"),
+    ("wrong entry directory", lambda d: d["rows"][0].update(
+        {"sandbox": "2BBB"}), "entry directory"),
+    ("non-session refine", lambda d: d["rows"][0]["processes"]["refine"].update(
+        {"start_new_session": False}), "start_new_session"),
+    ("non-session ready_set", lambda d: d["rows"][0]["processes"]
+     ["ready_set"].update({"start_new_session": False}), "ready_set"),
+    ("signal-terminated refine", lambda d: d["rows"][0].update(
+        {"refinement_terminated_by_signal": True}), "signal-terminated"),
+    ("durable-store mutation", lambda d: d["rows"][0].update(
+        {"store_unchanged": False}), "byte-unchanged"),
+    ("mixed REFMAC convention", lambda d: d["rows"][0].update(
+        {"refmac_convention": "ISOT"}), "ANIS"),
+    ("drifted perturbation disclosure", lambda d: d["rows"][0]
+     ["perturbation_reproduction"].update({"absdiff_all": 0.0}),
+     "perturbation reproduction"),
+    ("drifted ANIS summary", lambda d: d["summary"]["anis_verification"].update(
+        {"logs_with_anis": 3}), "anis_verification"),
+    ("row missing one ANIS log", lambda d: d["rows"][0]
+     ["anis_log_verification"].update({"checked": 1, "with_anis": 1}),
+     "both pre/post"),
+    ("invalid cache input hash", lambda d: d["rows"][0]["processes"]
+     ["dynamics"]["cache_input_hashes"].update({"input": "not-a-hash"}),
+     "content-addressed"),
+    ("drifted hydrogen summary", lambda d: d["summary"]
+     ["hydrogen_verification"].update({"retained_equal": 1}),
+     "hydrogen_verification"),
+    ("drifted prior-round comparison", lambda d: d["summary"]
+     ["comparison_with_osol"].update({"gained": []}),
+     "comparison_with_osol"),
+):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        bad = json.loads(json.dumps(SANDBOX_RECOVER))
+        mutate(bad)
+        make_sandbox_tree(root, bad)
+        code, out = run_guard(root)
+        check(f"#356: {label} fails", code, 1)
+        check(f"#356: {label} is named", expected in out, True)
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    partial = json.loads(json.dumps(SANDBOX_RECOVER))
+    partial["rows"] = partial["rows"][:1]
+    partial["summary"]["osol_h"].update(
+        {"attempted": 1, "completed": 1, "successes": 1}
+    )
+    partial["summary"]["sandbox_verification"].update(
+        {"distinct_sandboxes": 1, "distinct_pgids": 1}
+    )
+    make_sandbox_tree(root, partial)
+    code, out = run_guard(root)
+    check("#356: interrupted full record fails enrollment completeness", code, 1)
+    check("#356: interrupted record names the missing enrollment id",
+          "2BBB" in out and "does not exactly match" in out, True)
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    clean_doc = (
+        "osol_h success 2/2; osol comparison 1/2; ANIS 2/2; "
+        "H/D 100–100 per model, retained 2/2; all **4** logs; "
+        "2 distinct sandbox directories; 2 distinct refinement PGIDs; "
+        "0.01 Å unmasked; 0.01 Å all-residue; gained 2BBB. "
+        "No old success was lost."
+    )
+    make_sandbox_tree(root, SANDBOX_RECOVER)
+    (root / "ref/research/negative_control_round9.md").write_text(clean_doc)
+    code, out = run_guard(root)
+    check("#419: clean recover prose headlines pass", code, 0)
+    (root / "ref/research/negative_control_round9.md").write_text(
+        clean_doc.replace("2/2; osol comparison", "1/2; osol comparison", 1)
+    )
+    code, out = run_guard(root)
+    check("#419: drifted recover prose headline fails", code, 1)
+    check("#419: prose drift names the protected headline",
+          "osol_h success" in out and "#419" in out, True)
 
 print(f"\n{PASSED} checks passed")
