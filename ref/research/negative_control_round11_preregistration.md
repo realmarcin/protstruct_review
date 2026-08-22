@@ -61,11 +61,18 @@ merge:
 > the candidate itself is measured consensually, and the rule grades what
 > the tools actually agree on. W4 keeps its role unchanged against the
 > two-path evidence.
+>
+> **Acknowledged borrow (#422):** `d_refmac_anis` is a DELTA-distribution
+> scale being reused as a LEVEL-agreement tolerance. It is the only
+> registered REFMAC-family scale on record, and the committed post-diff
+> (0.0012) sits an order of magnitude inside it; if the borrow is ever
+> load-bearing near the boundary, a level-specific scale must be
+> calibrated by its own registered round before a verdict rests on it.
 
 **Else** (the gap does not decompose into named terms), 2VXN's third
-opinion **stands down for candidate legs** as it already has for the
-entry's aniso-reader pathologies' neighbors — the round-8 stand-down
-logic extended, no third outcome.
+opinion **stands down for candidate legs** — the same registered move as
+9YGW's round-8 stand-down, applied to a different entry for a different
+named cause; no third outcome.
 
 Either way, committed rounds 5 and 10 are not re-judged; L3 discloses
 what the amendment would have said.
@@ -74,9 +81,9 @@ what the amendment would have said.
 
 Recompute the committed round-5 (`osol`) and round-10 (`osol_h`) 2VXN
 rows under the post-agreement rule and disclose the outcomes (prediction
-Z3), alongside the same sweep for every other entry's candidate rows —
-the rule must be shown to change nothing anywhere the families already
-agreed.
+Z3), alongside the same sweep over every candidate row in the committed
+round-4, round-5, and round-10 recover records — the rule must be shown
+to change nothing anywhere the families already agreed.
 
 ## Predictions
 
