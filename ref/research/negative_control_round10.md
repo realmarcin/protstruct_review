@@ -72,15 +72,19 @@ row in the full-run record.
 ## Infrastructure landed
 
 - `entry_sandbox.py` owns path containment, fresh-session launch, active-PGID
-  registration, and TERM→KILL group cleanup. Name-based `pkill` is absent.
+  registration, and whole-group TERM→KILL cleanup, including descendants that
+  outlive the group leader. Name-based `pkill` is absent.
 - `bench_round10.py` supports bounded concurrent entries while retaining
-  precise all-active cancellation and atomic completed-row persistence.
+  precise all-active cancellation, content-addressed stage resume, durable-
+  store checks on every exit path, and atomic completed-row persistence.
 - The negative-control guard rejects duplicate sandboxes/PGIDs, non-session or
-  signal-terminated refinements, store mutation, mixed REFMAC conventions,
-  drifted perturbation comparisons, and interrupted “full” records that do not
-  exactly match `SET_RECORD`.
+  abnormal exits in any subject stage, store mutation, stale ANIS/H/comparison
+  headlines, drifted perturbation comparisons, and interrupted “full” records
+  that do not exactly match `SET_RECORD`.
 - Focused tests launch real parent/child process groups and prove that a timeout
-  reaches the descendant without touching a sibling sandbox.
+  reaches and, when needed, force-kills a descendant without touching a sibling
+  sandbox. The adversarial review and remediation are recorded in
+  `negative_control_round10_review.md`.
 
 ## Inheritance
 

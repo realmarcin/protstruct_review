@@ -84,6 +84,27 @@ with tempfile.TemporaryDirectory() as temporary:
           json.loads(timed.child("child-term.json").read_text())["signal"],
           "TERM")
 
+    stubborn = EntrySandbox(root, "3DDD")
+    stubborn_child = (
+        "import signal,time; from pathlib import Path; "
+        "signal.signal(signal.SIGTERM, signal.SIG_IGN); time.sleep(1); "
+        "Path('survived.txt').write_text('alive'); time.sleep(30)"
+    )
+    stubborn_parent = (
+        "import subprocess,sys,time; from pathlib import Path; "
+        f"p=subprocess.Popen([sys.executable,'-c',{stubborn_child!r}]); "
+        "Path('child-pid.txt').write_text(str(p.pid)); time.sleep(30)"
+    )
+    stubborn_result = stubborn.run_logged(
+        [sys.executable, "-c", stubborn_parent], "stubborn.log",
+        timeout=0.5, terminate_grace=0.2,
+    )
+    time.sleep(1.0)
+    check("timeout kills a TERM-ignoring descendant after its leader exits",
+          stubborn.child("survived.txt").exists(), False)
+    check("stubborn timeout still records the leader signal",
+          stubborn_result.termination_signal, 15)
+
     concurrent = EntrySandbox(root, "4DDD")
     result_box = []
     thread = threading.Thread(
@@ -106,5 +127,27 @@ with tempfile.TemporaryDirectory() as temporary:
           result_box[0].termination_signal is not None, True)
     check("active registry is empty after worker cleanup",
           EntrySandbox.active_pgids(), [])
+
+    concurrent_stubborn = EntrySandbox(root, "5EEE")
+    concurrent_box = []
+    thread = threading.Thread(
+        target=lambda: concurrent_box.append(concurrent_stubborn.run_logged(
+            [sys.executable, "-c", stubborn_parent],
+            "concurrent-stubborn.log", timeout=60,
+        ))
+    )
+    thread.start()
+    deadline = time.monotonic() + 2.0
+    while (not concurrent_stubborn.child("child-pid.txt").exists()
+           and time.monotonic() < deadline):
+        time.sleep(0.02)
+    EntrySandbox.terminate_all_active(terminate_grace=0.2)
+    thread.join(timeout=2.0)
+    time.sleep(1.0)
+    check("concurrent cancellation kills a TERM-ignoring descendant",
+          concurrent_stubborn.child("survived.txt").exists(), False)
+    check("stubborn concurrent worker finishes", thread.is_alive(), False)
+    check("stubborn concurrent cancellation records leader signal",
+          concurrent_box[0].termination_signal, 15)
 
 print(f"\n{PASSED} checks passed")

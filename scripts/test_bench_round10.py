@@ -77,6 +77,22 @@ class FakeSandbox:
         return result
 
 
+class StageSandbox(FakeSandbox):
+    def run_logged(self, arguments, log_name, timeout=None):
+        self.calls.append([str(argument) for argument in arguments])
+        self.child(log_name).write_text("synthetic log\n")
+        self.child("product.pdb").write_text(
+            f"product {len(self.calls)} {arguments[-1]}\n"
+        )
+        result = ProcessGroupResult(
+            arguments=[str(argument) for argument in arguments],
+            returncode=0, pid=self.next_pid, pgid=self.next_pid,
+            timed_out=False, termination_signal=None,
+        )
+        self.next_pid += 1
+        return result
+
+
 with tempfile.TemporaryDirectory() as temporary:
     root = Path(temporary)
     sandbox = FakeSandbox(root / "1AAA")
@@ -107,6 +123,57 @@ with tempfile.TemporaryDirectory() as temporary:
     check("both isolated process records are retained",
           set(processes) >= {"ready_set", "refine"}, True)
     check("the H-bearing refined output is returned", recovered.exists(), True)
+
+
+with tempfile.TemporaryDirectory() as temporary:
+    root = Path(temporary)
+    sandbox = StageSandbox(root / "CACHE")
+    input_path = root / "input.dat"
+    input_path.write_text("input-v1\n")
+    product, first = b10._stage(
+        sandbox, "stage", ["tool", "protocol=v1"], "product.pdb",
+        inputs=[input_path], timeout=1,
+    )
+    product, intact = b10._stage(
+        sandbox, "stage", ["tool", "protocol=v1"], "product.pdb",
+        inputs=[input_path], timeout=1,
+    )
+    check("intact content-addressed cache avoids relaunch", len(sandbox.calls), 1)
+    check("cache records input and output hashes",
+          set(intact) >= {"cache_input_hashes", "output_sha256"}, True)
+
+    product, changed_args = b10._stage(
+        sandbox, "stage", ["tool", "protocol=v2"], "product.pdb",
+        inputs=[input_path], timeout=1,
+    )
+    check("changed protocol arguments invalidate cache", len(sandbox.calls), 2)
+    input_path.write_text("input-v2\n")
+    product, changed_input = b10._stage(
+        sandbox, "stage", ["tool", "protocol=v2"], "product.pdb",
+        inputs=[input_path], timeout=1,
+    )
+    check("changed input content invalidates cache", len(sandbox.calls), 3)
+    product.write_text("tampered product\n")
+    b10._stage(
+        sandbox, "stage", ["tool", "protocol=v2"], "product.pdb",
+        inputs=[input_path], timeout=1,
+    )
+    check("changed output content invalidates cache", len(sandbox.calls), 4)
+    process_record = sandbox.child("stage_process.json")
+    cached = __import__("json").loads(process_record.read_text())
+    cached["returncode"] = 9
+    process_record.write_text(__import__("json").dumps(cached))
+    b10._stage(
+        sandbox, "stage", ["tool", "protocol=v2"], "product.pdb",
+        inputs=[input_path], timeout=1,
+    )
+    check("failed process evidence invalidates cache", len(sandbox.calls), 5)
+    process_record.write_text("{malformed")
+    b10._stage(
+        sandbox, "stage", ["tool", "protocol=v2"], "product.pdb",
+        inputs=[input_path], timeout=1,
+    )
+    check("malformed process evidence invalidates cache", len(sandbox.calls), 6)
 
 
 # ANIS must reach the REFMAC call used by both pre and post measurement.  This
@@ -147,6 +214,9 @@ def completed_row(index: int) -> dict:
         "sandbox": f"E{index:03d}", "pgid": 1000 + index,
         "refmac_convention": "ANIS", "store_unchanged": True,
         "refinement_terminated_by_signal": False,
+        "processes": {"hydrogen_count_ready": 100 + index,
+                      "hydrogen_count_refined": 100 + index},
+        "anis_log_verification": {"checked": 2, "with_anis": 2},
         "recovery_success": index < 14, "w4_contradiction": False,
         "perturbation_reproduction": {
             "absdiff_unmasked": round(index / 10000, 4),
@@ -160,8 +230,17 @@ def completed_row(index: int) -> dict:
 summary = b10.summarize([completed_row(index) for index in range(22)])
 check("Y1 summary counts successes from rows", summary["osol_h"]["successes"], 14)
 check("Y2 summary counts 21 measurable ANIS rows",
-      summary["anis_verification"],
+      {key: summary["anis_verification"][key]
+       for key in ("measurable", "mixed_convention_rows")},
       {"measurable": 21, "mixed_convention_rows": 0})
+check("ANIS log summary is row-derived",
+      {key: summary["anis_verification"][key]
+       for key in ("logs_checked", "logs_with_anis")},
+      {"logs_checked": 44, "logs_with_anis": 44})
+check("hydrogen retention summary is row-derived",
+      summary["hydrogen_verification"],
+      {"models": 22, "minimum_ready": 100, "maximum_ready": 121,
+       "retained_equal": 22})
 check("Y3 summary derives distinct sandboxes and pgids",
       summary["sandbox_verification"],
       {"distinct_sandboxes": 22, "distinct_pgids": 22,
@@ -170,5 +249,58 @@ check("perturbation disclosure is derived from every row",
       summary["perturbation_reproduction"],
       {"n": 22, "max_absdiff_unmasked": 0.0021,
        "max_absdiff_all": 0.001})
+
+
+with tempfile.TemporaryDirectory() as temporary:
+    root = Path(temporary)
+    durable = root / "durable"
+    work = root / "work"
+    durable.mkdir()
+    for suffix in ("pdb", "cif", "mtz"):
+        (durable / f"1aaa.{suffix}").write_text(f"original {suffix}\n")
+    (durable / "1aaa_validation.xml").write_text("original validation\n")
+    original_science = b10._run_entry_science
+
+    def failing_mutator(
+        row, _pdb_id, inputs, _durable, _sandbox, _thresholds, _s_r2
+    ):
+        inputs["model"].write_text("mutated by failed stage\n")
+        row["status"], row["reason"] = "data_defect", "synthetic failure"
+        return row
+
+    b10._run_entry_science = failing_mutator
+    try:
+        try:
+            b10.run_entry({"pdb_id": "1AAA"}, durable, work, {}, {})
+        except SystemExit as exc:
+            mutation_refused = "mutated the durable store" in str(exc)
+        else:
+            mutation_refused = False
+    finally:
+        b10._run_entry_science = original_science
+    check("failed stages cannot bypass durable-store mutation detection",
+          mutation_refused, True)
+
+    for suffix in ("pdb", "cif", "mtz"):
+        (durable / f"1aaa.{suffix}").write_text(f"original {suffix}\n")
+
+    def failing_deleter(row, _pdb_id, inputs, _durable, _sandbox,
+                        _thresholds, _s_r2):
+        inputs["model"].unlink()
+        row["status"], row["reason"] = "data_defect", "synthetic failure"
+        return row
+
+    b10._run_entry_science = failing_deleter
+    try:
+        try:
+            b10.run_entry({"pdb_id": "1AAA"}, durable, work, {}, {})
+        except SystemExit as exc:
+            deletion_refused = "mutated the durable store" in str(exc)
+        else:
+            deletion_refused = False
+    finally:
+        b10._run_entry_science = original_science
+    check("deleted durable inputs produce the named mutation failure",
+          deletion_refused, True)
 
 print(f"\n{PASSED} checks passed")

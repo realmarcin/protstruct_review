@@ -131,23 +131,40 @@ class EntrySandbox:
     def _terminate_group(
         process: subprocess.Popen[str], pgid: int, terminate_grace: float
     ) -> None:
-        """Terminate one known process group, escalating TERM to KILL."""
-        if process.poll() is not None:
+        """Terminate one known process group, escalating TERM to KILL.
+
+        The group leader may obey TERM while one of its descendants ignores
+        it.  Waiting only for the leader therefore is not proof that the
+        owned process group is gone (#416).
+        """
+        if not EntrySandbox._group_exists(pgid):
+            process.communicate()
             return
         try:
             os.killpg(pgid, signal.SIGTERM)
         except ProcessLookupError:
             pass
-        try:
-            process.communicate(timeout=terminate_grace)
-            return
-        except subprocess.TimeoutExpired:
-            pass
-        try:
-            os.killpg(pgid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
+        deadline = time.monotonic() + terminate_grace
+        while EntrySandbox._group_exists(pgid) and time.monotonic() < deadline:
+            process.poll()  # Reap the leader promptly; descendants may remain.
+            time.sleep(0.02)
+        if EntrySandbox._group_exists(pgid):
+            try:
+                os.killpg(pgid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
         process.communicate()
+
+    @staticmethod
+    def _group_exists(pgid: int) -> bool:
+        """Return whether any process still belongs to the recorded PGID."""
+        try:
+            os.killpg(pgid, 0)
+        except ProcessLookupError:
+            return False
+        except PermissionError:
+            return True
+        return True
 
     @staticmethod
     def active_pgids() -> list[int]:
@@ -165,19 +182,19 @@ class EntrySandbox:
         """
         with _ACTIVE_LOCK:
             active = list(_ACTIVE_PROCESSES.items())
-        for pgid, process in active:
-            if process.poll() is None:
+        for pgid, _process in active:
+            if EntrySandbox._group_exists(pgid):
                 try:
                     os.killpg(pgid, signal.SIGTERM)
                 except ProcessLookupError:
                     pass
         deadline = time.monotonic() + terminate_grace
         while time.monotonic() < deadline:
-            if all(process.poll() is not None for _, process in active):
+            if all(not EntrySandbox._group_exists(pgid) for pgid, _ in active):
                 return
             time.sleep(0.02)
-        for pgid, process in active:
-            if process.poll() is None:
+        for pgid, _process in active:
+            if EntrySandbox._group_exists(pgid):
                 try:
                     os.killpg(pgid, signal.SIGKILL)
                 except ProcessLookupError:

@@ -23,8 +23,10 @@ import argparse
 import concurrent.futures
 import importlib.util
 import json
+import os
 import sys
 from pathlib import Path
+from typing import Sequence
 
 if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -37,6 +39,8 @@ ENROLLED_JSON = REPO / SET_RECORD
 OUT_JSON = REPO / "ref/research/data/negative_control_round10_recover.json"
 R4_RECOVER_RECORD = "ref/research/data/negative_control_round4_recover.json"
 R4_RECOVER_JSON = REPO / R4_RECOVER_RECORD
+COMPARISON_RECORD = "ref/research/data/negative_control_round5_recover.json"
+COMPARISON_JSON = REPO / COMPARISON_RECORD
 SUBJECT = "osol_h"
 
 
@@ -64,23 +68,40 @@ def _stage(
     arguments: list,
     output_name: str,
     *,
+    inputs: Sequence[Path],
     timeout: float,
 ) -> tuple[Path | None, dict]:
-    """Run or resume one sandboxed stage, retaining its process evidence."""
+    """Run or resume one stage only when its content identity matches."""
     output = sandbox.child(output_name)
     process_record = sandbox.child(f"{name}_process.json")
+    argv = [os.fspath(argument) for argument in arguments]
+    input_hashes = {
+        str(path.resolve()): _scr.sha256_file(path) for path in inputs
+    }
     if output.exists() and process_record.exists():
-        cached = json.loads(process_record.read_text())
-        if cached.get("returncode") == 0:
+        try:
+            cached = json.loads(process_record.read_text())
+        except (json.JSONDecodeError, OSError):
+            cached = {}
+        cache_matches = (
+            cached.get("returncode") == 0
+            and cached.get("arguments") == argv
+            and cached.get("cache_input_hashes") == input_hashes
+            and cached.get("output_sha256") == _scr.sha256_file(output)
+        )
+        if cache_matches:
             return output, cached
-    # A killed stage can leave a partial output.  It is not a cache hit unless
-    # a matching normal-exit process record exists.
+    # Killed, stale, or modified stages can leave plausible partial products.
+    # None is reusable without an exact process/input/output identity (#417).
     output.unlink(missing_ok=True)
     result = sandbox.run_logged(arguments, f"{name}.log", timeout=timeout)
     record = result.to_record()
-    sandbox.write_json_atomic(f"{name}_process.json", record)
     if result.returncode != 0 or not output.exists():
+        sandbox.write_json_atomic(f"{name}_process.json", record)
         return None, record
+    record["cache_input_hashes"] = input_hashes
+    record["output_sha256"] = _scr.sha256_file(output)
+    sandbox.write_json_atomic(f"{name}_process.json", record)
     return output, record
 
 
@@ -134,6 +155,7 @@ def perturb(
             f"output_file_name_prefix={prefix}",
         ],
         f"{prefix}.pdb",
+        inputs=[model],
         timeout=3600,
     )
 
@@ -164,6 +186,7 @@ def refine_osol_h(
             "ready_set.actions.ligands=True",
         ],
         ready_name,
+        inputs=[perturbed],
         timeout=3600,
     )
     processes = {"ready_set": ready_process}
@@ -193,6 +216,7 @@ def refine_osol_h(
             "--overwrite",
         ],
         f"{prefix}_001.pdb",
+        inputs=[ready, mtz],
         timeout=10800,
     )
     processes["refine"] = refine_process
@@ -213,30 +237,15 @@ def _failure_reason(processes: dict, fallback: str) -> str:
     return fallback
 
 
-def run_entry(
-    entry: dict,
+def _run_entry_science(
+    row: dict,
+    pdb_id: str,
+    inputs: dict[str, Path],
     durable: Path,
-    work: Path,
+    sandbox: EntrySandbox,
     thresholds: dict,
     s_r2: dict,
 ) -> dict:
-    pdb_id = entry["pdb_id"].upper()
-    sandbox = EntrySandbox(work, pdb_id)
-    row: dict = {
-        "pdb_id": pdb_id,
-        "subject": SUBJECT,
-        "stratum": entry.get("stratum"),
-        "d_min": entry.get("d_min"),
-        "sandbox": sandbox.path.name,
-        "refmac_convention": "ANIS",
-    }
-    inputs, input_error = _stored_inputs(pdb_id, durable)
-    if input_error:
-        row["status"], row["reason"] = "data_defect", input_error
-        return row
-    before_hashes = _hash_inputs(inputs)
-    row["input_hashes"] = before_hashes
-
     mask = _gold.build_mask(pdb_id, durable)
     pair, flag = _scr.select_arrays(inputs["mtz"])
     if pair is None:
@@ -297,6 +306,14 @@ def run_entry(
     )
     judged["two_path_only"] = judged.get("numbers", {}).get("d_refmac") is None
     row["recovered"] = judged
+    anis_logs = sorted(sandbox.path.glob("refmac_*.log"))
+    row["anis_log_verification"] = {
+        "checked": len(anis_logs),
+        "with_anis": sum(
+            "REFI BREF ANIS" in log.read_text(errors="replace")
+            for log in anis_logs
+        ),
+    }
     if judged.get("status") != "judged":
         row["status"] = "data_defect"
         row["reason"] = judged.get("reason", "judgment failed")
@@ -309,13 +326,48 @@ def run_entry(
     row["w4_contradiction"] = _b5.w4_contradiction(
         judged, thresholds, row["recovery_success"]
     )
-    after_hashes = _hash_inputs(inputs)
-    row["store_unchanged"] = before_hashes == after_hashes
-    row["sandbox_files"] = sandbox.inventory()
-    if not row["store_unchanged"]:
-        raise SystemExit(f"bench_round10: {pdb_id} mutated the durable store")
     row["status"] = "completed"
     return row
+
+
+def run_entry(
+    entry: dict,
+    durable: Path,
+    work: Path,
+    thresholds: dict,
+    s_r2: dict,
+) -> dict:
+    pdb_id = entry["pdb_id"].upper()
+    sandbox = EntrySandbox(work, pdb_id)
+    row: dict = {
+        "pdb_id": pdb_id,
+        "subject": SUBJECT,
+        "stratum": entry.get("stratum"),
+        "d_min": entry.get("d_min"),
+        "sandbox": sandbox.path.name,
+        "refmac_convention": "ANIS",
+    }
+    inputs, input_error = _stored_inputs(pdb_id, durable)
+    if input_error:
+        row["status"], row["reason"] = "data_defect", input_error
+        return row
+    before_hashes = _hash_inputs(inputs)
+    row["input_hashes"] = before_hashes
+    try:
+        return _run_entry_science(
+            row, pdb_id, inputs, durable, sandbox, thresholds, s_r2
+        )
+    finally:
+        try:
+            after_hashes = _hash_inputs(inputs)
+        except OSError:
+            after_hashes = None
+        row["store_unchanged"] = before_hashes == after_hashes
+        row["sandbox_files"] = sandbox.inventory()
+        if not row["store_unchanged"]:
+            raise SystemExit(
+                f"bench_round10: {pdb_id} mutated the durable store"
+            )
 
 
 def summarize(rows: list[dict]) -> dict:
@@ -327,6 +379,23 @@ def summarize(rows: list[dict]) -> dict:
         for row in completed
         if isinstance(row.get("perturbation_reproduction"), dict)
     ]
+    ready_h = [
+        row.get("processes", {}).get("hydrogen_count_ready")
+        for row in completed
+    ]
+    refined_h = [
+        row.get("processes", {}).get("hydrogen_count_refined")
+        for row in completed
+    ]
+    old_rows = json.loads(COMPARISON_JSON.read_text()).get("rows", [])
+    old_successes = {
+        row["pdb_id"].upper() for row in old_rows
+        if row.get("subject") == "osol" and row.get("recovery_success")
+    }
+    current_successes = {
+        row["pdb_id"].upper() for row in completed
+        if row.get("recovery_success")
+    }
     return {
         SUBJECT: {
             "attempted": len(rows),
@@ -349,6 +418,34 @@ def summarize(rows: list[dict]) -> dict:
             "mixed_convention_rows": sum(
                 1 for row in completed if row.get("refmac_convention") != "ANIS"
             ),
+            "logs_checked": sum(
+                row.get("anis_log_verification", {}).get("checked", 0)
+                for row in completed
+            ),
+            "logs_with_anis": sum(
+                row.get("anis_log_verification", {}).get("with_anis", 0)
+                for row in completed
+            ),
+        },
+        "hydrogen_verification": {
+            "models": len(ready_h),
+            "minimum_ready": min(ready_h, default=None),
+            "maximum_ready": max(ready_h, default=None),
+            "retained_equal": sum(
+                ready == refined
+                for ready, refined in zip(ready_h, refined_h, strict=True)
+            ),
+        },
+        "comparison_with_osol": {
+            "record": COMPARISON_RECORD,
+            "osol_attempted": sum(
+                row.get("subject") == "osol" for row in old_rows
+            ),
+            "osol_successes": len(old_successes),
+            "osol_h_attempted": len(completed),
+            "osol_h_successes": len(current_successes),
+            "gained": sorted(current_successes - old_successes),
+            "lost": sorted(old_successes - current_successes),
         },
         "sandbox_verification": {
             "distinct_sandboxes": len(set(sandboxes)),
@@ -429,6 +526,7 @@ def main() -> int:
         "subject": SUBJECT,
         "set_record": SET_RECORD,
         "perturbation_record": R4_RECOVER_RECORD,
+        "comparison_record": COMPARISON_RECORD,
         "fit_rule": "E1",
         "fit_thresholds": thresholds,
         "refmac_convention": "ANIS",

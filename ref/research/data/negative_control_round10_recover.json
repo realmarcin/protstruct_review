@@ -22,7 +22,8 @@
       "gemmi_cli_version": "gemmi 0.7.5",
       "gemmi_python": "0.7.5",
       "python": "3.12.11"
-    }
+    },
+    "comparison_record": "ref/research/data/negative_control_round5_recover.json"
   },
   "rows": [
     {
@@ -59,7 +60,11 @@
           "pgid": 19735,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/4m7g.pdb": "e94b951321c791fef757e407640e4e3c1d36e605b8ec19761de2157075bf2b31"
+          },
+          "output_sha256": "88ac5d6d11c03f04ffdd5b99b7430b13487472db313e7fa9ea70ec589f32d4fe"
         },
         "ready_set": {
           "arguments": [
@@ -76,7 +81,11 @@
           "pgid": 20043,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/4M7G/r4p_4m7g.pdb": "88ac5d6d11c03f04ffdd5b99b7430b13487472db313e7fa9ea70ec589f32d4fe"
+          },
+          "output_sha256": "5693bdb12810012eca5a77c38f4cdd8acdbc2e20d1596e79e14c28acc076f597"
         },
         "refine": {
           "arguments": [
@@ -96,7 +105,12 @@
           "pgid": 21274,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/4M7G/r10h_r4p_4m7g_ready.pdb": "5693bdb12810012eca5a77c38f4cdd8acdbc2e20d1596e79e14c28acc076f597",
+            "/Users/marcin/protstruct_bench_inputs/4m7g.mtz": "f6824a5b756b807d236bdcdfa75c1a8babf7c157fd9634c4a166fc96ce1c336b"
+          },
+          "output_sha256": "e366eb5524fd9a96d5d11e7b1bc9c19e0468597c4aa3ecb312d6fda963f11d39"
         },
         "hydrogen_count_ready": 1827,
         "hydrogen_count_refined": 1827
@@ -189,7 +203,11 @@
         "sfcalc_gemmi_4m7g.log",
         "sfcalc_gemmi_r10h_r4p_4m7g_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "7R2H",
@@ -225,7 +243,11 @@
           "pgid": 23025,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/7r2h.pdb": "a166df0a2539dd441cc9382e0dd229fdc2236dacf336fb319b2e41d23c74e783"
+          },
+          "output_sha256": "f0c020b8efb8e154c9dc6aa87ddd6c804fb26af5f3f6b62153888a14e73e6690"
         },
         "ready_set": {
           "arguments": [
@@ -242,7 +264,11 @@
           "pgid": 25124,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/7R2H/r4p_7r2h.pdb": "f0c020b8efb8e154c9dc6aa87ddd6c804fb26af5f3f6b62153888a14e73e6690"
+          },
+          "output_sha256": "4391d8f8044009b4cdc0dc605e95ef0b677985df2452df12ea024ce50f538af7"
         },
         "refine": {
           "arguments": [
@@ -262,7 +288,12 @@
           "pgid": 26120,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/7R2H/r10h_r4p_7r2h_ready.pdb": "4391d8f8044009b4cdc0dc605e95ef0b677985df2452df12ea024ce50f538af7",
+            "/Users/marcin/protstruct_bench_inputs/7r2h.mtz": "c4e84836698ce14e6d89af49f77416ae59f6c274c433d90cbb048df20ff1804e"
+          },
+          "output_sha256": "97a4b5a254620b19b6f092ca3f7a17917f09d6ef11834d09f22495f141e0b2ad"
         },
         "hydrogen_count_ready": 1253,
         "hydrogen_count_refined": 1253
@@ -355,7 +386,11 @@
         "sfcalc_gemmi_7r2h.log",
         "sfcalc_gemmi_r10h_r4p_7r2h_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "2VXN",
@@ -391,7 +426,11 @@
           "pgid": 36342,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/2vxn.pdb": "63cd65e6b6c11aa4d96c30cd01e3352e5c1cec0137db4888524ff8bf3ba7519f"
+          },
+          "output_sha256": "8e2145d17de0b24c11c68dba6e861e76380b4a81f710763d739cdb72b9620fb9"
         },
         "ready_set": {
           "arguments": [
@@ -408,7 +447,11 @@
           "pgid": 37287,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/2VXN/r4p_2vxn.pdb": "8e2145d17de0b24c11c68dba6e861e76380b4a81f710763d739cdb72b9620fb9"
+          },
+          "output_sha256": "1ae7ead96cc00f64ff8d88063b441d35b162051125140af39cedf35499d356e5"
         },
         "refine": {
           "arguments": [
@@ -428,7 +471,12 @@
           "pgid": 37567,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/2VXN/r10h_r4p_2vxn_ready.pdb": "1ae7ead96cc00f64ff8d88063b441d35b162051125140af39cedf35499d356e5",
+            "/Users/marcin/protstruct_bench_inputs/2vxn.mtz": "1ce4b08130d6183b9aab0fa85d4abbc0e3b0a7195aeba1be8262715ee76e227f"
+          },
+          "output_sha256": "00e88ed9c5a7c64248434c64c1d0a4e93beec51c13bd6683f7e3fec736c6cad2"
         },
         "hydrogen_count_ready": 2125,
         "hydrogen_count_refined": 2125
@@ -523,7 +571,11 @@
         "sfcalc_gemmi_2vxn.log",
         "sfcalc_gemmi_r10h_r4p_2vxn_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "7ATV",
@@ -559,7 +611,11 @@
           "pgid": 37288,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/7atv.pdb": "2059afd7eb1004c18460ac66501cb822bffa098a11d87fc5be6cbacfc718e9f9"
+          },
+          "output_sha256": "d59cc8b7c80d7fc39ab521d609d75b3ac0d438682e3acd54230afaae123ff112"
         },
         "ready_set": {
           "arguments": [
@@ -576,7 +632,11 @@
           "pgid": 37480,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/7ATV/r4p_7atv.pdb": "d59cc8b7c80d7fc39ab521d609d75b3ac0d438682e3acd54230afaae123ff112"
+          },
+          "output_sha256": "6abc7ebd688bd42b27c12d14b244aeb42fc73138186f57d20eab0abcb7437a37"
         },
         "refine": {
           "arguments": [
@@ -596,7 +656,12 @@
           "pgid": 37791,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/7ATV/r10h_r4p_7atv_ready.pdb": "6abc7ebd688bd42b27c12d14b244aeb42fc73138186f57d20eab0abcb7437a37",
+            "/Users/marcin/protstruct_bench_inputs/7atv.mtz": "eec43eb3722db7717a35a7b78ad1569e288072dac4d217a4da990d27c92ce0a8"
+          },
+          "output_sha256": "4f2a1b33cec8ff66af45b37e01a411d38d82ab7464b878f35b6e8d6234edb980"
         },
         "hydrogen_count_ready": 3083,
         "hydrogen_count_refined": 3083
@@ -691,7 +756,11 @@
         "sfcalc_gemmi_7atv.log",
         "sfcalc_gemmi_r10h_r4p_7atv_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "6Q01",
@@ -727,7 +796,11 @@
           "pgid": 37321,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/6q01.pdb": "2fa8a027a1678ce20690b88f686635d351362d9652563917fbc9a5b4607cf85b"
+          },
+          "output_sha256": "f1bb57209c5712a65282f9915b96e39044dac55a3d331d878147a32efa21a9c5"
         },
         "ready_set": {
           "arguments": [
@@ -744,7 +817,11 @@
           "pgid": 37502,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/6Q01/r4p_6q01.pdb": "f1bb57209c5712a65282f9915b96e39044dac55a3d331d878147a32efa21a9c5"
+          },
+          "output_sha256": "12d1e96cc105c8622c2cc6a65701cdfa520c2e73471f3c7b4004f1af53268e9c"
         },
         "refine": {
           "arguments": [
@@ -764,7 +841,12 @@
           "pgid": 37813,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/6Q01/r10h_r4p_6q01_ready.pdb": "12d1e96cc105c8622c2cc6a65701cdfa520c2e73471f3c7b4004f1af53268e9c",
+            "/Users/marcin/protstruct_bench_inputs/6q01.mtz": "4eb2de8b3e0e9c005e61b6ced6dd57474d0ac9ac6b8f861bccc8933affd0623c"
+          },
+          "output_sha256": "07e5db2d918b6896ebb3d1dd082c81733f8aeadb4dce110b0987a840f8baf740"
         },
         "hydrogen_count_ready": 2378,
         "hydrogen_count_refined": 2378
@@ -857,7 +939,11 @@
         "sfcalc_gemmi_6q01.log",
         "sfcalc_gemmi_r10h_r4p_6q01_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "6ZWY",
@@ -893,7 +979,11 @@
           "pgid": 37336,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/6zwy.pdb": "1edcb8619d3c951a90b22c29a078517314a09f205ab38c75f1ceeb85ef0fcb82"
+          },
+          "output_sha256": "9bdd58bf790a77456255e7b98463a43364223f2a745c4064d94bade7df5924b7"
         },
         "ready_set": {
           "arguments": [
@@ -910,7 +1000,11 @@
           "pgid": 37387,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/6ZWY/r4p_6zwy.pdb": "9bdd58bf790a77456255e7b98463a43364223f2a745c4064d94bade7df5924b7"
+          },
+          "output_sha256": "e3095d65d22353f7af5ab867399b0417525fc4092703d21a80e4cb9427ba410a"
         },
         "refine": {
           "arguments": [
@@ -930,7 +1024,12 @@
           "pgid": 37617,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/6ZWY/r10h_r4p_6zwy_ready.pdb": "e3095d65d22353f7af5ab867399b0417525fc4092703d21a80e4cb9427ba410a",
+            "/Users/marcin/protstruct_bench_inputs/6zwy.mtz": "d270095289c6b8308670ed07525fd30364ca0d00c3826be2b5f60a9d59cdee5a"
+          },
+          "output_sha256": "1a6463ce6e7762ae9c59a036afe66a5533c6668cbf0eda6be0b7032a3c1e66bb"
         },
         "hydrogen_count_ready": 2312,
         "hydrogen_count_refined": 2312
@@ -1023,7 +1122,11 @@
         "sfcalc_gemmi_6zwy.log",
         "sfcalc_gemmi_r10h_r4p_6zwy_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "5XS6",
@@ -1059,7 +1162,11 @@
           "pgid": 80162,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/5xs6.pdb": "18a0aba6813a2b9c2fd489086628c3f321760376e858c3424c5bec2f6e765239"
+          },
+          "output_sha256": "d68063405cbc62c5342fe65b8523347f6217de5a136caa29c8b17b99dacf0ee6"
         },
         "ready_set": {
           "arguments": [
@@ -1076,7 +1183,11 @@
           "pgid": 82536,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/5XS6/r4p_5xs6.pdb": "d68063405cbc62c5342fe65b8523347f6217de5a136caa29c8b17b99dacf0ee6"
+          },
+          "output_sha256": "7b525ab5443895ada2196a0f600a4c7a0601e52d3e24b9c5440031cf286b099c"
         },
         "refine": {
           "arguments": [
@@ -1096,7 +1207,12 @@
           "pgid": 88523,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/5XS6/r10h_r4p_5xs6_ready.pdb": "7b525ab5443895ada2196a0f600a4c7a0601e52d3e24b9c5440031cf286b099c",
+            "/Users/marcin/protstruct_bench_inputs/5xs6.mtz": "9a9b7247826fff85c0baa893af0a75b741ddff4966b1f24fed414adc5c6a93a3"
+          },
+          "output_sha256": "5b0eda00955824477e6913b7dad019824ff1b4a4c29a665746410e251b92ab29"
         },
         "hydrogen_count_ready": 5196,
         "hydrogen_count_refined": 5196
@@ -1189,7 +1305,11 @@
         "sfcalc_gemmi_5xs6.log",
         "sfcalc_gemmi_r10h_r4p_5xs6_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "8ERE",
@@ -1225,7 +1345,11 @@
           "pgid": 83903,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/8ere.pdb": "9ecfb9999f6e5228052dc298145f17839a9e681f53fc6ca6b24a2074f38d9423"
+          },
+          "output_sha256": "f8c562dda779a430bd5ed5d7e656086a5902e2d8513b51a3963e680370003b27"
         },
         "ready_set": {
           "arguments": [
@@ -1242,7 +1366,11 @@
           "pgid": 85154,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/8ERE/r4p_8ere.pdb": "f8c562dda779a430bd5ed5d7e656086a5902e2d8513b51a3963e680370003b27"
+          },
+          "output_sha256": "dbdb1b98b2c4f8ce011e852a5c7a66526a0ef0f7be46ab9cd0ceaba9c338b502"
         },
         "refine": {
           "arguments": [
@@ -1262,7 +1390,12 @@
           "pgid": 86255,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/8ERE/r10h_r4p_8ere_ready.pdb": "dbdb1b98b2c4f8ce011e852a5c7a66526a0ef0f7be46ab9cd0ceaba9c338b502",
+            "/Users/marcin/protstruct_bench_inputs/8ere.mtz": "35f5f3e12c555f25b8ed416a354f79f9f7f9eb410cb9faa0850ece24bdd80e52"
+          },
+          "output_sha256": "034d3f354321515a896f0909326e3c7e28b062c0c2b2a6ad2e290a7715c86857"
         },
         "hydrogen_count_ready": 1091,
         "hydrogen_count_refined": 1091
@@ -1355,7 +1488,11 @@
         "sfcalc_gemmi_8ere.log",
         "sfcalc_gemmi_r10h_r4p_8ere_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "3ZOJ",
@@ -1391,7 +1528,11 @@
           "pgid": 95759,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/3zoj.pdb": "5c7b8268d6852b7499cc75695bb5a1fda71fb83386d8721c87fb66748e64b750"
+          },
+          "output_sha256": "8528628efd6245f953ff251bd31327968c83ad22e0edf24e2391419449c0b4ef"
         },
         "ready_set": {
           "arguments": [
@@ -1408,7 +1549,11 @@
           "pgid": 97018,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/3ZOJ/r4p_3zoj.pdb": "8528628efd6245f953ff251bd31327968c83ad22e0edf24e2391419449c0b4ef"
+          },
+          "output_sha256": "b1e290f7277fc3b4d4e101bb7a7355c7080332ed690abc11e92951ca54306661"
         },
         "refine": {
           "arguments": [
@@ -1428,7 +1573,12 @@
           "pgid": 99941,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/3ZOJ/r10h_r4p_3zoj_ready.pdb": "b1e290f7277fc3b4d4e101bb7a7355c7080332ed690abc11e92951ca54306661",
+            "/Users/marcin/protstruct_bench_inputs/3zoj.mtz": "f44408607b7e41a8b3c5942ef114b362097e4d808b0945bcaa115b452cfd4e88"
+          },
+          "output_sha256": "8b5d427419d0a7e31239b5da2883fd44613f9218bd8f8f3c5fe8b81f82559b5c"
         },
         "hydrogen_count_ready": 2177,
         "hydrogen_count_refined": 2177
@@ -1521,7 +1671,11 @@
         "sfcalc_gemmi_3zoj.log",
         "sfcalc_gemmi_r10h_r4p_3zoj_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "9YGW",
@@ -1557,7 +1711,11 @@
           "pgid": 97397,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/9ygw.pdb": "e56874e596758d862c2e2f6137921e4c4d18c1093fe81a6c3fe9e7a385f16c71"
+          },
+          "output_sha256": "36e131983fcda44c900bcba67d76ac11505d47b1a0def1ca69dba52ac93cfd6f"
         },
         "ready_set": {
           "arguments": [
@@ -1574,7 +1732,11 @@
           "pgid": 99507,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/9YGW/r4p_9ygw.pdb": "36e131983fcda44c900bcba67d76ac11505d47b1a0def1ca69dba52ac93cfd6f"
+          },
+          "output_sha256": "b7764380e6592090729da4e90f5d90601bff3f7b3f0a5aedb8f4ebeb9975e55e"
         },
         "refine": {
           "arguments": [
@@ -1594,7 +1756,12 @@
           "pgid": 1168,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/9YGW/r10h_r4p_9ygw_ready.pdb": "b7764380e6592090729da4e90f5d90601bff3f7b3f0a5aedb8f4ebeb9975e55e",
+            "/Users/marcin/protstruct_bench_inputs/9ygw.mtz": "f097f00b834f2c8ed2383438df3fcfce59cda0b341cc91b2bbf806ac441a9705"
+          },
+          "output_sha256": "ac4f2eef6c7652102ea36bb5aa6b3bd325f025c888e277b44542571262fd5845"
         },
         "hydrogen_count_ready": 3507,
         "hydrogen_count_refined": 3507
@@ -1681,7 +1848,11 @@
         "sfcalc_gemmi_9ygw.log",
         "sfcalc_gemmi_r10h_r4p_9ygw_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "9P25",
@@ -1717,7 +1888,11 @@
           "pgid": 18068,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/9p25.pdb": "63b30af0f3e24146f06fe3ede114003ac0a55b14ef7e396d00df928f28577437"
+          },
+          "output_sha256": "532dacc3b0c3189885983343beddaf530363c394eb9e59ff1dc1173b50fc7f5f"
         },
         "ready_set": {
           "arguments": [
@@ -1734,7 +1909,11 @@
           "pgid": 18499,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/9P25/r4p_9p25.pdb": "532dacc3b0c3189885983343beddaf530363c394eb9e59ff1dc1173b50fc7f5f"
+          },
+          "output_sha256": "47c5b357162a735cff5c4f72d4e035bfcb3d520864226940b0c8fc4a01354769"
         },
         "refine": {
           "arguments": [
@@ -1754,7 +1933,12 @@
           "pgid": 28339,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/9P25/r10h_r4p_9p25_ready.pdb": "47c5b357162a735cff5c4f72d4e035bfcb3d520864226940b0c8fc4a01354769",
+            "/Users/marcin/protstruct_bench_inputs/9p25.mtz": "28e14bf932322d3c73e12554fb760de04db8b9fe175fcd9bee9f52dbc78d71a7"
+          },
+          "output_sha256": "8bff04503ef541653391267b41f831f7dc9e35edfeaff6a4137dc7492c851824"
         },
         "hydrogen_count_ready": 3188,
         "hydrogen_count_refined": 3188
@@ -1847,7 +2031,11 @@
         "sfcalc_gemmi_9p25.log",
         "sfcalc_gemmi_r10h_r4p_9p25_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "8R5K",
@@ -1883,7 +2071,11 @@
           "pgid": 34607,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/8r5k.pdb": "89b06927f2fd2cb0d8506277d6cc7b9dfd2a804cfbccf95fe31bc4fef75dcf2c"
+          },
+          "output_sha256": "280fb7eb06b9159098d921f6d7c11242cff6986c227c6823744a35c91aaf0380"
         },
         "ready_set": {
           "arguments": [
@@ -1900,7 +2092,11 @@
           "pgid": 34971,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/8R5K/r4p_8r5k.pdb": "280fb7eb06b9159098d921f6d7c11242cff6986c227c6823744a35c91aaf0380"
+          },
+          "output_sha256": "311d2655ca8405fd2ccad1784b80da709e683b4aef4d11ef6a0fabba73134539"
         },
         "refine": {
           "arguments": [
@@ -1920,7 +2116,12 @@
           "pgid": 39746,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/8R5K/r10h_r4p_8r5k_ready.pdb": "311d2655ca8405fd2ccad1784b80da709e683b4aef4d11ef6a0fabba73134539",
+            "/Users/marcin/protstruct_bench_inputs/8r5k.mtz": "1f72255b54b6ece04779dae7303a5b8a92880061e5378548358011f369965cad"
+          },
+          "output_sha256": "f841b0eb30d83a1f6af76a551b815b1517974ee40ab652e2287fde29524b0996"
         },
         "hydrogen_count_ready": 1189,
         "hydrogen_count_refined": 1189
@@ -2013,7 +2214,11 @@
         "sfcalc_gemmi_8r5k.log",
         "sfcalc_gemmi_r10h_r4p_8r5k_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "7TVL",
@@ -2049,7 +2254,11 @@
           "pgid": 56192,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/7tvl.pdb": "e288d4c5472d172e53f05aa0296e7bb50d9d4d4c0c3ef8000de338600a7c1d55"
+          },
+          "output_sha256": "5e92895d652385af94257bc16f93b8ab38c8172b0f65339ee5a6f59f44bfd057"
         },
         "ready_set": {
           "arguments": [
@@ -2066,7 +2275,11 @@
           "pgid": 57217,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/7TVL/r4p_7tvl.pdb": "5e92895d652385af94257bc16f93b8ab38c8172b0f65339ee5a6f59f44bfd057"
+          },
+          "output_sha256": "422abbebef820cce67ecf6d578592ece0b382b0110a8dc24a142975e7e25b0c9"
         },
         "refine": {
           "arguments": [
@@ -2086,7 +2299,12 @@
           "pgid": 58138,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/7TVL/r10h_r4p_7tvl_ready.pdb": "422abbebef820cce67ecf6d578592ece0b382b0110a8dc24a142975e7e25b0c9",
+            "/Users/marcin/protstruct_bench_inputs/7tvl.mtz": "2e453c18154ccef983c4dd09805bf578bcbde67becdec6774ffe3f9d064d31b1"
+          },
+          "output_sha256": "ef20712018bc0a02a1396530d6c0f05dce3b80bf9ecae1f83569a3b51b66be38"
         },
         "hydrogen_count_ready": 1798,
         "hydrogen_count_refined": 1798
@@ -2179,7 +2397,11 @@
         "sfcalc_gemmi_7tvl.log",
         "sfcalc_gemmi_r10h_r4p_7tvl_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "8QXQ",
@@ -2215,7 +2437,11 @@
           "pgid": 87296,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/8qxq.pdb": "864bc500d73a49e49f0539139348646d8b2e2abfc86a89d0fedf56bf3d7c38ed"
+          },
+          "output_sha256": "3b78217e8ec70900d0bba006a37c5d75c142a8e5906ef34e8b872e8bc3c054f7"
         },
         "ready_set": {
           "arguments": [
@@ -2232,7 +2458,11 @@
           "pgid": 89531,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/8QXQ/r4p_8qxq.pdb": "3b78217e8ec70900d0bba006a37c5d75c142a8e5906ef34e8b872e8bc3c054f7"
+          },
+          "output_sha256": "d34105a976545621e05f4e79c2cbf04c3ec5e85fe070493a559fbb98f6806cc9"
         },
         "refine": {
           "arguments": [
@@ -2252,7 +2482,12 @@
           "pgid": 784,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/8QXQ/r10h_r4p_8qxq_ready.pdb": "d34105a976545621e05f4e79c2cbf04c3ec5e85fe070493a559fbb98f6806cc9",
+            "/Users/marcin/protstruct_bench_inputs/8qxq.mtz": "e193f767ad16111a3ef53f62fd0936afb47f4d17059c2a4313d8f1575ce6d58e"
+          },
+          "output_sha256": "b99abd754cad1962292142c03fa55080da889f91b3f1d96f8c7dc31d52494396"
         },
         "hydrogen_count_ready": 2791,
         "hydrogen_count_refined": 2791
@@ -2345,7 +2580,11 @@
         "sfcalc_gemmi_8qxq.log",
         "sfcalc_gemmi_r10h_r4p_8qxq_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "6F1O",
@@ -2381,7 +2620,11 @@
           "pgid": 89512,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/6f1o.pdb": "cad2051362b564e16fde6317a7957cd2ce0d97c3967aa80860b10492be8246f3"
+          },
+          "output_sha256": "94129ba52232678556ddc9af951f12ba303547444e79453b09a4d062d37be667"
         },
         "ready_set": {
           "arguments": [
@@ -2398,7 +2641,11 @@
           "pgid": 90589,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/6F1O/r4p_6f1o.pdb": "94129ba52232678556ddc9af951f12ba303547444e79453b09a4d062d37be667"
+          },
+          "output_sha256": "5621ec32f130611861e25e7005faf9085f3bfca4f1318a0a558a35d68f606f19"
         },
         "refine": {
           "arguments": [
@@ -2418,7 +2665,12 @@
           "pgid": 92770,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/6F1O/r10h_r4p_6f1o_ready.pdb": "5621ec32f130611861e25e7005faf9085f3bfca4f1318a0a558a35d68f606f19",
+            "/Users/marcin/protstruct_bench_inputs/6f1o.mtz": "712fb348692e9b91602ee3cba743cfbfac2a0324bc9a27c6c4c3399ae18f2711"
+          },
+          "output_sha256": "c480545e4b075aae704c68388d3ff0db3f21864408856baad0998df2bf458b9a"
         },
         "hydrogen_count_ready": 991,
         "hydrogen_count_refined": 991
@@ -2511,7 +2763,11 @@
         "sfcalc_gemmi_6f1o.log",
         "sfcalc_gemmi_r10h_r4p_6f1o_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "7TWR",
@@ -2547,7 +2803,11 @@
           "pgid": 46873,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/7twr.pdb": "f3e1d1d078b88c13c24b40dad39b1f31029b67d25c9e3bff04e48af23b090223"
+          },
+          "output_sha256": "9687e32a27f1f6b66806c73dcfbbdf718c2cb337195917f84e8e41cbbc16c651"
         },
         "ready_set": {
           "arguments": [
@@ -2564,7 +2824,11 @@
           "pgid": 51320,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/7TWR/r4p_7twr.pdb": "9687e32a27f1f6b66806c73dcfbbdf718c2cb337195917f84e8e41cbbc16c651"
+          },
+          "output_sha256": "f19bfa2820c03f17a510937c8cdc1b23f242cbb4ed9631a623ea93d532355dcb"
         },
         "refine": {
           "arguments": [
@@ -2584,7 +2848,12 @@
           "pgid": 55866,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/7TWR/r10h_r4p_7twr_ready.pdb": "f19bfa2820c03f17a510937c8cdc1b23f242cbb4ed9631a623ea93d532355dcb",
+            "/Users/marcin/protstruct_bench_inputs/7twr.mtz": "e53baa5484d05e1814a8c6ba1d2723aee2c9b7ca1b48210466b077a2bbbffa93"
+          },
+          "output_sha256": "4aaf71c528767571f4810dc8eaddcbb6237ea2a25632addd9e2b09d8a2e89089"
         },
         "hydrogen_count_ready": 2909,
         "hydrogen_count_refined": 2909
@@ -2677,7 +2946,11 @@
         "sfcalc_gemmi_7twr.log",
         "sfcalc_gemmi_r10h_r4p_7twr_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "6XVM",
@@ -2713,7 +2986,11 @@
           "pgid": 63316,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/6xvm.pdb": "d5b7a11630f05a3c38e306cc8a16596e45189ab527f2b2af52b71c351fc289c0"
+          },
+          "output_sha256": "c1dd9b8b963c6957e892acf0e380ba2498e54b020f34b2b78c0a398589a29e9b"
         },
         "ready_set": {
           "arguments": [
@@ -2730,7 +3007,11 @@
           "pgid": 66902,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/6XVM/r4p_6xvm.pdb": "c1dd9b8b963c6957e892acf0e380ba2498e54b020f34b2b78c0a398589a29e9b"
+          },
+          "output_sha256": "c6956a2cd8dda8b6110d3083175aaa90ca843574ec1cade83123f68d14ec7ff4"
         },
         "refine": {
           "arguments": [
@@ -2750,7 +3031,12 @@
           "pgid": 71487,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/6XVM/r10h_r4p_6xvm_ready.pdb": "c6956a2cd8dda8b6110d3083175aaa90ca843574ec1cade83123f68d14ec7ff4",
+            "/Users/marcin/protstruct_bench_inputs/6xvm.mtz": "74f4c53c0e402fc6ea51fab570f00103915ed46a54a258ca66e76508ddeff713"
+          },
+          "output_sha256": "2914cb2575dd69bf5bac3a39e820947efa550f5546ad6ecb2686272da8538247"
         },
         "hydrogen_count_ready": 1842,
         "hydrogen_count_refined": 1842
@@ -2845,7 +3131,11 @@
         "sfcalc_gemmi_6xvm.log",
         "sfcalc_gemmi_r10h_r4p_6xvm_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "9TEU",
@@ -2881,7 +3171,11 @@
           "pgid": 24576,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/9teu.pdb": "ae8cd7f299d7c9adc9fbc9be3ec3b73686da18c5d492c0918ab0f02191d1d646"
+          },
+          "output_sha256": "79ec28523f57b133d58e5910d7b05f20a964eef90c67f0cdc11000b6fc0e4f9c"
         },
         "ready_set": {
           "arguments": [
@@ -2898,7 +3192,11 @@
           "pgid": 24948,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/9TEU/r4p_9teu.pdb": "79ec28523f57b133d58e5910d7b05f20a964eef90c67f0cdc11000b6fc0e4f9c"
+          },
+          "output_sha256": "7d3549e5d2129396fe5e4a2de46bb936bcc69dd834fb68733c9471960d304335"
         },
         "refine": {
           "arguments": [
@@ -2918,7 +3216,12 @@
           "pgid": 25943,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/9TEU/r10h_r4p_9teu_ready.pdb": "7d3549e5d2129396fe5e4a2de46bb936bcc69dd834fb68733c9471960d304335",
+            "/Users/marcin/protstruct_bench_inputs/9teu.mtz": "f8cd3dd344a8337fd610ebe753c0286552af9a1fc766776742c288aa34dd504e"
+          },
+          "output_sha256": "6907ce4db92ae01a7caa04df6a8f050cf99b1984146ef484d4a5d05f19e34579"
         },
         "hydrogen_count_ready": 1144,
         "hydrogen_count_refined": 1144
@@ -3011,7 +3314,11 @@
         "sfcalc_gemmi_9teu.log",
         "sfcalc_gemmi_r10h_r4p_9teu_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "5R32",
@@ -3047,7 +3354,11 @@
           "pgid": 29404,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/5r32.pdb": "269f36c4005cdda4aa6f01182f53503868fc0f1dde7fa7c84266d8190b6c0670"
+          },
+          "output_sha256": "37a8bacfc6d86fa7b3a5c6c3345da83a3343fac09a52c58901550bd2415543f2"
         },
         "ready_set": {
           "arguments": [
@@ -3064,7 +3375,11 @@
           "pgid": 29825,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/5R32/r4p_5r32.pdb": "37a8bacfc6d86fa7b3a5c6c3345da83a3343fac09a52c58901550bd2415543f2"
+          },
+          "output_sha256": "f6aab622fb8854b5dd6463a709a1e7b4f383a1bfdf5c8a13960020d5df64431b"
         },
         "refine": {
           "arguments": [
@@ -3084,7 +3399,12 @@
           "pgid": 29965,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/5R32/r10h_r4p_5r32_ready.pdb": "f6aab622fb8854b5dd6463a709a1e7b4f383a1bfdf5c8a13960020d5df64431b",
+            "/Users/marcin/protstruct_bench_inputs/5r32.mtz": "2c768aa7746ce984f8ece5635f2b4fbe4716a0b3661fb6d7f85d41a1b5b14f03"
+          },
+          "output_sha256": "992ff3b1a441987cc3bc4ca1a39283939b1debf72df69bf4cff3e3479b460a2e"
         },
         "hydrogen_count_ready": 2341,
         "hydrogen_count_refined": 2341
@@ -3177,7 +3497,11 @@
         "sfcalc_gemmi_5r32.log",
         "sfcalc_gemmi_r10h_r4p_5r32_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "5KXV",
@@ -3213,7 +3537,11 @@
           "pgid": 37124,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/5kxv.pdb": "fd0ef7d5265a8037c94143677517c9cbffc0bcc2ddc6273c79d16d56fba7855e"
+          },
+          "output_sha256": "c56d19aa773bfd6c7d8851f466afe2e9190c0082ff2f9a70710cccd997e9fba6"
         },
         "ready_set": {
           "arguments": [
@@ -3230,7 +3558,11 @@
           "pgid": 38748,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/5KXV/r4p_5kxv.pdb": "c56d19aa773bfd6c7d8851f466afe2e9190c0082ff2f9a70710cccd997e9fba6"
+          },
+          "output_sha256": "8a7da7f25252788f574105633ccbb240b1a0224f62e870c6093ad22e81c686a7"
         },
         "refine": {
           "arguments": [
@@ -3250,7 +3582,12 @@
           "pgid": 41159,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/5KXV/r10h_r4p_5kxv_ready.pdb": "8a7da7f25252788f574105633ccbb240b1a0224f62e870c6093ad22e81c686a7",
+            "/Users/marcin/protstruct_bench_inputs/5kxv.mtz": "c35df96ef84bcec4efb69884a615342c07e54bff4b44b61e862f1ce732a5ea47"
+          },
+          "output_sha256": "dfe831f92b623f0300677a6b57e175dc43b648f3559d325dde8a9a0e6e0b0d5a"
         },
         "hydrogen_count_ready": 2264,
         "hydrogen_count_refined": 2264
@@ -3343,7 +3680,11 @@
         "sfcalc_gemmi_5kxv.log",
         "sfcalc_gemmi_r10h_r4p_5kxv_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "7OYN",
@@ -3379,7 +3720,11 @@
           "pgid": 43381,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/7oyn.pdb": "f2a6948b0a7b56f7d2dac5fdb18ef251a2fd5c4f88a0ed04816f791b82f477a9"
+          },
+          "output_sha256": "813507d623542405e76c3c2d0b73c1773ec4ab4be1646a858d5aff8b3c2f7c15"
         },
         "ready_set": {
           "arguments": [
@@ -3396,7 +3741,11 @@
           "pgid": 44905,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/7OYN/r4p_7oyn.pdb": "813507d623542405e76c3c2d0b73c1773ec4ab4be1646a858d5aff8b3c2f7c15"
+          },
+          "output_sha256": "786997e895dbcfc03668d31ab4c415e42c162f4c83531a39e3bc241905cd5394"
         },
         "refine": {
           "arguments": [
@@ -3416,7 +3765,12 @@
           "pgid": 50521,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/7OYN/r10h_r4p_7oyn_ready.pdb": "786997e895dbcfc03668d31ab4c415e42c162f4c83531a39e3bc241905cd5394",
+            "/Users/marcin/protstruct_bench_inputs/7oyn.mtz": "8809cac8fefe21166e94f60b7a6204669f8fc2664f23ba721075ca446c65b4e1"
+          },
+          "output_sha256": "f64026bb621f5cd98dd4b21e241d78ff78d19cee73a33505b29cd716ed14bdf2"
         },
         "hydrogen_count_ready": 2084,
         "hydrogen_count_refined": 2084
@@ -3509,7 +3863,11 @@
         "sfcalc_gemmi_7oyn.log",
         "sfcalc_gemmi_r10h_r4p_7oyn_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     },
     {
       "pdb_id": "9TXE",
@@ -3545,7 +3903,11 @@
           "pgid": 14765,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/Users/marcin/protstruct_bench_inputs/9txe.pdb": "a599a7216f99165eecee94d99cc91d31a90cbbb3fd49aacd80f6db118fb4300c"
+          },
+          "output_sha256": "cb1da87373bd5aac053f1686fc84ba3b99d7bc4ad15d83f051104cad08040fad"
         },
         "ready_set": {
           "arguments": [
@@ -3562,7 +3924,11 @@
           "pgid": 15665,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/9TXE/r4p_9txe.pdb": "cb1da87373bd5aac053f1686fc84ba3b99d7bc4ad15d83f051104cad08040fad"
+          },
+          "output_sha256": "fe5c055bbe17b7d0d69a3168d455841e5431ff2c3a9ac3f9a362469fcf772273"
         },
         "refine": {
           "arguments": [
@@ -3582,7 +3948,12 @@
           "pgid": 21431,
           "timed_out": false,
           "termination_signal": null,
-          "start_new_session": true
+          "start_new_session": true,
+          "cache_input_hashes": {
+            "/private/tmp/protstruct-nc10-canary.nlk4Jb/work/9TXE/r10h_r4p_9txe_ready.pdb": "fe5c055bbe17b7d0d69a3168d455841e5431ff2c3a9ac3f9a362469fcf772273",
+            "/Users/marcin/protstruct_bench_inputs/9txe.mtz": "d1b0e7c3d674738008da78eb6428fb3d27cb0d582fa9a072c9f309f2412b4a04"
+          },
+          "output_sha256": "7e28b19905c91b2f60157db4996fd13c29c88b97925be6f2abbe6dbfe580194f"
         },
         "hydrogen_count_ready": 725,
         "hydrogen_count_refined": 725
@@ -3675,7 +4046,11 @@
         "sfcalc_gemmi_9txe.log",
         "sfcalc_gemmi_r10h_r4p_9txe_001.log"
       ],
-      "status": "completed"
+      "status": "completed",
+      "anis_log_verification": {
+        "checked": 2,
+        "with_anis": 2
+      }
     }
   ],
   "summary": {
@@ -3688,7 +4063,29 @@
     },
     "anis_verification": {
       "measurable": 21,
-      "mixed_convention_rows": 0
+      "mixed_convention_rows": 0,
+      "logs_checked": 44,
+      "logs_with_anis": 44
+    },
+    "hydrogen_verification": {
+      "models": 22,
+      "minimum_ready": 725,
+      "maximum_ready": 5196,
+      "retained_equal": 22
+    },
+    "comparison_with_osol": {
+      "record": "ref/research/data/negative_control_round5_recover.json",
+      "osol_attempted": 22,
+      "osol_successes": 11,
+      "osol_h_attempted": 22,
+      "osol_h_successes": 15,
+      "gained": [
+        "5R32",
+        "7ATV",
+        "7OYN",
+        "8R5K"
+      ],
+      "lost": []
     },
     "sandbox_verification": {
       "distinct_sandboxes": 22,

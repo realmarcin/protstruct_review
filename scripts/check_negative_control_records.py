@@ -160,7 +160,7 @@ def check_bench(path: Path, failures: list[str]) -> dict | None:
     return doc
 
 
-def check_recover(path: Path, failures: list[str]) -> None:
+def check_recover(path: Path, failures: list[str]) -> dict:
     doc = json.loads(path.read_text())
     rows = doc.get("rows", [])
     sandboxed = (doc.get("run") or {}).get("sandbox_protocol") == \
@@ -274,20 +274,38 @@ def check_recover(path: Path, failures: list[str]) -> None:
                 fail(f"{path.name}: {who} sandbox {sandbox!r} is not its "
                      f"entry directory {expected_sandbox!r}", failures)
             pgid = r.get("pgid")
-            refine = (r.get("processes") or {}).get("refine") or {}
+            processes = r.get("processes") or {}
+            refine = processes.get("refine") or {}
             if not isinstance(pgid, int) or pgid <= 0:
                 fail(f"{path.name}: {who} has no positive recorded pgid",
                      failures)
             if refine.get("pgid") != pgid:
                 fail(f"{path.name}: {who} row pgid {pgid!r} disagrees with "
                      f"its refine process {refine.get('pgid')!r}", failures)
-            if refine.get("start_new_session") is not True:
-                fail(f"{path.name}: {who} refine did not record "
-                     f"start_new_session=True", failures)
-            if refine.get("returncode") != 0:
-                fail(f"{path.name}: {who} refine returncode is "
-                     f"{refine.get('returncode')!r}, not a normal exit",
-                     failures)
+            for stage in ("dynamics", "ready_set", "refine"):
+                process = processes.get(stage) or {}
+                if process.get("start_new_session") is not True:
+                    fail(f"{path.name}: {who} {stage} did not record "
+                         f"start_new_session=True", failures)
+                if process.get("returncode") != 0:
+                    fail(f"{path.name}: {who} {stage} returncode is "
+                         f"{process.get('returncode')!r}, not a normal exit",
+                         failures)
+                cache_inputs = process.get("cache_input_hashes")
+                if (not isinstance(cache_inputs, dict) or not cache_inputs
+                        or any(
+                            not isinstance(key, str)
+                            or not isinstance(value, str)
+                            or not re.fullmatch(r"[0-9a-f]{64}", value)
+                            for key, value in cache_inputs.items()
+                        )):
+                    fail(f"{path.name}: {who} {stage} has no content-addressed "
+                         f"input identity", failures)
+                output_hash = process.get("output_sha256")
+                if (not isinstance(output_hash, str)
+                        or not re.fullmatch(r"[0-9a-f]{64}", output_hash)):
+                    fail(f"{path.name}: {who} {stage} has no valid output "
+                         f"content hash", failures)
             if r.get("refinement_terminated_by_signal") is not False:
                 fail(f"{path.name}: {who} refinement was signal-terminated",
                      failures)
@@ -297,6 +315,10 @@ def check_recover(path: Path, failures: list[str]) -> None:
             if r.get("refmac_convention") != "ANIS":
                 fail(f"{path.name}: {who} mixes or omits the ANIS REFMAC "
                      f"convention", failures)
+            anis_logs = r.get("anis_log_verification") or {}
+            if anis_logs != {"checked": 2, "with_anis": 2}:
+                fail(f"{path.name}: {who} does not prove ANIS in both "
+                     f"pre/post REFMAC logs", failures)
     summary = doc.get("summary") or {}
     groups = ({None: summary} if "attempted" in summary
               else {subj: s for subj, s in summary.items()})
@@ -345,6 +367,95 @@ def check_recover(path: Path, failures: list[str]) -> None:
             if verification.get(key) != want:
                 fail(f"{path.name}: sandbox_verification.{key}="
                      f"{verification.get(key)!r} but rows hold {want}", failures)
+        anis_summary = (doc.get("summary") or {}).get("anis_verification") or {}
+        anis_derived = {
+            "measurable": sum(
+                (r.get("recovered") or {}).get("numbers", {}).get("d_refmac")
+                is not None for r in completed
+            ),
+            "mixed_convention_rows": sum(
+                r.get("refmac_convention") != "ANIS" for r in completed
+            ),
+            "logs_checked": sum(
+                (r.get("anis_log_verification") or {}).get("checked", 0)
+                for r in completed
+            ),
+            "logs_with_anis": sum(
+                (r.get("anis_log_verification") or {}).get("with_anis", 0)
+                for r in completed
+            ),
+        }
+        if anis_summary != anis_derived:
+            fail(f"{path.name}: anis_verification summary {anis_summary!r} "
+                 f"but rows derive {anis_derived!r}", failures)
+        ready_h = [
+            (r.get("processes") or {}).get("hydrogen_count_ready")
+            for r in completed
+        ]
+        refined_h = [
+            (r.get("processes") or {}).get("hydrogen_count_refined")
+            for r in completed
+        ]
+        if any(not isinstance(value, int) or value <= 0
+               for value in ready_h + refined_h):
+            fail(f"{path.name}: hydrogen counts are missing or non-positive",
+                 failures)
+        else:
+            hydrogen_derived = {
+                "models": len(ready_h),
+                "minimum_ready": min(ready_h, default=None),
+                "maximum_ready": max(ready_h, default=None),
+                "retained_equal": sum(
+                    ready == refined
+                    for ready, refined in zip(ready_h, refined_h, strict=True)
+                ),
+            }
+            hydrogen_summary = (doc.get("summary") or {}).get(
+                "hydrogen_verification") or {}
+            if hydrogen_summary != hydrogen_derived:
+                fail(f"{path.name}: hydrogen_verification summary "
+                     f"{hydrogen_summary!r} but rows derive "
+                     f"{hydrogen_derived!r}", failures)
+        comparison_record = run.get("comparison_record")
+        if (not isinstance(comparison_record, str)
+                or Path(comparison_record).is_absolute()
+                or ".." in Path(comparison_record).parts):
+            fail(f"{path.name}: sandboxed run has unsafe or missing "
+                 f"comparison_record {comparison_record!r}", failures)
+        else:
+            comparison_path = path.parents[3] / comparison_record
+            if not comparison_path.is_file():
+                fail(f"{path.name}: comparison_record does not exist: "
+                     f"{comparison_record}", failures)
+            else:
+                old_rows = json.loads(comparison_path.read_text()).get("rows", [])
+                old_subject = "osol"
+                old_subject_rows = [
+                    r for r in old_rows if r.get("subject") == old_subject
+                ]
+                old_successes = {
+                    r["pdb_id"].upper() for r in old_subject_rows
+                    if r.get("recovery_success")
+                }
+                current_successes = {
+                    r["pdb_id"].upper() for r in completed
+                    if r.get("recovery_success")
+                }
+                comparison_derived = {
+                    "record": comparison_record,
+                    "osol_attempted": len(old_subject_rows),
+                    "osol_successes": len(old_successes),
+                    "osol_h_attempted": len(completed),
+                    "osol_h_successes": len(current_successes),
+                    "gained": sorted(current_successes - old_successes),
+                    "lost": sorted(old_successes - current_successes),
+                }
+                comparison_summary = (doc.get("summary") or {}).get(
+                    "comparison_with_osol") or {}
+                if comparison_summary != comparison_derived:
+                    fail(f"{path.name}: comparison_with_osol summary "
+                         f"{comparison_summary!r} but records derive "
+                         f"{comparison_derived!r}", failures)
         reproductions = [r.get("perturbation_reproduction") or {}
                          for r in completed]
         perturb_summary = (doc.get("summary") or {}).get(
@@ -366,6 +477,7 @@ def check_recover(path: Path, failures: list[str]) -> None:
             fail(f"{path.name}: sandboxed run does not declare ANIS REFMAC",
                  failures)
     _check_full_run(doc, path.name, failures)
+    return doc
 
 
 def check_bench_round_doc(md: Path, bench: dict, failures: list[str]) -> None:
@@ -382,6 +494,60 @@ def check_bench_round_doc(md: Path, bench: dict, failures: list[str]) -> None:
         fail(f"{md.name}: Q1 headline {headline!r} (null degraded/attempted) "
              f"not in the doc — record and prose have drifted (#311 class)",
              failures)
+
+
+def check_recover_round_doc(md: Path, recover: dict,
+                            failures: list[str]) -> None:
+    """Guard the evidence-bearing NC-10 prose headlines (#419)."""
+    if (recover.get("run") or {}).get("sandbox_protocol") != \
+            "per-entry-process-group-v1":
+        return
+    text = md.read_text()
+    summary = recover.get("summary") or {}
+    subject = summary.get("osol_h") or {}
+    anis = summary.get("anis_verification") or {}
+    hydrogen = summary.get("hydrogen_verification") or {}
+    comparison = summary.get("comparison_with_osol") or {}
+    sandbox = summary.get("sandbox_verification") or {}
+    perturb = summary.get("perturbation_reproduction") or {}
+    success = f"{subject.get('successes')}/{subject.get('attempted')}"
+    old_success = (
+        f"{comparison.get('osol_successes')}/{comparison.get('osol_attempted')}"
+    )
+    anis_fraction = f"{anis.get('measurable')}/{anis.get('measurable')}"
+    h_range = (
+        f"{hydrogen.get('minimum_ready')}–{hydrogen.get('maximum_ready')}"
+    )
+    h_retained = f"{hydrogen.get('retained_equal')}/{hydrogen.get('models')}"
+    required = {
+        "osol_h success": rf"osol_h[^0-9\n]{{0,80}}{re.escape(success)}",
+        "osol comparison": rf"osol[^0-9\n]{{0,80}}{re.escape(old_success)}",
+        "ANIS measurability": rf"ANIS[^0-9\n]{{0,80}}{re.escape(anis_fraction)}",
+        "H/D range": rf"{re.escape(h_range)}[^\n]{{0,30}}model",
+        "H/D retention": rf"retained[^0-9\n]{{0,80}}{re.escape(h_retained)}",
+        "ANIS log count": rf"all[^0-9\n]{{0,20}}{anis.get('logs_with_anis')}[^\n]{{0,30}}log",
+        "sandbox count": (
+            rf"{sandbox.get('distinct_sandboxes')} distinct sandbox"
+        ),
+        "PGID count": rf"{sandbox.get('distinct_pgids')} distinct refinement PGID",
+        "unmasked reproduction": (
+            rf"{perturb.get('max_absdiff_unmasked')} Å unmasked"
+        ),
+        "all-residue reproduction": (
+            rf"{perturb.get('max_absdiff_all')} Å all-residue"
+        ),
+    }
+    for label, pattern in required.items():
+        if not re.search(pattern, text, re.IGNORECASE):
+            fail(f"{md.name}: {label} headline is absent — "
+                 f"record and prose have drifted (#419)", failures)
+    gained = comparison.get("gained") or []
+    if gained and any(pdb_id not in text for pdb_id in gained):
+        fail(f"{md.name}: gained-success list is absent or incomplete (#419)",
+             failures)
+    if (comparison.get("lost") == []
+            and not re.search(r"No old success was\s+lost", text)):
+        fail(f"{md.name}: zero-loss comparison is absent (#419)", failures)
 
 
 def check_round_doc(md: Path, screen: dict, failures: list[str]) -> None:
@@ -444,8 +610,12 @@ def main() -> int:
         bench = guarded(check_bench, path, failures)
         if bench is not None and match:
             benches[match.group(1)] = bench
+    recovers: dict[str, dict] = {}
     for path in sorted(data.glob("negative_control_round*_recover.json")):
-        guarded(check_recover, path, failures)
+        match = re.match(r"negative_control_round(\d+)_recover\.json", path.name)
+        recover = guarded(check_recover, path, failures)
+        if recover is not None and match:
+            recovers[match.group(1)] = recover
     for md in sorted(research.glob("negative_control_round*.md")):
         match = re.match(r"negative_control_round(\d+)\.md", md.name)
         if match and match.group(1) in benches:
@@ -455,6 +625,11 @@ def main() -> int:
         match = re.match(r"negative_control_round(\d+)\.md", md.name)
         if match and match.group(1) in screens:
             guarded(check_round_doc, md, screens[match.group(1)], failures)
+    for md in sorted(research.glob("negative_control_round*.md")):
+        match = re.match(r"negative_control_round(\d+)\.md", md.name)
+        if match and match.group(1) in recovers:
+            guarded(check_recover_round_doc, md, recovers[match.group(1)],
+                    failures)
 
     if failures:
         print(f"{len(failures)} negative-control record failure(s)")
