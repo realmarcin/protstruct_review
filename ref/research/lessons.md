@@ -8,6 +8,10 @@ material, not a backlog.
 mistake that produced it. A lesson with no incident behind it is a maxim, and this file is not for
 maxims.
 
+The stopping and consolidation discipline these lessons imply is stated once, as a checklist a
+round applies at registration time, in [`stopping_criteria.md`](stopping_criteria.md) (#292);
+this file remains the incident record it consolidates from.
+
 ## Index
 
 | Rule | Round |
