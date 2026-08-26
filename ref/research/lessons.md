@@ -1,4 +1,4 @@
-# Lessons from thirty rounds of tolerance benchmarking
+# Lessons from forty-eight rounds of tolerance benchmarking
 
 The reusable output of the benchmarking series in `ref/research/tolerance_benchmark_*.md`. Extracted
 from `NEXT_TASKS.md` (#65), which had become 49 % preamble before its first task — these are reference
