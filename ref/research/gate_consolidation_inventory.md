@@ -27,7 +27,7 @@ is a bespoke prose parser rather than a data comparison.
 | `check_driver_thresholds.py` | **literal table** | a hand-written `CHECKS` table: current value regex + retired literals per metric | 1 (generic) | the table *is* the restatement |
 | `check_summary_coverage.py` | **prose parser** | `NEXT_TASKS.md` and `lessons.md` round coverage, defect-count claims, spelled-out round counts (`_TENS`/`_UNITS`) | 7 | parses prose, compares with the round-doc set |
 | `check_next_tasks_dates.py` | **prose parser** | NC-table rows: PR numbers + date spans vs `git log` | 5 | parses prose, compares with git |
-| `check_negative_control_records.py` | **mixed** | records ↔ records (internal consistency: data); records ↔ round-doc prose (one hand-written check per record *family*: an f-string test for bench, a proximity regex over four counts for screen, a keyword-anchored `required` dict for sandboxed recover records, #419); registry §6 ↔ `bench_recover_leg` constants | 16 (3 in the prose checks, 4 in the §6 check, 9 filename matches) | the record and §6 checks re-derive; the prose checks are per-family hand-written |
+| `check_negative_control_records.py` | **mixed** | records ↔ records (internal consistency: data); records ↔ round-doc prose (one hand-written check per record *family*: an f-string test for bench, a proximity regex over four counts for screen, a keyword-anchored `required` dict for sandboxed recover records, #419); registry §6 ↔ `bench_recover_leg` constants | 16 (3 in the prose checks, 5 in the §6 check incl. `TRIPLE_RE`, 8 filename matches — `RECORD_RE` plus seven in `main()`) | the record and §6 checks re-derive; the prose checks are per-family hand-written |
 
 Reading of the table: the **structural** guards (five) carry no literal surface and
 are not #293's concern. The **recompute-vs-prose** guards already have the shape #293
@@ -35,7 +35,7 @@ wants — a committed data file is the source and the prose is diffed against it
 their remaining regexes are the unavoidable "find the labelled figure in the sentence"
 step. The literal-parsing weight sits in the last four rows: **28 of the 40 regex sites**
 are in `check_negative_control_records`, `check_summary_coverage` and
-`check_next_tasks_dates` — though 9 of the 16 in the first are filename matches, not
+`check_next_tasks_dates` — though 8 of the 16 in the first are filename matches, not
 prose parsing — and `check_driver_thresholds`'s entire content is a table of literals
 that must be hand-extended every time the registry gains a governed value (PR #436
 added an entry, and its first attempt broke `test_driver_thresholds` by changing the
@@ -48,7 +48,7 @@ the restatement today. "—" means nothing does.
 
 | Fact | Authoritative source | Restated in | Checked by |
 |---|---|---|---|
-| Tolerance-series round count — `NEXT_TASKS.md` ("N rounds of …", spelled out) | the set of `tolerance_benchmark_round*.md` | `NEXT_TASKS.md` | `check_summary_coverage.round_count_claim`: renders the expected phrase with `spell()` (fails closed outside 20–99 since #160) and locates it with a `_TENS`-derived alternation (went MISSING at round 40 until derived, round-40 PR #265) |
+| Tolerance-series round count — `NEXT_TASKS.md` ("N rounds of …", spelled out) | the set of `tolerance_benchmark_round*.md` | `NEXT_TASKS.md` | `check_summary_coverage.round_count_claim`: renders the expected phrase with `spell()` (fails closed outside 20–99 since PR #159, issue #160) and locates it with a `_TENS`-derived alternation (went MISSING at round 40 until derived, round-40 PR #265; #244 was the same MISSING-on-correct-prose class in `check_round_figures --refresh`, and the comment at `check_summary_coverage.py:261` still credits it — #468) |
 | Tolerance-series round count — `lessons.md` title | same | `ref/research/lessons.md` line 1 | — (`lessons_coverage` checks the index table's round tokens, not the count; the title currently says "thirty" against forty-eight — #467) |
 | Per-round defect counts / issue ranges | `round_findings.tsv` | `NEXT_TASKS.md`, `lessons.md`, round docs | `check_summary_coverage` (`_DEFECT_CLAIM`), `check_round_figures` (`_SEVERITY_CLAIM`) |
 | §4 dataset figures (n, ρ, degradation counts, nesting sentence) | `em_refinement_deltas.tsv` | registry §4 prose | `check_registry_figures` (labelled figures + one nesting-sentence regex) |
@@ -74,23 +74,29 @@ mergeable and must keep its predecessor's negative tests passing before the swap
 guard).
 
 **(a) NC headline sidecar — replaces the per-round pattern dicts.** Every NC driver
-already writes its record; add a `headlines` block to the record's `summary` (or a
-sibling `negative_control_round<N>_headlines.json`) of `{label: rendered string}` —
+already writes its record; add a `headlines` block to the record's `summary` of `{label: rendered string}` —
 `"osol_h success": "15/22"`, `"sandbox count": "22 distinct sandbox directories"` —
 rendered *by the driver from the same variables it prints*. Each entry carries the
 **anchor keyword with the value** (`{"keyword": "osol_h", "value": "15/22"}`), not the
 bare figure: `check_round_doc`'s own docstring records that a bare-presence check
 "passes whenever another identical digit exists anywhere in the doc", and
-`check_recover_round_doc`'s 80-character keyword window exists for that reason — the
-generic check keeps that proximity rule as its one rule. 3b then has one check for
-every family: each `(keyword, value)` pair appears within the window in the round doc.
+`check_round_doc` narrowed its window from 80 to 20 characters after its own test
+caught a neighbouring digit satisfying the wrong keyword (comment at
+`check_negative_control_records.py:565–568`); `check_recover_round_doc` still uses 80
+with no stated rationale. So the window is **per entry**, carried in the headline block
+(`"window": 20` default, overridable where a legitimately long phrase needs more —
+the recover "H/D range" and "osol comparison" entries), and the generic check keeps
+that proximity rule as its one rule: each `(keyword, value)` pair appears within its
+window in the round doc.
 The three per-family `check_*_round_doc` functions (~92 lines, 3 regex sites) collapse
 into one, and the next round adds headlines by writing them, not by editing the guard.
 The headlines live **inside** the record's `summary` — a sibling
 `negative_control_round<N>_headlines.json` would be swept up by `check_orphan_family`
 (`RECORD_RE` matches every family) and would need its own manifest and citation.
-Regression tests: the #419 drift cases and the wrong-keyword-digit case in
-`test_check_negative_control.py` must still fail by name under the generic check before
+Regression tests: in `test_check_negative_control.py`, `"round doc missing a headline
+figure fails"` (the neighbouring-digit case: "1 floor" 25 characters from "screened"),
+`"#419: drifted recover prose headline fails"` and `"#419: prose drift names the
+protected headline"` must still fail/pass exactly as now under the generic check before
 the old functions are deleted. Committed rounds keep their existing checks until a
 later round's record carries the block: this proposal's policy is that committed records
 are not rewritten to fit a new guard (the same reason #319 admits only full-run records).
@@ -136,4 +142,4 @@ Footnotes: guard count `ls scripts/check_*.py | wc -l`; regex sites
 `grep -c 're\.\(search\|compile\|findall\|match\|finditer\)' scripts/check_*.py`;
 lines `wc -l scripts/check_*.py`; `CHECKS` entries
 `uv run --locked -q -- python -c 'import importlib.util as u,sys; s=u.spec_from_file_location("m","scripts/check_driver_thresholds.py"); m=u.module_from_spec(s); s.loader.exec_module(m); print(len(m.CHECKS))'`;
-the three prose checks `sed -n 483,574p scripts/check_negative_control_records.py`.
+the three prose checks `grep -n '^def check_.*_round_doc' scripts/check_negative_control_records.py`.
