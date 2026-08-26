@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite it as below."
+type: software
+title: protstruct_review
+authors:
+  - family-names: Joachimiak
+    given-names: Marcin P.
+    affiliation: Lawrence Berkeley National Laboratory
+repository-code: "https://github.com/realmarcin/protstruct_review"
+license:
+  - BSD-3-Clause
+  - CC-BY-4.0
+version: 0.1.0
+date-released: "2026-08-26"
+keywords:
+  - protein structure
+  - crystallographic refinement
+  - cross-tool validation
+  - negative-control benchmark
+  - preregistration
+abstract: >-
+  Quality-assessment harness for agent-refined or generated protein structures.
+  Independent oracles (PHENIX, CCP4, gemmi, biotite) are compared rather than
+  trusted singly; tolerances are calibrated by preregistered benchmark rounds and
+  a negative-control series of gold-standard sub-Ångström structures.

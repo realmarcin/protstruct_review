@@ -37,6 +37,9 @@ historical path for different bytes: that would silently invalidate the evaluati
 
 ## Agent and benchmark outputs
 
+Per-class reuse terms for everything under `data/` are tabulated in
+[`LICENSE-DOCS.md`](../LICENSE-DOCS.md); this section records provenance.
+
 `agents/` contains refined/generated structures and benchmark artifacts. `coscientists/` contains
 evaluation records, logs, reports, and presentation artifacts. These are derived research outputs;
 their source structures and experimental data remain subject to their recorded upstream terms.

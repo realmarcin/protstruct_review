@@ -65,9 +65,10 @@ for schema authoring and regeneration details.
 
 ## Reuse, provenance, and citation
 
-This repository does not yet declare a repository-wide license. Do not infer one from the
-CC-BY-4.0 declaration inside the LinkML schema; the intended scope is tracked in
-[#399](https://github.com/realmarcin/protstruct_review/issues/399).
+Code is licensed under BSD-3-Clause ([`LICENSE`](LICENSE)); documentation, the LinkML schema and
+catalog, and the authored scientific records under `ref/research/` and `data/` are CC-BY-4.0
+([`LICENSE-DOCS.md`](LICENSE-DOCS.md), which lists the scope per content class). Cite the repository
+as given in [`CITATION.cff`](CITATION.cff).
 Third-party materials retain their upstream terms. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)
 and [`data/README.md`](data/README.md) before redistributing data fixtures. The repository does not
 ship a PHENIX documentation mirror; `ref/download_phenix_docs.sh` creates an ignored, opt-in local
