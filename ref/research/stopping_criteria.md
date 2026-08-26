@@ -4,7 +4,8 @@ The stopping discipline that has actually governed rounds lives as scattered
 prose in [`lessons.md`](lessons.md). This file states it once, as a checklist
 a round applies **at registration time** — so "when do we stop?" is a
 decision with a criterion, not a judgement call re-made each round. Nothing
-here is new doctrine; every criterion cites the round that paid for it.
+here is new doctrine; each item cites the incident or planning record it
+consolidates.
 
 ## The checklist
 
@@ -23,10 +24,11 @@ investigation into another round.
    settle. Exhaustion is a legitimate stopping point — state it as one.
    *(Rounds 32–33, under a stopping rule fixed in advance.)*
 
-3. **Measurement floor.** If the detectable effect size exceeds the
-   reachable N, stop and report the base-rate estimate; do not chase.
-   *(Round 33: a 0.86 pp difference needing ~5,542 claims per arm, against
-   three rounds of hand-verification producing 159.)*
+3. **Measurement floor.** Compute the minimum detectable effect at the
+   reachable N. If the effect the question asks about is smaller, stop and
+   report the base-rate estimate; do not chase. *(Round 33: a 0.86 pp
+   difference would need ~5,542 claims per arm, against three rounds of
+   hand-verification producing 159.)*
 
 4. **An underpowered null is not a refutation.** `0 of 13` above a fence is
    `P(0) = 0.408` at the base rate — an underpowered draw. Report the power
@@ -35,12 +37,11 @@ investigation into another round.
    the query, not the budget — before spending, check the candidate
    population is large enough to answer.)*
 
-5. **Class, not instance.** Fix an instance once. **The signal to build the
-   guard is the second recurrence, not the third** — the round's real
-   output for a recurring class is the gate that finds the next one, not a
-   hand-fix of the latest. *(Round 24's headline is "three times by luck is
-   not a process"; its refined form in lessons.md sets the trigger at the
-   second recurrence, and this file follows the refined form.)*
+5. **Class, not instance.** Fix an instance once. **The third occurrence —
+   the second recurrence — is the signal to build the guard**: the round's
+   real output for a recurring class is the gate that finds the next one,
+   not a hand-fix of the latest. *(Round 24 found three instances by luck
+   and identifies that second recurrence as the trigger.)*
 
 6. **Pre-registered stop rule.** Every round states its stop/continue
    decision rule before seeing the data. A failed prediction is honoured as
@@ -62,11 +63,14 @@ holds:
 - the question is **closed as unanswerable here** by criteria 1–3, with the
   power arithmetic recorded;
 - the remaining work is **assurance rather than measurement** (another
-  audit pass with a new lens is always available, finds something every
-  time, and has no endpoint — choosing it is a deliberate budget decision,
-  stated as such, not a default);
-- the recurring-defect class has its **guard merged**, after which further
-  instances are the guard's job.
+  audit pass with a new lens is always available, every pass so far has
+  found something, and there is no defined endpoint — choosing it is a
+  deliberate budget decision, stated as such, not a default; the source is
+  [`NEXT_TASKS.md`](../../NEXT_TASKS.md)'s assurance-budget boundary);
+- the recurring-defect class has a guard **tested against the defect and
+  wired into the hermetic gate**. Future detection is then the guard's job;
+  each detected instance remains explicit remediation work. *(Round 24;
+  #228 is the counterexample of a test that shipped but was not run.)*
 
 ## What this file is not
 
@@ -74,3 +78,11 @@ Not a tolerance, not a gate, and not a license to skip a registered stop —
 the registered rule of the round in flight always wins. When a criterion
 here and a round's registration disagree, the registration governs that
 round, and the disagreement is a finding to reconcile in the next one.
+
+## Adversarial review
+
+Review of PR #427 re-derived the cited arithmetic and precedents. It found
+and corrected a dimensionally invalid power rule (#428), a false contrast
+between equivalent occurrence counts (#429), missing provenance for the
+assurance boundary (#430), and a guard trigger that conflated merge state,
+detection, and remediation (#431). No tolerance or scientific result changed.
