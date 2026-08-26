@@ -4,8 +4,8 @@ The stopping discipline that has actually governed rounds lives as scattered
 prose in [`lessons.md`](lessons.md). This file states it once, as a checklist
 a round applies **at registration time** — so "when do we stop?" is a
 decision with a criterion, not a judgement call re-made each round. Nothing
-here is new doctrine; each item cites the incident or planning record it
-consolidates.
+in the numbered checklist is new doctrine; each criterion cites the round
+that paid for it.
 
 ## The checklist
 
@@ -86,3 +86,4 @@ and corrected a dimensionally invalid power rule (#428), a false contrast
 between equivalent occurrence counts (#429), missing provenance for the
 assurance boundary (#430), and a guard trigger that conflated merge state,
 detection, and remediation (#431). No tolerance or scientific result changed.
+A second review pass narrowed an overclaim about citation coverage (#432).
