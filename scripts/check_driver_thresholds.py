@@ -45,6 +45,14 @@ HISTORY_MARKERS = ("pre-benchmark", "originally", "round-5", "round 5", "catalog
 # retired literals that must not appear as a live threshold.
 CHECKS = [
     {
+        "metric": "NC FIT threshold d_refmac, ANIS (§6)",
+        "current": "0.01150",
+        "registry": r"\(unchanged[^)]*\), d_refmac \*\*([\d.]+)\*\* from the round-9 null",
+        "consumers": ["scripts/bench_recover_leg.py", "scripts/bench_round10.py",
+                      "scripts/bench_round11.py"],
+        "retired": ["0.01220", "0.01090", "0.00540"],
+    },
+    {
         "metric": "CA RMSD agreement (§3)",
         "current": "0.03",
         "registry": r"\| CA RMSD \| \\\|Δ\\\| ≤ \*\*([\d.]+) Å\*\*",

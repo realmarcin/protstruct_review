@@ -586,8 +586,23 @@ def check_orphan_family(path: Path, research: Path, failures: list[str]) -> None
     if not match or match.group(2) in KNOWN_FAMILIES:
         return
     rec = json.loads(path.read_text())
-    if not isinstance(rec, dict) or not isinstance(rec.get("run"), dict):
+    run = rec.get("run") if isinstance(rec, dict) else None
+    if not isinstance(run, dict):
         fail(f"{path.name}: no run manifest block", failures)
+    else:
+        if run.get("round") != int(match.group(1)):
+            fail(f"{path.name}: run.round {run.get('round')!r} does not "
+                 f"match the filename", failures)
+        prereg = run.get("preregistration")
+        if not isinstance(prereg, str) or not (research / prereg).is_file():
+            fail(f"{path.name}: run.preregistration {prereg!r} is not a "
+                 f"committed document", failures)
+        if not isinstance(run.get("tools"), dict):
+            fail(f"{path.name}: run.tools missing", failures)
+        if "run_mode" in run and run["run_mode"] != "full":
+            fail(f"{path.name}: committed record carries a "
+                 f"{run['run_mode']!r} run manifest — full runs only (#319)",
+                 failures)
     doc = research / f"negative_control_round{match.group(1)}.md"
     if not doc.exists():
         fail(f"{path.name}: no round doc {doc.name}", failures)
@@ -655,6 +670,14 @@ def check_registry_section(text: str, constants: dict, failures: list[str],
              f"{constants['S_R2']}", failures)
     if "above **2×** its threshold" not in sec:
         fail(f"{label}: W4 row must state the 2× bound in bold", failures)
+    for phrase, key in ((r"MAD floored at \*\*([\d.]+)\*\*", "MAD_FLOOR"),
+                        (r"unmasked Cα shift > \*\*([\d.]+) Å\*\*", "SHIFT_BAND_A")):
+        m = re.search(phrase, sec)
+        if not m:
+            fail(f"{label}: no bold {key} figure", failures)
+        elif float(m.group(1)) != constants[key]:
+            fail(f"{label}: {key} stated {m.group(1)}, registered "
+                 f"{constants[key]}", failures)
 
 
 def registered_constants(scripts: Path) -> dict:
@@ -670,6 +693,8 @@ def registered_constants(scripts: Path) -> dict:
         "CANDIDATE_LEG_THIRD_OPINION_STANDDOWN":
             mod.CANDIDATE_LEG_THIRD_OPINION_STANDDOWN,
         "S_R2": mod.s_r2_from_record(),
+        "MAD_FLOOR": mod.MAD_FLOOR,
+        "SHIFT_BAND_A": mod.SHIFT_BAND_A,
     }
 
 
@@ -734,19 +759,24 @@ def main() -> int:
     for path in sorted(data.glob("negative_control_round*.json")):
         guarded(check_orphan_family, path, research, failures)
     # #433: the registry section restates the record-derived constants.
-    # Runs on a real checkout (bench_recover_leg.py present); synthetic
-    # guard-test trees without it exercise check_registry_section directly.
+    # Enforced whenever --root is this script's own checkout (the gate's
+    # path) or the tree carries bench_recover_leg.py; only synthetic
+    # guard-test trees are skipped — a moved script cannot fail open (#442).
+    own_repo = Path(__file__).resolve().parent.parent
     brl = root / "scripts" / "bench_recover_leg.py"
     registry = root / "ref" / "thresholds_and_standards.md"
-    if brl.exists():
-        if not registry.exists():
+    if root.resolve() == own_repo or brl.exists():
+        if not brl.exists():
+            fail("scripts/bench_recover_leg.py missing — §6 cannot be checked",
+                 failures)
+        elif not registry.exists():
             fail("ref/thresholds_and_standards.md missing", failures)
         else:
             try:
                 consts = registered_constants(root / "scripts")
             except (SystemExit, Exception) as exc:  # noqa: BLE001
-                fail(f"bench_recover_leg constants do not re-derive: {exc}",
-                     failures)
+                fail(f"bench_recover_leg constants do not re-derive "
+                     f"({type(exc).__name__}: {exc})", failures)
             else:
                 check_registry_section(registry.read_text(), consts, failures)
 

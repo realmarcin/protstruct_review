@@ -12,7 +12,7 @@ tracks the current GitHub-side startup failure if those checks are absent. The m
 command is `uv run --locked -- bash scripts/validate.sh`, and it must exit 0 before a merge.
 External-tool and online benchmarks remain manual.
 
-## The negative-control track (2026-08-08 → 2026-08-22)
+## The negative-control track (2026-08-08 → 2026-08-26)
 
 A second benchmark series, planned from a deep-research run and executed in eleven preregistered
 rounds: gold-standard sub-Å structures as **negative tests** for refinement. Full plan:

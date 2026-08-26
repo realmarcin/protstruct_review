@@ -470,7 +470,10 @@ with tempfile.TemporaryDirectory() as tmp:
     data = root / "ref/research/data"
     data.mkdir(parents=True)
     rec = data / "negative_control_round12_echo.json"
-    rec.write_text(json.dumps({"run": {"run_mode": "full"}, "l1": {}}))
+    (root / "ref/research/negative_control_round12_preregistration.md").write_text("# p\n")
+    good_run = {"round": 12, "preregistration":
+                "negative_control_round12_preregistration.md", "tools": {}}
+    rec.write_text(json.dumps({"run": good_run, "l1": {}}))
     code, out = run_guard(root)
     check("#434: orphan-family record without a round doc fails",
           code == 1 and "no round doc" in out, True)
@@ -486,6 +489,20 @@ with tempfile.TemporaryDirectory() as tmp:
     code, out = run_guard(root)
     check("#434: orphan-family record without a run manifest fails",
           code == 1 and "no run manifest" in out, True)
+    rec.write_text(json.dumps({"run": {}, "l1": {}}))
+    code, out = run_guard(root)
+    check("#443: an empty run block fails on round, prereg and tools",
+          code == 1 and "run.round" in out and "run.preregistration" in out
+          and "run.tools" in out, True)
+    rec.write_text(json.dumps({"run": dict(good_run, round=11), "l1": {}}))
+    code, out = run_guard(root)
+    check("#443: run.round disagreeing with the filename fails",
+          code == 1 and "does not match the filename" in out, True)
+    rec.write_text(json.dumps({"run": dict(good_run, run_mode="canary"),
+                               "l1": {}}))
+    code, out = run_guard(root)
+    check("#443: a canary run_mode in an orphan family fails (#319)",
+          code == 1 and "full runs only" in out, True)
     rec.write_text("{not json")
     code, out = run_guard(root)
     check("#434: malformed orphan-family record is a named failure",
@@ -504,6 +521,8 @@ CONSTS = {
                                        "d_refmac": 0.0115},
     "CANDIDATE_LEG_THIRD_OPINION_STANDDOWN": {"2VXN"},
     "S_R2": {"phenix": 0.00275, "gemmi": 0.0026},
+    "MAD_FLOOR": 0.0005,
+    "SHIFT_BAND_A": 0.12,
 }
 GOOD = """## 5. x
 
@@ -513,7 +532,8 @@ GOOD = """## 5. x
 
 | Rule | Registered form | Provenance |
 |---|---|---|
-| Family flags | **F-data**: ΔR-free > +3·S_r2 on **both** paths, S_r2 = round-2 scales **0.00275 / 0.00260**; more | p |
+| Family flags | **F-data**: ΔR-free > +3·S_r2 on **both** paths, S_r2 = round-2 scales **0.00275 / 0.00260**; **F-shift**: unmasked Cα shift > **0.12 Å** | p |
+| E1 | MAD floored at **0.0005** | p |
 | FIT thresholds — ISOT convention (history) | d_phenix **0.01200**, d_gemmi **0.01025**, d_refmac **0.00560** (retired 0.01220) | p |
 | FIT thresholds — ANIS convention (current) | d_phenix **0.01200**, d_gemmi **0.01025** (unchanged), d_refmac **0.01150** from x | p |
 | W4 | no residual above **2×** its threshold | p |
@@ -523,9 +543,14 @@ GOOD = """## 5. x
 """
 
 
-def registry_failures(text):
+import contextlib  # noqa: E402
+import io  # noqa: E402
+
+
+def registry_failures(text, consts=CONSTS):
     fl = []
-    _g.check_registry_section(text, CONSTS, fl)
+    with contextlib.redirect_stdout(io.StringIO()):  # #448: quiet negatives
+        _g.check_registry_section(text, consts, fl)
     return fl
 
 
@@ -553,7 +578,26 @@ check("#433: a drifted S_r2 fails",
 check("#433: a W4 row without the 2x bound fails",
       any("W4" in f for f in registry_failures(GOOD.replace("**2×**", "twice"))),
       True)
-check("#433: the real checkout's constants re-derive from records",
-      set(_g.registered_constants(REPO / "scripts")) == set(CONSTS), True)
+check("#433: a drifted MAD floor fails",
+      any("MAD_FLOOR" in f
+          for f in registry_failures(GOOD.replace("**0.0005**", "**0.0010**"))),
+      True)
+REAL_CONSTS = _g.registered_constants(REPO / "scripts")
+REAL_TEXT = (REPO / "ref/thresholds_and_standards.md").read_text()
+check("#442: the real registry passes against the real record-derived constants",
+      registry_failures(REAL_TEXT, REAL_CONSTS), [])
+check("#442: real registry with ANIS d_refmac 0.01150→0.01100 fails by name",
+      any("ANIS convention row states" in f for f in registry_failures(
+          REAL_TEXT.replace("d_refmac **0.01150**", "d_refmac **0.01100**"),
+          REAL_CONSTS)), True)
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    (root / "ref/research/data").mkdir(parents=True)
+    (root / "scripts").mkdir()
+    (root / "scripts/bench_recover_leg.py").write_text("raise ImportError('x')\n")
+    (root / "ref/thresholds_and_standards.md").write_text("## 6. Negative-control verdict rules\n")
+    code, out = run_guard(root)
+    check("#442/#447: a tree carrying bench_recover_leg.py enforces §6 and names the exception type",
+          code == 1 and "ImportError" in out, True)
 
 print(f"\n{PASSED} checks passed")
