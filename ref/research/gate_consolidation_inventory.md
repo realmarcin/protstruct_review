@@ -4,9 +4,10 @@
 `scripts/check_*.py` guards, identify the facts asserted as prose in more than one
 place, and propose the smallest consolidation that removes the most literal-parsing
 surface without rewriting the registry's human-readable form. This file is that pass.
-It changes no gate, no tolerance, and no registry prose. Counts below are from
-`main` at the merge of PR #436 (11 guards, 2 897 lines); re-run the commands in
-the footnotes rather than trusting the numbers if the set has grown.
+It changes no gate, no tolerance, and no registry prose. **As of `main` 4b2af28
+(2026-08-26): 11 guards, 2 897 lines, 40 regex sites.** Every count in this file is a
+restatement of exactly the kind it inventories; re-run the footnote commands rather
+than trusting the numbers once the set has moved.
 
 ## 1. Inventory
 
@@ -26,18 +27,19 @@ is a bespoke prose parser rather than a data comparison.
 | `check_driver_thresholds.py` | **literal table** | a hand-written `CHECKS` table: current value regex + retired literals per metric | 1 (generic) | the table *is* the restatement |
 | `check_summary_coverage.py` | **prose parser** | `NEXT_TASKS.md` and `lessons.md` round coverage, defect-count claims, spelled-out round counts (`_TENS`/`_UNITS`) | 7 | parses prose, compares with the round-doc set |
 | `check_next_tasks_dates.py` | **prose parser** | NC-table rows: PR numbers + date spans vs `git log` | 5 | parses prose, compares with git |
-| `check_negative_control_records.py` | **mixed** | records ↔ records (internal consistency: data); records ↔ round-doc prose (per-round `required` pattern dicts: #419 style); registry §6 ↔ `bench_recover_leg` constants | 16 | the record checks re-derive; the prose checks are per-round hand-written pattern lists |
+| `check_negative_control_records.py` | **mixed** | records ↔ records (internal consistency: data); records ↔ round-doc prose (one hand-written check per record *family*: an f-string test for bench, a proximity regex over four counts for screen, a keyword-anchored `required` dict for sandboxed recover records, #419); registry §6 ↔ `bench_recover_leg` constants | 16 (3 in the prose checks, 4 in the §6 check, 9 filename matches) | the record and §6 checks re-derive; the prose checks are per-family hand-written |
 
 Reading of the table: the **structural** guards (five) carry no literal surface and
 are not #293's concern. The **recompute-vs-prose** guards already have the shape #293
 wants — a committed data file is the source and the prose is diffed against it — and
 their remaining regexes are the unavoidable "find the labelled figure in the sentence"
-step. The literal-parsing weight sits in the last four rows: **29 of the 40 regex sites**
+step. The literal-parsing weight sits in the last four rows: **28 of the 40 regex sites**
 are in `check_negative_control_records`, `check_summary_coverage` and
-`check_next_tasks_dates`, and `check_driver_thresholds`'s entire content is a table of
-literals that must be hand-extended every time the registry gains a governed value
-(PR #436 added the fifth entry, and its first attempt broke `test_driver_thresholds`
-by changing the table's order — a literal table with positional tests).
+`check_next_tasks_dates` — though 9 of the 16 in the first are filename matches, not
+prose parsing — and `check_driver_thresholds`'s entire content is a table of literals
+that must be hand-extended every time the registry gains a governed value (PR #436
+added an entry, and its first attempt broke `test_driver_thresholds` by changing the
+table's order — a literal table with positional tests, `CHECKS[0]`).
 
 ## 2. Facts asserted in more than one place
 
@@ -46,19 +48,23 @@ the restatement today. "—" means nothing does.
 
 | Fact | Authoritative source | Restated in | Checked by |
 |---|---|---|---|
-| Tolerance-series round count | the set of `tolerance_benchmark_round*.md` | `NEXT_TASKS.md` ("N rounds of …", spelled out), `lessons.md` | `check_summary_coverage` via `_TENS`/`_UNITS` (the #160/#244 class: a spelled-number regex that stopped at "thirty") |
+| Tolerance-series round count — `NEXT_TASKS.md` ("N rounds of …", spelled out) | the set of `tolerance_benchmark_round*.md` | `NEXT_TASKS.md` | `check_summary_coverage.round_count_claim`: renders the expected phrase with `spell()` (fails closed outside 20–99 since #160) and locates it with a `_TENS`-derived alternation (went MISSING at round 40 until derived, round-40 PR #265) |
+| Tolerance-series round count — `lessons.md` title | same | `ref/research/lessons.md` line 1 | — (`lessons_coverage` checks the index table's round tokens, not the count; the title currently says "thirty" against forty-eight — #467) |
 | Per-round defect counts / issue ranges | `round_findings.tsv` | `NEXT_TASKS.md`, `lessons.md`, round docs | `check_summary_coverage` (`_DEFECT_CLAIM`), `check_round_figures` (`_SEVERITY_CLAIM`) |
 | §4 dataset figures (n, ρ, degradation counts, nesting sentence) | `em_refinement_deltas.tsv` | registry §4 prose | `check_registry_figures` (labelled figures + one nesting-sentence regex) |
 | Governed thresholds and their retired values | registry §3/§4/§6 | drivers, `bench_*.py` docstrings | `check_driver_thresholds` `CHECKS` table (five entries, hand-maintained) |
 | NC verdict thresholds (ISOT, ANIS), S_r2, MAD floor, shift band, stand-down set | committed NC records → `bench_recover_leg.py` constants | registry §6 | validate 3b (`check_registry_section`, PR #436) |
-| NC per-round headline figures (15/22, 21/21, 22 sandboxes, …) | `negative_control_round<N>_*.json` | `negative_control_round<N>.md` | validate 3b, **one hand-written `required` pattern dict per round family** (`check_bench_round_doc`, `check_round_doc`, `check_recover_round_doc`) — the surface that grows fastest |
+| NC per-round headline figures (15/22, 21/21, 22 sandboxes, …) | `negative_control_round<N>_*.json` | `negative_control_round<N>.md` | validate 3b, **one hand-written check per record family** (`check_bench_round_doc`, `check_round_doc`, `check_recover_round_doc`; ~92 lines, 3 regex sites) — the surface that grows with every new family or headline |
 | NC milestone dates and PR numbers | `git log` squash-merge trail | `NEXT_TASKS.md` NC table | `check_next_tasks_dates` (regex row parser + ±1 day skew) |
 | NC round-doc ↔ record linkage | filenames | round docs cite record filenames | validate 3b orphan-family check (PR #436) |
-| Partial-record ledger (⚠ rows), marked/backed row status | registry §4 row markers | `NEXT_TASKS.md`, `lessons.md` | — (prose only; the #293 body's motivating example) |
+| Partial-record ledger (⚠ rows), marked/backed row status | **none — the registry's §4 row markers are prose** | `NEXT_TASKS.md`, `lessons.md` | — (the #293 body's motivating example; a sidecar would have to be *created*, not derived) |
 
-The single-source candidates are the last five rows: each has an unambiguous
-machine-readable origin already committed (a record, a TSV, or git), and the prose is
-the *only* thing being parsed.
+Nine facts; eight have a committed machine-readable origin. Two of those eight are
+already checked against it by a data comparison (NC thresholds and record linkage,
+both landed in #436). The single-source **candidates** — facts whose origin is committed
+but whose restatement is still checked by hand-written prose parsing — are the NC
+headline figures and the NC dates; the `lessons.md` title is unchecked; the
+partial-record ledger has no origin to derive from and is a separate design question.
 
 ## 3. Proposal — the smallest consolidation
 
@@ -71,31 +77,45 @@ guard).
 already writes its record; add a `headlines` block to the record's `summary` (or a
 sibling `negative_control_round<N>_headlines.json`) of `{label: rendered string}` —
 `"osol_h success": "15/22"`, `"sandbox count": "22 distinct sandbox directories"` —
-rendered *by the driver from the same variables it prints*. 3b then has one generic
-check: every rendered headline string appears verbatim in the round doc. The three
-per-family `check_*_round_doc` functions and their `required` dicts (about 120 lines,
-10 of the 16 regex sites) collapse into ~15 lines, and the next round adds headlines
-by writing them, not by editing the guard. Regression test: the #419 drift cases
-(`test_check_negative_control.py`) must still fail by name under the generic check
-before the old functions are deleted. Committed rounds keep their existing checks
-until their records carry the block — do not re-render history.
+rendered *by the driver from the same variables it prints*. Each entry carries the
+**anchor keyword with the value** (`{"keyword": "osol_h", "value": "15/22"}`), not the
+bare figure: `check_round_doc`'s own docstring records that a bare-presence check
+"passes whenever another identical digit exists anywhere in the doc", and
+`check_recover_round_doc`'s 80-character keyword window exists for that reason — the
+generic check keeps that proximity rule as its one rule. 3b then has one check for
+every family: each `(keyword, value)` pair appears within the window in the round doc.
+The three per-family `check_*_round_doc` functions (~92 lines, 3 regex sites) collapse
+into one, and the next round adds headlines by writing them, not by editing the guard.
+The headlines live **inside** the record's `summary` — a sibling
+`negative_control_round<N>_headlines.json` would be swept up by `check_orphan_family`
+(`RECORD_RE` matches every family) and would need its own manifest and citation.
+Regression tests: the #419 drift cases and the wrong-keyword-digit case in
+`test_check_negative_control.py` must still fail by name under the generic check before
+the old functions are deleted. Committed rounds keep their existing checks until a
+later round's record carries the block: this proposal's policy is that committed records
+are not rewritten to fit a new guard (the same reason #319 admits only full-run records).
 
 **(b) `CHECKS` table → `ref/thresholds_and_standards.yaml` sidecar.** Move
 `check_driver_thresholds.CHECKS` into a small YAML file next to the registry:
-`metric, section, current, registry_pattern, consumers[], retired[]`. No behaviour
-change; the guard reads the file. What it buys: the table becomes data the registry's
-author edits alongside the prose, the positional test (`CHECKS[0]`) becomes a keyed
-lookup, and a later step can generate the registry's `[provenance]` column from it.
+`metric, section, current, registry_pattern, consumers[], retired[]`. The guard reads
+the file; behaviour is unchanged, and — said plainly — the `registry_pattern` strings
+are still per-figure regexes, moved from Python to YAML, not removed. What it buys is
+narrower: the table becomes data the registry's author edits alongside the prose, the
+positional test (`CHECKS[0]`) becomes a keyed lookup, and a later step can generate
+the registry's `[provenance]` column from it. It does not conflict with
+`CODING_STANDARDS.md` rule 10 (thresholds stay defined once, in the `.md`; the sidecar
+is guard data, not a second definition).
 Regression test: `test_driver_thresholds.py` on the YAML-loaded table, plus a check
 that every `**bold**` figure in a governed section has an entry (the missing-entry
 case #445 found by hand).
 
-**(c) Spelled-out counts → render, don't parse.** `check_summary_coverage` already
-knows the true round count; instead of parsing "forty-eight rounds" with `_TENS`, have
-it *render* the expected phrase (`num2words`-style, twenty…ninety-nine plus an
-explicit fail above the table's range) and search for that string. Removes the
-open-ended number grammar; the guard fails closed when the count leaves the rendered
-range instead of going MISSING as in #160.
+**(c) Extend the rendered round count to `lessons.md`.** `round_count_claim` already
+renders the expected phrase with `spell()` and fails closed outside 20–99; the only
+remaining grammar is the `_TENS`-derived alternation that locates the phrase to tell
+STALE from MISSING, and it is already derived from the same table. There is nothing
+left to consolidate there. What *is* missing is coverage: the same rendered comparison
+does not run on `lessons.md`, whose title is stale today (#467). The step is to run the
+existing check on both files, with the title fixed first.
 
 **Not proposed.** `check_registry_figures` and `check_round_figures` are already
 recompute-vs-prose; their regexes locate labelled figures and are the irreducible part.
@@ -103,12 +123,17 @@ recompute-vs-prose; their regexes locate labelled figures and are the irreducibl
 the NC table would just move the same rows; leave it. The five structural guards are
 out of scope.
 
-**Order.** (a) first — largest surface, most growth, and its regression tests already
-exist. (b) second — mechanical. (c) last — smallest. Each as its own PR with its own
-adversarial review; no tolerance value or registry prose changes in any of them.
+**Order.** (a) first — not for regex count (it removes 3 of 40) but because it is the
+surface that grows: every new record family or headline has so far meant a new
+hand-written check, and the drivers already own the values. (b) second — mechanical,
+removes the positional coupling. (c) last — a coverage extension of an existing check.
+Each as its own PR with its own adversarial review; no tolerance value or registry
+prose changes in any of them.
 
 ---
 
 Footnotes: guard count `ls scripts/check_*.py | wc -l`; regex sites
 `grep -c 're\.\(search\|compile\|findall\|match\|finditer\)' scripts/check_*.py`;
-lines `wc -l scripts/check_*.py`.
+lines `wc -l scripts/check_*.py`; `CHECKS` entries
+`uv run --locked -q -- python -c 'import importlib.util as u,sys; s=u.spec_from_file_location("m","scripts/check_driver_thresholds.py"); m=u.module_from_spec(s); s.loader.exec_module(m); print(len(m.CHECKS))'`;
+the three prose checks `sed -n 483,574p scripts/check_negative_control_records.py`.

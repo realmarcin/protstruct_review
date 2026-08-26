@@ -42,9 +42,9 @@ recover records** with verdicts recomputed from their own evidence (**#338 close
 | Round NC-11: **the 2VXN echo** | [#421](https://github.com/realmarcin/protstruct_review/pull/421)/[#423](https://github.com/realmarcin/protstruct_review/pull/423) (merged 2026-08-22) | **Z1/Z2 hold, Z3 falsified — and the falsification is the finding.** The candidate-leg pre-gap decomposes almost exactly (0.0328 = solvent 0.0410 − riding-H 0.0111 + 0.0029, sandboxed zero-cycle REFMAC), while posts agree within 0.0012. The post-agreement amendment **refused itself** by its registered L3 safety sweep (54/78 rule flips), so the else-branch stand-down is enacted: `CANDIDATE_LEG_THIRD_OPINION_STANDDOWN = {"2VXN"}` — 2VXN contributes no REFMAC third opinion on candidate legs; its rows are two-path and say so. |
 
 **Gate consolidation (#293):** the design pass the issue requires before any gate is touched
-landed as `ref/research/gate_consolidation_inventory.md` — 11 guards classified, eight multiply-stated
-facts traced to their machine-readable source, three ranked consolidation steps (NC headline
-sidecar → thresholds YAML sidecar → rendered-not-parsed counts). Implementation is one PR per step,
+landed as `ref/research/gate_consolidation_inventory.md` — 11 guards classified, nine multiply-stated
+facts (eight with a machine-readable source), three ranked consolidation steps (in-record NC headline
+block → thresholds YAML sidecar → round-count check extended to `lessons.md`). Implementation is one PR per step,
 each with its regression test before the swap; none started.
 
 **NC-11 closeout and the registry:** the stopping/consolidation checklist promised by #292 landed as
