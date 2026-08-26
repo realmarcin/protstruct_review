@@ -1,7 +1,9 @@
 # Third-party notices
 
 This file records provenance and upstream reuse constraints; it is not a repository-wide license
-and grants no additional rights. The repository does not currently have a root `LICENSE` file.
+and grants no additional rights. The root `LICENSE` (BSD-3-Clause, code) and `LICENSE-DOCS.md`
+(CC-BY-4.0, documentation/schema/authored records) cover repository-owned content only; nothing
+listed in this file is licensed by them.
 
 ## PHENIX documentation
 
@@ -11,8 +13,8 @@ authorized to do so. The cache is deliberately excluded from version control and
 
 PHENIX publishes license terms at <https://phenix-online.org/license>. Those terms treat associated
 online or electronic documentation as part of the licensed software and restrict distribution.
-Consequently, a locally created cache must not be assumed to be covered by any license later chosen
-for this repository and must not be published or redistributed without appropriate authorization.
+Consequently, a locally created cache must not be assumed to be covered by the repository's
+licenses and must not be published or redistributed without appropriate authorization.
 Preserve all upstream copyright and proprietary notices.
 
 ## wwPDB archive materials

@@ -3,7 +3,6 @@ name = "protstruct-review"
 version = "0.1.0"
 description = "Cross-tool quality-assessment harness for protein structures"
 license = "BSD-3-Clause"
-license-files = ["LICENSE"]
 authors = [{ name = "Marcin P. Joachimiak" }]
 requires-python = ">=3.11,<3.13"
 dependencies = [
