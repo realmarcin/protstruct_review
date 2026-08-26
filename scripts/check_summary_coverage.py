@@ -258,7 +258,9 @@ def round_count_claim(tasks: str, rounds: list[str]) -> dict[str, Any]:
     # Alternation derived from _TENS, not hardcoded: this regex was `(twenty|thirty)` and
     # went MISSING at round 40 -- spell() was fixed for 40 (#160) but this sibling search
     # was not, so the gate could not find "forty rounds of" and failed the round that
-    # crossed 40. Deriving it from the same table spell() uses keeps them in step (#244).
+    # crossed 40. Deriving it from the same table spell() uses keeps them in step
+    # (round-40 PR #265; #244 is the sibling MISSING-on-correct-prose defect in
+    # check_round_figures --refresh).
     found = re.search(rf"({'|'.join(_TENS.values())})(-\w+)? rounds of", prose(tasks))
     if not found:
         return {"check": "round count", "status": "MISSING",
