@@ -80,7 +80,7 @@ CHECKS = [
     {
         "metric": "NC FIT threshold d_refmac, ANIS (§6)",
         "current": "0.01150",
-        "registry": r"\(unchanged[^)]*\), d_refmac \*\*([\d.]+)\*\* from the round-9 null",
+        "registry": r"d_refmac \*\*([\d.]+)\*\* from the round-9 null",
         "consumers": ["scripts/bench_recover_leg.py", "scripts/bench_round10.py",
                       "scripts/bench_round11.py"],
         "retired": ["0.01220", "0.01090", "0.00540"],

@@ -594,11 +594,13 @@ def check_orphan_family(path: Path, research: Path, failures: list[str]) -> None
             fail(f"{path.name}: run.round {run.get('round')!r} does not "
                  f"match the filename", failures)
         prereg = run.get("preregistration")
-        if not isinstance(prereg, str) or not (research / prereg).is_file():
+        target = (research / prereg).resolve() if isinstance(prereg, str) else None
+        if (target is None or not target.is_file()
+                or research.resolve() not in target.parents):
             fail(f"{path.name}: run.preregistration {prereg!r} is not a "
                  f"committed document", failures)
-        if not isinstance(run.get("tools"), dict):
-            fail(f"{path.name}: run.tools missing", failures)
+        if not isinstance(run.get("tools"), dict) or not run["tools"]:
+            fail(f"{path.name}: run.tools missing or empty", failures)
         if "run_mode" in run and run["run_mode"] != "full":
             fail(f"{path.name}: committed record carries a "
                  f"{run['run_mode']!r} run manifest — full runs only (#319)",

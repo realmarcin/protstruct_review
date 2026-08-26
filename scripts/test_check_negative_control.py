@@ -472,7 +472,8 @@ with tempfile.TemporaryDirectory() as tmp:
     rec = data / "negative_control_round12_echo.json"
     (root / "ref/research/negative_control_round12_preregistration.md").write_text("# p\n")
     good_run = {"round": 12, "preregistration":
-                "negative_control_round12_preregistration.md", "tools": {}}
+                "negative_control_round12_preregistration.md",
+                "tools": {"gemmi": "0.7.5"}}
     rec.write_text(json.dumps({"run": good_run, "l1": {}}))
     code, out = run_guard(root)
     check("#434: orphan-family record without a round doc fails",
@@ -494,6 +495,15 @@ with tempfile.TemporaryDirectory() as tmp:
     check("#443: an empty run block fails on round, prereg and tools",
           code == 1 and "run.round" in out and "run.preregistration" in out
           and "run.tools" in out, True)
+    rec.write_text(json.dumps({"run": dict(good_run, tools={}), "l1": {}}))
+    code, out = run_guard(root)
+    check("#451: empty run.tools fails", code == 1 and "run.tools" in out, True)
+    (root / "escape.md").write_text("x")
+    rec.write_text(json.dumps({"run": dict(good_run, preregistration="../../escape.md"),
+                               "l1": {}}))
+    code, out = run_guard(root)
+    check("#450: a ../ preregistration path fails",
+          code == 1 and "run.preregistration" in out, True)
     rec.write_text(json.dumps({"run": dict(good_run, round=11), "l1": {}}))
     code, out = run_guard(root)
     check("#443: run.round disagreeing with the filename fails",
@@ -599,5 +609,8 @@ with tempfile.TemporaryDirectory() as tmp:
     code, out = run_guard(root)
     check("#442/#447: a tree carrying bench_recover_leg.py enforces §6 and names the exception type",
           code == 1 and "ImportError" in out, True)
+code, out = run_guard(REPO)
+check("#452: the real checkout passes the guard end-to-end with §6 enforced",
+      code == 0 and "cannot be checked" not in out, True)
 
 print(f"\n{PASSED} checks passed")
