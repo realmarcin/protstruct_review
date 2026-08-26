@@ -573,6 +573,133 @@ def check_round_doc(md: Path, screen: dict, failures: list[str]) -> None:
                  f"record and prose have drifted (#311 class)", failures)
 
 
+KNOWN_FAMILIES = {"screen", "enrolled", "reps", "bench", "recover"}
+RECORD_RE = re.compile(r"negative_control_round(\d+)_([a-z0-9]+)\.json")
+
+
+def check_orphan_family(path: Path, research: Path, failures: list[str]) -> None:
+    """#434: record families the per-family checks above do not open
+    (hygiene, attribution, closeout, anis, echo, and any future one) must
+    still parse, carry a run manifest, and be cited by filename from their
+    round doc. Passing 3b must mean every committed record was looked at."""
+    match = RECORD_RE.match(path.name)
+    if not match or match.group(2) in KNOWN_FAMILIES:
+        return
+    rec = json.loads(path.read_text())
+    run = rec.get("run") if isinstance(rec, dict) else None
+    if not isinstance(run, dict):
+        fail(f"{path.name}: no run manifest block", failures)
+    else:
+        if run.get("round") != int(match.group(1)):
+            fail(f"{path.name}: run.round {run.get('round')!r} does not "
+                 f"match the filename", failures)
+        prereg = run.get("preregistration")
+        target = (research / prereg).resolve() if isinstance(prereg, str) else None
+        if (target is None or not target.is_file()
+                or research.resolve() not in target.parents):
+            fail(f"{path.name}: run.preregistration {prereg!r} is not a "
+                 f"committed document", failures)
+        if not isinstance(run.get("tools"), dict) or not run["tools"]:
+            fail(f"{path.name}: run.tools missing or empty", failures)
+        if "run_mode" in run and run["run_mode"] != "full":
+            fail(f"{path.name}: committed record carries a "
+                 f"{run['run_mode']!r} run manifest — full runs only (#319)",
+                 failures)
+    doc = research / f"negative_control_round{match.group(1)}.md"
+    if not doc.exists():
+        fail(f"{path.name}: no round doc {doc.name}", failures)
+    elif path.name not in doc.read_text():
+        fail(f"{path.name}: not cited by filename in {doc.name}", failures)
+
+
+REGISTRY_ROWS = {
+    # row label fragment -> (constant name in bench_recover_leg)
+    "ISOT convention": "REGISTERED_FIT_THRESHOLDS",
+    "ANIS convention": "REGISTERED_FIT_THRESHOLDS_ANIS",
+}
+TRIPLE_RE = re.compile(r"d_phenix \*\*([\d.]+)\*\*, d_gemmi \*\*([\d.]+)\*\*"
+                       r"(?: \([^)]*\))?, d_refmac \*\*([\d.]+)\*\*")
+
+
+def registry_section(text: str) -> str | None:
+    match = re.search(r"^## 6\. Negative-control verdict rules.*?(?=^## |\Z)",
+                      text, re.S | re.M)
+    return match.group(0) if match else None
+
+
+def check_registry_section(text: str, constants: dict, failures: list[str],
+                           label: str = "thresholds_and_standards.md") -> None:
+    """#433: the registry's section 6 restates bench_recover_leg's registered
+    constants — the doc is checked against the machine-readable source, not
+    the other way round (#293: one source, no new per-figure parser)."""
+    sec = registry_section(text)
+    if sec is None:
+        fail(f"{label}: no '## 6. Negative-control verdict rules' section",
+             failures)
+        return
+    for fragment, const in REGISTRY_ROWS.items():
+        rows = [line for line in sec.splitlines()
+                if line.startswith("| FIT thresholds") and fragment in line]
+        if len(rows) != 1:
+            fail(f"{label}: expected one FIT-thresholds row for {fragment}, "
+                 f"found {len(rows)}", failures)
+            continue
+        m = TRIPLE_RE.search(rows[0])
+        if not m:
+            fail(f"{label}: {fragment} row has no bold d_phenix/d_gemmi/"
+                 f"d_refmac triple", failures)
+            continue
+        got = {"d_phenix": float(m.group(1)), "d_gemmi": float(m.group(2)),
+               "d_refmac": float(m.group(3))}
+        if got != constants[const]:
+            fail(f"{label}: {fragment} row states {got}, {const} is "
+                 f"{constants[const]}", failures)
+    m = re.search(r"Set: \*\*\{([^}]*)\}\*\*", sec)
+    if not m:
+        fail(f"{label}: stand-down row has no bold set", failures)
+    else:
+        got = {s.strip() for s in m.group(1).split(",") if s.strip()}
+        want = set(constants["CANDIDATE_LEG_THIRD_OPINION_STANDDOWN"])
+        if got != want:
+            fail(f"{label}: stand-down set {sorted(got)} != registered "
+                 f"{sorted(want)}", failures)
+    m = re.search(r"S_r2 = [^|]*?\*\*([\d.]+) / ([\d.]+)\*\*", sec)
+    if not m:
+        fail(f"{label}: F-data row has no bold S_r2 pair", failures)
+    elif ((float(m.group(1)), float(m.group(2)))
+          != (constants["S_R2"]["phenix"], constants["S_R2"]["gemmi"])):
+        fail(f"{label}: S_r2 {m.group(1)}/{m.group(2)} != record "
+             f"{constants['S_R2']}", failures)
+    if "above **2×** its threshold" not in sec:
+        fail(f"{label}: W4 row must state the 2× bound in bold", failures)
+    for phrase, key in ((r"MAD floored at \*\*([\d.]+)\*\*", "MAD_FLOOR"),
+                        (r"unmasked Cα shift > \*\*([\d.]+) Å\*\*", "SHIFT_BAND_A")):
+        m = re.search(phrase, sec)
+        if not m:
+            fail(f"{label}: no bold {key} figure", failures)
+        elif float(m.group(1)) != constants[key]:
+            fail(f"{label}: {key} stated {m.group(1)}, registered "
+                 f"{constants[key]}", failures)
+
+
+def registered_constants(scripts: Path) -> dict:
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "brl", scripts / "bench_recover_leg.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["brl"] = mod
+    spec.loader.exec_module(mod)
+    return {
+        "REGISTERED_FIT_THRESHOLDS": mod.fit_thresholds_from_record(),
+        "REGISTERED_FIT_THRESHOLDS_ANIS": mod.anis_thresholds_from_record(),
+        "CANDIDATE_LEG_THIRD_OPINION_STANDDOWN":
+            mod.CANDIDATE_LEG_THIRD_OPINION_STANDDOWN,
+        "S_R2": mod.s_r2_from_record(),
+        "MAD_FLOOR": mod.MAD_FLOOR,
+        "SHIFT_BAND_A": mod.SHIFT_BAND_A,
+    }
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--root", default=str(Path(__file__).resolve().parent.parent))
@@ -630,6 +757,30 @@ def main() -> int:
         if match and match.group(1) in recovers:
             guarded(check_recover_round_doc, md, recovers[match.group(1)],
                     failures)
+
+    for path in sorted(data.glob("negative_control_round*.json")):
+        guarded(check_orphan_family, path, research, failures)
+    # #433: the registry section restates the record-derived constants.
+    # Enforced whenever --root is this script's own checkout (the gate's
+    # path) or the tree carries bench_recover_leg.py; only synthetic
+    # guard-test trees are skipped — a moved script cannot fail open (#442).
+    own_repo = Path(__file__).resolve().parent.parent
+    brl = root / "scripts" / "bench_recover_leg.py"
+    registry = root / "ref" / "thresholds_and_standards.md"
+    if root.resolve() == own_repo or brl.exists():
+        if not brl.exists():
+            fail("scripts/bench_recover_leg.py missing — §6 cannot be checked",
+                 failures)
+        elif not registry.exists():
+            fail("ref/thresholds_and_standards.md missing", failures)
+        else:
+            try:
+                consts = registered_constants(root / "scripts")
+            except (SystemExit, Exception) as exc:  # noqa: BLE001
+                fail(f"bench_recover_leg constants do not re-derive "
+                     f"({type(exc).__name__}: {exc})", failures)
+            else:
+                check_registry_section(registry.read_text(), consts, failures)
 
     if failures:
         print(f"{len(failures)} negative-control record failure(s)")

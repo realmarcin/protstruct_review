@@ -48,7 +48,10 @@ Where this file and the handbook overlap, they must agree; if they drift, that i
     (T01–T17). Every numeric threshold is defined once in
     `ref/thresholds_and_standards.md` with a `[provenance]` tag naming its source; drivers cite it
     rather than restating values, and a new threshold without an admissible provenance is not
-    admissible.
+    admissible. **Negative-control clause:** the §6 verdict thresholds are re-derived from committed
+    round records by `scripts/bench_recover_leg.py`, so there the registry *restates* the
+    record-derived constants and validate 3b (`check_negative_control_records.py`) asserts the
+    restatement is exact — the record is the source, the registry the human-readable copy.
 
 ## QDS emitter (`scripts/qds_emit.py`)
 

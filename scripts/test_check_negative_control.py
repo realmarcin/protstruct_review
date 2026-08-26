@@ -463,4 +463,154 @@ with tempfile.TemporaryDirectory() as tmp:
     check("#419: prose drift names the protected headline",
           "osol_h success" in out and "#419" in out, True)
 
+# #434: record families the per-family checks never opened must still be
+# parsed, carry a run manifest, and be cited by filename from the round doc.
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    data = root / "ref/research/data"
+    data.mkdir(parents=True)
+    rec = data / "negative_control_round12_echo.json"
+    (root / "ref/research/negative_control_round12_preregistration.md").write_text("# p\n")
+    good_run = {"round": 12, "preregistration":
+                "negative_control_round12_preregistration.md",
+                "tools": {"gemmi": "0.7.5"}}
+    rec.write_text(json.dumps({"run": good_run, "l1": {}}))
+    code, out = run_guard(root)
+    check("#434: orphan-family record without a round doc fails",
+          code == 1 and "no round doc" in out, True)
+    doc = root / "ref/research/negative_control_round12.md"
+    doc.write_text("# round 12\n\nRecord: elsewhere.\n")
+    code, out = run_guard(root)
+    check("#434: uncited orphan-family record fails",
+          code == 1 and "not cited by filename" in out, True)
+    doc.write_text("# round 12\n\nRecord: `negative_control_round12_echo.json`.\n")
+    code, out = run_guard(root)
+    check("#434: cited orphan-family record with a run block passes", code, 0)
+    rec.write_text(json.dumps({"l1": {}}))
+    code, out = run_guard(root)
+    check("#434: orphan-family record without a run manifest fails",
+          code == 1 and "no run manifest" in out, True)
+    rec.write_text(json.dumps({"run": {}, "l1": {}}))
+    code, out = run_guard(root)
+    check("#443: an empty run block fails on round, prereg and tools",
+          code == 1 and "run.round" in out and "run.preregistration" in out
+          and "run.tools" in out, True)
+    rec.write_text(json.dumps({"run": dict(good_run, tools={}), "l1": {}}))
+    code, out = run_guard(root)
+    check("#451: empty run.tools fails", code == 1 and "run.tools" in out, True)
+    (root / "escape.md").write_text("x")
+    rec.write_text(json.dumps({"run": dict(good_run, preregistration="../../escape.md"),
+                               "l1": {}}))
+    code, out = run_guard(root)
+    check("#450: a ../ preregistration path fails",
+          code == 1 and "run.preregistration" in out, True)
+    rec.write_text(json.dumps({"run": dict(good_run, round=11), "l1": {}}))
+    code, out = run_guard(root)
+    check("#443: run.round disagreeing with the filename fails",
+          code == 1 and "does not match the filename" in out, True)
+    rec.write_text(json.dumps({"run": dict(good_run, run_mode="canary"),
+                               "l1": {}}))
+    code, out = run_guard(root)
+    check("#443: a canary run_mode in an orphan family fails (#319)",
+          code == 1 and "full runs only" in out, True)
+    rec.write_text("{not json")
+    code, out = run_guard(root)
+    check("#434: malformed orphan-family record is a named failure",
+          code == 1 and "negative_control_round12_echo.json" in out, True)
+
+# #433: the registry's section 6 must restate the record-derived constants.
+import importlib.util  # noqa: E402
+
+_spec = importlib.util.spec_from_file_location("cncr", GUARD)
+_g = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_g)
+CONSTS = {
+    "REGISTERED_FIT_THRESHOLDS": {"d_phenix": 0.012, "d_gemmi": 0.01025,
+                                  "d_refmac": 0.0056},
+    "REGISTERED_FIT_THRESHOLDS_ANIS": {"d_phenix": 0.012, "d_gemmi": 0.01025,
+                                       "d_refmac": 0.0115},
+    "CANDIDATE_LEG_THIRD_OPINION_STANDDOWN": {"2VXN"},
+    "S_R2": {"phenix": 0.00275, "gemmi": 0.0026},
+    "MAD_FLOOR": 0.0005,
+    "SHIFT_BAND_A": 0.12,
+}
+GOOD = """## 5. x
+
+| a |
+
+## 6. Negative-control verdict rules (x)
+
+| Rule | Registered form | Provenance |
+|---|---|---|
+| Family flags | **F-data**: ΔR-free > +3·S_r2 on **both** paths, S_r2 = round-2 scales **0.00275 / 0.00260**; **F-shift**: unmasked Cα shift > **0.12 Å** | p |
+| E1 | MAD floored at **0.0005** | p |
+| FIT thresholds — ISOT convention (history) | d_phenix **0.01200**, d_gemmi **0.01025**, d_refmac **0.00560** (retired 0.01220) | p |
+| FIT thresholds — ANIS convention (current) | d_phenix **0.01200**, d_gemmi **0.01025** (unchanged), d_refmac **0.01150** from x | p |
+| W4 | no residual above **2×** its threshold | p |
+| Stand-down | Set: **{2VXN}**; membership | p |
+
+## Adding a threshold
+"""
+
+
+import contextlib  # noqa: E402
+import io  # noqa: E402
+
+
+def registry_failures(text, consts=CONSTS):
+    fl = []
+    with contextlib.redirect_stdout(io.StringIO()):  # #448: quiet negatives
+        _g.check_registry_section(text, consts, fl)
+    return fl
+
+
+check("#433: a faithful section 6 passes", registry_failures(GOOD), [])
+check("#433: missing section 6 fails",
+      any("no '## 6." in f for f in registry_failures(GOOD.split("## 6.")[0])),
+      True)
+check("#433: a drifted ANIS d_refmac fails",
+      any("ANIS convention row states" in f
+          for f in registry_failures(GOOD.replace("**0.01150**", "**0.01100**"))),
+      True)
+check("#433: a drifted ISOT d_phenix fails",
+      any("ISOT convention row states" in f
+          for f in registry_failures(GOOD.replace("**0.01200**, d_gemmi **0.01025**, d_refmac **0.00560**",
+                                                  "**0.01220**, d_gemmi **0.01025**, d_refmac **0.00560**"))),
+      True)
+check("#433: a widened stand-down set fails",
+      any("stand-down set" in f
+          for f in registry_failures(GOOD.replace("{2VXN}", "{2VXN, 9YGW}"))),
+      True)
+check("#433: a drifted S_r2 fails",
+      any("S_r2" in f
+          for f in registry_failures(GOOD.replace("0.00260**", "0.00270**"))),
+      True)
+check("#433: a W4 row without the 2x bound fails",
+      any("W4" in f for f in registry_failures(GOOD.replace("**2×**", "twice"))),
+      True)
+check("#433: a drifted MAD floor fails",
+      any("MAD_FLOOR" in f
+          for f in registry_failures(GOOD.replace("**0.0005**", "**0.0010**"))),
+      True)
+REAL_CONSTS = _g.registered_constants(REPO / "scripts")
+REAL_TEXT = (REPO / "ref/thresholds_and_standards.md").read_text()
+check("#442: the real registry passes against the real record-derived constants",
+      registry_failures(REAL_TEXT, REAL_CONSTS), [])
+check("#442: real registry with ANIS d_refmac 0.01150→0.01100 fails by name",
+      any("ANIS convention row states" in f for f in registry_failures(
+          REAL_TEXT.replace("d_refmac **0.01150**", "d_refmac **0.01100**"),
+          REAL_CONSTS)), True)
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    (root / "ref/research/data").mkdir(parents=True)
+    (root / "scripts").mkdir()
+    (root / "scripts/bench_recover_leg.py").write_text("raise ImportError('x')\n")
+    (root / "ref/thresholds_and_standards.md").write_text("## 6. Negative-control verdict rules\n")
+    code, out = run_guard(root)
+    check("#442/#447: a tree carrying bench_recover_leg.py enforces §6 and names the exception type",
+          code == 1 and "ImportError" in out, True)
+code, out = run_guard(REPO)
+check("#452: the real checkout passes the guard end-to-end with §6 enforced",
+      code == 0 and "cannot be checked" not in out, True)
+
 print(f"\n{PASSED} checks passed")

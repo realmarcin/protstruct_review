@@ -77,6 +77,14 @@ CHECKS = [
         # calibration "within 0.10 A of the EMDB header" is a DIFFERENT quantity (§5).
         "retired": ["d_FSC_model_pre + 0.05 Å", "d_FSC_model_pre + **0.05"],
     },
+    {
+        "metric": "NC FIT threshold d_refmac, ANIS (§6)",
+        "current": "0.01150",
+        "registry": r"d_refmac \*\*([\d.]+)\*\* from the round-9 null",
+        "consumers": ["scripts/bench_recover_leg.py", "scripts/bench_round10.py",
+                      "scripts/bench_round11.py"],
+        "retired": ["0.01220", "0.01090", "0.00540"],
+    },
 ]
 
 
