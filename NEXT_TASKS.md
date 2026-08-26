@@ -3,17 +3,18 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-22** (through the negative-control track, rounds NC-0…NC-10
-including the ANIS adoption, the completed store remediation, and the NC-10 sandbox round, PRs #294–#415; the
+**Last reconciled: 2026-08-26** (through the negative-control track, rounds NC-0…NC-11
+including the ANIS adoption, the completed store remediation, the NC-10 sandbox round, the NC-11 echo
+attribution, and the stopping-criteria checklist, PRs #294–#427; the
 tolerance-series "Open" section below was last reconciled 2026-08-06 against rounds 37–42). **Check the issue tracker for open issues; this file does not mirror it in real
 time.** A GitHub Actions workflow configures the hermetic gate on Linux and macOS; [#410](https://github.com/realmarcin/protstruct_review/issues/410)
 tracks the current GitHub-side startup failure if those checks are absent. The matching local
 command is `uv run --locked -- bash scripts/validate.sh`, and it must exit 0 before a merge.
 External-tool and online benchmarks remain manual.
 
-## The negative-control track (2026-08-08 → 2026-08-21)
+## The negative-control track (2026-08-08 → 2026-08-22)
 
-A second benchmark series, planned from a deep-research run and executed in ten preregistered
+A second benchmark series, planned from a deep-research run and executed in eleven preregistered
 rounds: gold-standard sub-Å structures as **negative tests** for refinement. Full plan:
 `ref/research/negative_control_benchmark_plan.md`; tracking issue
 [#295](https://github.com/realmarcin/protstruct_review/issues/295); round docs
@@ -37,6 +38,14 @@ rounds: gold-standard sub-Å structures as **negative tests** for refinement. Fu
 
 Also landed alongside NC-8/9: the record-reconciliation guard now covers **bench and
 recover records** with verdicts recomputed from their own evidence (**#338 closed**, #381).
+
+| Round NC-11: **the 2VXN echo** | [#421](https://github.com/realmarcin/protstruct_review/pull/421)/[#423](https://github.com/realmarcin/protstruct_review/pull/423) (merged 2026-08-22) | **Z1/Z2 hold, Z3 falsified — and the falsification is the finding.** The candidate-leg pre-gap decomposes almost exactly (0.0328 = solvent 0.0410 − riding-H 0.0111 + 0.0029, sandboxed zero-cycle REFMAC), while posts agree within 0.0012. The post-agreement amendment **refused itself** by its registered L3 safety sweep (54/78 rule flips), so the else-branch stand-down is enacted: `CANDIDATE_LEG_THIRD_OPINION_STANDDOWN = {"2VXN"}` — 2VXN contributes no REFMAC third opinion on candidate legs; its rows are two-path and say so. |
+
+**NC-11 closeout and the registry:** the stopping/consolidation checklist promised by #292 landed as
+`ref/research/stopping_criteria.md` ([#427](https://github.com/realmarcin/protstruct_review/pull/427), merged 2026-08-26). Phase 5 of #295 — the promised
+registry treatment — is `ref/thresholds_and_standards.md` §6 (negative-control verdict rules, guarded
+against `bench_recover_leg`'s record-derived constants in validate 3b; #433), with 3b now opening every
+committed record family (#434) and this table reconciled (#435).
 
 **NC-10 closeout:** the first verdict-bearing ANIS round and #356's remaining sandbox half are
 complete. The mask-constrained D6 criterion from #321 landed before this round and remains bound to
