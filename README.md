@@ -74,10 +74,10 @@ and [`data/README.md`](data/README.md) before redistributing data fixtures. The 
 ship a PHENIX documentation mirror; `ref/download_phenix_docs.sh` creates an ignored, opt-in local
 cache after the user reviews the upstream terms. Retained deposited fixtures are source- and
 checksum-pinned in `data/pdb_mtz/fixture_provenance.yaml`, and the hermetic gate rejects inventory
-or checksum drift. Authoritative `CITATION.cff` metadata is tracked in
-[#402](https://github.com/realmarcin/protstruct_review/issues/402).
+or checksum drift. Citation metadata lives in [`CITATION.cff`](CITATION.cff) (#402, closed).
 
-The repository configures the hermetic gate in GitHub Actions on Linux and macOS. If those checks
-are absent, consult [#410](https://github.com/realmarcin/protstruct_review/issues/410), which tracks
-a GitHub-side startup failure reproduced by a minimal workflow. The locked local gate remains the
-required fallback evidence. PHENIX/CCP4 and online benchmarks remain deliberate, manual workflows.
+The repository configures the hermetic gate in GitHub Actions on Linux and macOS
+(`.github/workflows/validate.yml`), but as of 2026-08-26 those jobs do not execute: GitHub refuses to
+start them with an account-level billing lock ([#410](https://github.com/realmarcin/protstruct_review/issues/410)
+records the diagnosis and the verification recipe). Until #410 closes, the locked local gate is the
+**required** merge evidence, not a fallback. PHENIX/CCP4 and online benchmarks remain deliberate, manual workflows.
