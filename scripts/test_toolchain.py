@@ -219,10 +219,9 @@ for script in sorted(Path(__file__).parent.glob("*.py")):
         continue
     for node in ast.walk(ast.parse(script.read_text())):
         # argv literals are lists here; ("gemmi", fn) label tuples are not argv.
-        if (isinstance(node, (ast.List, ast.Tuple)) and node.elts
+        if (isinstance(node, ast.List) and node.elts
                 and isinstance(node.elts[0], ast.Constant)
-                and node.elts[0].value == "gemmi"
-                and isinstance(node, ast.List)):
+                and node.elts[0].value == "gemmi"):
             bare_gemmi.append(f"{script.name}:{node.lineno}")
         # shutil.which("gemmi") re-introduces a second resolver (#505).
         if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
