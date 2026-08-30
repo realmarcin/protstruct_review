@@ -1,0 +1,64 @@
+# Guard data for scripts/check_driver_thresholds.py (gate consolidation step b,
+# ref/research/gate_consolidation_inventory.md §3).
+#
+# This is NOT a second definition of any threshold: ref/thresholds_and_standards.md
+# stays the single source of truth (CODING_STANDARDS rule 10). Each entry here
+# tells the guard how to READ one governed value out of the registry prose
+# (`registry_pattern`, one capture group), which consumers must cite it rather
+# than restate it, and which retired literals may appear in those consumers only
+# on a line marked as history. Edit this file alongside the registry row.
+#
+# Keys per entry (all required): metric, section (registry "## N." heading number),
+# current (the value the pattern must yield today), registry_pattern, consumers,
+# retired. Metrics must be unique.
+governed:
+  - metric: "CA RMSD agreement (§3)"
+    section: 3
+    current: "0.03"
+    registry_pattern: '\| CA RMSD \| \\\|Δ\\\| ≤ \*\*([\d.]+) Å\*\*'
+    consumers:
+      - ref/driving_example.md
+      - ref/driving_example_T01.md
+      - scripts/bench_t01_superposition.py
+    retired: ["≤ 0.10 Å", "≤ **0.10 Å**", "≤0.10 Å"]
+
+  - metric: "ΔRMSD band, d_min >= 2.5 (§4)"
+    section: 4
+    current: "0.25"
+    registry_pattern: '`d_min ≥ 2\.5 Å`: \+ \*\*([\d.]+) Å\*\*'
+    consumers:
+      - ref/driving_example.md
+      - scripts/bench_refinement_deltas.py
+    retired: ["RMSD_pre + 0.05 Å", "RMSD_pre + **0.05"]
+
+  - metric: "CC_mask band, d_min < 3.0 (§4)"
+    section: 4
+    current: "0.04"
+    registry_pattern: '`d_min < 3\.0 Å`: CC_mask_post ≥ CC_mask_pre − \*\*([\d.]+)\*\*'
+    consumers:
+      - ref/driving_example.md
+      - ref/driving_example_T04.md
+      - scripts/bench_refinement_deltas_em.py
+    retired: ["CC_mask_pre − 0.01", "CC_mask_pre − **0.01**"]
+
+  - metric: "d_FSC_model band (§4)"
+    section: 4
+    current: "1.05"
+    registry_pattern: 'd_FSC_model_post ≤ d_FSC_model_pre × ([\d.]+)'
+    consumers:
+      - ref/driving_example.md
+      - ref/driving_example_T04.md
+      - scripts/bench_refinement_deltas_em.py
+    # the absolute +0.05 Å form is retired (the band is relative ×1.05); the
+    # calibration "within 0.10 Å of the EMDB header" is a DIFFERENT quantity (§5).
+    retired: ["d_FSC_model_pre + 0.05 Å", "d_FSC_model_pre + **0.05"]
+
+  - metric: "NC FIT threshold d_refmac, ANIS (§6)"
+    section: 6
+    current: "0.01150"
+    registry_pattern: 'd_refmac \*\*([\d.]+)\*\* from the round-9 null'
+    consumers:
+      - scripts/bench_recover_leg.py
+      - scripts/bench_round10.py
+      - scripts/bench_round11.py
+    retired: ["0.01220", "0.01090", "0.00540"]

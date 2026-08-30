@@ -51,13 +51,13 @@ def main() -> int:
 
     # registry_value extracts the current figure, and detects a changed one.
     check("registry_value extracts the current CA RMSD",
-          m.registry_value(m.CHECKS[0]["registry"], "| CA RMSD | \\|Δ\\| ≤ **0.03 Å**"),
+          m.registry_value(m.CHECKS_BY_METRIC["CA RMSD agreement (§3)"]["registry"], "| CA RMSD | \\|Δ\\| ≤ **0.03 Å**"),
           "0.03")
     check("registry_value sees a changed value",
-          m.registry_value(m.CHECKS[0]["registry"], "| CA RMSD | \\|Δ\\| ≤ **0.05 Å**"),
+          m.registry_value(m.CHECKS_BY_METRIC["CA RMSD agreement (§3)"]["registry"], "| CA RMSD | \\|Δ\\| ≤ **0.05 Å**"),
           "0.05")
     check("registry_value returns None on a reworded row",
-          m.registry_value(m.CHECKS[0]["registry"], "| CA RMSD | agreement is tight"),
+          m.registry_value(m.CHECKS_BY_METRIC["CA RMSD agreement (§3)"]["registry"], "| CA RMSD | agreement is tight"),
           None)
 
     # Every CHECKS metric must still be derivable from the LIVE registry, and match.
@@ -65,6 +65,37 @@ def main() -> int:
     for c in m.CHECKS:
         check(f"live registry still yields {c['metric']}",
               m.registry_value(c["registry"], registry), c["current"])
+
+    # Step (b): the table is data. Every consumer exists, every section is a
+    # real registry heading, and the loader refuses malformed tables by name.
+    for c in m.CHECKS:
+        check(f"consumer paths exist for {c['metric']}",
+              all((REPO / rel).exists() for rel in c["consumers"]), True)
+        check(f"section {c['section']} is a registry heading ({c['metric']})",
+              c["section"] in m.section_headings(registry), True)
+    check("sidecar has at least the five historical entries", len(m.CHECKS) >= 5, True)
+    check("keyed lookup covers every entry", set(m.CHECKS_BY_METRIC) == {c["metric"] for c in m.CHECKS}, True)
+    import tempfile
+    good = (REPO / "ref/thresholds_and_standards.yaml").read_text()
+    bad_tables = {
+        "missing key": good.replace("    section: 3\n", "", 1),
+        "duplicate metric": good.replace('metric: "ΔRMSD band, d_min >= 2.5 (§4)"', 'metric: "CA RMSD agreement (§3)"'),
+        "unquoted float current": good.replace('current: "0.03"', 'current: 0.03'),
+        "pattern without a capture group": good.replace("([\\d.]+) Å\\*\\*'", "[\\d.]+ Å\\*\\*'", 1),
+        "empty consumers": good.replace("    consumers:\n      - ref/driving_example.md\n      - ref/driving_example_T01.md\n      - scripts/bench_t01_superposition.py\n", "    consumers: []\n"),
+        "unknown key": good.replace("    section: 3\n", "    section: 3\n    note: x\n", 1),
+        "empty table": "governed: []\n",
+    }
+    for label, text in bad_tables.items():
+        assert text != good, label
+        with tempfile.NamedTemporaryFile("w", suffix=".yaml", delete=False) as fh:
+            fh.write(text)
+        try:
+            m.load_checks(Path(fh.name))
+            rejected = False
+        except ValueError:
+            rejected = True
+        check(f"loader rejects a table with {label}", rejected, True)
 
     print(f"\nall driver-threshold guard tests passed ({PASSED} checks)")
     return 0

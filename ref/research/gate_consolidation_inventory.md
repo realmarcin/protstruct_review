@@ -114,7 +114,12 @@ the registry's `[provenance]` column from it. It does not conflict with
 is guard data, not a second definition).
 Regression test: `test_driver_thresholds.py` on the YAML-loaded table, plus a check
 that every `**bold**` figure in a governed section has an entry (the missing-entry
-case #445 found by hand).
+case #445 found by hand). *(Amended at implementation: the sidecar landed as
+`ref/thresholds_and_standards.yaml` with a validating loader, keyed lookups, and a
+section-heading check; the bold-figure coverage check was NOT implemented — §3/§4/§6
+carry dozens of bold figures that are counts and statistics, not governed thresholds,
+so it would fail on every one of them. Coverage of new governed values stays a review
+obligation, as in #445.)*
 
 **(c) Extend the rendered round count to `lessons.md`.** `round_count_claim` already
 renders the expected phrase with `spell()` and fails closed outside 20–99; the only

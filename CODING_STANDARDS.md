@@ -52,6 +52,9 @@ Where this file and the handbook overlap, they must agree; if they drift, that i
     round records by `scripts/bench_recover_leg.py`, so there the registry *restates* the
     record-derived constants and validate 3b (`check_negative_control_records.py`) asserts the
     restatement is exact — the record is the source, the registry the human-readable copy.
+    The guard's own table of governed values (`ref/thresholds_and_standards.yaml`: read-pattern,
+    consumers, retired literals) is guard data, not a definition; a threshold's value still lives
+    only in the `.md` row the pattern reads.
 
 ## QDS emitter (`scripts/qds_emit.py`)
 

@@ -40,52 +40,69 @@ REGISTRY = REPO / "ref/thresholds_and_standards.md"
 HISTORY_MARKERS = ("pre-benchmark", "originally", "round-5", "round 5", "catalog's",
                    "was a ", "was the", "were the", "were round", "retired")
 
-# One entry per metric: the current value, a regex that finds it in the registry (to
-# prove the `current` literal is not itself stale), the consumers that quote it, and the
-# retired literals that must not appear as a live threshold.
-CHECKS = [
-    {
-        "metric": "CA RMSD agreement (§3)",
-        "current": "0.03",
-        "registry": r"\| CA RMSD \| \\\|Δ\\\| ≤ \*\*([\d.]+) Å\*\*",
-        "consumers": ["ref/driving_example.md", "ref/driving_example_T01.md",
-                      "scripts/bench_t01_superposition.py"],
-        "retired": ["≤ 0.10 Å", "≤ **0.10 Å**", "≤0.10 Å"],
-    },
-    {
-        "metric": "ΔRMSD band, d_min >= 2.5 (§4)",
-        "current": "0.25",
-        "registry": r"`d_min ≥ 2\.5 Å`: \+ \*\*([\d.]+) Å\*\*",
-        "consumers": ["ref/driving_example.md", "scripts/bench_refinement_deltas.py"],
-        "retired": ["RMSD_pre + 0.05 Å", "RMSD_pre + **0.05"],
-    },
-    {
-        "metric": "CC_mask band, d_min < 3.0 (§4)",
-        "current": "0.04",
-        "registry": r"`d_min < 3\.0 Å`: CC_mask_post ≥ CC_mask_pre − \*\*([\d.]+)\*\*",
-        "consumers": ["ref/driving_example.md", "ref/driving_example_T04.md",
-                      "scripts/bench_refinement_deltas_em.py"],
-        "retired": ["CC_mask_pre − 0.01", "CC_mask_pre − **0.01**"],
-    },
-    {
-        "metric": "d_FSC_model band (§4)",
-        "current": "1.05",
-        "registry": r"d_FSC_model_post ≤ d_FSC_model_pre × ([\d.]+)",
-        "consumers": ["ref/driving_example.md", "ref/driving_example_T04.md",
-                      "scripts/bench_refinement_deltas_em.py"],
-        # the absolute +0.05 A form is retired (the band is now relative ×1.05); the
-        # calibration "within 0.10 A of the EMDB header" is a DIFFERENT quantity (§5).
-        "retired": ["d_FSC_model_pre + 0.05 Å", "d_FSC_model_pre + **0.05"],
-    },
-    {
-        "metric": "NC FIT threshold d_refmac, ANIS (§6)",
-        "current": "0.01150",
-        "registry": r"d_refmac \*\*([\d.]+)\*\* from the round-9 null",
-        "consumers": ["scripts/bench_recover_leg.py", "scripts/bench_round10.py",
-                      "scripts/bench_round11.py"],
-        "retired": ["0.01220", "0.01090", "0.00540"],
-    },
-]
+SIDECAR = REPO / "ref/thresholds_and_standards.yaml"
+REQUIRED_KEYS = ("metric", "section", "current", "registry_pattern", "consumers",
+                 "retired")
+
+
+def load_checks(path: Path = SIDECAR) -> list[dict]:
+    """The governed-threshold table, from the YAML sidecar next to the registry
+    (gate consolidation step b). Validated on load: a malformed table is a
+    named failure, never a silently shorter one. Each entry is normalised to
+    the historical in-code shape (``registry`` = the pattern) so callers and
+    tests keep one vocabulary."""
+    import yaml
+    doc = yaml.safe_load(path.read_text())
+    if not isinstance(doc, dict) or not isinstance(doc.get("governed"), list) \
+            or not doc["governed"]:
+        raise ValueError(f"{path.name}: expected a non-empty 'governed' list")
+    out, seen = [], set()
+    for i, entry in enumerate(doc["governed"]):
+        where = f"{path.name}: governed[{i}]"
+        if not isinstance(entry, dict):
+            raise ValueError(f"{where}: not a mapping")
+        missing = [k for k in REQUIRED_KEYS if k not in entry]
+        if missing:
+            raise ValueError(f"{where}: missing {missing}")
+        unknown = sorted(set(entry) - set(REQUIRED_KEYS))
+        if unknown:
+            raise ValueError(f"{where}: unknown key(s) {unknown}")
+        if not isinstance(entry["metric"], str) or not entry["metric"].strip():
+            raise ValueError(f"{where}: metric must be a non-empty string")
+        if entry["metric"] in seen:
+            raise ValueError(f"{where}: duplicate metric {entry['metric']!r}")
+        seen.add(entry["metric"])
+        if type(entry["section"]) is not int or entry["section"] < 1:
+            raise ValueError(f"{where}: section must be a positive integer")
+        if not isinstance(entry["current"], str) or not entry["current"].strip():
+            raise ValueError(f"{where}: current must be a non-empty string "
+                             f"(quote it — YAML would otherwise turn 0.03 into a float)")
+        if not isinstance(entry["registry_pattern"], str):
+            raise ValueError(f"{where}: registry_pattern must be a string")
+        try:
+            groups = re.compile(entry["registry_pattern"]).groups
+        except re.error as exc:
+            raise ValueError(f"{where}: registry_pattern does not compile: {exc}")
+        if groups != 1:
+            raise ValueError(f"{where}: registry_pattern must have exactly one "
+                             f"capture group, has {groups}")
+        for key in ("consumers", "retired"):
+            if (not isinstance(entry[key], list) or not entry[key]
+                    or not all(isinstance(x, str) and x for x in entry[key])):
+                raise ValueError(f"{where}: {key} must be a non-empty list of strings")
+        out.append({"metric": entry["metric"], "section": entry["section"],
+                    "current": entry["current"], "registry": entry["registry_pattern"],
+                    "consumers": list(entry["consumers"]),
+                    "retired": list(entry["retired"])})
+    return out
+
+
+CHECKS = load_checks()
+CHECKS_BY_METRIC = {c["metric"]: c for c in CHECKS}
+
+
+def section_headings(registry_text: str) -> set[int]:
+    return {int(m.group(1)) for m in re.finditer(r"^## (\d+)\.", registry_text, re.M)}
 
 
 def registry_value(pattern: str, text: str) -> str | None:
@@ -108,7 +125,11 @@ def stale_hits(consumer_text: str, retired: list[str]) -> list[str]:
 def main() -> int:
     registry = REGISTRY.read_text()
     failures = []
+    headings = section_headings(registry)
     for c in CHECKS:
+        if c["section"] not in headings:
+            failures.append(f"{c['metric']}: sidecar names section {c['section']}, "
+                            f"which is not a '## N.' heading of the registry")
         derived = registry_value(c["registry"], registry)
         if derived is None:
             failures.append(f"{c['metric']}: cannot find its value in the registry — the "
@@ -134,7 +155,8 @@ def main() -> int:
         for f in failures:
             print(f"  - {f}", file=sys.stderr)
         return 1
-    print(f"\nall {len(CHECKS)} registry-governed thresholds are current in their consumers")
+    print(f"\nall {len(CHECKS)} registry-governed thresholds (ref/thresholds_and_standards.yaml) "
+          f"are current in their consumers")
     return 0
 
 
