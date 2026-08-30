@@ -22,7 +22,7 @@ import json
 import subprocess
 import sys
 
-REPO_OWNER, REPO_NAME = "realmarcin", "protstruct_review"
+REPO_OWNER, REPO_NAME = "CultureBotAI", "protstruct_review"
 
 QUERY = """
 { repository(owner: "%s", name: "%s") {

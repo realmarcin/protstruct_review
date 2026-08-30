@@ -76,8 +76,7 @@ cache after the user reviews the upstream terms. Retained deposited fixtures are
 checksum-pinned in `data/pdb_mtz/fixture_provenance.yaml`, and the hermetic gate rejects inventory
 or checksum drift. Citation metadata lives in [`CITATION.cff`](CITATION.cff) (#402, closed).
 
-The repository configures the hermetic gate in GitHub Actions on Linux and macOS
-(`.github/workflows/validate.yml`), but as of 2026-08-26 those jobs do not execute: GitHub refuses to
-start them with an account-level billing lock ([#410](https://github.com/realmarcin/protstruct_review/issues/410)
-records the diagnosis and the verification recipe). Until #410 closes, the locked local gate is the
-**required** merge evidence, not a fallback. PHENIX/CCP4 and online benchmarks remain deliberate, manual workflows.
+The hermetic gate runs in GitHub Actions on Linux and macOS (`.github/workflows/validate.yml`) on every
+pull request and push to `main`, executing the same `uv sync --locked && uv run --locked -- bash
+scripts/validate.sh` documented above. Both the green check and a local exit 0 are required before a
+merge. PHENIX/CCP4 and online benchmarks remain deliberate, manual workflows.

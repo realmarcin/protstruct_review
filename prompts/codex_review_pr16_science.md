@@ -1,6 +1,6 @@
 <task>
 Scientific-accuracy review of a MERGED pull request in the structural-biology evaluation harness at
-/Users/marcin/Documents/VIMSS/ontology/protstruct_review (GitHub repo realmarcin/protstruct_review).
+/Users/marcin/Documents/VIMSS/ontology/protstruct_review (GitHub repo CultureBotAI/protstruct_review).
 
 PR #16 ("domain-expert review of [template] tolerances") changed crystallographic pass/agreement
 criteria based on a literature review. Verify the SCIENCE, not the code. Read:

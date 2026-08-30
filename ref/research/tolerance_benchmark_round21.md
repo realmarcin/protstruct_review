@@ -148,7 +148,7 @@ regenerate the numbers the row quotes.
 ## Self-review findings, filed as issues
 
 Reviewing this PR's own diff found six defects
-([#93](https://github.com/realmarcin/protstruct_review/issues/93)–[#98](https://github.com/realmarcin/protstruct_review/issues/98)),
+([#93](https://github.com/CultureBotAI/protstruct_review/issues/93)–[#98](https://github.com/CultureBotAI/protstruct_review/issues/98)),
 all fixed here. The first two are the round's own headline claims:
 
 - **#93 (high)** — the measurement was framed as an **independent** one agreeing with the historical

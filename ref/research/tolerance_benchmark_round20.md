@@ -201,7 +201,7 @@ checkable or it is decoration.
 ## Self-review findings, filed as issues
 
 Reviewing this PR's own diff found four defects, all fixed here
-([#87](https://github.com/realmarcin/protstruct_review/issues/87)–[#90](https://github.com/realmarcin/protstruct_review/issues/90)):
+([#87](https://github.com/CultureBotAI/protstruct_review/issues/87)–[#90](https://github.com/CultureBotAI/protstruct_review/issues/90)):
 
 - **#88 (high)** — the determinism result was written as holding "across a PHENIX upgrade". There was
   no upgrade: `bench_refinement_deltas.py` has pinned `phenix-2.0-5936` since round 5 and the line has
@@ -215,7 +215,7 @@ Reviewing this PR's own diff found four defects, all fixed here
 - **#90 (low)** — the round table row was out of order, unlinked and misdated.
 
 A second pass, over the fix commits themselves, found a fifth
-([#91](https://github.com/realmarcin/protstruct_review/issues/91)): the low-end guard had been added to
+([#91](https://github.com/CultureBotAI/protstruct_review/issues/91)): the low-end guard had been added to
 the *body* of the clashscore clause while its **bolded lead still said `while clashscore_pre ≲ 20`** —
 the one-sided, pre-round-20 condition. In a row this long the lead is what gets read, so the defect
 this round exists to fix was still live in the place it would be met. Fixed by making the lead state

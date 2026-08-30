@@ -33,7 +33,7 @@ git fetch origin
 git branch --show-current
 git status --short
 git log origin/main..HEAD --oneline
-gh pr list --repo realmarcin/protstruct_review --state open --limit 5000 \
+gh pr list --repo CultureBotAI/protstruct_review --state open --limit 5000 \
   --json number,title,baseRefName,headRefName,mergeable,mergeStateStatus,url
 ```
 
@@ -45,7 +45,7 @@ is still open work.
 
 ```bash
 queue_file="${TMPDIR:-/tmp}/protstruct-review-open-issues.json"
-gh issue list --repo realmarcin/protstruct_review --state open --limit 5000 \
+gh issue list --repo CultureBotAI/protstruct_review --state open --limit 5000 \
   --json number,title,body,labels,comments,createdAt,updatedAt > "$queue_file"
 jq -r '.[] | [.number, .createdAt[:10], .title] | @tsv' "$queue_file"
 jq length "$queue_file"
@@ -84,9 +84,9 @@ superseded, blocked, or an umbrella.
 - Query exact linked PRs with:
 
   ```bash
-  gh issue view <N> --repo realmarcin/protstruct_review \
+  gh issue view <N> --repo CultureBotAI/protstruct_review \
     --json closedByPullRequestsReferences
-  gh pr view <PR> --repo realmarcin/protstruct_review --json mergedAt,state,url
+  gh pr view <PR> --repo CultureBotAI/protstruct_review --json mergedAt,state,url
   ```
 
   Do not infer linkage from a bare-number PR search.

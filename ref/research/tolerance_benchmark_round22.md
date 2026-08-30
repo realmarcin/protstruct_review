@@ -141,7 +141,7 @@ instead of resting on one entry. If it fails, 10BU stays what it is: real, repro
 ## Self-review findings, filed as issues
 
 Reviewing this PR's own diff found four defects
-([#100](https://github.com/realmarcin/protstruct_review/issues/100)–[#103](https://github.com/realmarcin/protstruct_review/issues/103)),
+([#100](https://github.com/CultureBotAI/protstruct_review/issues/100)–[#103](https://github.com/CultureBotAI/protstruct_review/issues/103)),
 all fixed here. The first is a repeat of a defect this series fixed five rounds ago.
 
 - **#101 (high)** — the published ρ/p figures were **not what the cited script outputs**. They were

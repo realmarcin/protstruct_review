@@ -1,6 +1,6 @@
 <task>
 Take a goal through the full change cycle in the structural-biology evaluation harness at
-/Users/marcin/Documents/VIMSS/ontology/protstruct_review (GitHub repo realmarcin/protstruct_review):
+/Users/marcin/Documents/VIMSS/ontology/protstruct_review (GitHub repo CultureBotAI/protstruct_review):
 
   survey → triage and prioritize → branch → work → push → PR → adversarial review
          → file issues → address → pause for approval → merge → clean up
