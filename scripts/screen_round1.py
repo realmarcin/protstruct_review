@@ -170,15 +170,23 @@ def verify_or_record_hash(path: Path) -> str | None:
 
 
 def tool_versions() -> dict:
-    """Tool identity for the run manifest (#320). The gemmi CLI resolves from
-    PATH by design (homebrew), so its resolved path is RECORDED rather than
-    pinned — reproducibility needs the identity, not a machine-specific
-    hardcode; PHENIX is already path-pinned."""
+    """Tool identity for the run manifest (#320). The gemmi CLI is OPTIONAL
+    (the locked wheel ships only the Python module): when PATH has one its
+    resolved path and version are RECORDED rather than pinned — reproducibility
+    needs the identity, not a machine-specific hardcode; PHENIX is already
+    path-pinned. Tri-state by construction: (path, version), (path, None) when
+    the CLI prints nothing, (None, None) when absent (#492). Callers must not
+    assume strings."""
     import shutil
     gemmi_cli = shutil.which("gemmi")
-    version_run = run_capture(["gemmi", "--version"])
-    version_text = (version_run.stdout or version_run.stderr).strip()
-    ver = version_text.splitlines()[0] if version_text else ""
+    ver = ""
+    if gemmi_cli is not None:
+        # The wheel ships the Python module only; the CLI is optional and its
+        # absence is RECORDED (None), never invoked — the hermetic gate runs
+        # on machines without it (#492).
+        version_run = run_capture([gemmi_cli, "--version"])
+        version_text = (version_run.stdout or version_run.stderr).strip()
+        ver = version_text.splitlines()[0] if version_text else ""
     import gemmi as gemmi_py
     return {"phenix_bin": str(PHENIX_BIN),
             "gemmi_cli": gemmi_cli, "gemmi_cli_version": ver or None,
