@@ -32,7 +32,7 @@ macOS toolchain; override them without editing runners:
 | `PROTSTRUCT_CCP4_SETUP` | CCP4 `ccp4.setup-sh` file |
 | `PROTSTRUCT_TMALIGN` | TM-align executable |
 | `PROTSTRUCT_DSSP` | `mkdssp` executable |
-| `PROTSTRUCT_GEMMI` | `gemmi` CLI executable (optional; the locked wheel provides only the Python module) |
+| `PROTSTRUCT_GEMMI` | `gemmi` CLI executable (optional; the locked wheel provides only the Python module). Like the other overrides, a value that does not resolve falls back to PATH — check `benchmark_environment`'s `configured_path` vs `discovered_executable` |
 | `PROTSTRUCT_PROBE` | Richardson-lab `probe` executable |
 | `PROTSTRUCT_REDUCE` | Richardson-lab `reduce` executable |
 

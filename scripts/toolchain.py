@@ -140,11 +140,13 @@ def gemmi_executable(required: bool = True) -> Path | None:
     (#496). ``required=False`` returns None when absent; otherwise the failure is
     named, never a bare FileNotFoundError from subprocess."""
     executable = _discover_executable(GEMMI, ("gemmi",))
-    if executable is None and required:
-        raise FileNotFoundError(
-            "gemmi CLI not found on PATH; install it or set PROTSTRUCT_GEMMI"
-        )
-    return executable
+    if executable is None:
+        if required:
+            raise FileNotFoundError(
+                "gemmi CLI not found on PATH; install it or set PROTSTRUCT_GEMMI"
+            )
+        return None
+    return executable.resolve()
 
 
 def _version_output(executable: Path, arguments: tuple[str, ...]) -> str | None:

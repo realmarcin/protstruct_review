@@ -219,10 +219,17 @@ for script in sorted(Path(__file__).parent.glob("*.py")):
         continue
     for node in ast.walk(ast.parse(script.read_text())):
         # argv literals are lists here; ("gemmi", fn) label tuples are not argv.
-        if (isinstance(node, ast.List) and node.elts
+        if (isinstance(node, (ast.List, ast.Tuple)) and node.elts
                 and isinstance(node.elts[0], ast.Constant)
-                and node.elts[0].value == "gemmi"):
+                and node.elts[0].value == "gemmi"
+                and isinstance(node, ast.List)):
             bare_gemmi.append(f"{script.name}:{node.lineno}")
+        # shutil.which("gemmi") re-introduces a second resolver (#505).
+        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                and node.func.attr == "which" and node.args
+                and isinstance(node.args[0], ast.Constant)
+                and node.args[0].value == "gemmi"):
+            bare_gemmi.append(f"{script.name}:{node.lineno} (shutil.which)")
 check("no script invokes a bare 'gemmi' argv (#496)", not bare_gemmi)
 
 with tempfile.TemporaryDirectory(prefix="gemmi resolver ") as tmp:
@@ -235,11 +242,17 @@ with tempfile.TemporaryDirectory(prefix="gemmi resolver ") as tmp:
     try:
         toolchain.GEMMI = fake
         check("PROTSTRUCT_GEMMI absolute path is honoured",
-              toolchain.gemmi_executable() == fake)
+              toolchain.gemmi_executable() == fake.resolve())
         toolchain.GEMMI = Path("gemmi")
         os.environ["PATH"] = str(root)
         check("bare default resolves the PATH binary to an absolute path",
-              toolchain.gemmi_executable() == fake)
+              toolchain.gemmi_executable() == fake.resolve())
+        rel = Path(os.path.relpath(fake))
+        toolchain.GEMMI = rel
+        check("a relative PROTSTRUCT_GEMMI resolves to an absolute path (#503)",
+              toolchain.gemmi_executable().is_absolute()
+              and toolchain.gemmi_executable() == fake.resolve())
+        toolchain.GEMMI = Path("gemmi")
         os.environ["PATH"] = ""
         check("absent CLI: required=False returns None",
               toolchain.gemmi_executable(required=False) is None)
