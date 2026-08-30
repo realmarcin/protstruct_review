@@ -15,8 +15,13 @@ the guard. This module makes the headline the *record's* business:
   rule — the value must sit within a bounded window of its keyword — instead
   of one function per family;
 * records that predate the block are rendered on the fly by the per-family
-  renderers below, which reproduce the legacy checks exactly, so committed
-  rounds are neither rewritten nor re-judged.
+  renderers below, which reproduce the legacy checks (as strict or stricter
+  on every case measured in review; `present`/`phrase` stay case-sensitive),
+  so committed rounds are neither rewritten nor re-judged;
+* a block that IS present must still cover every (label, value) the renderer
+  derives from the record's own rows and summary (`covers`) — a driver may
+  add headlines, never drop or alter the implied ones, and an empty block is
+  therefore a failure, not an opt-out.
 
 Three matching modes cover everything the legacy checks did:
 
@@ -43,10 +48,19 @@ MODES = ("near", "present", "phrase")
 
 def headline(label: str, value, keyword: str | None = None, *,
              mode: str = "near", order: str = "any",
-             window: int = DEFAULT_WINDOW, between: str = "nodigit") -> dict:
-    return {"label": label, "value": str(value), "keyword": keyword,
-            "mode": mode, "order": order, "window": int(window),
-            "between": between}
+             window: int = DEFAULT_WINDOW, between: str = "nodigit",
+             min_gap: int = 0, then: str | None = None,
+             then_window: int = DEFAULT_WINDOW, then_between: str = "line") -> dict:
+    """``then`` is an optional second keyword that must FOLLOW the value
+    (conjunction: keyword … value … then), so a legacy check like
+    ``all … 44 … log`` stays one entry, not two independent halves."""
+    out = {"label": label, "value": str(value), "keyword": keyword,
+           "mode": mode, "order": order, "window": int(window),
+           "between": between, "min_gap": int(min_gap)}
+    if then is not None:
+        out.update({"then": then, "then_window": int(then_window),
+                    "then_between": then_between})
+    return out
 
 
 def validate(entry) -> str | None:
@@ -55,10 +69,14 @@ def validate(entry) -> str | None:
     if not isinstance(entry, dict):
         return "not an object"
     for key in ("label", "value", "mode"):
-        if not isinstance(entry.get(key), str) or not entry[key]:
+        if not isinstance(entry.get(key), str):
+            return f"{key!r} must be a string"
+        if not entry[key].strip():
             return f"missing or empty {key!r}"
     if entry["mode"] not in MODES:
         return f"unknown mode {entry['mode']!r}"
+    if entry["mode"] == "phrase" and not entry["value"].split():
+        return "phrase with no words"
     if entry["mode"] == "near":
         if not isinstance(entry.get("keyword"), str) or not entry["keyword"]:
             return "near-mode headline without a keyword"
@@ -67,8 +85,19 @@ def validate(entry) -> str | None:
         if entry.get("between", "nodigit") not in BETWEEN:
             return f"unknown between {entry.get('between')!r}"
         window = entry.get("window", DEFAULT_WINDOW)
-        if not isinstance(window, int) or window < 0 or window > 200:
+        if type(window) is not int or window < 0 or window > 200:
             return f"window {window!r} out of range 0..200"
+        min_gap = entry.get("min_gap", 0)
+        if type(min_gap) is not int or min_gap < 0 or min_gap > window:
+            return f"min_gap {min_gap!r} out of range 0..window"
+        if "then" in entry:
+            if not isinstance(entry["then"], str) or not entry["then"].strip():
+                return "empty 'then' keyword"
+            tw = entry.get("then_window", DEFAULT_WINDOW)
+            if type(tw) is not int or tw < 0 or tw > 200:
+                return f"then_window {tw!r} out of range 0..200"
+            if entry.get("then_between", "line") not in BETWEEN:
+                return f"unknown then_between {entry.get('then_between')!r}"
     return None
 
 
@@ -81,14 +110,31 @@ def pattern(entry: dict) -> str:
         return r"\s+".join(re.escape(w) for w in entry["value"].split())
     gap = BETWEEN[entry.get("between", "nodigit")]
     window = entry.get("window", DEFAULT_WINDOW)
+    lo = entry.get("min_gap", 0)
     keyword = re.escape(entry["keyword"])
-    # A value must not be a substring of a larger number ("2/2" in "12/2").
-    val = rf"\*{{0,2}}(?<![\d.])(?:{value})(?![\d])"
-    kf = rf"{keyword}{gap}{{0,{window}}}{val}"
-    vf = rf"{val}{gap}{{0,{window}}}{keyword}"
+    # A value must not be a fragment of a larger token ("2/2" in "12/2",
+    # "71" in "x71"); ** emphasis may wrap it.
+    val = rf"(?<![\w.])\*{{0,2}}(?:{value})(?!\w)"
+    kf = rf"{keyword}{gap}{{{lo},{window}}}{val}"
+    vf = rf"{val}{gap}{{{lo},{window}}}{keyword}"
+    if "then" in entry:
+        tgap = BETWEEN[entry.get("then_between", "line")]
+        tail = rf"{tgap}{{0,{entry.get('then_window', DEFAULT_WINDOW)}}}" \
+               rf"{re.escape(entry['then'])}"
+        kf, vf = kf + tail, vf + tail
     order = entry.get("order", "any")
     return kf if order == "keyword_first" else vf if order == "value_first" \
         else f"(?:{kf})|(?:{vf})"
+
+
+def covers(block: list, rendered: list) -> list[str]:
+    """Reasons a driver-written block fails to carry every rendered
+    (label, value) pair — a block may add headlines, never drop or alter the
+    ones the record's own rows and summary imply (#512, #513)."""
+    have = {(e.get("label"), e.get("value")) for e in block if isinstance(e, dict)}
+    return [f"{e['label']} headline ({e['value']!r}) implied by the record is "
+            f"not in the headlines block" for e in rendered
+            if (e["label"], e["value"]) not in have]
 
 
 def missing(text: str, headlines: list) -> list[str]:
@@ -99,7 +145,8 @@ def missing(text: str, headlines: list) -> list[str]:
         if why:
             out.append(f"malformed headline {entry!r}: {why}")
             continue
-        if not re.search(pattern(entry), text, re.IGNORECASE):
+        flags = re.IGNORECASE if entry["mode"] == "near" else 0
+        if not re.search(pattern(entry), text, flags):
             near = (f" near {entry['keyword']!r}"
                     if entry["mode"] == "near" else "")
             out.append(f"{entry['label']} headline ({entry['value']!r}{near}) "
@@ -138,7 +185,7 @@ def recover_headlines(summary: dict) -> list:
     sandbox = summary.get("sandbox_verification") or {}
     perturb = summary.get("perturbation_reproduction") or {}
     kf = dict(order="keyword_first", window=80, between="nodigit")
-    vf = dict(order="value_first", window=1, between="line")
+    vf = dict(order="value_first", window=1, min_gap=1, between="line")
     out = [
         headline("osol_h success",
                  f"{subject.get('successes')}/{subject.get('attempted')}",
@@ -156,9 +203,8 @@ def recover_headlines(summary: dict) -> list:
                  f"{hydrogen.get('retained_equal')}/{hydrogen.get('models')}",
                  "retained", **kf),
         headline("ANIS log count", anis.get("logs_with_anis"), "all",
-                 order="keyword_first", window=20, between="nodigit"),
-        headline("ANIS log count", anis.get("logs_with_anis"), "log",
-                 order="value_first", window=30, between="line"),
+                 order="keyword_first", window=20, between="nodigit",
+                 then="log", then_window=30, then_between="line"),
         headline("sandbox count", sandbox.get("distinct_sandboxes"),
                  "distinct sandbox", **vf),
         headline("PGID count", sandbox.get("distinct_pgids"),

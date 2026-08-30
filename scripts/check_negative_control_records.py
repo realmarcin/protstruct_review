@@ -489,12 +489,19 @@ def _record_headlines(record: dict, render, tag: str, name: str,
     """The record's own top-level ``headlines`` block when it carries one
     (driver-rendered, #293a); otherwise the legacy family renderer. A block
     that is present but not a list is a named failure."""
+    rendered = render()
     block = record.get("headlines")
     if block is None:
-        return render()
+        return rendered
     if not isinstance(block, list):
         fail(f"{name}: headlines block is not a list ({tag})", failures)
         return None
+    if rendered and not block:
+        fail(f"{name}: headlines block is empty while the record implies "
+             f"{len(rendered)} headline(s) ({tag})", failures)
+        return None
+    for reason in _nch.covers(block, rendered):
+        fail(f"{name}: {reason} ({tag})", failures)
     return block
 
 

@@ -548,9 +548,10 @@ def main() -> int:
             else row.get("reason", "")
         )
         print(f"  -> {row['status']}: {tag}", file=sys.stderr)
+        summary = summarize(rows)
         _scr.write_json_atomic(
-            out_path, {"run": manifest, "rows": rows, "summary": summarize(rows),
-                       "headlines": _nch.recover_headlines(summarize(rows))}
+            out_path, {"run": manifest, "rows": rows, "summary": summary,
+                       "headlines": _nch.recover_headlines(summary)}
         )
 
     if args.jobs == 1:
