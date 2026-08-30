@@ -32,6 +32,7 @@ def check(label, got, want) -> None:
 
 def main() -> int:
     m = load("check_driver_thresholds")
+    check("sidecar loaded without error (#531)", m._LOAD_ERROR, None)
 
     # A retired value stated on a live (non-history) line is a defect.
     check("retired value on a live line is flagged",
@@ -112,7 +113,8 @@ def main() -> int:
     for c in m.CHECKS:
         hit = m.re.search(c["registry"], registry)
         check(f"{c['metric']} is read from inside section {c['section']}",
-              spans[c["section"]][0] <= hit.start() < spans[c["section"]][1], True)
+              hit is not None
+              and spans[c["section"]][0] <= hit.start() < spans[c["section"]][1], True)
 
     print(f"\nall driver-threshold guard tests passed ({PASSED} checks)")
     return 0
