@@ -265,19 +265,27 @@ def round_count_claim(tasks: str, rounds: list[str],
     # crossed 40. Deriving it from the same table spell() uses keeps them in step
     # (round-40 PR #265; #244 is the sibling MISSING-on-correct-prose defect in
     # check_round_figures --refresh).
-    found = re.search(rf"({'|'.join(_TENS.values())})(-\w+)? rounds of", prose(tasks))
+    # EVERY occurrence, case-insensitively: NEXT_TASKS states the count twice
+    # ("Forty-eight rounds of benchmarking…" and "forty-eight rounds of rules"), and
+    # a check that read only the first lowercase one let a capitalised stale claim
+    # through (#533).
+    found = [m.group(0) for m in re.finditer(
+        rf"({'|'.join(_TENS.values())})(-\w+)? rounds of", prose(tasks), re.IGNORECASE)]
     if not found:
         return {"check": check, "status": "MISSING",
                 "detail": f"no spelled-out round count found; expected {expected!r}"}
-    if found.group(0) != expected:
+    stale = [f for f in found if f.lower() != expected]
+    if stale:
         return {"check": check, "status": "STALE",
                 # `rounds[-1]`, not len(rounds): the claim counts ROUNDS RUN, and rounds
                 # 1-5 and 9 have no separate trail file, so the file count is 20 while
                 # the highest round is 26. Reporting len() here said "there are 20
                 # rounds, so it should say twenty-six", which is incoherent.
-                "detail": f"the file says {found.group(0)!r}; the highest round on disk "
-                          f"is {rounds[-1]}, so it should say {expected!r}"}
-    return {"check": check, "status": "OK", "detail": expected}
+                "detail": f"the file says {stale[0]!r}; the highest round on disk "
+                          f"is {rounds[-1]}, so it should say {expected!r}"
+                          + (f" ({len(found)} occurrences checked)" if len(found) > 1 else "")}
+    return {"check": check, "status": "OK",
+            "detail": expected + (f" ({len(found)} occurrences)" if len(found) > 1 else "")}
 
 
 def run(repo: Path) -> list[dict[str, Any]]:
@@ -300,7 +308,7 @@ def main() -> int:
     results = run(Path(args.repo))
     bad = [r for r in results if r["status"] != "OK"]
     for r in results:
-        print(f"  {r['status']:<8} {r['check']:<26} {r['detail']}",
+        print(f"  {r['status']:<8} {r['check']:<40} {r['detail']}",
               file=sys.stderr if r["status"] != "OK" else sys.stdout)
     if bad:
         print(f"\n{len(bad)} summary-file claim(s) do not match the record.", file=sys.stderr)

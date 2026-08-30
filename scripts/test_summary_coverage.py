@@ -160,6 +160,15 @@ check("a stale lessons.md title is caught (#467 class)",
 check("a lessons.md title without the count goes MISSING",
       cov.round_count_claim(LESSONS.replace(CURRENT, "many rounds of", 1), ROUNDS,
                             cov.LESSONS)["status"], "MISSING")
+# #533: every occurrence is checked, case-insensitively.
+_CAP = CURRENT[0].upper() + CURRENT[1:]
+check("a capitalised occurrence is read", _CAP in cov.prose(TASKS), True)
+check("a stale capitalised occurrence is STALE (#533)",
+      cov.round_count_claim(TASKS.replace(_CAP, STALE_PHRASE.capitalize(), 1),
+                            ROUNDS)["status"], "STALE")
+check("a stale LATER occurrence is STALE",
+      cov.round_count_claim(TASKS + f"\n\nAlso {STALE_PHRASE} work.\n",
+                            ROUNDS)["status"], "STALE")
 check("run() reports both files' round counts",
       sorted(r["check"] for r in cov.run(REPO) if r["check"].startswith("round count")),
       sorted([f"round count ({cov.NEXT_TASKS})", f"round count ({cov.LESSONS})"]))
