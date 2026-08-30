@@ -33,7 +33,7 @@ for r in d['tool_recommendations']:
 
 | Oracle | Version | Path | Catalog tasks served |
 |---|---|---|---|
-| **gemmi** | 0.7.5 | `/opt/homebrew/bin/gemmi` (brew tap `brewsci/bio`) | T01 (`gemmi align`), T06 (`gemmi sfcalc`), T14 (`gemmi h`), T05 (**`gemmi rmsz`** — there is no `gemmi validate` subcommand) |
+| **gemmi** | 0.7.5 | PATH or `PROTSTRUCT_GEMMI` (locally `/opt/homebrew/bin/gemmi`, brew tap `brewsci/bio`); resolved once by `toolchain.gemmi_executable()` | T01 (`gemmi align`), T06 (`gemmi sfcalc`), T14 (`gemmi h`), T05 (**`gemmi rmsz`** — there is no `gemmi validate` subcommand) |
 | **TM-align** | 20220412 | `$HOME/tools/tmalign/TMalign` | T01 (TM-score, sequence-independent superposition) |
 | **probe** (Richardson lab) | 2.26.021123 | `$HOME/tools/probe-src/probe` | T05 (clash detection — feeds clashscore) |
 | **reduce** (Richardson lab) | 4.16.250520 | `$HOME/tools/reduce-src/build/reduce_src/reduce` | T14 (H-atom placement); T05 (input prep for clashscore) |
@@ -65,7 +65,7 @@ For **T13** the practical layering is: **aimless** is the canonical recommendati
 
 All benchmark runners consume the shared configuration in `scripts/toolchain.py`. The defaults below
 match the pinned macOS installation; on another machine set `PROTSTRUCT_PHENIX_BIN`,
-`PROTSTRUCT_CCP4_SETUP`, `PROTSTRUCT_TMALIGN`, `PROTSTRUCT_DSSP`, `PROTSTRUCT_PROBE`, or
+`PROTSTRUCT_CCP4_SETUP`, `PROTSTRUCT_TMALIGN`, `PROTSTRUCT_DSSP`, `PROTSTRUCT_GEMMI`, `PROTSTRUCT_PROBE`, or
 `PROTSTRUCT_REDUCE`. Do not edit individual runners. Each benchmark emits expected versions,
 resolved paths, measured version output, separately labeled configured-path hints, and a
 `version_divergence` flag before measurements begin. An override that does not match the registered
