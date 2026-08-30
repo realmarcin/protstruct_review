@@ -317,4 +317,13 @@ check("#492: absent gemmi CLI is recorded, not invoked",
       (tv["gemmi_cli"], tv["gemmi_cli_version"]), (None, None))
 check("#492: gemmi python version still recorded", bool(tv["gemmi_python"]), True)
 
+import subprocess as _sp  # noqa: E402
+
+with _mock.patch("shutil.which", return_value="/x/bin/gemmi"), \
+        _mock.patch.object(scr, "run_capture",
+                           return_value=_sp.CompletedProcess(["gemmi"], 0, "", "")):
+    tv = scr.tool_versions()
+check("#497: a present but silent CLI records (path, None)",
+      (tv["gemmi_cli"], tv["gemmi_cli_version"]), ("/x/bin/gemmi", None))
+
 print(f"\n{PASSED} checks passed")
