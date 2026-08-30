@@ -3,7 +3,7 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-26** (through the negative-control track, rounds NC-0…NC-11
+**Last reconciled: 2026-08-29** (through the negative-control track, rounds NC-0…NC-11
 including the ANIS adoption, the completed store remediation, the NC-10 sandbox round, the NC-11 echo
 attribution, and the stopping-criteria checklist, PRs #294–#427; the
 tolerance-series "Open" section below was last reconciled 2026-08-06 against rounds 37–42). **Check the issue tracker for open issues; this file does not mirror it in real
