@@ -147,6 +147,23 @@ check("a removed round count goes MISSING",
       cov.round_count_claim(TASKS.replace(CURRENT, "many rounds of"),
                             ROUNDS)["status"], "MISSING")
 
+# Gate consolidation step (c): the same rendered comparison on lessons.md, whose
+# title said "thirty rounds" at round 48 (#467) while NEXT_TASKS was guarded.
+check("lessons.md states the current round count", CURRENT in cov.prose(LESSONS), True)
+check("lessons.md round count matches",
+      cov.round_count_claim(LESSONS, ROUNDS, cov.LESSONS)["status"], "OK")
+check("the lessons.md check is labelled by file",
+      cov.round_count_claim(LESSONS, ROUNDS, cov.LESSONS)["check"], f"round count ({cov.LESSONS})")
+check("a stale lessons.md title is caught (#467 class)",
+      cov.round_count_claim(LESSONS.replace(CURRENT, STALE_PHRASE, 1), ROUNDS,
+                            cov.LESSONS)["status"], "STALE")
+check("a lessons.md title without the count goes MISSING",
+      cov.round_count_claim(LESSONS.replace(CURRENT, "many rounds of", 1), ROUNDS,
+                            cov.LESSONS)["status"], "MISSING")
+check("run() reports both files' round counts",
+      sorted(r["check"] for r in cov.run(REPO) if r["check"].startswith("round count")),
+      sorted([f"round count ({cov.NEXT_TASKS})", f"round count ({cov.LESSONS})"]))
+
 
 # --- #161: three partitions the first draft got wrong ------------------------------
 

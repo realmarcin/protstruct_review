@@ -127,7 +127,8 @@ remaining grammar is the `_TENS`-derived alternation that locates the phrase to 
 STALE from MISSING, and it is already derived from the same table. There is nothing
 left to consolidate there. What *is* missing is coverage: the same rendered comparison
 does not run on `lessons.md`, whose title is stale today (#467). The step is to run the
-existing check on both files, with the title fixed first.
+existing check on both files, with the title fixed first. *(Implemented: `round_count_claim(text,
+rounds, where)` runs on both files, each reported under its own label.)*
 
 **Not proposed.** `check_registry_figures` and `check_round_figures` are already
 recompute-vs-prose; their regexes locate labelled figures and are the irreducible part.

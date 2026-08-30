@@ -249,12 +249,16 @@ def spell(n: int) -> str:
     return _TENS[n // 10] + _UNITS[n % 10]
 
 
-def round_count_claim(tasks: str, rounds: list[str]) -> dict[str, Any]:
-    """The spelled-out round count in NEXT_TASKS must match the rounds on disk.
-
-    It read "twenty-four rounds of rules" for two rounds after the fact (#154).
+def round_count_claim(tasks: str, rounds: list[str],
+                      where: str = NEXT_TASKS) -> dict[str, Any]:
+    """The spelled-out round count in a summary file must match the rounds on
+    disk. NEXT_TASKS read "twenty-four rounds of rules" for two rounds after
+    the fact (#154); lessons.md's title said "thirty rounds" at round 48
+    (#467) because only NEXT_TASKS was checked — gate consolidation step (c)
+    runs the same rendered comparison on both files.
     """
     expected = f"{spell(int(rounds[-1]))} rounds of"
+    check = f"round count ({where})"
     # Alternation derived from _TENS, not hardcoded: this regex was `(twenty|thirty)` and
     # went MISSING at round 40 -- spell() was fixed for 40 (#160) but this sibling search
     # was not, so the gate could not find "forty rounds of" and failed the round that
@@ -263,17 +267,17 @@ def round_count_claim(tasks: str, rounds: list[str]) -> dict[str, Any]:
     # check_round_figures --refresh).
     found = re.search(rf"({'|'.join(_TENS.values())})(-\w+)? rounds of", prose(tasks))
     if not found:
-        return {"check": "round count", "status": "MISSING",
+        return {"check": check, "status": "MISSING",
                 "detail": f"no spelled-out round count found; expected {expected!r}"}
     if found.group(0) != expected:
-        return {"check": "round count", "status": "STALE",
+        return {"check": check, "status": "STALE",
                 # `rounds[-1]`, not len(rounds): the claim counts ROUNDS RUN, and rounds
                 # 1-5 and 9 have no separate trail file, so the file count is 20 while
                 # the highest round is 26. Reporting len() here said "there are 20
                 # rounds, so it should say twenty-six", which is incoherent.
                 "detail": f"the file says {found.group(0)!r}; the highest round on disk "
                           f"is {rounds[-1]}, so it should say {expected!r}"}
-    return {"check": "round count", "status": "OK", "detail": expected}
+    return {"check": check, "status": "OK", "detail": expected}
 
 
 def run(repo: Path) -> list[dict[str, Any]]:
@@ -285,7 +289,8 @@ def run(repo: Path) -> list[dict[str, Any]]:
         return [{"check": "rounds on disk", "status": "MISSING",
                  "detail": f"no files matched {ROUND_GLOB} — nothing to check against"}]
     return ([next_tasks_coverage(tasks, rounds), lessons_coverage(lessons, rounds),
-             round_count_claim(tasks, rounds)] + defect_counts(tasks, findings))
+             round_count_claim(tasks, rounds, NEXT_TASKS),
+             round_count_claim(lessons, rounds, LESSONS)] + defect_counts(tasks, findings))
 
 
 def main() -> int:
