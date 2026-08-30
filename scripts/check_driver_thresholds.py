@@ -33,6 +33,8 @@ import re
 import sys
 from pathlib import Path
 
+import yaml
+
 REPO = Path(__file__).resolve().parent.parent
 REGISTRY = REPO / "ref/thresholds_and_standards.md"
 
@@ -51,8 +53,11 @@ def load_checks(path: Path = SIDECAR) -> list[dict]:
     named failure, never a silently shorter one. Each entry is normalised to
     the historical in-code shape (``registry`` = the pattern) so callers and
     tests keep one vocabulary."""
-    import yaml
-    doc = yaml.safe_load(path.read_text())
+    try:
+        doc = yaml.safe_load(path.read_text())
+    except (OSError, yaml.YAMLError) as exc:
+        raise ValueError(f"{path.name}: unreadable sidecar ({type(exc).__name__}: "
+                         f"{exc})") from exc
     if not isinstance(doc, dict) or not isinstance(doc.get("governed"), list) \
             or not doc["governed"]:
         raise ValueError(f"{path.name}: expected a non-empty 'governed' list")
@@ -97,12 +102,29 @@ def load_checks(path: Path = SIDECAR) -> list[dict]:
     return out
 
 
-CHECKS = load_checks()
-CHECKS_BY_METRIC = {c["metric"]: c for c in CHECKS}
+def section_spans(registry_text: str) -> dict[int, tuple[int, int]]:
+    """{section number: (start, end)} character spans of the registry's
+    '## N.' sections, so a governed value can be required to be read from
+    inside the section its entry names (#527)."""
+    heads = list(re.finditer(r"^## (\d+)\..*$", registry_text, re.M))
+    spans = {}
+    for i, m in enumerate(heads):
+        nxt = re.search(r"^## ", registry_text[m.end():], re.M)
+        end = m.end() + nxt.start() if nxt else len(registry_text)
+        spans[int(m.group(1))] = (m.start(), end)
+    return spans
 
 
 def section_headings(registry_text: str) -> set[int]:
-    return {int(m.group(1)) for m in re.finditer(r"^## (\d+)\.", registry_text, re.M)}
+    return set(section_spans(registry_text))
+
+
+try:
+    CHECKS = load_checks()
+    _LOAD_ERROR = None
+except ValueError as exc:  # surfaced by main() as a named failure, not a traceback
+    CHECKS, _LOAD_ERROR = [], str(exc)
+CHECKS_BY_METRIC = {c["metric"]: c for c in CHECKS}
 
 
 def registry_value(pattern: str, text: str) -> str | None:
@@ -123,13 +145,23 @@ def stale_hits(consumer_text: str, retired: list[str]) -> list[str]:
 
 
 def main() -> int:
+    if _LOAD_ERROR:
+        print(f"FAIL  {_LOAD_ERROR}", file=sys.stderr)
+        return 1
     registry = REGISTRY.read_text()
     failures = []
-    headings = section_headings(registry)
+    spans = section_spans(registry)
     for c in CHECKS:
-        if c["section"] not in headings:
+        span = spans.get(c["section"])
+        if span is None:
             failures.append(f"{c['metric']}: sidecar names section {c['section']}, "
                             f"which is not a '## N.' heading of the registry")
+        else:
+            hit = re.search(c["registry"], registry)
+            if hit and not (span[0] <= hit.start() < span[1]):
+                failures.append(f"{c['metric']}: its value was read outside section "
+                                f"{c['section']} — the pattern matches a restatement "
+                                f"elsewhere in the registry")
         derived = registry_value(c["registry"], registry)
         if derived is None:
             failures.append(f"{c['metric']}: cannot find its value in the registry — the "

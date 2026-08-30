@@ -52,8 +52,8 @@ block → thresholds YAML sidecar → round-count check extended to `lessons.md`
 each with its regression test before the swap. **Step (a) landed** (`scripts/nc_headlines.py`, PR #511,
 2026-08-29): the three per-family prose checks are one generic rule over a top-level `headlines` block the
 drivers write; records without the block are rendered by legacy-equivalent renderers, so no committed
-record was rewritten. **Step (b) landed** (`ref/thresholds_and_standards.yaml` + validating loader in
-`check_driver_thresholds.py`; keyed lookups replace `CHECKS[0]`). Step (c) remains.
+record was rewritten. **Step (b)** (`ref/thresholds_and_standards.yaml` + validating loader in
+`check_driver_thresholds.py`, keyed lookups replace `CHECKS[0]`; PR #524, 2026-08-29). Step (c) remains.
 
 **NC-11 closeout and the registry:** the stopping/consolidation checklist promised by #292 landed as
 `ref/research/stopping_criteria.md` ([#427](https://github.com/CultureBotAI/protstruct_review/pull/427), merged 2026-08-26). Phase 5 of #295 — the promised

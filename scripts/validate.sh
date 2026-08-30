@@ -443,7 +443,7 @@ if ! "${PYTHON}" "${REPO_ROOT}/scripts/test_driver_thresholds.py" > /dev/null; t
 fi
 if ! "${PYTHON}" "${REPO_ROOT}/scripts/check_driver_thresholds.py" > /dev/null 2>&1; then
   "${PYTHON}" "${REPO_ROOT}/scripts/check_driver_thresholds.py" >&2 || true
-  fail "a driving example or benchmark docstring restates a retired registry threshold"
+  fail "driver thresholds: a consumer restates a retired value, or ref/thresholds_and_standards.yaml is malformed"
 fi
 if [[ "${QUIET}" == "0" ]]; then
   echo "driver/docstring thresholds match the registry"

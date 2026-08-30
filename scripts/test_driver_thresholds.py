@@ -78,24 +78,41 @@ def main() -> int:
     import tempfile
     good = (REPO / "ref/thresholds_and_standards.yaml").read_text()
     bad_tables = {
-        "missing key": good.replace("    section: 3\n", "", 1),
-        "duplicate metric": good.replace('metric: "ΔRMSD band, d_min >= 2.5 (§4)"', 'metric: "CA RMSD agreement (§3)"'),
-        "unquoted float current": good.replace('current: "0.03"', 'current: 0.03'),
-        "pattern without a capture group": good.replace("([\\d.]+) Å\\*\\*'", "[\\d.]+ Å\\*\\*'", 1),
-        "empty consumers": good.replace("    consumers:\n      - ref/driving_example.md\n      - ref/driving_example_T01.md\n      - scripts/bench_t01_superposition.py\n", "    consumers: []\n"),
-        "unknown key": good.replace("    section: 3\n", "    section: 3\n    note: x\n", 1),
-        "empty table": "governed: []\n",
+        "missing key": (good.replace("    section: 3\n", "", 1), "missing ['section']"),
+        "duplicate metric": (good.replace('metric: "ΔRMSD band, d_min >= 2.5 (§4)"', 'metric: "CA RMSD agreement (§3)"'), "duplicate metric"),
+        "unquoted float current": (good.replace('current: "0.03"', 'current: 0.03'), "current must be a non-empty string"),
+        "pattern without a capture group": (good.replace("([\\d.]+) Å\\*\\*'", "[\\d.]+ Å\\*\\*'", 1), "exactly one capture group, has 0"),
+        "empty consumers": (good.replace("    consumers:\n      - ref/driving_example.md\n      - ref/driving_example_T01.md\n      - scripts/bench_t01_superposition.py\n", "    consumers: []\n"), "consumers must be a non-empty list"),
+        "unknown key": (good.replace("    section: 3\n", "    section: 3\n    note: x\n", 1), "unknown key(s) ['note']"),
+        "empty table": ("governed: []\n", "non-empty 'governed' list"),
+        "YAML syntax error (#525)": (good + "\n  - : : :\n", "unreadable sidecar"),
+        "float retired literal": (good.replace('retired: ["0.01220", "0.01090", "0.00540"]', "retired: [0.01220, 0.01090, 0.00540]"), "retired must be a non-empty list of strings"),
     }
-    for label, text in bad_tables.items():
-        assert text != good, label
-        with tempfile.NamedTemporaryFile("w", suffix=".yaml", delete=False) as fh:
-            fh.write(text)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        for i, (label, (text, reason)) in enumerate(bad_tables.items()):
+            assert text != good, label
+            path = Path(tmpdir) / f"{i}.yaml"
+            path.write_text(text)
+            try:
+                m.load_checks(path)
+                got = "(accepted)"
+            except ValueError as exc:
+                got = str(exc)
+            check(f"loader rejects a table with {label} for the right reason",
+                  reason in got, True)
         try:
-            m.load_checks(Path(fh.name))
-            rejected = False
-        except ValueError:
-            rejected = True
-        check(f"loader rejects a table with {label}", rejected, True)
+            m.load_checks(Path(tmpdir) / "absent.yaml")
+            got = "(accepted)"
+        except ValueError as exc:
+            got = str(exc)
+        check("loader names a missing sidecar (#525)", "unreadable sidecar" in got, True)
+    # #527: a value read from the wrong section is a failure
+    spans = m.section_spans(registry)
+    check("section spans cover the numbered headings", set(spans) >= {3, 4, 6}, True)
+    for c in m.CHECKS:
+        hit = m.re.search(c["registry"], registry)
+        check(f"{c['metric']} is read from inside section {c['section']}",
+              spans[c["section"]][0] <= hit.start() < spans[c["section"]][1], True)
 
     print(f"\nall driver-threshold guard tests passed ({PASSED} checks)")
     return 0
