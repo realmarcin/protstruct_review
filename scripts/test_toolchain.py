@@ -206,9 +206,55 @@ for script in sorted(scripts_dir.glob("*.py")):
                     "TMALIGN",
                     "REDUCE",
                     "PROBE",
+                    "GEMMI",
                 }:
                     duplicate_constants.append(f"{script.name}:{target.id}")
 check("no runner invokes bash -c", not shell_calls)
+# #496: no script builds an argv that starts with a bare "gemmi" — the CLI is
+# resolved once through toolchain.gemmi_executable() so the manifest and the
+# measurements name the same binary even under the ccp4 environment rewrite.
+bare_gemmi = []
+for script in sorted(Path(__file__).parent.glob("*.py")):
+    if script.name in {"toolchain.py"} or script.name.startswith("test_"):
+        continue
+    for node in ast.walk(ast.parse(script.read_text())):
+        # argv literals are lists here; ("gemmi", fn) label tuples are not argv.
+        if (isinstance(node, ast.List) and node.elts
+                and isinstance(node.elts[0], ast.Constant)
+                and node.elts[0].value == "gemmi"):
+            bare_gemmi.append(f"{script.name}:{node.lineno}")
+check("no script invokes a bare 'gemmi' argv (#496)", not bare_gemmi)
+
+with tempfile.TemporaryDirectory(prefix="gemmi resolver ") as tmp:
+    root = Path(tmp)
+    fake = root / "gemmi"
+    fake.write_text("#!/bin/sh\necho gemmi 9.9.9\n")
+    fake.chmod(0o755)
+    old_gemmi = toolchain.GEMMI
+    old_path = os.environ.get("PATH", "")
+    try:
+        toolchain.GEMMI = fake
+        check("PROTSTRUCT_GEMMI absolute path is honoured",
+              toolchain.gemmi_executable() == fake)
+        toolchain.GEMMI = Path("gemmi")
+        os.environ["PATH"] = str(root)
+        check("bare default resolves the PATH binary to an absolute path",
+              toolchain.gemmi_executable() == fake)
+        os.environ["PATH"] = ""
+        check("absent CLI: required=False returns None",
+              toolchain.gemmi_executable(required=False) is None)
+        try:
+            toolchain.gemmi_executable()
+            named = False
+        except FileNotFoundError as exc:
+            named = "PROTSTRUCT_GEMMI" in str(exc)
+        check("absent CLI: required raises a failure naming PROTSTRUCT_GEMMI", named)
+    finally:
+        toolchain.GEMMI = old_gemmi
+        os.environ["PATH"] = old_path
+check("gemmi is in the external tool report",
+      "gemmi" in toolchain.EXTERNAL_TOOL_SPECS
+      and toolchain.EXTERNAL_TOOL_SPECS["gemmi"]["expected_version"] == toolchain.GEMMI_VERSION)
 check("tool paths are defined only in toolchain.py", not duplicate_constants)
 
 print("\nall toolchain unit tests passed")

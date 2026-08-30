@@ -41,7 +41,7 @@ from typing import Any
 
 if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-from toolchain import phenix, run_logged
+from toolchain import gemmi_executable, phenix, run_logged
 
 RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 _PHENIX_COVALENT_BOND = re.compile(r"covalent geometry\s*:\s*bond\s+([\d.]+)\s*\(\s*(\d+)\)")
@@ -88,7 +88,8 @@ def run_gemmi(model: Path, work: Path) -> dict[str, Any] | None:
     """Bond rmsD (Å) and restraint count from gemmi against the CCP4 monomer library."""
     log = work / f"rmsz_{model.stem}.log"
     if not log.exists() or not _GEMMI_RMSD.search(log.read_text(errors="ignore")):
-        run_logged(["gemmi", "rmsz", "-q", model], log, timeout=3600, ccp4=True)
+        run_logged([str(gemmi_executable()), "rmsz", "-q", model], log,
+                   timeout=3600, ccp4=True)
     if not log.exists():
         return None
     text = log.read_text(errors="ignore")

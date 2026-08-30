@@ -24,6 +24,7 @@ TMALIGN_VERSION = "20220412"
 DSSP_VERSION = "4.6.1"
 PROBE_VERSION = "2.26.021123"
 REDUCE_VERSION = "4.16.250520"
+GEMMI_VERSION = "0.7.5"
 
 
 def _configured_path(environment_name: str, default: Path) -> Path:
@@ -52,6 +53,9 @@ PROBE = _configured_path(
     "PROTSTRUCT_PROBE", Path.home() / "tools" / "probe-src" / "probe"
 )
 DSSP = _configured_path("PROTSTRUCT_DSSP", Path("mkdssp"))
+# The gemmi CLI is optional (the locked wheel ships the Python module only).
+# Bare name => PATH discovery; set PROTSTRUCT_GEMMI to pin a binary (#496).
+GEMMI = _configured_path("PROTSTRUCT_GEMMI", Path("gemmi"))
 
 EXTERNAL_TOOL_SPECS = {
     "PHENIX": {
@@ -84,6 +88,12 @@ EXTERNAL_TOOL_SPECS = {
         "configured_path": PROBE,
         "executables": ("probe",),
         "version_args": ("-version",),
+    },
+    "gemmi": {
+        "expected_version": GEMMI_VERSION,
+        "configured_path": GEMMI,
+        "executables": ("gemmi",),
+        "version_args": ("--version",),
     },
     "reduce": {
         "expected_version": REDUCE_VERSION,
@@ -121,6 +131,20 @@ def _discover_executable(
         if discovered := shutil.which(name):
             return Path(discovered)
     return None
+
+
+def gemmi_executable(required: bool = True) -> Path | None:
+    """Resolve the gemmi CLI once, to an absolute path, from PROTSTRUCT_GEMMI or
+    PATH. Callers pass the RESOLVED path in argv so a later environment rewrite
+    (``ccp4=True``) cannot swap binaries between the manifest and the measurement
+    (#496). ``required=False`` returns None when absent; otherwise the failure is
+    named, never a bare FileNotFoundError from subprocess."""
+    executable = _discover_executable(GEMMI, ("gemmi",))
+    if executable is None and required:
+        raise FileNotFoundError(
+            "gemmi CLI not found on PATH; install it or set PROTSTRUCT_GEMMI"
+        )
+    return executable
 
 
 def _version_output(executable: Path, arguments: tuple[str, ...]) -> str | None:

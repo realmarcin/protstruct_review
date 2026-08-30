@@ -43,7 +43,7 @@ from typing import Any
 
 if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-from toolchain import phenix, run_capture, run_logged
+from toolchain import gemmi_executable, phenix, run_capture, run_logged
 
 RCSB_SF = "https://files.rcsb.org/download/{pdb_id}-sf.cif"
 RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
@@ -99,7 +99,8 @@ def to_mtz(sf: Path, work: Path) -> tuple[Path, tuple[str, str], str] | None:
     """
     mtz = work / (sf.stem.replace("-sf", "") + "_g.mtz")
     if not mtz.exists():
-        proc = run_capture(["gemmi", "cif2mtz", sf, mtz], cwd=work, timeout=1800)
+        proc = run_capture([str(gemmi_executable()), "cif2mtz", sf, mtz],
+                           cwd=work, timeout=1800)
         if not mtz.exists():
             diagnosis = (proc.stdout + proc.stderr)[-200:]
             print(f"  ! gemmi cif2mtz failed: {diagnosis}", file=sys.stderr)
@@ -210,7 +211,7 @@ def run_gemmi_r(model: Path, mtz: Path, labels: tuple[str, str], free_label: str
     if not calc.exists():
         proc = run_capture(
             [
-                "gemmi",
+                str(gemmi_executable()),
                 "sfcalc",
                 f"--dmin={d_min:.4f}",
                 f"--radii-set={radii_set}",

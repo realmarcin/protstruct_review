@@ -309,7 +309,7 @@ check("mad hand value", scr.mad([1.0, 2.0, 4.0]), 1.0)
 # absent (the wheel ships only the Python module; CI runners have no CLI).
 import unittest.mock as _mock  # noqa: E402
 
-with _mock.patch("shutil.which", return_value=None), \
+with _mock.patch.object(scr, "gemmi_executable", return_value=None), \
         _mock.patch.object(scr, "run_capture",
                            side_effect=AssertionError("CLI must not be invoked")):
     tv = scr.tool_versions()
@@ -319,7 +319,7 @@ check("#492: gemmi python version still recorded", bool(tv["gemmi_python"]), Tru
 
 import subprocess as _sp  # noqa: E402
 
-with _mock.patch("shutil.which", return_value="/x/bin/gemmi"), \
+with _mock.patch.object(scr, "gemmi_executable", return_value=Path("/x/bin/gemmi")), \
         _mock.patch.object(scr, "run_capture",
                            return_value=_sp.CompletedProcess(["gemmi"], 0, "", "")):
     tv = scr.tool_versions()

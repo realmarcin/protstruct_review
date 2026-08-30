@@ -34,6 +34,10 @@ from typing import Any
 
 import yaml
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain import gemmi_executable  # noqa: E402
+
 REPO = Path(__file__).resolve().parent.parent
 
 # Three-state collapse. DSSP 8-state -> HEC; biotite a/b/c -> HEC.
@@ -97,11 +101,12 @@ def _normalise_for_dssp(model: Path) -> Path:
     Falls back to the original path when gemmi is unavailable, so the failure mode
     is mkdssp's own error rather than a missing-tool error from here.
     """
-    if shutil.which("gemmi") is None:
+    gemmi = gemmi_executable(required=False)
+    if gemmi is None:
         return model
     with tempfile.NamedTemporaryFile(suffix=".pdb", delete=False) as tmp:
         converted = Path(tmp.name)
-    proc = subprocess.run(["gemmi", "convert", str(model), str(converted)],
+    proc = subprocess.run([str(gemmi), "convert", str(model), str(converted)],
                           capture_output=True, text=True)
     if proc.returncode != 0 or not converted.stat().st_size:
         converted.unlink(missing_ok=True)
