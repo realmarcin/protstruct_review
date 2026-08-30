@@ -268,7 +268,8 @@ def round_count_claim(tasks: str, rounds: list[str],
     # EVERY occurrence, case-insensitively: NEXT_TASKS states the count twice
     # ("Forty-eight rounds of benchmarking…" and "forty-eight rounds of rules"), and
     # a check that read only the first lowercase one let a capitalised stale claim
-    # through (#533).
+    # through (#533). Any other `<tens> rounds of` phrase in these files will be
+    # flagged too; reword it (e.g. "20 rounds of") rather than loosen the check.
     found = [m.group(0) for m in re.finditer(
         rf"({'|'.join(_TENS.values())})(-\w+)? rounds of", prose(tasks), re.IGNORECASE)]
     if not found:
