@@ -46,7 +46,7 @@ from typing import Any
 
 if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-from toolchain import phenix, run_logged
+from toolchain import gemmi_executable, phenix, run_logged
 
 RCSB_PDB = "https://files.rcsb.org/download/{pdb_id}.pdb"
 VALIDATION_XML = "https://www.ebi.ac.uk/pdbe/entry-files/download/{pdb_id}_validation.xml"
@@ -282,7 +282,8 @@ def sidechain_torsion_z(model: Path) -> dict[tuple[str, int, str], float]:
     log = model.with_suffix(".rmsz.log")
     if not log.exists() or "torsion" not in log.read_text(errors="ignore"):
         run_logged(
-            ["gemmi", "rmsz", "--cutoff=0", model], log, timeout=3600, ccp4=True
+            [str(gemmi_executable()), "rmsz", "--cutoff=0", model], log,
+            timeout=3600, ccp4=True
         )
     if not log.exists():
         return {}

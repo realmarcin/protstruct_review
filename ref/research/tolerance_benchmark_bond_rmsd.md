@@ -106,4 +106,6 @@ allows, so it would have flagged correct models as disagreeing.
 - 17 X-ray models, bond RMSD 0.0018–0.0175 Å. Models with unusual ligands or heavy covalent
   modification are not represented, and are where monomer-library coverage differences would be
   largest.
-- One version pair: PHENIX 2.0-5936 and gemmi 0.7.5 against CCP4 9.0.015's monomer library.
+- One version pair: PHENIX 2.0-5936 and gemmi against CCP4 9.0.015's monomer library — gemmi **0.7.4** (CCP4's bundled binary) for the rmsz legs, see the disclosure below.
+
+> **Disclosure (2026-08-29, #502).** The `gemmi rmsz` legs above ran under the sourced CCP4 environment, which prepends `ccp4-9/bin` to `PATH` — and that directory carries CCP4's bundled **gemmi 0.7.4**. So the rmsz figures in this document were produced by 0.7.4, not the Homebrew 0.7.5 named here and in the run manifests; the PHENIX and monomer-library identities are unaffected. A one-model spot check (1d3z, full rmsz output) is byte-identical between the two versions; the tables were not re-run and are not re-judged. From PR #501 on, every gemmi invocation resolves through `toolchain.gemmi_executable()` (`PROTSTRUCT_GEMMI` or PATH, absolute path in argv), and the run manifest written by `tool_versions()` records that resolved path and version alongside the measurement.

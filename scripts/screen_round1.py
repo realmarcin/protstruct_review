@@ -43,7 +43,7 @@ from pathlib import Path
 
 if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-from toolchain import PHENIX_BIN, phenix, run_capture, run_logged
+from toolchain import PHENIX_BIN, gemmi_executable, phenix, run_capture, run_logged
 
 REPO = Path(__file__).resolve().parent.parent
 # Round-2 outputs (#314): the round-1 record is committed history and a
@@ -177,13 +177,14 @@ def tool_versions() -> dict:
     path-pinned. Tri-state by construction: (path, version), (path, None) when
     the CLI prints nothing, (None, None) when absent (#492). Callers must not
     assume strings."""
-    import shutil
-    gemmi_cli = shutil.which("gemmi")
+    resolved = gemmi_executable(required=False)
+    gemmi_cli = str(resolved) if resolved else None
     ver = ""
     if gemmi_cli is not None:
         # The wheel ships the Python module only; the CLI is optional and its
         # absence is RECORDED (None), never invoked — the hermetic gate runs
-        # on machines without it (#492).
+        # on machines without it (#492). Resolved through toolchain so the
+        # manifest names the binary the measurements use (#496).
         version_run = run_capture([gemmi_cli, "--version"])
         version_text = (version_run.stdout or version_run.stderr).strip()
         ver = version_text.splitlines()[0] if version_text else ""
@@ -372,7 +373,7 @@ def gemmi_rfree(model: Path, obs_mtz: Path, work: Path, tag: str,
     if not calc.exists():
         run_logged(
             [
-                "gemmi",
+                str(gemmi_executable()),
                 "sfcalc",
                 f"--dmin={d_min:.3f}",
                 f"--scale-to={obs_mtz}:{f_label}:{sig_label}",
