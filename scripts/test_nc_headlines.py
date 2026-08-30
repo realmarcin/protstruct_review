@@ -68,6 +68,11 @@ check("covers: identical block covers", h.covers([H("a", 1, "k")], [H("a", 1, "k
 check("covers: extra entries allowed", h.covers([H("a", 1, "k"), H("b", 2, "k")], [H("a", 1, "k")]), [])
 check("covers: dropped label named", len(h.covers([H("b", 2, "k")], [H("a", 1, "k")])), 1)
 check("covers: altered value named", len(h.covers([H("a", 9, "k")], [H("a", 1, "k")])), 1)
+check("covers: same label/value downgraded to present is named (#521)",
+      len(h.covers([H("a", 1, mode="present")], [H("a", 1, "k")])), 1)
+check("covers: same label/value with a wider window is named",
+      len(h.covers([H("a", 1, "k", window=80)], [H("a", 1, "k", window=20)])), 1)
+check("validate: whitespace-only keyword rejected (#522)", h.validate(H("x", 1, " ")) is not None, True)
 # present / phrase
 check("present: bare substring", h.missing("Q1: 0/22 false verdicts", [H("q", "0/22", mode="present")]), [])
 check("phrase: whitespace tolerant",

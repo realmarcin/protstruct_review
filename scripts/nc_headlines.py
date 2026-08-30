@@ -37,6 +37,7 @@ Three matching modes cover everything the legacy checks did:
 """
 from __future__ import annotations
 
+import json
 import re
 from collections import Counter
 
@@ -51,8 +52,9 @@ def headline(label: str, value, keyword: str | None = None, *,
              window: int = DEFAULT_WINDOW, between: str = "nodigit",
              min_gap: int = 0, then: str | None = None,
              then_window: int = DEFAULT_WINDOW, then_between: str = "line") -> dict:
-    """``then`` is an optional second keyword that must FOLLOW the value
-    (conjunction: keyword … value … then), so a legacy check like
+    """``then`` is an optional second keyword that must follow the
+    keyword–value pair (conjunction: keyword … value … then, or with
+    ``value_first``: value … keyword … then), so a legacy check like
     ``all … 44 … log`` stays one entry, not two independent halves."""
     out = {"label": label, "value": str(value), "keyword": keyword,
            "mode": mode, "order": order, "window": int(window),
@@ -78,7 +80,8 @@ def validate(entry) -> str | None:
     if entry["mode"] == "phrase" and not entry["value"].split():
         return "phrase with no words"
     if entry["mode"] == "near":
-        if not isinstance(entry.get("keyword"), str) or not entry["keyword"]:
+        if (not isinstance(entry.get("keyword"), str)
+                or not entry["keyword"].strip()):
             return "near-mode headline without a keyword"
         if entry.get("order", "any") not in ORDERS:
             return f"unknown order {entry.get('order')!r}"
@@ -127,14 +130,19 @@ def pattern(entry: dict) -> str:
         else f"(?:{kf})|(?:{vf})"
 
 
+def _canonical(entry: dict) -> str:
+    return json.dumps(entry, sort_keys=True, ensure_ascii=False)
+
+
 def covers(block: list, rendered: list) -> list[str]:
-    """Reasons a driver-written block fails to carry every rendered
-    (label, value) pair — a block may add headlines, never drop or alter the
-    ones the record's own rows and summary imply (#512, #513)."""
-    have = {(e.get("label"), e.get("value")) for e in block if isinstance(e, dict)}
+    """Reasons a driver-written block fails to carry every rendered entry
+    AS A WHOLE — label, value, mode, keyword, order, window, gap. A block may
+    add headlines; it may never drop, alter, or loosen the ones the record's
+    own rows and summary imply (#512, #513, #521)."""
+    have = {_canonical(e) for e in block if isinstance(e, dict)}
     return [f"{e['label']} headline ({e['value']!r}) implied by the record is "
-            f"not in the headlines block" for e in rendered
-            if (e["label"], e["value"]) not in have]
+            f"not in the headlines block (or is there with different "
+            f"strictness)" for e in rendered if _canonical(e) not in have]
 
 
 def missing(text: str, headlines: list) -> list[str]:
