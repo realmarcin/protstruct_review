@@ -81,6 +81,7 @@ def _load(name: str):
 _scr = _load("screen_round1")      # select_arrays, R paths, fetch, hashing, atomic IO
 _bench = _load("bench_refinement_deltas")
 _gold = _load("gold_mask")
+_nch = _load("nc_headlines")
 def refine_sa(model: Path, mtz: Path, work: Path,
               pair: tuple[str, str], flag: str | None) -> tuple[Path | None, dict]:
     """S-SA: the registered subject — null protocol + simulated_annealing=True,
@@ -425,7 +426,8 @@ def main() -> int:
                                    for r in sub),
         }
     _scr.write_json_atomic(out_path, {"run": manifest, "rows": rows,
-                                      "summary": summary})
+                                      "summary": summary,
+                                      "headlines": _nch.bench_headlines(rows)})
     print(json.dumps(summary, indent=2))
     return 0
 

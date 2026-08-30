@@ -463,6 +463,64 @@ with tempfile.TemporaryDirectory() as tmp:
     check("#419: prose drift names the protected headline",
           "osol_h success" in out and "#419" in out, True)
 
+# #293a: a record that carries its own top-level `headlines` block is checked
+# against THAT block (the driver owns the values); a malformed block is a
+# named failure, never a silent pass.
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    make_sandbox_tree(root, SANDBOX_RECOVER)
+    rec_path = root / "ref/research/data/negative_control_round9_recover.json"
+    rec = json.loads(rec_path.read_text())
+    import importlib.util as _ilu
+    _s = _ilu.spec_from_file_location("nch", REPO / "scripts" / "nc_headlines.py")
+    _nch = _ilu.module_from_spec(_s); _s.loader.exec_module(_nch)
+    implied = _nch.recover_headlines(rec["summary"])
+    extra = {"label": "driver headline", "value": "7/7", "keyword": "custom",
+             "mode": "near", "order": "any", "window": 20, "between": "nodigit",
+             "min_gap": 0}
+    rec["headlines"] = implied + [extra]
+    rec_path.write_text(json.dumps(rec))
+    doc = root / "ref/research/negative_control_round9.md"
+    clean = (
+        "osol_h success 2/2; osol comparison 1/2; ANIS 2/2; "
+        "H/D 100–100 per model, retained 2/2; all **4** logs; "
+        "2 distinct sandbox directories; 2 distinct refinement PGIDs; "
+        "0.01 Å unmasked; 0.01 Å all-residue; gained 2BBB. "
+        "No old success was lost. custom 7/7 stated."
+    )
+    doc.write_text(clean)
+    code, out = run_guard(root)
+    check("#293a: a block that covers the implied headlines and adds one passes", code, 0)
+    doc.write_text(clean.replace("custom 7/7", "custom 6/7"))
+    code, out = run_guard(root)
+    check("#293a: a missing driver headline fails by label",
+          code == 1 and "driver headline" in out and "#419" in out, True)
+    doc.write_text(clean)
+    rec["headlines"] = [extra]
+    rec_path.write_text(json.dumps(rec))
+    code, out = run_guard(root)
+    check("#513: a block that drops an implied headline fails by label",
+          code == 1 and "osol_h success" in out and "not in the headlines block" in out, True)
+    rec["headlines"] = implied[:-1] + [dict(implied[-1], value="No old success was lost!!")] + [extra]
+    rec_path.write_text(json.dumps(rec))
+    code, out = run_guard(root)
+    check("#513: a block that alters an implied value fails", code, 1)
+    rec["headlines"] = []
+    rec_path.write_text(json.dumps(rec))
+    code, out = run_guard(root)
+    check("#512: an empty block is a named failure, not an opt-out",
+          code == 1 and "block is empty" in out, True)
+    rec["headlines"] = [{"label": "broken"}]
+    rec_path.write_text(json.dumps(rec))
+    code, out = run_guard(root)
+    check("#293a: a malformed headline entry is a named failure",
+          code == 1 and "malformed headline" in out, True)
+    rec["headlines"] = "7/7"
+    rec_path.write_text(json.dumps(rec))
+    code, out = run_guard(root)
+    check("#293a: a non-list headlines block is a named failure",
+          code == 1 and "not a list" in out, True)
+
 # #434: record families the per-family checks never opened must still be
 # parsed, carry a run manifest, and be cited by filename from the round doc.
 with tempfile.TemporaryDirectory() as tmp:

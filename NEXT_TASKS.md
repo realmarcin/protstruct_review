@@ -49,7 +49,10 @@ recover records** with verdicts recomputed from their own evidence (**#338 close
 landed as `ref/research/gate_consolidation_inventory.md` — 11 guards classified, nine multiply-stated
 facts (eight with a machine-readable source), three ranked consolidation steps (in-record NC headline
 block → thresholds YAML sidecar → round-count check extended to `lessons.md`). Implementation is one PR per step,
-each with its regression test before the swap; none started.
+each with its regression test before the swap. **Step (a) landed** (`scripts/nc_headlines.py`, PR #511,
+2026-08-29): the three per-family prose checks are one generic rule over a top-level `headlines` block the
+drivers write; records without the block are rendered by legacy-equivalent renderers, so no committed
+record was rewritten. Steps (b) and (c) remain.
 
 **NC-11 closeout and the registry:** the stopping/consolidation checklist promised by #292 landed as
 `ref/research/stopping_criteria.md` ([#427](https://github.com/CultureBotAI/protstruct_review/pull/427), merged 2026-08-26). Phase 5 of #295 — the promised

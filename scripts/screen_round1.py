@@ -43,6 +43,7 @@ from pathlib import Path
 
 if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
+from nc_headlines import screen_headlines  # noqa: E402
 from toolchain import PHENIX_BIN, gemmi_executable, phenix, run_capture, run_logged
 
 REPO = Path(__file__).resolve().parent.parent
@@ -677,6 +678,7 @@ def main() -> int:
               "floor_unmasked": FLOOR_UNMASKED, "sigma_factor": SIGMA_FACTOR,
               "min_noise_n": MIN_NOISE_N, "s_floor": S_FLOOR,
               "rows": rows, "d6": stats}
+    report["headlines"] = screen_headlines(rows)
     write_json_atomic(screen_out, report)
 
     if stats.get("fallback") != "stop" and full_run:

@@ -90,9 +90,10 @@ that proximity rule as its one rule: each `(keyword, value)` pair appears within
 window in the round doc.
 The three per-family `check_*_round_doc` functions (~92 lines, 3 regex sites) collapse
 into one, and the next round adds headlines by writing them, not by editing the guard.
-The headlines live **inside** the record's `summary` — a sibling
-`negative_control_round<N>_headlines.json` would be swept up by `check_orphan_family`
-(`RECORD_RE` matches every family) and would need its own manifest and citation.
+The headlines live in the record as a **top-level `headlines` key** — not inside `summary`, whose
+keys validate 3b iterates as subjects, and not as a sibling
+`negative_control_round<N>_headlines.json`, which `check_orphan_family` would sweep up (`RECORD_RE`
+matches every family) and demand a manifest and citation for. *(Amended at implementation, PR #511.)*
 Regression tests: in `test_check_negative_control.py`, `"round doc missing a headline
 figure fails"` (the neighbouring-digit case: "1 floor" 25 characters from "screened"),
 `"#419: drifted recover prose headline fails"` and `"#419: prose drift names the
