@@ -6,7 +6,7 @@ authors:
   - family-names: Joachimiak
     given-names: Marcin P.
     affiliation: Lawrence Berkeley National Laboratory
-repository-code: "https://github.com/realmarcin/protstruct_review"
+repository-code: "https://github.com/CultureBotAI/protstruct_review"
 license:
   - BSD-3-Clause
   - CC-BY-4.0

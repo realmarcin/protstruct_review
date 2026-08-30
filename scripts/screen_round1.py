@@ -176,9 +176,14 @@ def tool_versions() -> dict:
     hardcode; PHENIX is already path-pinned."""
     import shutil
     gemmi_cli = shutil.which("gemmi")
-    version_run = run_capture(["gemmi", "--version"])
-    version_text = (version_run.stdout or version_run.stderr).strip()
-    ver = version_text.splitlines()[0] if version_text else ""
+    ver = ""
+    if gemmi_cli is not None:
+        # The wheel ships the Python module only; the CLI is optional and its
+        # absence is RECORDED (None), never invoked — the hermetic gate runs
+        # on machines without it (#492).
+        version_run = run_capture([gemmi_cli, "--version"])
+        version_text = (version_run.stdout or version_run.stderr).strip()
+        ver = version_text.splitlines()[0] if version_text else ""
     import gemmi as gemmi_py
     return {"phenix_bin": str(PHENIX_BIN),
             "gemmi_cli": gemmi_cli, "gemmi_cli_version": ver or None,
