@@ -143,9 +143,14 @@ for _bad in (19, 100):
         _raised = str(_bad) in str(_e)
     check(f"  and refuses {_bad} by name rather than a bare KeyError", _raised, True)
 
-check("a removed round count goes MISSING",
-      cov.round_count_claim(TASKS.replace(CURRENT, "many rounds of"),
+_CAP = CURRENT[0].upper() + CURRENT[1:]
+check("a removed round count goes MISSING (both occurrences removed, #533)",
+      cov.round_count_claim(TASKS.replace(CURRENT, "many rounds of")
+                                 .replace(_CAP, "Many rounds of"),
                             ROUNDS)["status"], "MISSING")
+check("removing only the lowercase occurrence leaves the capitalised one checked",
+      cov.round_count_claim(TASKS.replace(CURRENT, "many rounds of"),
+                            ROUNDS)["status"], "OK")
 
 # Gate consolidation step (c): the same rendered comparison on lessons.md, whose
 # title said "thirty rounds" at round 48 (#467) while NEXT_TASKS was guarded.
@@ -161,7 +166,6 @@ check("a lessons.md title without the count goes MISSING",
       cov.round_count_claim(LESSONS.replace(CURRENT, "many rounds of", 1), ROUNDS,
                             cov.LESSONS)["status"], "MISSING")
 # #533: every occurrence is checked, case-insensitively.
-_CAP = CURRENT[0].upper() + CURRENT[1:]
 check("a capitalised occurrence is read", _CAP in cov.prose(TASKS), True)
 check("a stale capitalised occurrence is STALE (#533)",
       cov.round_count_claim(TASKS.replace(_CAP, STALE_PHRASE.capitalize(), 1),
