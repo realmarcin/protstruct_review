@@ -32,6 +32,7 @@ def check(label, got, want) -> None:
 
 def main() -> int:
     m = load("check_driver_thresholds")
+    check("sidecar loaded without error (#531)", m._LOAD_ERROR, None)
 
     # A retired value stated on a live (non-history) line is a defect.
     check("retired value on a live line is flagged",
@@ -51,13 +52,13 @@ def main() -> int:
 
     # registry_value extracts the current figure, and detects a changed one.
     check("registry_value extracts the current CA RMSD",
-          m.registry_value(m.CHECKS[0]["registry"], "| CA RMSD | \\|Δ\\| ≤ **0.03 Å**"),
+          m.registry_value(m.CHECKS_BY_METRIC["CA RMSD agreement (§3)"]["registry"], "| CA RMSD | \\|Δ\\| ≤ **0.03 Å**"),
           "0.03")
     check("registry_value sees a changed value",
-          m.registry_value(m.CHECKS[0]["registry"], "| CA RMSD | \\|Δ\\| ≤ **0.05 Å**"),
+          m.registry_value(m.CHECKS_BY_METRIC["CA RMSD agreement (§3)"]["registry"], "| CA RMSD | \\|Δ\\| ≤ **0.05 Å**"),
           "0.05")
     check("registry_value returns None on a reworded row",
-          m.registry_value(m.CHECKS[0]["registry"], "| CA RMSD | agreement is tight"),
+          m.registry_value(m.CHECKS_BY_METRIC["CA RMSD agreement (§3)"]["registry"], "| CA RMSD | agreement is tight"),
           None)
 
     # Every CHECKS metric must still be derivable from the LIVE registry, and match.
@@ -65,6 +66,55 @@ def main() -> int:
     for c in m.CHECKS:
         check(f"live registry still yields {c['metric']}",
               m.registry_value(c["registry"], registry), c["current"])
+
+    # Step (b): the table is data. Every consumer exists, every section is a
+    # real registry heading, and the loader refuses malformed tables by name.
+    for c in m.CHECKS:
+        check(f"consumer paths exist for {c['metric']}",
+              all((REPO / rel).exists() for rel in c["consumers"]), True)
+        check(f"section {c['section']} is a registry heading ({c['metric']})",
+              c["section"] in m.section_headings(registry), True)
+    check("sidecar has at least the five historical entries", len(m.CHECKS) >= 5, True)
+    check("keyed lookup covers every entry", set(m.CHECKS_BY_METRIC) == {c["metric"] for c in m.CHECKS}, True)
+    import tempfile
+    good = (REPO / "ref/thresholds_and_standards.yaml").read_text()
+    bad_tables = {
+        "missing key": (good.replace("    section: 3\n", "", 1), "missing ['section']"),
+        "duplicate metric": (good.replace('metric: "ΔRMSD band, d_min >= 2.5 (§4)"', 'metric: "CA RMSD agreement (§3)"'), "duplicate metric"),
+        "unquoted float current": (good.replace('current: "0.03"', 'current: 0.03'), "current must be a non-empty string"),
+        "pattern without a capture group": (good.replace("([\\d.]+) Å\\*\\*'", "[\\d.]+ Å\\*\\*'", 1), "exactly one capture group, has 0"),
+        "empty consumers": (good.replace("    consumers:\n      - ref/driving_example.md\n      - ref/driving_example_T01.md\n      - scripts/bench_t01_superposition.py\n", "    consumers: []\n"), "consumers must be a non-empty list"),
+        "unknown key": (good.replace("    section: 3\n", "    section: 3\n    note: x\n", 1), "unknown key(s) ['note']"),
+        "empty table": ("governed: []\n", "non-empty 'governed' list"),
+        "YAML syntax error (#525)": (good + "\n  - : : :\n", "unreadable sidecar"),
+        "float retired literal": (good.replace('retired: ["0.01220", "0.01090", "0.00540"]', "retired: [0.01220, 0.01090, 0.00540]"), "retired must be a non-empty list of strings"),
+    }
+    with tempfile.TemporaryDirectory() as tmpdir:
+        for i, (label, (text, reason)) in enumerate(bad_tables.items()):
+            assert text != good, label
+            path = Path(tmpdir) / f"{i}.yaml"
+            path.write_text(text)
+            try:
+                m.load_checks(path)
+                got = "(accepted)"
+            except ValueError as exc:
+                got = str(exc)
+            check(f"loader rejects a table with {label} for the right reason",
+                  reason in got, True)
+        try:
+            m.load_checks(Path(tmpdir) / "absent.yaml")
+            got = "(accepted)"
+        except ValueError as exc:
+            got = str(exc)
+        check("loader names a missing sidecar (#525)", "unreadable sidecar" in got, True)
+    # #527: a value read from the wrong section is a failure
+    spans = m.section_spans(registry)
+    check("section spans cover the numbered headings", set(spans) >= {3, 4, 6}, True)
+    for c in m.CHECKS:
+        hit = m.re.search(c["registry"], registry)
+        check(f"{c['metric']} is read from inside section {c['section']}",
+              hit is not None
+              and spans[c["section"]][0] <= hit.start() < spans[c["section"]][1], True)
 
     print(f"\nall driver-threshold guard tests passed ({PASSED} checks)")
     return 0
