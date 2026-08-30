@@ -463,6 +463,37 @@ with tempfile.TemporaryDirectory() as tmp:
     check("#419: prose drift names the protected headline",
           "osol_h success" in out and "#419" in out, True)
 
+# #293a: a record that carries its own top-level `headlines` block is checked
+# against THAT block (the driver owns the values); a malformed block is a
+# named failure, never a silent pass.
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    make_sandbox_tree(root, SANDBOX_RECOVER)
+    rec_path = root / "ref/research/data/negative_control_round9_recover.json"
+    rec = json.loads(rec_path.read_text())
+    rec["headlines"] = [{"label": "driver headline", "value": "7/7",
+                         "keyword": "custom", "mode": "near", "order": "any",
+                         "window": 20, "between": "nodigit"}]
+    rec_path.write_text(json.dumps(rec))
+    doc = root / "ref/research/negative_control_round9.md"
+    doc.write_text("custom 7/7 stated; nothing else.")
+    code, out = run_guard(root)
+    check("#293a: a record's own headlines block governs (legacy phrases not required)", code, 0)
+    doc.write_text("osol_h success 2/2 but the driver headline is missing.")
+    code, out = run_guard(root)
+    check("#293a: a missing driver headline fails by label",
+          code == 1 and "driver headline" in out and "#419" in out, True)
+    rec["headlines"] = [{"label": "broken"}]
+    rec_path.write_text(json.dumps(rec))
+    code, out = run_guard(root)
+    check("#293a: a malformed headline entry is a named failure",
+          code == 1 and "malformed headline" in out, True)
+    rec["headlines"] = "7/7"
+    rec_path.write_text(json.dumps(rec))
+    code, out = run_guard(root)
+    check("#293a: a non-list headlines block is a named failure",
+          code == 1 and "not a list" in out, True)
+
 # #434: record families the per-family checks never opened must still be
 # parsed, carry a run manifest, and be cited by filename from the round doc.
 with tempfile.TemporaryDirectory() as tmp:

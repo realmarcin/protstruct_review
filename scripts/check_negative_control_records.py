@@ -30,6 +30,10 @@ import re
 import sys
 from pathlib import Path
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+import nc_headlines as _nch  # noqa: E402
+
 KNOWN_STATUSES = {"screened", "floor", "data_defect", "cluster_collision"}
 
 
@@ -480,20 +484,37 @@ def check_recover(path: Path, failures: list[str]) -> dict:
     return doc
 
 
+def _record_headlines(record: dict, render, tag: str, name: str,
+                      failures: list[str]) -> list | None:
+    """The record's own top-level ``headlines`` block when it carries one
+    (driver-rendered, #293a); otherwise the legacy family renderer. A block
+    that is present but not a list is a named failure."""
+    block = record.get("headlines")
+    if block is None:
+        return render()
+    if not isinstance(block, list):
+        fail(f"{name}: headlines block is not a list ({tag})", failures)
+        return None
+    return block
+
+
+def _check_headlines(md: Path, headlines: list | None, tag: str,
+                     failures: list[str]) -> None:
+    if not headlines:
+        return
+    text = md.read_text()
+    for reason in _nch.missing(text, headlines):
+        fail(f"{md.name}: {reason} — record and prose have drifted ({tag})",
+             failures)
+
+
 def check_bench_round_doc(md: Path, bench: dict, failures: list[str]) -> None:
     """The bench round's registered headline (Q1: false verdicts on nulls)
     must appear as its degraded/attempted figure in the round doc."""
-    text = md.read_text()
-    rows = bench.get("rows", [])
-    null_rows = [r for r in rows if r.get("subject") == "null"]
-    if not null_rows:
-        return
-    degraded = sum(1 for r in null_rows if r.get("verdict") == "DEGRADED")
-    headline = f"{degraded}/{len(null_rows)}"
-    if headline not in text:
-        fail(f"{md.name}: Q1 headline {headline!r} (null degraded/attempted) "
-             f"not in the doc — record and prose have drifted (#311 class)",
-             failures)
+    headlines = _record_headlines(
+        bench, lambda: _nch.bench_headlines(bench.get("rows", [])),
+        "#311 class", md.name, failures)
+    _check_headlines(md, headlines, "#311 class", failures)
 
 
 def check_recover_round_doc(md: Path, recover: dict,
@@ -502,75 +523,22 @@ def check_recover_round_doc(md: Path, recover: dict,
     if (recover.get("run") or {}).get("sandbox_protocol") != \
             "per-entry-process-group-v1":
         return
-    text = md.read_text()
-    summary = recover.get("summary") or {}
-    subject = summary.get("osol_h") or {}
-    anis = summary.get("anis_verification") or {}
-    hydrogen = summary.get("hydrogen_verification") or {}
-    comparison = summary.get("comparison_with_osol") or {}
-    sandbox = summary.get("sandbox_verification") or {}
-    perturb = summary.get("perturbation_reproduction") or {}
-    success = f"{subject.get('successes')}/{subject.get('attempted')}"
-    old_success = (
-        f"{comparison.get('osol_successes')}/{comparison.get('osol_attempted')}"
-    )
-    anis_fraction = f"{anis.get('measurable')}/{anis.get('measurable')}"
-    h_range = (
-        f"{hydrogen.get('minimum_ready')}–{hydrogen.get('maximum_ready')}"
-    )
-    h_retained = f"{hydrogen.get('retained_equal')}/{hydrogen.get('models')}"
-    required = {
-        "osol_h success": rf"osol_h[^0-9\n]{{0,80}}{re.escape(success)}",
-        "osol comparison": rf"osol[^0-9\n]{{0,80}}{re.escape(old_success)}",
-        "ANIS measurability": rf"ANIS[^0-9\n]{{0,80}}{re.escape(anis_fraction)}",
-        "H/D range": rf"{re.escape(h_range)}[^\n]{{0,30}}model",
-        "H/D retention": rf"retained[^0-9\n]{{0,80}}{re.escape(h_retained)}",
-        "ANIS log count": rf"all[^0-9\n]{{0,20}}{anis.get('logs_with_anis')}[^\n]{{0,30}}log",
-        "sandbox count": (
-            rf"{sandbox.get('distinct_sandboxes')} distinct sandbox"
-        ),
-        "PGID count": rf"{sandbox.get('distinct_pgids')} distinct refinement PGID",
-        "unmasked reproduction": (
-            rf"{perturb.get('max_absdiff_unmasked')} Å unmasked"
-        ),
-        "all-residue reproduction": (
-            rf"{perturb.get('max_absdiff_all')} Å all-residue"
-        ),
-    }
-    for label, pattern in required.items():
-        if not re.search(pattern, text, re.IGNORECASE):
-            fail(f"{md.name}: {label} headline is absent — "
-                 f"record and prose have drifted (#419)", failures)
-    gained = comparison.get("gained") or []
-    if gained and any(pdb_id not in text for pdb_id in gained):
-        fail(f"{md.name}: gained-success list is absent or incomplete (#419)",
-             failures)
-    if (comparison.get("lost") == []
-            and not re.search(r"No old success was\s+lost", text)):
-        fail(f"{md.name}: zero-loss comparison is absent (#419)", failures)
+    headlines = _record_headlines(
+        recover,
+        lambda: _nch.recover_headlines(recover.get("summary") or {}),
+        "#419", md.name, failures)
+    _check_headlines(md, headlines, "#419", failures)
 
 
 def check_round_doc(md: Path, screen: dict, failures: list[str]) -> None:
     """Each headline count must appear NEAR its keyword — a bare
     number-presence check passes whenever another identical digit exists
-    anywhere in the doc (the guard's own test caught that weakness)."""
-    text = md.read_text()
-    rows = screen.get("rows", [])
-    from collections import Counter
-    counts = Counter(r["status"] for r in rows)
-    figures = {"attempt": len(rows), "floor": counts.get("floor", 0),
-               "defect": counts.get("data_defect", 0),
-               "screened": counts.get("screened", 0)}
-    for keyword, value in figures.items():
-        # A 20-char window: wide enough for "attempted **71 entries**" and
-        # "1 fully screened", narrow enough that a neighboring figure's digit
-        # cannot satisfy the wrong keyword (the guard's test caught an 80-char
-        # window doing exactly that).
-        near = (rf"\*{{0,2}}\b{value}\b[^.\n]{{0,20}}{keyword}|"
-                rf"{keyword}[^.\n]{{0,20}}\*{{0,2}}\b{value}\b")
-        if not re.search(near, text, re.IGNORECASE):
-            fail(f"{md.name}: figure {value} not found near {keyword!r} — "
-                 f"record and prose have drifted (#311 class)", failures)
+    anywhere in the doc (the guard's own test caught that weakness); the
+    20-character window is the renderer's."""
+    headlines = _record_headlines(
+        screen, lambda: _nch.screen_headlines(screen.get("rows", [])),
+        "#311 class", md.name, failures)
+    _check_headlines(md, headlines, "#311 class", failures)
 
 
 KNOWN_FAMILIES = {"screen", "enrolled", "reps", "bench", "recover"}

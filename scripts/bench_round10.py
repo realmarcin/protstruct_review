@@ -55,6 +55,7 @@ def _load(name: str):
 
 
 _scr = _load("screen_round1")
+_nch = _load("nc_headlines")
 _bnc = _load("bench_negative_control")
 _brl = _load("bench_recover_leg")
 _b5 = _load("bench_round5")
@@ -548,7 +549,8 @@ def main() -> int:
         )
         print(f"  -> {row['status']}: {tag}", file=sys.stderr)
         _scr.write_json_atomic(
-            out_path, {"run": manifest, "rows": rows, "summary": summarize(rows)}
+            out_path, {"run": manifest, "rows": rows, "summary": summarize(rows),
+                       "headlines": _nch.recover_headlines(summarize(rows))}
         )
 
     if args.jobs == 1:
