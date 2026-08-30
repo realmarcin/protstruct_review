@@ -3,15 +3,17 @@
 Backlog of substantive work not yet done. Mirrors the open GitHub issues; this file
 carries the execution detail. Keep in sync — close a GitHub issue and check the box here.
 
-**Last reconciled: 2026-08-26** (through the negative-control track, rounds NC-0…NC-11
+**Last reconciled: 2026-08-29** (through the negative-control track, rounds NC-0…NC-11
 including the ANIS adoption, the completed store remediation, the NC-10 sandbox round, the NC-11 echo
 attribution, and the stopping-criteria checklist, PRs #294–#427; the
 tolerance-series "Open" section below was last reconciled 2026-08-06 against rounds 37–42). **Check the issue tracker for open issues; this file does not mirror it in real
-time.** A GitHub Actions workflow configures the hermetic gate on Linux and macOS; [#410](https://github.com/realmarcin/protstruct_review/issues/410)
-tracks the GitHub-side failure if those checks are absent — diagnosed 2026-08-26 as an account-level
-billing lock (jobs are created since the repo went public, but GitHub refuses to start them); owner
-action in Billing, nothing repo-side. Licensing and citation landed in #479 (2026-08-26). The matching local
-command is `uv run --locked -- bash scripts/validate.sh`, and it must exit 0 before a merge.
+time.** The repository lives at `CultureBotAI/protstruct_review` since 2026-08-29 (transferred from
+`realmarcin` to escape a personal-account Actions billing lock, [#410](https://github.com/CultureBotAI/protstruct_review/issues/410));
+the GitHub Actions workflow now runs the hermetic gate on Linux and macOS on every PR and `main` push
+(first green: run 33283623725, after [#492](https://github.com/CultureBotAI/protstruct_review/issues/492)/PR #494
+removed the gate's dependency on a Homebrew `gemmi` CLI). Licensing and citation landed in #479
+(2026-08-26). The matching local command is `uv run --locked -- bash scripts/validate.sh`; it must exit 0
+before a merge, and CI must be green on the PR.
 External-tool and online benchmarks remain manual.
 
 ## The negative-control track (2026-08-08 → 2026-08-26)
@@ -19,12 +21,12 @@ External-tool and online benchmarks remain manual.
 A second benchmark series, planned from a deep-research run and executed in eleven preregistered
 rounds: gold-standard sub-Å structures as **negative tests** for refinement. Full plan:
 `ref/research/negative_control_benchmark_plan.md`; tracking issue
-[#295](https://github.com/realmarcin/protstruct_review/issues/295); round docs
+[#295](https://github.com/CultureBotAI/protstruct_review/issues/295); round docs
 `ref/research/negative_control_round<N>.md`; records under `ref/research/data/`.
 
 | Milestone | PR | Outcome |
 |---|---|---|
-| Plan (from deep research) | [#294](https://github.com/realmarcin/protstruct_review/pull/294) (2026-08-08) | curation, prior art, confound handling, metric families registered as a phased plan |
+| Plan (from deep research) | [#294](https://github.com/CultureBotAI/protstruct_review/pull/294) (2026-08-08) | curation, prior art, confound handling, metric families registered as a phased plan |
 | Phase 0 feasibility + phase 1 masks | #299, #305 | every window viable (≤1.0 Å strict: 254 entries/116 clusters); residue-level masks with post-mask outlier protection |
 | gemmi R path promoted + hardened | #300, #326 | non-cctbx R oracle in `scripts/`; work-only scale fit (free-set leakage removed, offset ≤1e-5) |
 | Codex external review remediation | #313, #326, #328, #330, #332 | all 10 findings resolved: trust invariant ENFORCED with waivers (validate 3c), record-reconciliation guard (3b), unified array selection, null-centered statistics, provenance + hash-verified caches |
@@ -36,12 +38,12 @@ rounds: gold-standard sub-Å structures as **negative tests** for refinement. Fu
 | Round NC-7: attribution | #363/#367/#370 (2026-08-17) | **2VXN attributed (#355 closed): the Murshudov family never applied the deposited aniso ADPs** — iso-only model moves both R paths +0.051, REFMAC/Servalcat 0.000; closing invocation `REFI BREF ANIS` (0.1712→0.1371) registered as the third-opinion amendment. H1 flip sweep: 66 rows, zero verdict flips. **V3 falsified** (9YGW's aniso block is internally consistent — CYS-altA/CSO-altB microheterogeneity; stays named-unmeasurable, census 21/22). **V4 falsified with mechanism** (the converter rolls random free flags on unmeasured reflections — refetch is provably non-reproducible for 11/12); 8R5K remediated end-to-end on the user's explicit go-ahead (#370) |
 | Round NC-8: closeout | #373/#376/#378 (merged 2026-08-17→19) | **the aniso tax is set-wide: 21/21 entries drop under `REFI BREF ANIS`** (median −0.033, all ~6× beyond `d_refmac` — the no-mixing rule proved structural). **W4 falsified terminally**: 9YGW's PDB form fails at the same CYS/CSO position — **stood down to permanent two-path status**. All 11 wavelength patches proof-verified, then written on the user's named go-ahead (#378, deposition values incl. two converter-placeholder corrections); the store is complete, 22/22 nonzero-wavelength and sidecar-consistent (**#361 closed**) |
 | Round NC-9: **the ANIS adoption** | #379/#383 (merged 2026-08-19→20 UTC) | first falsification-free round — **X1/X2/X3 all hold**: 22 nulls regenerated, reproducing committed deltas at worst gap 0.0006 (8R5K's match also quantifies the MLHL contamination's delta impact as negligible); **`d_refmac_anis` = 0.01150** registered with record cross-check; direction agreement 20/21 vs 17/21 — 2VXN's null flips −0.0122 → +0.0130, so **the #355 sign conflict was manufactured by iso-collapse**. From round 10, the third opinion grades gold standards with their anisotropy applied; ISOT retained as history |
-| Round NC-10: **`osol_h` + per-entry sandboxes** | [#415](https://github.com/realmarcin/protstruct_review/pull/415) | **Y1 holds: 15/22 recoveries**, four above `osol` with no old success lost. **Y3 holds exactly:** 22 distinct sandboxes/PGIDs, zero signal-terminated refinements or store mutations; #356's remaining half ships. ANIS is measurable 21/21 with zero convention mixing, but **Y2 is falsified** by 2VXN's one W4 contradiction; the driver preserves all 22 rows then exits nonzero. Perturbations regenerated with maximum round-4 reproduction gaps 0.0214 Å unmasked / 0.0181 Å all-residue. |
+| Round NC-10: **`osol_h` + per-entry sandboxes** | [#415](https://github.com/CultureBotAI/protstruct_review/pull/415) | **Y1 holds: 15/22 recoveries**, four above `osol` with no old success lost. **Y3 holds exactly:** 22 distinct sandboxes/PGIDs, zero signal-terminated refinements or store mutations; #356's remaining half ships. ANIS is measurable 21/21 with zero convention mixing, but **Y2 is falsified** by 2VXN's one W4 contradiction; the driver preserves all 22 rows then exits nonzero. Perturbations regenerated with maximum round-4 reproduction gaps 0.0214 Å unmasked / 0.0181 Å all-residue. |
 
 Also landed alongside NC-8/9: the record-reconciliation guard now covers **bench and
 recover records** with verdicts recomputed from their own evidence (**#338 closed**, #381).
 
-| Round NC-11: **the 2VXN echo** | [#421](https://github.com/realmarcin/protstruct_review/pull/421)/[#423](https://github.com/realmarcin/protstruct_review/pull/423) (merged 2026-08-22) | **Z1/Z2 hold, Z3 falsified — and the falsification is the finding.** The candidate-leg pre-gap decomposes almost exactly (0.0328 = solvent 0.0410 − riding-H 0.0111 + 0.0029, sandboxed zero-cycle REFMAC), while posts agree within 0.0012. The post-agreement amendment **refused itself** by its registered L3 safety sweep (54/78 rule flips), so the else-branch stand-down is enacted: `CANDIDATE_LEG_THIRD_OPINION_STANDDOWN = {"2VXN"}` — 2VXN contributes no REFMAC third opinion on candidate legs; its rows are two-path and say so. |
+| Round NC-11: **the 2VXN echo** | [#421](https://github.com/CultureBotAI/protstruct_review/pull/421)/[#423](https://github.com/CultureBotAI/protstruct_review/pull/423) (merged 2026-08-22) | **Z1/Z2 hold, Z3 falsified — and the falsification is the finding.** The candidate-leg pre-gap decomposes almost exactly (0.0328 = solvent 0.0410 − riding-H 0.0111 + 0.0029, sandboxed zero-cycle REFMAC), while posts agree within 0.0012. The post-agreement amendment **refused itself** by its registered L3 safety sweep (54/78 rule flips), so the else-branch stand-down is enacted: `CANDIDATE_LEG_THIRD_OPINION_STANDDOWN = {"2VXN"}` — 2VXN contributes no REFMAC third opinion on candidate legs; its rows are two-path and say so. |
 
 **Gate consolidation (#293):** the design pass the issue requires before any gate is touched
 landed as `ref/research/gate_consolidation_inventory.md` — 11 guards classified, nine multiply-stated
@@ -50,7 +52,7 @@ block → thresholds YAML sidecar → round-count check extended to `lessons.md`
 each with its regression test before the swap; none started.
 
 **NC-11 closeout and the registry:** the stopping/consolidation checklist promised by #292 landed as
-`ref/research/stopping_criteria.md` ([#427](https://github.com/realmarcin/protstruct_review/pull/427), merged 2026-08-26). Phase 5 of #295 — the promised
+`ref/research/stopping_criteria.md` ([#427](https://github.com/CultureBotAI/protstruct_review/pull/427), merged 2026-08-26). Phase 5 of #295 — the promised
 registry treatment — is `ref/thresholds_and_standards.md` §6 (negative-control verdict rules, guarded
 against `bench_recover_leg`'s record-derived constants in validate 3b; #433), with 3b now opening every
 committed record family (#434) and this table reconciled (#435).
@@ -81,32 +83,32 @@ floors row.
 
 | Round | PR | Settled |
 |---|---|---|
-| 1 | [#24](https://github.com/realmarcin/protstruct_review/pull/24) (2026-07-25) | interface BSA, Wilson B — the two marked *provisional* |
-| 2 | [#28](https://github.com/realmarcin/protstruct_review/pull/28) (2026-07-26) | R offset, clashscore, H-placement, CA RMSD, aligned-residue count, bond-length RMSD |
-| 3 | [#32](https://github.com/realmarcin/protstruct_review/pull/32) (2026-07-26) | restraint-library decomposition, Asn/Gln/His flip sets, L-test |
-| 4 | [#36](https://github.com/realmarcin/protstruct_review/pull/36) (2026-07-26) | Ramachandran/rotamer outlier %, R-free, completeness, SS agreement, DockQ mapping, NMR ordered core |
-| 5 | [#39](https://github.com/realmarcin/protstruct_review/pull/39) (2026-07-26) | the §4 refinement Δ-tolerances (X-ray + cryo-EM), Ramachandran favored % |
-| 6 | [#42](https://github.com/realmarcin/protstruct_review/pull/42) (2026-07-26) | flip sets vs reduce2, rotamer assignment agreement, §4 detection floor |
-| 7 | [#44](https://github.com/realmarcin/protstruct_review/pull/44) (2026-07-26) | §4 bands made resolution-conditional; rotamer boundary bounded |
-| 8 | [#46](https://github.com/realmarcin/protstruct_review/pull/46) (2026-07-26) | 2.5 Å split validated; restraint effect measured; round-7 `d_FSC_model` diagnosis withdrawn |
-| 9 | [#48](https://github.com/realmarcin/protstruct_review/pull/48) (2026-07-27) | `d_FSC_model` mechanism found; the clause is gateable after all |
-| 10 | [#50](https://github.com/realmarcin/protstruct_review/pull/50) (2026-07-27) | EM set completed (CC_mask band breached and widened); §4 high-res end filled; rotamer chi geometry verified |
-| 11 | [#52](https://github.com/realmarcin/protstruct_review/pull/52) (2026-07-27) | both "edge" bands breached; CC_mask made resolution-conditional; rotamer library corroborated |
-| 12 | [#54](https://github.com/realmarcin/protstruct_review/pull/54) (2026-07-27) | CC_mask holds at 22 entries and its split is located; `d_FSC_model` band made relative |
-| 13 | [#56](https://github.com/realmarcin/protstruct_review/pull/56) (2026-07-27) | CC_mask `< 3.0 Å` breached and widened; `d_FSC_model` band corrected to one-sided |
-| 14 | [#60](https://github.com/realmarcin/protstruct_review/pull/60) (2026-07-27) | EM benchmark made reproducible; entry count shown not to be evidence; split kept |
-| 15 | [#62](https://github.com/realmarcin/protstruct_review/pull/62) (2026-07-28) | pre-registered low-resolution widening: P1–P4 confirmed, P5/P6 falsified, clustering withdrawn |
-| 16 | [#66](https://github.com/realmarcin/protstruct_review/pull/66) (2026-07-30) | per-entry record made durable; all 5 predictions held; `d_FSC_model` tail shown to be sampled thinly, not thin |
-| 17 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-30) | rate question closed as underpowered; 10BU verified byte-identical; registry audited (7 rows marked partial); ligand screen moved to fetch time |
-| 18 | [#69](https://github.com/realmarcin/protstruct_review/pull/69) (2026-07-31) | every benchmark commits its set + gate; bond-angle recovered and DockQ mark withdrawn; fetch attrition made durable; §4 staleness diagnosed as two untested clauses |
-| 19 | [#82](https://github.com/realmarcin/protstruct_review/pull/82) (2026-08-01) | EM set 59→69 named entries; all bands held; P4 falsified and round 16's tail reading corrected; 10BU located at 3.24× the next-largest; zero refinement-stage attrition |
-| 20 | [#86](https://github.com/realmarcin/protstruct_review/pull/86) (2026-08-02) | the two §4 clauses untested since round 7 re-measured: both hold, both worst cases reproduce exactly; the clashscore ratio gate found undefined at `pre = 0` and given a low-end guard; `phenix.refine` shown deterministic 8/8 |
-| 21 | [#92](https://github.com/realmarcin/protstruct_review/pull/92) (2026-08-03) | L-test made re-derivable on a committed 24-dataset set instead of being retired — a subset re-run, so reproducible rather than corroborating; EM benchmark now writes per-entry results as it goes |
+| 1 | [#24](https://github.com/CultureBotAI/protstruct_review/pull/24) (2026-07-25) | interface BSA, Wilson B — the two marked *provisional* |
+| 2 | [#28](https://github.com/CultureBotAI/protstruct_review/pull/28) (2026-07-26) | R offset, clashscore, H-placement, CA RMSD, aligned-residue count, bond-length RMSD |
+| 3 | [#32](https://github.com/CultureBotAI/protstruct_review/pull/32) (2026-07-26) | restraint-library decomposition, Asn/Gln/His flip sets, L-test |
+| 4 | [#36](https://github.com/CultureBotAI/protstruct_review/pull/36) (2026-07-26) | Ramachandran/rotamer outlier %, R-free, completeness, SS agreement, DockQ mapping, NMR ordered core |
+| 5 | [#39](https://github.com/CultureBotAI/protstruct_review/pull/39) (2026-07-26) | the §4 refinement Δ-tolerances (X-ray + cryo-EM), Ramachandran favored % |
+| 6 | [#42](https://github.com/CultureBotAI/protstruct_review/pull/42) (2026-07-26) | flip sets vs reduce2, rotamer assignment agreement, §4 detection floor |
+| 7 | [#44](https://github.com/CultureBotAI/protstruct_review/pull/44) (2026-07-26) | §4 bands made resolution-conditional; rotamer boundary bounded |
+| 8 | [#46](https://github.com/CultureBotAI/protstruct_review/pull/46) (2026-07-26) | 2.5 Å split validated; restraint effect measured; round-7 `d_FSC_model` diagnosis withdrawn |
+| 9 | [#48](https://github.com/CultureBotAI/protstruct_review/pull/48) (2026-07-27) | `d_FSC_model` mechanism found; the clause is gateable after all |
+| 10 | [#50](https://github.com/CultureBotAI/protstruct_review/pull/50) (2026-07-27) | EM set completed (CC_mask band breached and widened); §4 high-res end filled; rotamer chi geometry verified |
+| 11 | [#52](https://github.com/CultureBotAI/protstruct_review/pull/52) (2026-07-27) | both "edge" bands breached; CC_mask made resolution-conditional; rotamer library corroborated |
+| 12 | [#54](https://github.com/CultureBotAI/protstruct_review/pull/54) (2026-07-27) | CC_mask holds at 22 entries and its split is located; `d_FSC_model` band made relative |
+| 13 | [#56](https://github.com/CultureBotAI/protstruct_review/pull/56) (2026-07-27) | CC_mask `< 3.0 Å` breached and widened; `d_FSC_model` band corrected to one-sided |
+| 14 | [#60](https://github.com/CultureBotAI/protstruct_review/pull/60) (2026-07-27) | EM benchmark made reproducible; entry count shown not to be evidence; split kept |
+| 15 | [#62](https://github.com/CultureBotAI/protstruct_review/pull/62) (2026-07-28) | pre-registered low-resolution widening: P1–P4 confirmed, P5/P6 falsified, clustering withdrawn |
+| 16 | [#66](https://github.com/CultureBotAI/protstruct_review/pull/66) (2026-07-30) | per-entry record made durable; all 5 predictions held; `d_FSC_model` tail shown to be sampled thinly, not thin |
+| 17 | [#69](https://github.com/CultureBotAI/protstruct_review/pull/69) (2026-07-30) | rate question closed as underpowered; 10BU verified byte-identical; registry audited (7 rows marked partial); ligand screen moved to fetch time |
+| 18 | [#69](https://github.com/CultureBotAI/protstruct_review/pull/69) (2026-07-31) | every benchmark commits its set + gate; bond-angle recovered and DockQ mark withdrawn; fetch attrition made durable; §4 staleness diagnosed as two untested clauses |
+| 19 | [#82](https://github.com/CultureBotAI/protstruct_review/pull/82) (2026-08-01) | EM set 59→69 named entries; all bands held; P4 falsified and round 16's tail reading corrected; 10BU located at 3.24× the next-largest; zero refinement-stage attrition |
+| 20 | [#86](https://github.com/CultureBotAI/protstruct_review/pull/86) (2026-08-02) | the two §4 clauses untested since round 7 re-measured: both hold, both worst cases reproduce exactly; the clashscore ratio gate found undefined at `pre = 0` and given a low-end guard; `phenix.refine` shown deterministic 8/8 |
+| 21 | [#92](https://github.com/CultureBotAI/protstruct_review/pull/92) (2026-08-03) | L-test made re-derivable on a committed 24-dataset set instead of being retired — a subset re-run, so reproducible rather than corroborating; EM benchmark now writes per-entry results as it goes |
 | 22 | (2026-08-03) | 10BU shown to be a genuine statistical outlier; a candidate mechanism supported but not established (n = 2), with the successor test specified; flip-set row shown **not** to be fixable by round 21's route |
 | 23 | (2026-08-03) | crossing-quality test **could not be run at the 1.3 cut** — 0 of 24 screened; at the data-driven 1.074 fence one already-refined near-miss (10EU) leans against it; estimator characterised over 60 crossings; the fetcher's all-or-nothing write fixed |
 | 24 | (2026-08-04) | staleness audit: the registry's `named entries` definition had drifted to yield 93 not 69; a gate now recomputes 8 dataset-dependent figures and fails on a stale value **or** a rewrite |
-| 25 | [#129](https://github.com/realmarcin/protstruct_review/pull/129) (2026-08-04) | first systematic audit of `scripts/` itself — **12 defects** (#116–#127), 4 high, including a guard that **could not fail** (it compared four counts it derived itself and never read the registry) and a wwPDB parser fabricating `0.0` violations where the real value is 17.4. No tolerance changed |
-| 26 | [#141](https://github.com/realmarcin/protstruct_review/pull/141) (2026-08-04) | tested round 25's three parting claims: **P1 and P3 confirmed, P2 falsified, P4 indeterminate**. Declared the EM `status` vocabulary once beside its writer; gated a round document's claims about its own findings. Six review passes found **14 defects** (#139–#153), several inside the round's own fixes. No tolerance changed |
+| 25 | [#129](https://github.com/CultureBotAI/protstruct_review/pull/129) (2026-08-04) | first systematic audit of `scripts/` itself — **12 defects** (#116–#127), 4 high, including a guard that **could not fail** (it compared four counts it derived itself and never read the registry) and a wwPDB parser fabricating `0.0` violations where the real value is 17.4. No tolerance changed |
+| 26 | [#141](https://github.com/CultureBotAI/protstruct_review/pull/141) (2026-08-04) | tested round 25's three parting claims: **P1 and P3 confirmed, P2 falsified, P4 indeterminate**. Declared the EM `status` vocabulary once beside its writer; gated a round document's claims about its own findings. Six review passes found **14 defects** (#139–#153), several inside the round's own fixes. No tolerance changed |
 | 27 | (2026-08-04) | gated the counts the summary files quote, after **9 miscounts** shipped across rounds 24–26; found the round-coverage gate merged one PR earlier had **two false passes** (an unrelated table, and a fenced example row) because it lived in shell and could not be tested |
 | 28 | (2026-08-04) | **measured** the miscount class instead of gating it again: ~326 numeric claims swept by hand, ~307 verifiable, **7 wrong** (~2.3 %) + 3 contested. Two of four predictions falsified — self-contradiction does *not* dominate (2 of 7), and the gate-covered files are *not* where the errors are. The registry is **~5.7× cleaner** than the round trails, which have no gate at all |
 | 29 | (2026-08-04) | set out to gate the registry's **per-entry** figures (12 aggregate, 0 per-entry, and both of round 28's registry errors were per-entry) and **did not**: P1 falsified — every derivable per-entry figure already matched — and **P2 indeterminate**, the derivable/underivable split flipping with the counting method (#182). Five checks ship, on P1 alone; the gate now states its own coverage |
@@ -238,9 +240,9 @@ conceptual-review action plan
 shipped (#271); **P2** done (#272); **P3a** registered but execution-blocked on a second PHENIX
 build (#273); **P3b** done through round 48 (every resolvable partial record resolved); **P3c**
 done (#291 — the round-42 lognormal is guarded, not assumed). **Open: P4** —
-[#292](https://github.com/realmarcin/protstruct_review/issues/292) (explicit
+[#292](https://github.com/CultureBotAI/protstruct_review/issues/292) (explicit
 stopping/consolidation criteria for the round cadence) and
-[#293](https://github.com/realmarcin/protstruct_review/issues/293) (consolidate the literal-based
+[#293](https://github.com/CultureBotAI/protstruct_review/issues/293) (consolidate the literal-based
 gates behind fewer machine-readable representations). A **second, code-level Codex review
 (2026-08-12) was fully remediated** in the negative-control track above (PRs #313–#332), including
 two invariants the whole repo now enforces: the trust model as a gate (validate 3c) and

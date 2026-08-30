@@ -224,7 +224,7 @@ a 200 MB map and a multi-hour refinement.
 ## Self-review findings, filed as issues
 
 Reviewing this PR's own diff turned up four defects, all introduced by round 19's edits and all fixed
-in the same PR ([#71](https://github.com/realmarcin/protstruct_review/issues/71)–[#74](https://github.com/realmarcin/protstruct_review/issues/74)):
+in the same PR ([#71](https://github.com/CultureBotAI/protstruct_review/issues/71)–[#74](https://github.com/CultureBotAI/protstruct_review/issues/74)):
 
 - **#71** the §4 map-model row quoted **two different set sizes** — the CC_mask half updated to 69,
   the `d_FSC_model` half left at 53.
@@ -237,7 +237,7 @@ in the same PR ([#71](https://github.com/realmarcin/protstruct_review/issues/71)
 - **#74** a doubled parenthetical left the counting argument unreadable.
 
 A second review pass, run against the rebuilt branch after #69 merged, found three more
-([#83](https://github.com/realmarcin/protstruct_review/issues/83)–[#85](https://github.com/realmarcin/protstruct_review/issues/85)),
+([#83](https://github.com/CultureBotAI/protstruct_review/issues/83)–[#85](https://github.com/CultureBotAI/protstruct_review/issues/85)),
 also fixed here:
 
 - **#84** — the §4 EM set size went **53 → 69** for a round that added **10** entries, because the

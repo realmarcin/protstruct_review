@@ -2,7 +2,7 @@
 
 **Status: plan — nothing below has been measured.** This document records the design and
 its evidence base so the phases can be preregistered and executed in later rounds.
-Tracking issue: [#295](https://github.com/realmarcin/protstruct_review/issues/295)
+Tracking issue: [#295](https://github.com/CultureBotAI/protstruct_review/issues/295)
 (phase checklist and dependencies).
 
 ## The idea

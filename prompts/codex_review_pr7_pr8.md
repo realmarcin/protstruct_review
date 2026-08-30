@@ -1,7 +1,7 @@
 <task>
 Review two GitHub pull requests in the structural-biology evaluation harness at
 /Users/marcin/Documents/VIMSS/ontology/protstruct_review (GitHub repo
-realmarcin/protstruct_review). Fetch each branch and read its full diff against main:
+CultureBotAI/protstruct_review). Fetch each branch and read its full diff against main:
   gh pr diff 7   # "Close tool_recommendations coverage gap: 142/142 metrics"
   gh pr diff 8   # "Make T15 runnable: DSSP-vs-biotite secondary-structure agreement"
 Also read, for grounding: CODING_STANDARDS.md, ref/oracle_tools.md, ref/catalog.yaml,

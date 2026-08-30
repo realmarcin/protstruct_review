@@ -34,7 +34,7 @@ Test set: 22 pairs of independently deposited structures — same protein re-dep
 in a different state, and **homolog / cross-species pairs** (lysozymes, papain vs actinidin, trypsin
 vs tonin, barnase vs binase). The homologs matter: re-depositions of one protein leave the aligners
 almost no room to disagree, so a floor measured only on those would be optimistic
-([#30](https://github.com/realmarcin/protstruct_review/issues/30)). Two pairs failed and are
+([#30](https://github.com/CultureBotAI/protstruct_review/issues/30)). Two pairs failed and are
 reported below rather than dropped silently.
 
 ## Results

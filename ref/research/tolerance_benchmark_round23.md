@@ -206,7 +206,7 @@ cheap.
 ## Self-review finding: a stale statistic, re-derived and confirmed
 
 Reviewing this PR turned up something unrelated to the round's own work
-([#107](https://github.com/realmarcin/protstruct_review/issues/107)). The registry characterised the
+([#107](https://github.com/CultureBotAI/protstruct_review/issues/107)). The registry characterised the
 CC_mask rate question with figures computed in **round 17 on 25 entries**; round 19 added 10, so the
 current data gives **35** and materially different numbers — Mann–Whitney p 0.32 → **0.18**, and
 ρ(pre, Δ) −0.445 → **−0.506, p = 0.0019**. None carried its n, so all read as current.
@@ -230,8 +230,8 @@ A quoted statistic ages the moment the set grows, and nothing in the pipeline no
 ## Second self-review pass
 
 An adversarial read of this PR found two more
-([#108](https://github.com/realmarcin/protstruct_review/issues/108),
-[#109](https://github.com/realmarcin/protstruct_review/issues/109)), both fixed above.
+([#108](https://github.com/CultureBotAI/protstruct_review/issues/108),
+[#109](https://github.com/CultureBotAI/protstruct_review/issues/109)), both fixed above.
 
 - **#108 (high)** — two miscounts. "57 of 60 within 0.73–1.01" is **50**; "3 of 60 above the 1.074
   fence" is **4**. The missing fourth is **10EU at 1.076, already refined in round 16**, whose Δ of

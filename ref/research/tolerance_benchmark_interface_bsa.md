@@ -47,7 +47,7 @@ tolerance is about:
 1CHO is excluded outright rather than by the guard: its α-chymotrypsin is deposited as three
 fragments (E 1–10, F 16–146, G 149–245), so beyond the three intramolecular pairs the guard catches,
 its remaining pairs (F/I, G/I) are two halves of a *single* chymotrypsin–OMTKY3 interface. See
-[#25](https://github.com/realmarcin/protstruct_review/issues/25) — an earlier revision of this
+[#25](https://github.com/CultureBotAI/protstruct_review/issues/25) — an earlier revision of this
 benchmark included all five and it loosened the tolerance.
 
 ## Test set and results
@@ -131,7 +131,7 @@ that the 30 Å² floor binds, which is what makes small-interface comparisons su
 > **Revision note.** The first version of this benchmark reported median 1.29 %, p90 3.59 %, max
 > 9.06 % over 26 interfaces and set the floor at **60 Å²**. Five of those rows came from 1CHO, whose
 > chymotrypsin is deposited as three fragments; three were intramolecular contacts and two were
-> halves of one interface ([#25](https://github.com/realmarcin/protstruct_review/issues/25)).
+> halves of one interface ([#25](https://github.com/CultureBotAI/protstruct_review/issues/25)).
 > They supplied both the worst relative disagreement (9.06 %) and the row that set the 60 Å² floor,
 > so removing them tightened the floor to 30 Å². The one-sided finding was unaffected.
 
